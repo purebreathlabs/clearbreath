@@ -50,7 +50,7 @@ func main() {
 		Addr:     cfg.RedisAddr,
 		Password: cfg.RedisPassword,
 	})
-	defer rdb.Close()
+	defer func() { _ = rdb.Close() }()
 
 	if err := rdb.Ping(ctx).Err(); err != nil {
 		slog.Error("failed to ping redis", "error", err)
