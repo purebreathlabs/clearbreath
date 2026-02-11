@@ -2,16 +2,19 @@
        mobile-run mobile-build mobile-analyze mobile-get \
        web-dev web-build \
        docker-up docker-down \
-       db-create setup clean
+       db-create setup clean \
+       version version-sync version-bump-patch version-bump-minor version-bump-major
 
 FLUTTER := /Users/rahul/sdk/flutter/bin/flutter
 PSQL := /opt/homebrew/opt/postgresql@17/bin/psql
+VERSION := $(shell cat VERSION 2>/dev/null || echo 0.0.0)
+BUILD := $(shell git rev-list --count HEAD 2>/dev/null || echo 1)
 
 server-dev:
 	cd server && go run ./cmd/api
 
 server-build:
-	cd server && go build -o bin/api ./cmd/api
+	cd server && go build -ldflags="-X main.version=$(VERSION)" -o bin/api ./cmd/api
 
 server-lint:
 	cd server && go vet ./...
@@ -55,3 +58,18 @@ setup:
 clean:
 	rm -rf server/bin
 	cd apps/web && rm -rf dist .astro
+
+version:
+	@echo $(VERSION)+$(BUILD)
+
+version-sync:
+	@bash scripts/version-sync.sh
+
+version-bump-patch:
+	@bash scripts/version-bump.sh patch
+
+version-bump-minor:
+	@bash scripts/version-bump.sh minor
+
+version-bump-major:
+	@bash scripts/version-bump.sh major

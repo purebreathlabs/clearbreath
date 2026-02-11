@@ -18,6 +18,8 @@ import (
 	"github.com/clearbreath/server/internal/middleware"
 )
 
+var version = "dev"
+
 type redisPinger struct{ c *redis.Client }
 
 func (r redisPinger) Ping(ctx context.Context) error { return r.c.Ping(ctx).Err() }
