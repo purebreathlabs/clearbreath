@@ -1,5 +1,6 @@
 {
   "name": "clearbreath",
+  "version": "0.0.1",
   "private": true,
   "scripts": {
     "dev": "make server-dev",
@@ -16,6 +17,11 @@
     "docker:up": "make docker-up",
     "docker:down": "make docker-down",
     "setup": "make setup",
-    "clean": "make clean"
+    "clean": "make clean",
+    "version:sync": "bash scripts/version-sync.sh",
+    "version:check": "make version",
+    "version:patch": "bash scripts/version-bump.sh patch",
+    "version:minor": "bash scripts/version-bump.sh minor",
+    "version:major": "bash scripts/version-bump.sh major"
   }
 }
