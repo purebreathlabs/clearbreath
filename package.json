@@ -1,0 +1,21 @@
+{
+  "name": "clearbreath",
+  "private": true,
+  "scripts": {
+    "dev": "make server-dev",
+    "server": "make server-dev",
+    "server:build": "make server-build",
+    "server:lint": "make server-lint",
+    "server:test": "make server-test",
+    "mobile": "make mobile-run",
+    "mobile:build": "make mobile-build",
+    "mobile:analyze": "make mobile-analyze",
+    "mobile:get": "make mobile-get",
+    "web": "make web-dev",
+    "web:build": "make web-build",
+    "docker:up": "make docker-up",
+    "docker:down": "make docker-down",
+    "setup": "make setup",
+    "clean": "make clean"
+  }
+}

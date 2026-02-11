@@ -1,0 +1,34 @@
+# Go
+server/bin/
+*.exe
+*.dll
+*.so
+*.dylib
+
+# Flutter / Dart
+**/build/
+**/.dart_tool/
+**/.packages
+**/.flutter-plugins
+**/.flutter-plugins-dependencies
+
+# Node / Bun
+**/node_modules/
+**/dist/
+**/.astro/
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
