@@ -10,9 +10,6 @@ on:
 jobs:
   ci:
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: apps/mobile
     steps:
       - uses: actions/checkout@v4
 
@@ -21,13 +18,13 @@ jobs:
           channel: stable
 
       - name: Install dependencies
-        run: flutter pub get
+        run: make FLUTTER=flutter mobile-get
 
       - name: Analyze
-        run: flutter analyze
+        run: make FLUTTER=flutter mobile-analyze
 
       - name: Format check
-        run: dart format --set-exit-if-changed --output=none lib/
+        run: make FLUTTER=flutter mobile-fmt-check
 
       - name: Test
-        run: flutter test
+        run: make FLUTTER=flutter mobile-test

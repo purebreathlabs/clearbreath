@@ -1,5 +1,5 @@
 .PHONY: server-dev server-build server-lint server-test server-fmt-check \
-       mobile-run mobile-build mobile-analyze mobile-get mobile-fmt-check \
+       mobile-run mobile-build mobile-analyze mobile-get mobile-fmt-check mobile-test \
        fmt-check \
        web-dev web-build \
        docker-up docker-down \
@@ -41,6 +41,9 @@ mobile-get:
 
 mobile-fmt-check:
 	cd apps/mobile && dart format --set-exit-if-changed --output=none lib/
+
+mobile-test:
+	cd apps/mobile && $(FLUTTER) test
 
 fmt-check: server-fmt-check mobile-fmt-check
 
