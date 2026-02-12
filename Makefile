@@ -1,11 +1,13 @@
-.PHONY: server-dev server-build server-lint server-test \
-       mobile-run mobile-build mobile-analyze mobile-get \
+.PHONY: server-dev server-build server-lint server-test server-fmt-check \
+       mobile-run mobile-build mobile-analyze mobile-get mobile-fmt-check mobile-test \
+       fmt-check \
        web-dev web-build \
        docker-up docker-down \
        db-create setup clean \
        version version-sync version-bump-patch version-bump-minor version-bump-major
 
 FLUTTER := /Users/rahul/sdk/flutter/bin/flutter
+GOLANGCI_LINT := $(HOME)/go/bin/golangci-lint
 PSQL := /opt/homebrew/opt/postgresql@17/bin/psql
 VERSION := $(shell cat VERSION 2>/dev/null || echo 0.0.0)
 BUILD := $(shell git rev-list --count HEAD 2>/dev/null || echo 1)
@@ -17,10 +19,13 @@ server-build:
 	cd server && go build -ldflags="-X main.version=$(VERSION)" -o bin/api ./cmd/api
 
 server-lint:
-	cd server && go vet ./...
+	cd server && $(GOLANGCI_LINT) run
 
 server-test:
 	cd server && go test ./...
+
+server-fmt-check:
+	cd server && test -z "$$(gofmt -l .)"
 
 mobile-run:
 	cd apps/mobile && $(FLUTTER) run
@@ -33,6 +38,14 @@ mobile-analyze:
 
 mobile-get:
 	cd apps/mobile && $(FLUTTER) pub get
+
+mobile-fmt-check:
+	cd apps/mobile && dart format --set-exit-if-changed --output=none lib/
+
+mobile-test:
+	cd apps/mobile && $(FLUTTER) test
+
+fmt-check: server-fmt-check mobile-fmt-check
 
 web-dev:
 	cd apps/web && bun run dev
@@ -51,6 +64,7 @@ db-create:
 
 setup:
 	go install github.com/sqlc-dev/sqlc/cmd/sqlc@latest
+	go install github.com/golangci/golangci-lint/v2/cmd/golangci-lint@latest
 	cd server && go mod download
 	cd apps/mobile && $(FLUTTER) pub get
 	cd apps/web && bun install
