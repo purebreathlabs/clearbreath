@@ -1,0 +1,30 @@
+name: Mobile CI
+
+on:
+  push:
+    branches: [main]
+    paths: [apps/mobile/**]
+  pull_request:
+    paths: [apps/mobile/**]
+
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+
+      - name: Install dependencies
+        run: make FLUTTER=flutter mobile-get
+
+      - name: Analyze
+        run: make FLUTTER=flutter mobile-analyze
+
+      - name: Format check
+        run: make FLUTTER=flutter mobile-fmt-check
+
+      - name: Test
+        run: make FLUTTER=flutter mobile-test
