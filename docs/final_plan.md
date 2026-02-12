@@ -94,7 +94,7 @@ The MVP excludes monetization and advanced social/community complexity to maximi
 - Account required only for leaderboard and cloud backup
 - Providers: Apple and Google
 - Age gate for accounts: ask birth year; if under 13, block sign-in but keep guest mode
-- Leaderboard visibility default OFF (opt-in required)
+- Leaderboard visibility default ON (opt-out available)
 
 ### 4.7 Leaderboard Rules
 
@@ -165,11 +165,11 @@ The MVP excludes monetization and advanced social/community complexity to maximi
 
 ### 6.3 Guest to Signed-In Journey
 
-1. User taps locked Leaderboard or sees post-session prompt (after 5 guest sessions)
+1. User taps locked Leaderboard or sees post-session prompt (after 3 guest sessions)
 2. App asks birth year
 3. If 13+, continue with Apple or Google sign-in
 4. Merge local history into cloud account
-5. Leaderboard remains opt-in until user explicitly enables visibility
+5. Leaderboard visibility is on by default; user can opt out from Profile settings
 
 ### 6.4 Signed-In Leaderboard Journey
 
@@ -639,7 +639,7 @@ Route naming remains implementation-defined, but behavior is normative.
 | --- | --- | --- | --- | --- | --- | --- |
 | Get profile | JWT required | User scope must match requester unless explicitly allowed by privacy rules | Returns canonical profile and privacy preferences | Idempotent | Standard authenticated read limits | 401 unauthorized, 403 forbidden, 404 not found |
 | Update display name | JWT required | 3-20 chars, letters/numbers/space, profanity filter enforced | Returns updated profile snapshot | Idempotent by same value | Standard authenticated write limits | 400 validation, 401 unauthorized, 409 constraint conflict |
-| Update leaderboard/privacy flags | JWT required | Boolean flags only; visibility defaults OFF unless explicit opt-in | Returns updated visibility/initials settings | Idempotent by same value | Standard authenticated write limits | 400 validation, 401 unauthorized |
+| Update leaderboard/privacy flags | JWT required | Boolean flags only; visibility defaults ON, user may opt out | Returns updated visibility/initials settings | Idempotent by same value | Standard authenticated write limits | 400 validation, 401 unauthorized |
 | Delete account | JWT required | Must satisfy re-auth or high-confidence session policy | Deletes account data per retention policy and revokes tokens | Idempotent | Low-frequency sensitive action limit | 401 unauthorized, 403 policy failure, 409 state conflict |
 
 ### Sessions contract table
@@ -654,7 +654,7 @@ Route naming remains implementation-defined, but behavior is normative.
 
 | Capability | Auth requirement | Request field constraints | Response semantics | Idempotency | Rate-limit policy | Error classes |
 | --- | --- | --- | --- | --- | --- | --- |
-| Fetch leaderboard list | JWT optional; guest sees locked gate behavior in app | ranking must be one of streak/weekly/all_time; limit max 50 | Returns ordered list excluding users without opt-in visibility | Idempotent | Tight read limits per IP/user to prevent scraping | 400 validation, 429 rate-limited |
+| Fetch leaderboard list | JWT optional; guest sees locked gate behavior in app | ranking must be one of streak/weekly/all_time; limit max 50 | Returns ordered list excluding users who have opted out of visibility | Idempotent | Tight read limits per IP/user to prevent scraping | 400 validation, 429 rate-limited |
 | Fetch self-rank snapshot | JWT required | ranking enum required | Returns requester rank even when outside top list | Idempotent | Standard authenticated read limits | 400 validation, 401 unauthorized |
 
 ### Cross-cutting middleware contract
@@ -713,7 +713,7 @@ Route naming remains implementation-defined, but behavior is normative.
 | id | UUID | Yes | Immutable | Unique | Internal identifier | Server | Never merged across identities |
 | display_name | String | Yes | 3-20 chars, letters/numbers/space, profanity blocked | Not globally unique | Public when user opts in | Server | Last valid update wins |
 | avatar_seed | String | Yes | Deterministic generation seed, immutable after create unless product policy changes | Not unique | Public when user opts in | Server | Stable per user |
-| leaderboard_opt_in | Bool | Yes | Default false | N/A | Private preference | Server | Explicit user action only |
+| leaderboard_opt_in | Bool | Yes | Default true | N/A | Private preference | Server | Explicit user action only |
 | leaderboard_initials_only | Bool | Yes | Effective only when opt-in true | N/A | Private preference | Server | Explicit user action only |
 | created_at | Timestamp | Yes | Server timestamp | N/A | Internal metadata | Server | Immutable |
 
