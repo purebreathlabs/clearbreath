@@ -19,9 +19,18 @@ class DesignSystemScreen extends StatelessWidget {
         children: [
           Text('Typography', style: typography.titleLarge),
           SizedBox(height: spacing.md),
-          _TypographyRow(label: 'Display Large', style: typography.displayLarge),
-          _TypographyRow(label: 'Display Medium', style: typography.displayMedium),
-          _TypographyRow(label: 'Headline Large', style: typography.headlineLarge),
+          _TypographyRow(
+            label: 'Display Large',
+            style: typography.displayLarge,
+          ),
+          _TypographyRow(
+            label: 'Display Medium',
+            style: typography.displayMedium,
+          ),
+          _TypographyRow(
+            label: 'Headline Large',
+            style: typography.headlineLarge,
+          ),
           _TypographyRow(label: 'Title Large', style: typography.titleLarge),
           _TypographyRow(label: 'Title Medium', style: typography.titleMedium),
           _TypographyRow(label: 'Body Large', style: typography.bodyLarge),
@@ -51,15 +60,9 @@ class DesignSystemScreen extends StatelessWidget {
           SizedBox(height: spacing.xxl),
           Text('Components', style: typography.titleLarge),
           SizedBox(height: spacing.md),
-          FilledButton(
-            onPressed: () {},
-            child: const Text('Primary Button'),
-          ),
+          FilledButton(onPressed: () {}, child: const Text('Primary Button')),
           SizedBox(height: spacing.sm),
-          const FilledButton(
-            onPressed: null,
-            child: Text('Disabled Button'),
-          ),
+          const FilledButton(onPressed: null, child: Text('Disabled Button')),
           SizedBox(height: spacing.sm),
           OutlinedButton(
             onPressed: () {},
@@ -142,7 +145,9 @@ class _ColorSwatch extends StatelessWidget {
   Widget build(BuildContext context) {
     final spacing = Theme.of(context).extension<AppSpacingTokens>()!;
     final typography = Theme.of(context).extension<AppTypographyTokens>()!;
-    final textColor = color.computeLuminance() > 0.4 ? Colors.black : Colors.white;
+    final textColor = color.computeLuminance() > 0.4
+        ? Colors.black
+        : Colors.white;
 
     return Container(
       width: 150,

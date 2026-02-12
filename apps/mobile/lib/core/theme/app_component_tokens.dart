@@ -128,7 +128,8 @@ class AppComponentTokens extends ThemeExtension<AppComponentTokens> {
           buttonDisabledBackground ?? this.buttonDisabledBackground,
       buttonDisabledForeground:
           buttonDisabledForeground ?? this.buttonDisabledForeground,
-      buttonSecondaryBorder: buttonSecondaryBorder ?? this.buttonSecondaryBorder,
+      buttonSecondaryBorder:
+          buttonSecondaryBorder ?? this.buttonSecondaryBorder,
       buttonSecondaryForeground:
           buttonSecondaryForeground ?? this.buttonSecondaryForeground,
       cardRadius: cardRadius ?? this.cardRadius,
@@ -159,27 +160,42 @@ class AppComponentTokens extends ThemeExtension<AppComponentTokens> {
     return AppComponentTokens(
       buttonHeightMedium:
           lerpDouble(buttonHeightMedium, other.buttonHeightMedium, t) ??
-              buttonHeightMedium,
+          buttonHeightMedium,
       buttonHeightLarge:
           lerpDouble(buttonHeightLarge, other.buttonHeightLarge, t) ??
-              buttonHeightLarge,
+          buttonHeightLarge,
       buttonHorizontalPadding:
-          lerpDouble(buttonHorizontalPadding, other.buttonHorizontalPadding, t) ??
-              buttonHorizontalPadding,
-      buttonRadius: lerpDouble(buttonRadius, other.buttonRadius, t) ?? buttonRadius,
+          lerpDouble(
+            buttonHorizontalPadding,
+            other.buttonHorizontalPadding,
+            t,
+          ) ??
+          buttonHorizontalPadding,
+      buttonRadius:
+          lerpDouble(buttonRadius, other.buttonRadius, t) ?? buttonRadius,
       buttonPrimaryBackground:
-          Color.lerp(buttonPrimaryBackground, other.buttonPrimaryBackground, t) ??
-              buttonPrimaryBackground,
+          Color.lerp(
+            buttonPrimaryBackground,
+            other.buttonPrimaryBackground,
+            t,
+          ) ??
+          buttonPrimaryBackground,
       buttonPrimaryForeground:
-          Color.lerp(buttonPrimaryForeground, other.buttonPrimaryForeground, t) ??
-              buttonPrimaryForeground,
-      buttonDisabledBackground: Color.lerp(
+          Color.lerp(
+            buttonPrimaryForeground,
+            other.buttonPrimaryForeground,
+            t,
+          ) ??
+          buttonPrimaryForeground,
+      buttonDisabledBackground:
+          Color.lerp(
             buttonDisabledBackground,
             other.buttonDisabledBackground,
             t,
           ) ??
           buttonDisabledBackground,
-      buttonDisabledForeground: Color.lerp(
+      buttonDisabledForeground:
+          Color.lerp(
             buttonDisabledForeground,
             other.buttonDisabledForeground,
             t,
@@ -187,28 +203,33 @@ class AppComponentTokens extends ThemeExtension<AppComponentTokens> {
           buttonDisabledForeground,
       buttonSecondaryBorder:
           Color.lerp(buttonSecondaryBorder, other.buttonSecondaryBorder, t) ??
-              buttonSecondaryBorder,
-      buttonSecondaryForeground: Color.lerp(
+          buttonSecondaryBorder,
+      buttonSecondaryForeground:
+          Color.lerp(
             buttonSecondaryForeground,
             other.buttonSecondaryForeground,
             t,
           ) ??
           buttonSecondaryForeground,
       cardRadius: lerpDouble(cardRadius, other.cardRadius, t) ?? cardRadius,
-      cardElevation: lerpDouble(cardElevation, other.cardElevation, t) ?? cardElevation,
+      cardElevation:
+          lerpDouble(cardElevation, other.cardElevation, t) ?? cardElevation,
       cardPadding: lerpDouble(cardPadding, other.cardPadding, t) ?? cardPadding,
-      cardBackground: Color.lerp(cardBackground, other.cardBackground, t) ?? cardBackground,
+      cardBackground:
+          Color.lerp(cardBackground, other.cardBackground, t) ?? cardBackground,
       cardBorder: Color.lerp(cardBorder, other.cardBorder, t) ?? cardBorder,
       inputRadius: lerpDouble(inputRadius, other.inputRadius, t) ?? inputRadius,
       inputHorizontalPadding:
           lerpDouble(inputHorizontalPadding, other.inputHorizontalPadding, t) ??
-              inputHorizontalPadding,
+          inputHorizontalPadding,
       inputVerticalPadding:
           lerpDouble(inputVerticalPadding, other.inputVerticalPadding, t) ??
-              inputVerticalPadding,
+          inputVerticalPadding,
       inputBackground:
-          Color.lerp(inputBackground, other.inputBackground, t) ?? inputBackground,
-      inputDisabledBackground: Color.lerp(
+          Color.lerp(inputBackground, other.inputBackground, t) ??
+          inputBackground,
+      inputDisabledBackground:
+          Color.lerp(
             inputDisabledBackground,
             other.inputDisabledBackground,
             t,
@@ -217,7 +238,7 @@ class AppComponentTokens extends ThemeExtension<AppComponentTokens> {
       inputBorder: Color.lerp(inputBorder, other.inputBorder, t) ?? inputBorder,
       inputFocusedBorder:
           Color.lerp(inputFocusedBorder, other.inputFocusedBorder, t) ??
-              inputFocusedBorder,
+          inputFocusedBorder,
       inputText: Color.lerp(inputText, other.inputText, t) ?? inputText,
       inputHint: Color.lerp(inputHint, other.inputHint, t) ?? inputHint,
     );

@@ -23,7 +23,9 @@ class HomeScreen extends StatelessWidget {
               SizedBox(height: spacing.sm),
               Text(
                 'Week 1 foundation',
-                style: typography.bodyLarge.copyWith(color: colors.textSecondary),
+                style: typography.bodyLarge.copyWith(
+                  color: colors.textSecondary,
+                ),
               ),
               SizedBox(height: spacing.xl),
               FilledButton(

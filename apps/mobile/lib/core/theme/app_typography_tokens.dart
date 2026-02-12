@@ -119,7 +119,10 @@ class AppTypographyTokens extends ThemeExtension<AppTypographyTokens> {
   }
 
   @override
-  AppTypographyTokens lerp(ThemeExtension<AppTypographyTokens>? other, double t) {
+  AppTypographyTokens lerp(
+    ThemeExtension<AppTypographyTokens>? other,
+    double t,
+  ) {
     if (other is! AppTypographyTokens) {
       return this;
     }
@@ -128,9 +131,11 @@ class AppTypographyTokens extends ThemeExtension<AppTypographyTokens> {
       displayLarge:
           TextStyle.lerp(displayLarge, other.displayLarge, t) ?? displayLarge,
       displayMedium:
-          TextStyle.lerp(displayMedium, other.displayMedium, t) ?? displayMedium,
+          TextStyle.lerp(displayMedium, other.displayMedium, t) ??
+          displayMedium,
       headlineLarge:
-          TextStyle.lerp(headlineLarge, other.headlineLarge, t) ?? headlineLarge,
+          TextStyle.lerp(headlineLarge, other.headlineLarge, t) ??
+          headlineLarge,
       titleLarge: TextStyle.lerp(titleLarge, other.titleLarge, t) ?? titleLarge,
       titleMedium:
           TextStyle.lerp(titleMedium, other.titleMedium, t) ?? titleMedium,

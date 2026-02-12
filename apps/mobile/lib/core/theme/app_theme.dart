@@ -47,7 +47,9 @@ class AppTheme {
             Size.fromHeight(components.buttonHeightMedium),
           ),
           padding: WidgetStateProperty.all(
-            EdgeInsets.symmetric(horizontal: components.buttonHorizontalPadding),
+            EdgeInsets.symmetric(
+              horizontal: components.buttonHorizontalPadding,
+            ),
           ),
           shape: WidgetStateProperty.all(
             RoundedRectangleBorder(
@@ -75,7 +77,9 @@ class AppTheme {
             Size.fromHeight(components.buttonHeightMedium),
           ),
           padding: WidgetStateProperty.all(
-            EdgeInsets.symmetric(horizontal: components.buttonHorizontalPadding),
+            EdgeInsets.symmetric(
+              horizontal: components.buttonHorizontalPadding,
+            ),
           ),
           shape: WidgetStateProperty.all(
             RoundedRectangleBorder(
@@ -110,7 +114,9 @@ class AppTheme {
         filled: true,
         fillColor: components.inputBackground,
         hintStyle: typography.bodyMedium.copyWith(color: components.inputHint),
-        labelStyle: typography.labelMedium.copyWith(color: colors.textSecondary),
+        labelStyle: typography.labelMedium.copyWith(
+          color: colors.textSecondary,
+        ),
         contentPadding: EdgeInsets.symmetric(
           horizontal: components.inputHorizontalPadding,
           vertical: components.inputVerticalPadding,
@@ -121,7 +127,10 @@ class AppTheme {
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(components.inputRadius),
-          borderSide: BorderSide(color: components.inputFocusedBorder, width: 1.5),
+          borderSide: BorderSide(
+            color: components.inputFocusedBorder,
+            width: 1.5,
+          ),
         ),
         disabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(components.inputRadius),
