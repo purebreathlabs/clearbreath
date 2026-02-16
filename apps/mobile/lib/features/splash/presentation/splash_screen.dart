@@ -6,6 +6,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../core/theme/theme_extensions.dart';
+import '../../onboarding/domain/onboarding_gate.dart';
 import '../domain/splash_gate.dart';
 
 class SplashScreen extends ConsumerStatefulWidget {
@@ -24,6 +25,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
   late final AnimationController _controller;
   late final Animation<double> _scale;
   Timer? _navigationTimer;
+  Timer? _readinessTimer;
 
   @override
   void initState() {
@@ -48,7 +50,32 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
     ]).animate(_controller);
 
     _controller.forward();
-    _navigationTimer = Timer(_duration, _finish);
+    _navigationTimer = Timer(_duration, _waitForReadiness);
+  }
+
+  void _waitForReadiness() {
+    if (!mounted) {
+      return;
+    }
+
+    final gate = ref.read(onboardingGateProvider);
+    if (gate.isLoaded) {
+      _finish();
+      return;
+    }
+
+    _readinessTimer?.cancel();
+    _readinessTimer = Timer.periodic(const Duration(milliseconds: 60), (timer) {
+      if (!mounted) {
+        timer.cancel();
+        return;
+      }
+
+      if (ref.read(onboardingGateProvider).isLoaded) {
+        timer.cancel();
+        _finish();
+      }
+    });
   }
 
   void _finish() {
@@ -76,6 +103,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
   @override
   void dispose() {
     _navigationTimer?.cancel();
+    _readinessTimer?.cancel();
     _controller.dispose();
     super.dispose();
   }
