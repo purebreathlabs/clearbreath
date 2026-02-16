@@ -55,13 +55,51 @@ class OnboardingController extends Notifier<OnboardingState> {
     );
   }
 
-  void setPrimaryGoal(PrimaryGoal value) {
-    state = state.copyWith(answers: state.answers.copyWith(primaryGoal: value));
+  void togglePrimaryGoal(PrimaryGoal value) {
+    final next = {...state.answers.primaryGoals};
+    if (next.contains(value)) {
+      if (next.length == 1) {
+        return;
+      }
+      next.remove(value);
+    } else {
+      next.add(value);
+    }
+
+    state = state.copyWith(answers: state.answers.copyWith(primaryGoals: next));
   }
 
-  void setPracticeWindow(PracticeWindow value) {
+  void togglePracticeWindow(PracticeWindow value) {
+    final next = {...state.answers.practiceWindows};
+
+    if (value == PracticeWindow.varies) {
+      next
+        ..clear()
+        ..add(PracticeWindow.varies);
+      state = state.copyWith(
+        answers: state.answers.copyWith(practiceWindows: next),
+      );
+      return;
+    }
+
+    next.remove(PracticeWindow.varies);
+    if (next.contains(value)) {
+      if (next.length == 1) {
+        next
+          ..clear()
+          ..add(PracticeWindow.varies);
+      } else {
+        next.remove(value);
+        if (next.isEmpty) {
+          next.add(PracticeWindow.varies);
+        }
+      }
+    } else {
+      next.add(value);
+    }
+
     state = state.copyWith(
-      answers: state.answers.copyWith(practiceWindow: value),
+      answers: state.answers.copyWith(practiceWindows: next),
     );
   }
 
@@ -77,17 +115,15 @@ class OnboardingController extends Notifier<OnboardingState> {
     );
   }
 
-  void setKeepScreenAwake(bool enabled) {
-    state = state.copyWith(
-      answers: state.answers.copyWith(keepScreenAwake: enabled),
-    );
-  }
-
   void setReminderTimeMinutes(int minutesSinceMidnight) {
     state = state.copyWith(
       answers: state.answers.copyWith(
         reminderTimeMinutes: minutesSinceMidnight,
       ),
     );
+  }
+
+  void setDisplayName(String value) {
+    state = state.copyWith(answers: state.answers.copyWith(displayName: value));
   }
 }

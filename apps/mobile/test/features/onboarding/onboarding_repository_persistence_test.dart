@@ -8,12 +8,18 @@ import 'package:flutter_test/flutter_test.dart';
 
 void main() {
   test('persists onboarding completion and answers', () async {
-    final tempDir = await Directory.systemTemp.createTemp('clearbreath_onboarding_');
+    final tempDir = await Directory.systemTemp.createTemp(
+      'clearbreath_onboarding_',
+    );
     final dbFile = File('${tempDir.path}/prefs.sqlite');
 
     final answers = OnboardingAnswers.defaults().copyWith(
-      primaryGoal: PrimaryGoal.sleep,
+      primaryGoals: {PrimaryGoal.sleep, PrimaryGoal.focus},
+      practiceWindows: {PracticeWindow.morning, PracticeWindow.evening},
+      sessionLengthMinutes: 15,
+      hapticsEnabled: false,
       reminderTimeMinutes: 21 * 60 + 30,
+      displayName: ' Rahul ',
     );
 
     try {
@@ -31,8 +37,19 @@ void main() {
 
       expect(await repo2.isOnboardingComplete(), isTrue);
       final restored = await repo2.readAnswers();
-      expect(restored?.primaryGoal, PrimaryGoal.sleep);
-      expect(restored?.reminderTimeMinutes, 21 * 60 + 30);
+      expect(restored, isNotNull);
+      expect(
+        restored!.primaryGoals,
+        unorderedEquals([PrimaryGoal.sleep, PrimaryGoal.focus]),
+      );
+      expect(
+        restored.practiceWindows,
+        unorderedEquals([PracticeWindow.morning, PracticeWindow.evening]),
+      );
+      expect(restored.sessionLengthMinutes, 15);
+      expect(restored.hapticsEnabled, isFalse);
+      expect(restored.reminderTimeMinutes, 21 * 60 + 30);
+      expect(restored.displayName, 'Rahul');
 
       await db2.close();
     } finally {
@@ -40,4 +57,3 @@ void main() {
     }
   });
 }
-

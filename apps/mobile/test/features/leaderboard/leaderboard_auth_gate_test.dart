@@ -11,9 +11,7 @@ void main() {
     await tester.pumpWidget(
       ProviderScope(
         overrides: [
-          authStateProvider.overrideWith(
-            () => _SignedInAuthStateController(),
-          ),
+          authStateProvider.overrideWith(() => _SignedInAuthStateController()),
           onboardingGateProvider.overrideWith((ref) {
             final repository = ref.watch(onboardingRepositoryProvider);
             final gate = OnboardingGate(
@@ -37,7 +35,10 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('Leaderboard is locked'), findsNothing);
-    expect(find.byKey(const Key('leaderboard_placeholder_title')), findsOneWidget);
+    expect(
+      find.byKey(const Key('leaderboard_placeholder_title')),
+      findsOneWidget,
+    );
   });
 }
 

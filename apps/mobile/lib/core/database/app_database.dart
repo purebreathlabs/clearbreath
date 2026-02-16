@@ -18,7 +18,36 @@ class AppDatabase extends _$AppDatabase {
   }
 
   @override
-  int get schemaVersion => 1;
+  int get schemaVersion => 2;
+
+  @override
+  MigrationStrategy get migration => MigrationStrategy(
+    onCreate: (migrator) async {
+      await migrator.createAll();
+    },
+    onUpgrade: (migrator, from, to) async {
+      if (from < 2) {
+        try {
+          await migrator.addColumn(preferences, preferences.primaryGoalsJson);
+        } catch (_) {}
+        try {
+          await migrator.addColumn(
+            preferences,
+            preferences.practiceWindowsJson,
+          );
+        } catch (_) {}
+        try {
+          await migrator.addColumn(preferences, preferences.displayName);
+        } catch (_) {}
+
+        await customStatement(
+          "UPDATE preferences SET primary_goals_json = '[\"' || primary_goal || '\"]', "
+          "practice_windows_json = '[\"' || practice_window || '\"]' "
+          "WHERE onboarding_complete = 1 AND primary_goals_json = '[\"calm\"]';",
+        );
+      }
+    },
+  );
 }
 
 LazyDatabase _openConnection() {

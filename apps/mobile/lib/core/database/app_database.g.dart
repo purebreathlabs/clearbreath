@@ -57,6 +57,18 @@ class $PreferencesTable extends Preferences
     requiredDuringInsert: false,
     defaultValue: const Constant('calm'),
   );
+  static const VerificationMeta _primaryGoalsJsonMeta = const VerificationMeta(
+    'primaryGoalsJson',
+  );
+  @override
+  late final GeneratedColumn<String> primaryGoalsJson = GeneratedColumn<String>(
+    'primary_goals_json',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant('["calm"]'),
+  );
   static const VerificationMeta _practiceWindowMeta = const VerificationMeta(
     'practiceWindow',
   );
@@ -69,6 +81,18 @@ class $PreferencesTable extends Preferences
     requiredDuringInsert: false,
     defaultValue: const Constant('morning'),
   );
+  static const VerificationMeta _practiceWindowsJsonMeta =
+      const VerificationMeta('practiceWindowsJson');
+  @override
+  late final GeneratedColumn<String> practiceWindowsJson =
+      GeneratedColumn<String>(
+        'practice_windows_json',
+        aliasedName,
+        false,
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+        defaultValue: const Constant('["varies"]'),
+      );
   static const VerificationMeta _sessionLengthMinutesMeta =
       const VerificationMeta('sessionLengthMinutes');
   @override
@@ -121,17 +145,32 @@ class $PreferencesTable extends Preferences
     requiredDuringInsert: false,
     defaultValue: const Constant(22 * 60),
   );
+  static const VerificationMeta _displayNameMeta = const VerificationMeta(
+    'displayName',
+  );
+  @override
+  late final GeneratedColumn<String> displayName = GeneratedColumn<String>(
+    'display_name',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(''),
+  );
   @override
   List<GeneratedColumn> get $columns => [
     id,
     onboardingComplete,
     experienceLevel,
     primaryGoal,
+    primaryGoalsJson,
     practiceWindow,
+    practiceWindowsJson,
     sessionLengthMinutes,
     hapticsEnabled,
     keepScreenAwake,
     reminderTimeMinutes,
+    displayName,
   ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -175,12 +214,30 @@ class $PreferencesTable extends Preferences
         ),
       );
     }
+    if (data.containsKey('primary_goals_json')) {
+      context.handle(
+        _primaryGoalsJsonMeta,
+        primaryGoalsJson.isAcceptableOrUnknown(
+          data['primary_goals_json']!,
+          _primaryGoalsJsonMeta,
+        ),
+      );
+    }
     if (data.containsKey('practice_window')) {
       context.handle(
         _practiceWindowMeta,
         practiceWindow.isAcceptableOrUnknown(
           data['practice_window']!,
           _practiceWindowMeta,
+        ),
+      );
+    }
+    if (data.containsKey('practice_windows_json')) {
+      context.handle(
+        _practiceWindowsJsonMeta,
+        practiceWindowsJson.isAcceptableOrUnknown(
+          data['practice_windows_json']!,
+          _practiceWindowsJsonMeta,
         ),
       );
     }
@@ -220,6 +277,15 @@ class $PreferencesTable extends Preferences
         ),
       );
     }
+    if (data.containsKey('display_name')) {
+      context.handle(
+        _displayNameMeta,
+        displayName.isAcceptableOrUnknown(
+          data['display_name']!,
+          _displayNameMeta,
+        ),
+      );
+    }
     return context;
   }
 
@@ -245,9 +311,17 @@ class $PreferencesTable extends Preferences
         DriftSqlType.string,
         data['${effectivePrefix}primary_goal'],
       )!,
+      primaryGoalsJson: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}primary_goals_json'],
+      )!,
       practiceWindow: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
         data['${effectivePrefix}practice_window'],
+      )!,
+      practiceWindowsJson: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}practice_windows_json'],
       )!,
       sessionLengthMinutes: attachedDatabase.typeMapping.read(
         DriftSqlType.int,
@@ -265,6 +339,10 @@ class $PreferencesTable extends Preferences
         DriftSqlType.int,
         data['${effectivePrefix}reminder_time_minutes'],
       )!,
+      displayName: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}display_name'],
+      )!,
     );
   }
 
@@ -279,21 +357,27 @@ class Preference extends DataClass implements Insertable<Preference> {
   final bool onboardingComplete;
   final String experienceLevel;
   final String primaryGoal;
+  final String primaryGoalsJson;
   final String practiceWindow;
+  final String practiceWindowsJson;
   final int sessionLengthMinutes;
   final bool hapticsEnabled;
   final bool keepScreenAwake;
   final int reminderTimeMinutes;
+  final String displayName;
   const Preference({
     required this.id,
     required this.onboardingComplete,
     required this.experienceLevel,
     required this.primaryGoal,
+    required this.primaryGoalsJson,
     required this.practiceWindow,
+    required this.practiceWindowsJson,
     required this.sessionLengthMinutes,
     required this.hapticsEnabled,
     required this.keepScreenAwake,
     required this.reminderTimeMinutes,
+    required this.displayName,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -302,11 +386,14 @@ class Preference extends DataClass implements Insertable<Preference> {
     map['onboarding_complete'] = Variable<bool>(onboardingComplete);
     map['experience_level'] = Variable<String>(experienceLevel);
     map['primary_goal'] = Variable<String>(primaryGoal);
+    map['primary_goals_json'] = Variable<String>(primaryGoalsJson);
     map['practice_window'] = Variable<String>(practiceWindow);
+    map['practice_windows_json'] = Variable<String>(practiceWindowsJson);
     map['session_length_minutes'] = Variable<int>(sessionLengthMinutes);
     map['haptics_enabled'] = Variable<bool>(hapticsEnabled);
     map['keep_screen_awake'] = Variable<bool>(keepScreenAwake);
     map['reminder_time_minutes'] = Variable<int>(reminderTimeMinutes);
+    map['display_name'] = Variable<String>(displayName);
     return map;
   }
 
@@ -316,11 +403,14 @@ class Preference extends DataClass implements Insertable<Preference> {
       onboardingComplete: Value(onboardingComplete),
       experienceLevel: Value(experienceLevel),
       primaryGoal: Value(primaryGoal),
+      primaryGoalsJson: Value(primaryGoalsJson),
       practiceWindow: Value(practiceWindow),
+      practiceWindowsJson: Value(practiceWindowsJson),
       sessionLengthMinutes: Value(sessionLengthMinutes),
       hapticsEnabled: Value(hapticsEnabled),
       keepScreenAwake: Value(keepScreenAwake),
       reminderTimeMinutes: Value(reminderTimeMinutes),
+      displayName: Value(displayName),
     );
   }
 
@@ -334,7 +424,11 @@ class Preference extends DataClass implements Insertable<Preference> {
       onboardingComplete: serializer.fromJson<bool>(json['onboardingComplete']),
       experienceLevel: serializer.fromJson<String>(json['experienceLevel']),
       primaryGoal: serializer.fromJson<String>(json['primaryGoal']),
+      primaryGoalsJson: serializer.fromJson<String>(json['primaryGoalsJson']),
       practiceWindow: serializer.fromJson<String>(json['practiceWindow']),
+      practiceWindowsJson: serializer.fromJson<String>(
+        json['practiceWindowsJson'],
+      ),
       sessionLengthMinutes: serializer.fromJson<int>(
         json['sessionLengthMinutes'],
       ),
@@ -343,6 +437,7 @@ class Preference extends DataClass implements Insertable<Preference> {
       reminderTimeMinutes: serializer.fromJson<int>(
         json['reminderTimeMinutes'],
       ),
+      displayName: serializer.fromJson<String>(json['displayName']),
     );
   }
   @override
@@ -353,11 +448,14 @@ class Preference extends DataClass implements Insertable<Preference> {
       'onboardingComplete': serializer.toJson<bool>(onboardingComplete),
       'experienceLevel': serializer.toJson<String>(experienceLevel),
       'primaryGoal': serializer.toJson<String>(primaryGoal),
+      'primaryGoalsJson': serializer.toJson<String>(primaryGoalsJson),
       'practiceWindow': serializer.toJson<String>(practiceWindow),
+      'practiceWindowsJson': serializer.toJson<String>(practiceWindowsJson),
       'sessionLengthMinutes': serializer.toJson<int>(sessionLengthMinutes),
       'hapticsEnabled': serializer.toJson<bool>(hapticsEnabled),
       'keepScreenAwake': serializer.toJson<bool>(keepScreenAwake),
       'reminderTimeMinutes': serializer.toJson<int>(reminderTimeMinutes),
+      'displayName': serializer.toJson<String>(displayName),
     };
   }
 
@@ -366,21 +464,27 @@ class Preference extends DataClass implements Insertable<Preference> {
     bool? onboardingComplete,
     String? experienceLevel,
     String? primaryGoal,
+    String? primaryGoalsJson,
     String? practiceWindow,
+    String? practiceWindowsJson,
     int? sessionLengthMinutes,
     bool? hapticsEnabled,
     bool? keepScreenAwake,
     int? reminderTimeMinutes,
+    String? displayName,
   }) => Preference(
     id: id ?? this.id,
     onboardingComplete: onboardingComplete ?? this.onboardingComplete,
     experienceLevel: experienceLevel ?? this.experienceLevel,
     primaryGoal: primaryGoal ?? this.primaryGoal,
+    primaryGoalsJson: primaryGoalsJson ?? this.primaryGoalsJson,
     practiceWindow: practiceWindow ?? this.practiceWindow,
+    practiceWindowsJson: practiceWindowsJson ?? this.practiceWindowsJson,
     sessionLengthMinutes: sessionLengthMinutes ?? this.sessionLengthMinutes,
     hapticsEnabled: hapticsEnabled ?? this.hapticsEnabled,
     keepScreenAwake: keepScreenAwake ?? this.keepScreenAwake,
     reminderTimeMinutes: reminderTimeMinutes ?? this.reminderTimeMinutes,
+    displayName: displayName ?? this.displayName,
   );
   Preference copyWithCompanion(PreferencesCompanion data) {
     return Preference(
@@ -394,9 +498,15 @@ class Preference extends DataClass implements Insertable<Preference> {
       primaryGoal: data.primaryGoal.present
           ? data.primaryGoal.value
           : this.primaryGoal,
+      primaryGoalsJson: data.primaryGoalsJson.present
+          ? data.primaryGoalsJson.value
+          : this.primaryGoalsJson,
       practiceWindow: data.practiceWindow.present
           ? data.practiceWindow.value
           : this.practiceWindow,
+      practiceWindowsJson: data.practiceWindowsJson.present
+          ? data.practiceWindowsJson.value
+          : this.practiceWindowsJson,
       sessionLengthMinutes: data.sessionLengthMinutes.present
           ? data.sessionLengthMinutes.value
           : this.sessionLengthMinutes,
@@ -409,6 +519,9 @@ class Preference extends DataClass implements Insertable<Preference> {
       reminderTimeMinutes: data.reminderTimeMinutes.present
           ? data.reminderTimeMinutes.value
           : this.reminderTimeMinutes,
+      displayName: data.displayName.present
+          ? data.displayName.value
+          : this.displayName,
     );
   }
 
@@ -419,11 +532,14 @@ class Preference extends DataClass implements Insertable<Preference> {
           ..write('onboardingComplete: $onboardingComplete, ')
           ..write('experienceLevel: $experienceLevel, ')
           ..write('primaryGoal: $primaryGoal, ')
+          ..write('primaryGoalsJson: $primaryGoalsJson, ')
           ..write('practiceWindow: $practiceWindow, ')
+          ..write('practiceWindowsJson: $practiceWindowsJson, ')
           ..write('sessionLengthMinutes: $sessionLengthMinutes, ')
           ..write('hapticsEnabled: $hapticsEnabled, ')
           ..write('keepScreenAwake: $keepScreenAwake, ')
-          ..write('reminderTimeMinutes: $reminderTimeMinutes')
+          ..write('reminderTimeMinutes: $reminderTimeMinutes, ')
+          ..write('displayName: $displayName')
           ..write(')'))
         .toString();
   }
@@ -434,11 +550,14 @@ class Preference extends DataClass implements Insertable<Preference> {
     onboardingComplete,
     experienceLevel,
     primaryGoal,
+    primaryGoalsJson,
     practiceWindow,
+    practiceWindowsJson,
     sessionLengthMinutes,
     hapticsEnabled,
     keepScreenAwake,
     reminderTimeMinutes,
+    displayName,
   );
   @override
   bool operator ==(Object other) =>
@@ -448,11 +567,14 @@ class Preference extends DataClass implements Insertable<Preference> {
           other.onboardingComplete == this.onboardingComplete &&
           other.experienceLevel == this.experienceLevel &&
           other.primaryGoal == this.primaryGoal &&
+          other.primaryGoalsJson == this.primaryGoalsJson &&
           other.practiceWindow == this.practiceWindow &&
+          other.practiceWindowsJson == this.practiceWindowsJson &&
           other.sessionLengthMinutes == this.sessionLengthMinutes &&
           other.hapticsEnabled == this.hapticsEnabled &&
           other.keepScreenAwake == this.keepScreenAwake &&
-          other.reminderTimeMinutes == this.reminderTimeMinutes);
+          other.reminderTimeMinutes == this.reminderTimeMinutes &&
+          other.displayName == this.displayName);
 }
 
 class PreferencesCompanion extends UpdateCompanion<Preference> {
@@ -460,56 +582,72 @@ class PreferencesCompanion extends UpdateCompanion<Preference> {
   final Value<bool> onboardingComplete;
   final Value<String> experienceLevel;
   final Value<String> primaryGoal;
+  final Value<String> primaryGoalsJson;
   final Value<String> practiceWindow;
+  final Value<String> practiceWindowsJson;
   final Value<int> sessionLengthMinutes;
   final Value<bool> hapticsEnabled;
   final Value<bool> keepScreenAwake;
   final Value<int> reminderTimeMinutes;
+  final Value<String> displayName;
   const PreferencesCompanion({
     this.id = const Value.absent(),
     this.onboardingComplete = const Value.absent(),
     this.experienceLevel = const Value.absent(),
     this.primaryGoal = const Value.absent(),
+    this.primaryGoalsJson = const Value.absent(),
     this.practiceWindow = const Value.absent(),
+    this.practiceWindowsJson = const Value.absent(),
     this.sessionLengthMinutes = const Value.absent(),
     this.hapticsEnabled = const Value.absent(),
     this.keepScreenAwake = const Value.absent(),
     this.reminderTimeMinutes = const Value.absent(),
+    this.displayName = const Value.absent(),
   });
   PreferencesCompanion.insert({
     this.id = const Value.absent(),
     this.onboardingComplete = const Value.absent(),
     this.experienceLevel = const Value.absent(),
     this.primaryGoal = const Value.absent(),
+    this.primaryGoalsJson = const Value.absent(),
     this.practiceWindow = const Value.absent(),
+    this.practiceWindowsJson = const Value.absent(),
     this.sessionLengthMinutes = const Value.absent(),
     this.hapticsEnabled = const Value.absent(),
     this.keepScreenAwake = const Value.absent(),
     this.reminderTimeMinutes = const Value.absent(),
+    this.displayName = const Value.absent(),
   });
   static Insertable<Preference> custom({
     Expression<int>? id,
     Expression<bool>? onboardingComplete,
     Expression<String>? experienceLevel,
     Expression<String>? primaryGoal,
+    Expression<String>? primaryGoalsJson,
     Expression<String>? practiceWindow,
+    Expression<String>? practiceWindowsJson,
     Expression<int>? sessionLengthMinutes,
     Expression<bool>? hapticsEnabled,
     Expression<bool>? keepScreenAwake,
     Expression<int>? reminderTimeMinutes,
+    Expression<String>? displayName,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
       if (onboardingComplete != null) 'onboarding_complete': onboardingComplete,
       if (experienceLevel != null) 'experience_level': experienceLevel,
       if (primaryGoal != null) 'primary_goal': primaryGoal,
+      if (primaryGoalsJson != null) 'primary_goals_json': primaryGoalsJson,
       if (practiceWindow != null) 'practice_window': practiceWindow,
+      if (practiceWindowsJson != null)
+        'practice_windows_json': practiceWindowsJson,
       if (sessionLengthMinutes != null)
         'session_length_minutes': sessionLengthMinutes,
       if (hapticsEnabled != null) 'haptics_enabled': hapticsEnabled,
       if (keepScreenAwake != null) 'keep_screen_awake': keepScreenAwake,
       if (reminderTimeMinutes != null)
         'reminder_time_minutes': reminderTimeMinutes,
+      if (displayName != null) 'display_name': displayName,
     });
   }
 
@@ -518,22 +656,28 @@ class PreferencesCompanion extends UpdateCompanion<Preference> {
     Value<bool>? onboardingComplete,
     Value<String>? experienceLevel,
     Value<String>? primaryGoal,
+    Value<String>? primaryGoalsJson,
     Value<String>? practiceWindow,
+    Value<String>? practiceWindowsJson,
     Value<int>? sessionLengthMinutes,
     Value<bool>? hapticsEnabled,
     Value<bool>? keepScreenAwake,
     Value<int>? reminderTimeMinutes,
+    Value<String>? displayName,
   }) {
     return PreferencesCompanion(
       id: id ?? this.id,
       onboardingComplete: onboardingComplete ?? this.onboardingComplete,
       experienceLevel: experienceLevel ?? this.experienceLevel,
       primaryGoal: primaryGoal ?? this.primaryGoal,
+      primaryGoalsJson: primaryGoalsJson ?? this.primaryGoalsJson,
       practiceWindow: practiceWindow ?? this.practiceWindow,
+      practiceWindowsJson: practiceWindowsJson ?? this.practiceWindowsJson,
       sessionLengthMinutes: sessionLengthMinutes ?? this.sessionLengthMinutes,
       hapticsEnabled: hapticsEnabled ?? this.hapticsEnabled,
       keepScreenAwake: keepScreenAwake ?? this.keepScreenAwake,
       reminderTimeMinutes: reminderTimeMinutes ?? this.reminderTimeMinutes,
+      displayName: displayName ?? this.displayName,
     );
   }
 
@@ -552,8 +696,16 @@ class PreferencesCompanion extends UpdateCompanion<Preference> {
     if (primaryGoal.present) {
       map['primary_goal'] = Variable<String>(primaryGoal.value);
     }
+    if (primaryGoalsJson.present) {
+      map['primary_goals_json'] = Variable<String>(primaryGoalsJson.value);
+    }
     if (practiceWindow.present) {
       map['practice_window'] = Variable<String>(practiceWindow.value);
+    }
+    if (practiceWindowsJson.present) {
+      map['practice_windows_json'] = Variable<String>(
+        practiceWindowsJson.value,
+      );
     }
     if (sessionLengthMinutes.present) {
       map['session_length_minutes'] = Variable<int>(sessionLengthMinutes.value);
@@ -567,6 +719,9 @@ class PreferencesCompanion extends UpdateCompanion<Preference> {
     if (reminderTimeMinutes.present) {
       map['reminder_time_minutes'] = Variable<int>(reminderTimeMinutes.value);
     }
+    if (displayName.present) {
+      map['display_name'] = Variable<String>(displayName.value);
+    }
     return map;
   }
 
@@ -577,11 +732,14 @@ class PreferencesCompanion extends UpdateCompanion<Preference> {
           ..write('onboardingComplete: $onboardingComplete, ')
           ..write('experienceLevel: $experienceLevel, ')
           ..write('primaryGoal: $primaryGoal, ')
+          ..write('primaryGoalsJson: $primaryGoalsJson, ')
           ..write('practiceWindow: $practiceWindow, ')
+          ..write('practiceWindowsJson: $practiceWindowsJson, ')
           ..write('sessionLengthMinutes: $sessionLengthMinutes, ')
           ..write('hapticsEnabled: $hapticsEnabled, ')
           ..write('keepScreenAwake: $keepScreenAwake, ')
-          ..write('reminderTimeMinutes: $reminderTimeMinutes')
+          ..write('reminderTimeMinutes: $reminderTimeMinutes, ')
+          ..write('displayName: $displayName')
           ..write(')'))
         .toString();
   }
@@ -604,11 +762,14 @@ typedef $$PreferencesTableCreateCompanionBuilder =
       Value<bool> onboardingComplete,
       Value<String> experienceLevel,
       Value<String> primaryGoal,
+      Value<String> primaryGoalsJson,
       Value<String> practiceWindow,
+      Value<String> practiceWindowsJson,
       Value<int> sessionLengthMinutes,
       Value<bool> hapticsEnabled,
       Value<bool> keepScreenAwake,
       Value<int> reminderTimeMinutes,
+      Value<String> displayName,
     });
 typedef $$PreferencesTableUpdateCompanionBuilder =
     PreferencesCompanion Function({
@@ -616,11 +777,14 @@ typedef $$PreferencesTableUpdateCompanionBuilder =
       Value<bool> onboardingComplete,
       Value<String> experienceLevel,
       Value<String> primaryGoal,
+      Value<String> primaryGoalsJson,
       Value<String> practiceWindow,
+      Value<String> practiceWindowsJson,
       Value<int> sessionLengthMinutes,
       Value<bool> hapticsEnabled,
       Value<bool> keepScreenAwake,
       Value<int> reminderTimeMinutes,
+      Value<String> displayName,
     });
 
 class $$PreferencesTableFilterComposer
@@ -652,8 +816,18 @@ class $$PreferencesTableFilterComposer
     builder: (column) => ColumnFilters(column),
   );
 
+  ColumnFilters<String> get primaryGoalsJson => $composableBuilder(
+    column: $table.primaryGoalsJson,
+    builder: (column) => ColumnFilters(column),
+  );
+
   ColumnFilters<String> get practiceWindow => $composableBuilder(
     column: $table.practiceWindow,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get practiceWindowsJson => $composableBuilder(
+    column: $table.practiceWindowsJson,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -674,6 +848,11 @@ class $$PreferencesTableFilterComposer
 
   ColumnFilters<int> get reminderTimeMinutes => $composableBuilder(
     column: $table.reminderTimeMinutes,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get displayName => $composableBuilder(
+    column: $table.displayName,
     builder: (column) => ColumnFilters(column),
   );
 }
@@ -707,8 +886,18 @@ class $$PreferencesTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<String> get primaryGoalsJson => $composableBuilder(
+    column: $table.primaryGoalsJson,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<String> get practiceWindow => $composableBuilder(
     column: $table.practiceWindow,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get practiceWindowsJson => $composableBuilder(
+    column: $table.practiceWindowsJson,
     builder: (column) => ColumnOrderings(column),
   );
 
@@ -729,6 +918,11 @@ class $$PreferencesTableOrderingComposer
 
   ColumnOrderings<int> get reminderTimeMinutes => $composableBuilder(
     column: $table.reminderTimeMinutes,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get displayName => $composableBuilder(
+    column: $table.displayName,
     builder: (column) => ColumnOrderings(column),
   );
 }
@@ -760,8 +954,18 @@ class $$PreferencesTableAnnotationComposer
     builder: (column) => column,
   );
 
+  GeneratedColumn<String> get primaryGoalsJson => $composableBuilder(
+    column: $table.primaryGoalsJson,
+    builder: (column) => column,
+  );
+
   GeneratedColumn<String> get practiceWindow => $composableBuilder(
     column: $table.practiceWindow,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get practiceWindowsJson => $composableBuilder(
+    column: $table.practiceWindowsJson,
     builder: (column) => column,
   );
 
@@ -782,6 +986,11 @@ class $$PreferencesTableAnnotationComposer
 
   GeneratedColumn<int> get reminderTimeMinutes => $composableBuilder(
     column: $table.reminderTimeMinutes,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get displayName => $composableBuilder(
+    column: $table.displayName,
     builder: (column) => column,
   );
 }
@@ -821,21 +1030,27 @@ class $$PreferencesTableTableManager
                 Value<bool> onboardingComplete = const Value.absent(),
                 Value<String> experienceLevel = const Value.absent(),
                 Value<String> primaryGoal = const Value.absent(),
+                Value<String> primaryGoalsJson = const Value.absent(),
                 Value<String> practiceWindow = const Value.absent(),
+                Value<String> practiceWindowsJson = const Value.absent(),
                 Value<int> sessionLengthMinutes = const Value.absent(),
                 Value<bool> hapticsEnabled = const Value.absent(),
                 Value<bool> keepScreenAwake = const Value.absent(),
                 Value<int> reminderTimeMinutes = const Value.absent(),
+                Value<String> displayName = const Value.absent(),
               }) => PreferencesCompanion(
                 id: id,
                 onboardingComplete: onboardingComplete,
                 experienceLevel: experienceLevel,
                 primaryGoal: primaryGoal,
+                primaryGoalsJson: primaryGoalsJson,
                 practiceWindow: practiceWindow,
+                practiceWindowsJson: practiceWindowsJson,
                 sessionLengthMinutes: sessionLengthMinutes,
                 hapticsEnabled: hapticsEnabled,
                 keepScreenAwake: keepScreenAwake,
                 reminderTimeMinutes: reminderTimeMinutes,
+                displayName: displayName,
               ),
           createCompanionCallback:
               ({
@@ -843,21 +1058,27 @@ class $$PreferencesTableTableManager
                 Value<bool> onboardingComplete = const Value.absent(),
                 Value<String> experienceLevel = const Value.absent(),
                 Value<String> primaryGoal = const Value.absent(),
+                Value<String> primaryGoalsJson = const Value.absent(),
                 Value<String> practiceWindow = const Value.absent(),
+                Value<String> practiceWindowsJson = const Value.absent(),
                 Value<int> sessionLengthMinutes = const Value.absent(),
                 Value<bool> hapticsEnabled = const Value.absent(),
                 Value<bool> keepScreenAwake = const Value.absent(),
                 Value<int> reminderTimeMinutes = const Value.absent(),
+                Value<String> displayName = const Value.absent(),
               }) => PreferencesCompanion.insert(
                 id: id,
                 onboardingComplete: onboardingComplete,
                 experienceLevel: experienceLevel,
                 primaryGoal: primaryGoal,
+                primaryGoalsJson: primaryGoalsJson,
                 practiceWindow: practiceWindow,
+                practiceWindowsJson: practiceWindowsJson,
                 sessionLengthMinutes: sessionLengthMinutes,
                 hapticsEnabled: hapticsEnabled,
                 keepScreenAwake: keepScreenAwake,
                 reminderTimeMinutes: reminderTimeMinutes,
+                displayName: displayName,
               ),
           withReferenceMapper: (p0) => p0
               .map((e) => (e.readTable(table), BaseReferences(db, table, e)))

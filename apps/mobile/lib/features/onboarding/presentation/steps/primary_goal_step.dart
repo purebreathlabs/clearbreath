@@ -8,56 +8,56 @@ import '../widgets/onboarding_question.dart';
 class PrimaryGoalStep extends StatelessWidget {
   const PrimaryGoalStep({
     super.key,
-    required this.value,
-    required this.onChanged,
+    required this.values,
+    required this.onToggle,
   });
 
-  final PrimaryGoal value;
-  final ValueChanged<PrimaryGoal> onChanged;
+  final Set<PrimaryGoal> values;
+  final ValueChanged<PrimaryGoal> onToggle;
 
   @override
   Widget build(BuildContext context) {
     final spacing = Theme.of(context).extension<AppSpacingTokens>()!;
 
     return OnboardingQuestion(
-      title: 'Your primary goal',
-      subtitle: 'We’ll suggest a daily practice that fits your intent.',
+      title: 'Your goals',
+      subtitle: 'Select all that apply.',
       child: Column(
         children: [
           OnboardingOptionButton(
             label: 'Calm',
-            selected: value == PrimaryGoal.calm,
-            onTap: () => onChanged(PrimaryGoal.calm),
+            selected: values.contains(PrimaryGoal.calm),
+            onTap: () => onToggle(PrimaryGoal.calm),
           ),
           SizedBox(height: spacing.md),
           OnboardingOptionButton(
             label: 'Sleep',
-            selected: value == PrimaryGoal.sleep,
-            onTap: () => onChanged(PrimaryGoal.sleep),
+            selected: values.contains(PrimaryGoal.sleep),
+            onTap: () => onToggle(PrimaryGoal.sleep),
           ),
           SizedBox(height: spacing.md),
           OnboardingOptionButton(
             label: 'Focus',
-            selected: value == PrimaryGoal.focus,
-            onTap: () => onChanged(PrimaryGoal.focus),
+            selected: values.contains(PrimaryGoal.focus),
+            onTap: () => onToggle(PrimaryGoal.focus),
           ),
           SizedBox(height: spacing.md),
           OnboardingOptionButton(
             label: 'Energy',
-            selected: value == PrimaryGoal.energy,
-            onTap: () => onChanged(PrimaryGoal.energy),
+            selected: values.contains(PrimaryGoal.energy),
+            onTap: () => onToggle(PrimaryGoal.energy),
           ),
           SizedBox(height: spacing.md),
           OnboardingOptionButton(
             label: 'HRV',
-            selected: value == PrimaryGoal.hrv,
-            onTap: () => onChanged(PrimaryGoal.hrv),
+            selected: values.contains(PrimaryGoal.hrv),
+            onTap: () => onToggle(PrimaryGoal.hrv),
           ),
           SizedBox(height: spacing.md),
           OnboardingOptionButton(
             label: 'Spiritual',
-            selected: value == PrimaryGoal.spiritual,
-            onTap: () => onChanged(PrimaryGoal.spiritual),
+            selected: values.contains(PrimaryGoal.spiritual),
+            onTap: () => onToggle(PrimaryGoal.spiritual),
           ),
         ],
       ),
