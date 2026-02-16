@@ -1,5 +1,5 @@
-.PHONY: server-dev server-build server-lint server-test server-fmt-check \
-       mobile-run mobile-build mobile-analyze mobile-get mobile-fmt-check mobile-test \
+.PHONY: server-dev server-build server-lint server-test server-test-ci server-test-integration server-fmt-check server-sqlc \
+       mobile-run mobile-build mobile-analyze mobile-get mobile-gen mobile-fmt mobile-fmt-check mobile-test \
        fmt-check \
        web-dev web-build \
        docker-up docker-down \
@@ -8,6 +8,7 @@
 
 FLUTTER := /Users/rahul/sdk/flutter/bin/flutter
 GOLANGCI_LINT := $(HOME)/go/bin/golangci-lint
+SQLC := $(HOME)/go/bin/sqlc
 PSQL := /opt/homebrew/opt/postgresql@17/bin/psql
 VERSION := $(shell cat VERSION 2>/dev/null || echo 0.0.0)
 BUILD := $(shell git rev-list --count HEAD 2>/dev/null || echo 1)
@@ -24,8 +25,17 @@ server-lint:
 server-test:
 	cd server && go test ./...
 
+server-test-ci:
+	cd server && go test -race -count=1 ./...
+
+server-test-integration:
+	cd server && CLEARBREATH_INTEGRATION=1 go test ./...
+
 server-fmt-check:
 	cd server && test -z "$$(gofmt -l .)"
+
+server-sqlc:
+	cd server && $(SQLC) generate -f sqlc/sqlc.yaml
 
 mobile-run:
 	cd apps/mobile && $(FLUTTER) run
@@ -38,6 +48,12 @@ mobile-analyze:
 
 mobile-get:
 	cd apps/mobile && $(FLUTTER) pub get
+
+mobile-gen:
+	cd apps/mobile && dart run build_runner build --delete-conflicting-outputs
+
+mobile-fmt:
+	cd apps/mobile && dart format lib/ test/
 
 mobile-fmt-check:
 	cd apps/mobile && dart format --set-exit-if-changed --output=none lib/
