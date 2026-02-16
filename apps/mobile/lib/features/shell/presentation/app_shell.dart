@@ -1,17 +1,22 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../core/theme/theme_extensions.dart';
+import '../../auth/domain/auth_state_provider.dart';
 
-class AppShell extends StatelessWidget {
+class AppShell extends ConsumerWidget {
   const AppShell({super.key, required this.navigationShell});
 
   final StatefulNavigationShell navigationShell;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final typography = Theme.of(context).extension<AppTypographyTokens>()!;
     final colors = Theme.of(context).extension<AppColorTokens>()!;
+    final isGuest = ref.watch(
+      authStateProvider.select((state) => state.isGuest),
+    );
 
     return Scaffold(
       body: navigationShell,
@@ -52,23 +57,27 @@ class AppShell extends StatelessWidget {
                 initialLocation: index == navigationShell.currentIndex,
               );
             },
-            destinations: const [
-              NavigationDestination(
+            destinations: [
+              const NavigationDestination(
                 icon: Icon(Icons.home_outlined),
                 selectedIcon: Icon(Icons.home_rounded),
                 label: 'Home',
               ),
-              NavigationDestination(
+              const NavigationDestination(
                 icon: Icon(Icons.grid_view_outlined),
                 selectedIcon: Icon(Icons.grid_view_rounded),
                 label: 'Techniques',
               ),
               NavigationDestination(
-                icon: _LockedNavIcon(icon: Icons.emoji_events_outlined),
-                selectedIcon: _LockedNavIcon(icon: Icons.emoji_events_rounded),
+                icon: isGuest
+                    ? const _LockedNavIcon(icon: Icons.emoji_events_outlined)
+                    : const Icon(Icons.emoji_events_outlined),
+                selectedIcon: isGuest
+                    ? const _LockedNavIcon(icon: Icons.emoji_events_rounded)
+                    : const Icon(Icons.emoji_events_rounded),
                 label: 'Leaderboard',
               ),
-              NavigationDestination(
+              const NavigationDestination(
                 icon: Icon(Icons.person_outline),
                 selectedIcon: Icon(Icons.person_rounded),
                 label: 'Profile',

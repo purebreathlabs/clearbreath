@@ -57,9 +57,9 @@ The MVP excludes monetization and advanced social/community complexity to maximi
 
 ### 4.1 UX and Navigation
 
-- Four bottom tabs: Home, Techniques, Stats/Profile, Leaderboard
+- Four bottom tabs: Home, Techniques, Leaderboard, Profile
 - Leaderboard tab visible but locked for guests
-- Settings entry inside Stats/Profile
+- Stats and Settings live inside Profile
 
 ### 4.2 Visual Direction
 
@@ -190,7 +190,7 @@ The MVP excludes monetization and advanced social/community complexity to maximi
 - Pre-session countdown view
 - Session active view
 - Session completion view
-- Stats/Profile screen
+- Profile screen (Stats)
 - Settings sections (embedded in Profile)
 - Leaderboard screen
 - Sign-in gate and age gate screens
