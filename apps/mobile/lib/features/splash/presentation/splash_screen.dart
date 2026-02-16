@@ -111,28 +111,49 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).extension<AppColorTokens>()!;
+    final spacing = Theme.of(context).extension<AppSpacingTokens>()!;
+    final typography = Theme.of(context).extension<AppTypographyTokens>()!;
 
     return Scaffold(
       body: ColoredBox(
         color: colors.background,
         child: SafeArea(
           child: Center(
-            child: AnimatedBuilder(
-              animation: _controller,
-              builder: (context, child) {
-                return Transform.scale(scale: _scale.value, child: child);
-              },
-              child: RepaintBoundary(
-                child: SvgPicture.asset(
-                  'assets/branding/clearbreath_logo.svg',
-                  width: 160,
-                  height: 160,
-                  colorFilter: ColorFilter.mode(
-                    colors.textPrimary,
-                    BlendMode.srcIn,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                AnimatedBuilder(
+                  animation: _controller,
+                  builder: (context, child) {
+                    return Transform.scale(scale: _scale.value, child: child);
+                  },
+                  child: RepaintBoundary(
+                    child: SvgPicture.asset(
+                      'assets/branding/clearbreath_logo.svg',
+                      width: 160,
+                      height: 160,
+                      colorFilter: ColorFilter.mode(
+                        colors.textPrimary,
+                        BlendMode.srcIn,
+                      ),
+                    ),
                   ),
                 ),
-              ),
+                SizedBox(height: spacing.lg),
+                Text(
+                  'ClearBreath',
+                  style: typography.headlineLarge.copyWith(
+                    color: colors.textPrimary,
+                  ),
+                ),
+                SizedBox(height: spacing.xs),
+                Text(
+                  'Breathe with intention.',
+                  style: typography.bodyMedium.copyWith(
+                    color: colors.textSecondary,
+                  ),
+                ),
+              ],
             ),
           ),
         ),
