@@ -1,5 +1,5 @@
 .PHONY: server-dev server-build server-lint server-test server-test-ci server-test-integration server-fmt-check server-sqlc \
-       mobile-run mobile-build mobile-analyze mobile-get mobile-fmt-check mobile-test \
+       mobile-run mobile-build mobile-analyze mobile-get mobile-gen mobile-fmt mobile-fmt-check mobile-test \
        fmt-check \
        web-dev web-build \
        docker-up docker-down \
@@ -48,6 +48,12 @@ mobile-analyze:
 
 mobile-get:
 	cd apps/mobile && $(FLUTTER) pub get
+
+mobile-gen:
+	cd apps/mobile && dart run build_runner build --delete-conflicting-outputs
+
+mobile-fmt:
+	cd apps/mobile && dart format lib/ test/
 
 mobile-fmt-check:
 	cd apps/mobile && dart format --set-exit-if-changed --output=none lib/

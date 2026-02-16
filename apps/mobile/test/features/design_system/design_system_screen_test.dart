@@ -4,12 +4,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
-  testWidgets('renders typography palette and component previews', (tester) async {
+  testWidgets('renders typography palette and component previews', (
+    tester,
+  ) async {
     await tester.pumpWidget(
-      MaterialApp(
-        theme: AppTheme.dark(),
-        home: const DesignSystemScreen(),
-      ),
+      MaterialApp(theme: AppTheme.dark(), home: const DesignSystemScreen()),
     );
 
     final listView = find.byType(ListView);

@@ -4,28 +4,73 @@ import 'package:go_router/go_router.dart';
 
 import '../../features/design_system/presentation/design_system_screen.dart';
 import '../../features/home/presentation/home_screen.dart';
-import '../../features/leaderboard/presentation/leaderboard_locked_screen.dart';
+import '../../features/intro/domain/intro_gate.dart';
+import '../../features/intro/presentation/intro_screen.dart';
+import '../../features/leaderboard/presentation/leaderboard_screen.dart';
+import '../../features/onboarding/domain/onboarding_gate.dart';
+import '../../features/onboarding/presentation/onboarding_screen.dart';
 import '../../features/profile/presentation/profile_screen.dart';
 import '../../features/shell/presentation/app_shell.dart';
 import '../../features/splash/domain/splash_gate.dart';
 import '../../features/splash/presentation/splash_screen.dart';
 import '../../features/techniques/presentation/techniques_screen.dart';
 
+final appInitialLocationProvider = Provider<String?>((ref) => null);
+
 final appRouterProvider = Provider<GoRouter>((ref) {
   final splashGate = ref.read(splashGateProvider);
+  final onboardingGate = ref.read(onboardingGateProvider);
+  final introGate = ref.read(introGateProvider);
 
   String? redirect(BuildContext context, GoRouterState state) {
     final isSplash = state.matchedLocation == '/splash';
+    final isIntro = state.matchedLocation == '/intro';
+    final isOnboarding = state.matchedLocation == '/onboarding';
     if (!splashGate.completed && !isSplash) {
       final from = Uri.encodeComponent(state.uri.toString());
       return '/splash?from=$from';
+    }
+
+    if (splashGate.completed && onboardingGate.isLoaded) {
+      if (!onboardingGate.isComplete) {
+        if (!introGate.completed) {
+          if (isOnboarding) {
+            final from = Uri.encodeComponent(
+              state.uri.queryParameters['from'] ?? '/home',
+            );
+            return '/intro?from=$from';
+          }
+          if (!isIntro && !isSplash) {
+            final from = Uri.encodeComponent(state.uri.toString());
+            return '/intro?from=$from';
+          }
+        } else if (!isOnboarding && !isSplash) {
+          final destination = isIntro
+              ? (state.uri.queryParameters['from'] ?? '/home')
+              : state.uri.toString();
+          final from = Uri.encodeComponent(destination);
+          return '/onboarding?from=$from';
+        }
+      }
+      if (onboardingGate.isComplete && isOnboarding) {
+        final from = state.uri.queryParameters['from'] ?? '/home';
+        return _sanitizeDestination(from);
+      }
+      if (onboardingGate.isComplete && isIntro) {
+        return '/home';
+      }
     }
 
     return null;
   }
 
   final router = GoRouter(
-    refreshListenable: splashGate,
+    initialLocation: ref.read(appInitialLocationProvider),
+    refreshListenable: Listenable.merge([
+      splashGate,
+      onboardingGate,
+      introGate,
+    ]),
     redirect: redirect,
     routes: [
       GoRoute(path: '/', redirect: (context, state) => '/home'),
@@ -33,6 +78,20 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/design-system',
         redirect: (context, state) => '/home/design-system',
+      ),
+      GoRoute(
+        path: '/onboarding',
+        builder: (context, state) {
+          final from = state.uri.queryParameters['from'] ?? '/home';
+          return OnboardingScreen(from: from);
+        },
+      ),
+      GoRoute(
+        path: '/intro',
+        builder: (context, state) {
+          final from = state.uri.queryParameters['from'] ?? '/home';
+          return IntroScreen(from: from);
+        },
       ),
       GoRoute(
         path: '/splash',
@@ -72,7 +131,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
             routes: [
               GoRoute(
                 path: '/leaderboard',
-                builder: (context, state) => const LeaderboardLockedScreen(),
+                builder: (context, state) => const LeaderboardScreen(),
               ),
             ],
           ),
@@ -92,3 +151,22 @@ final appRouterProvider = Provider<GoRouter>((ref) {
   ref.onDispose(router.dispose);
   return router;
 });
+
+String _sanitizeDestination(String destination) {
+  if (destination.isEmpty) {
+    return '/home';
+  }
+  if (!destination.startsWith('/')) {
+    return '/home';
+  }
+  if (destination.startsWith('/splash')) {
+    return '/home';
+  }
+  if (destination.startsWith('/onboarding')) {
+    return '/home';
+  }
+  if (destination.startsWith('/intro')) {
+    return '/home';
+  }
+  return destination;
+}
