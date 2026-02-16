@@ -4,6 +4,8 @@ import (
 	"log/slog"
 	"net/http"
 	"time"
+
+	"github.com/clearbreath/server/internal/auth"
 )
 
 type wrappedWriter struct {
@@ -29,6 +31,15 @@ func Logger(next http.Handler) http.Handler {
 			"status", wrapped.statusCode,
 			"duration_ms", time.Since(start).Milliseconds(),
 			"request_id", RequestIDFromContext(r.Context()),
+			"user_id", userID(r),
 		)
 	})
+}
+
+func userID(r *http.Request) string {
+	id, ok := auth.UserIDFromContext(r.Context())
+	if !ok {
+		return ""
+	}
+	return id.String()
 }
