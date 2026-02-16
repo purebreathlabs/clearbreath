@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"database/sql"
 	"log/slog"
 	"net/http"
 	"os"
@@ -11,11 +12,23 @@ import (
 
 	"github.com/go-chi/chi/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
+	_ "github.com/jackc/pgx/v5/stdlib"
+	"github.com/pressly/goose/v3"
 	"github.com/redis/go-redis/v9"
 
+	"github.com/clearbreath/server/internal/auth"
+	"github.com/clearbreath/server/internal/clock"
 	"github.com/clearbreath/server/internal/config"
 	"github.com/clearbreath/server/internal/handler"
 	"github.com/clearbreath/server/internal/middleware"
+	"github.com/clearbreath/server/internal/profanity"
+	"github.com/clearbreath/server/internal/repository"
+	authsvc "github.com/clearbreath/server/internal/service/auth"
+	lbsvc "github.com/clearbreath/server/internal/service/leaderboard"
+	sessionsvc "github.com/clearbreath/server/internal/service/session"
+	statssvc "github.com/clearbreath/server/internal/service/stats"
+	usersvc "github.com/clearbreath/server/internal/service/user"
+	"github.com/clearbreath/server/internal/technique"
 )
 
 var version = "dev"
@@ -33,16 +46,24 @@ func main() {
 		os.Exit(1)
 	}
 
-	ctx := context.Background()
+	appCtx, appCancel := context.WithCancel(context.Background())
+	defer appCancel()
 
-	pool, err := pgxpool.New(ctx, cfg.DatabaseURL)
+	if cfg.Env == "development" {
+		if err := migrate(cfg.DatabaseURL); err != nil {
+			slog.Error("failed to run migrations", "error", err)
+			os.Exit(1)
+		}
+	}
+
+	pool, err := pgxpool.New(appCtx, cfg.DatabaseURL)
 	if err != nil {
 		slog.Error("failed to create postgres pool", "error", err)
 		os.Exit(1)
 	}
 	defer pool.Close()
 
-	if err := pool.Ping(ctx); err != nil {
+	if err := pool.Ping(appCtx); err != nil {
 		slog.Error("failed to ping postgres", "error", err)
 		os.Exit(1)
 	}
@@ -54,11 +75,56 @@ func main() {
 	})
 	defer func() { _ = rdb.Close() }()
 
-	if err := rdb.Ping(ctx).Err(); err != nil {
+	if err := rdb.Ping(appCtx).Err(); err != nil {
 		slog.Error("failed to ping redis", "error", err)
 		os.Exit(1)
 	}
 	slog.Info("redis connected")
+
+	store := repository.NewStore(pool)
+	clk := clock.RealClock{}
+
+	accessTokens, err := auth.NewAccessTokenManager(cfg.JWTAccessSecret, cfg.JWTAccessTTLMinutes)
+	if err != nil {
+		slog.Error("failed to init access token manager", "error", err)
+		os.Exit(1)
+	}
+
+	authService, err := authsvc.NewService(store, clk, accessTokens, cfg.JWTRefreshSecret, cfg.JWTRefreshTTLMinutes, cfg.DevAuthEnabled, cfg.DevAuthSecret, cfg.GoogleOAuthClientID, cfg.AppleOAuthAudience)
+	if err != nil {
+		slog.Error("failed to init auth service", "error", err)
+		os.Exit(1)
+	}
+
+	userService, err := usersvc.NewService(store, profanity.NewDefault())
+	if err != nil {
+		slog.Error("failed to init user service", "error", err)
+		os.Exit(1)
+	}
+
+	registry, err := technique.Load(cfg.TechniqueRegistryPath)
+	if err != nil {
+		slog.Error("failed to load technique registry", "error", err)
+		os.Exit(1)
+	}
+
+	statsService, err := statssvc.NewService(store, clk)
+	if err != nil {
+		slog.Error("failed to init stats service", "error", err)
+		os.Exit(1)
+	}
+
+	sessionService, err := sessionsvc.NewService(store, registry, statsService, clk)
+	if err != nil {
+		slog.Error("failed to init session service", "error", err)
+		os.Exit(1)
+	}
+
+	leaderboardService, err := lbsvc.NewService(store, rdb, clk, cfg.LeaderboardDailyCapMin)
+	if err != nil {
+		slog.Error("failed to init leaderboard service", "error", err)
+		os.Exit(1)
+	}
 
 	r := chi.NewRouter()
 	r.Use(middleware.RequestID)
@@ -67,7 +133,54 @@ func main() {
 	r.Use(middleware.CORS(cfg.CORSOrigins))
 
 	health := handler.NewHealthHandler(pool, redisPinger{rdb})
+	ready := handler.NewReadyHandler(pool, redisPinger{rdb})
 	r.Get("/health", health.Check)
+	r.Get("/ready", ready.Check)
+
+	authHandler := handler.NewAuthHandler(authService)
+	authRateLimitMin := middleware.RateLimitIP(rdb, "rl:auth:min", cfg.RateLimitAuthBurstPerMin, time.Minute)
+	authRateLimitHour := middleware.RateLimitIP(rdb, "rl:auth:hour", cfg.RateLimitAuthPerHour, time.Hour)
+	r.Route("/v1/auth", func(r chi.Router) {
+		r.With(authRateLimitMin, authRateLimitHour).Post("/provider_sign_in", authHandler.ProviderSignIn)
+		r.With(authRateLimitMin, authRateLimitHour).Post("/refresh", authHandler.Refresh)
+		r.With(middleware.Auth(accessTokens, store)).Post("/logout", authHandler.Logout)
+	})
+
+	meHandler := handler.NewMeHandler(userService)
+	r.With(middleware.Auth(accessTokens, store)).Get("/v1/me", meHandler.Get)
+	r.With(middleware.Auth(accessTokens, store)).Patch("/v1/me", meHandler.Patch)
+	r.With(middleware.AuthAllowDeleted(accessTokens, store)).Delete("/v1/me", meHandler.Delete)
+
+	sessionsHandler := handler.NewSessionsHandler(sessionService)
+	sessionRateLimitDay := middleware.RateLimitUser(rdb, "rl:sessions:day", cfg.RateLimitSessionPerDay, 24*time.Hour)
+	r.With(middleware.Auth(accessTokens, store), sessionRateLimitDay).Post("/v1/sessions/submit", sessionsHandler.Submit)
+	r.With(middleware.Auth(accessTokens, store), sessionRateLimitDay).Post("/v1/sessions/sync", sessionsHandler.Sync)
+
+	statsHandler := handler.NewStatsHandler(statsService)
+	r.With(middleware.Auth(accessTokens, store)).Get("/v1/stats/snapshot", statsHandler.Snapshot)
+
+	leaderboardHandler := handler.NewLeaderboardHandler(leaderboardService)
+	leaderboardRateLimitMin := middleware.RateLimitIP(rdb, "rl:leaderboard:min", cfg.RateLimitLeaderboardPerM, time.Minute)
+	r.With(leaderboardRateLimitMin).Get("/v1/leaderboard", leaderboardHandler.List)
+	r.With(middleware.Auth(accessTokens, store), leaderboardRateLimitMin).Get("/v1/leaderboard/self", leaderboardHandler.Self)
+
+	if err := leaderboardService.Refresh(appCtx); err != nil {
+		slog.Error("failed to refresh leaderboard", "error", err)
+	}
+	go func() {
+		ticker := time.NewTicker(5 * time.Minute)
+		defer ticker.Stop()
+		for {
+			select {
+			case <-ticker.C:
+				if err := leaderboardService.Refresh(appCtx); err != nil {
+					slog.Error("leaderboard refresh failed", "error", err)
+				}
+			case <-appCtx.Done():
+				return
+			}
+		}
+	}()
 
 	srv := &http.Server{
 		Addr:         ":" + cfg.Port,
@@ -90,6 +203,7 @@ func main() {
 	<-quit
 
 	slog.Info("shutting down server")
+	appCancel()
 	shutdownCtx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
@@ -99,4 +213,22 @@ func main() {
 	}
 
 	slog.Info("server stopped")
+}
+
+func migrate(databaseURL string) error {
+	db, err := sql.Open("pgx", databaseURL)
+	if err != nil {
+		return err
+	}
+	defer func() { _ = db.Close() }()
+
+	if err := goose.SetDialect("postgres"); err != nil {
+		return err
+	}
+
+	if err := goose.Up(db, "migrations"); err != nil {
+		return err
+	}
+
+	return nil
 }

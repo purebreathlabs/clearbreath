@@ -1,0 +1,93 @@
+{
+  "techniques": [
+    {
+      "id": "hrv_resonance",
+      "presets": {
+        "beginner": { "id": "beginner", "min_duration_seconds": 120, "max_duration_seconds": 1800, "min_breaths_per_minute": 4.0, "max_breaths_per_minute": 7.0 },
+        "intermediate": { "id": "intermediate", "min_duration_seconds": 120, "max_duration_seconds": 3600, "min_breaths_per_minute": 4.0, "max_breaths_per_minute": 7.0 },
+        "advanced": { "id": "advanced", "min_duration_seconds": 120, "max_duration_seconds": 5400, "min_breaths_per_minute": 4.0, "max_breaths_per_minute": 7.0 }
+      }
+    },
+    {
+      "id": "ultra_slow",
+      "presets": {
+        "beginner": { "id": "beginner", "min_duration_seconds": 120, "max_duration_seconds": 1800, "min_breaths_per_minute": 2.0, "max_breaths_per_minute": 4.0 },
+        "intermediate": { "id": "intermediate", "min_duration_seconds": 120, "max_duration_seconds": 3600, "min_breaths_per_minute": 1.5, "max_breaths_per_minute": 3.0 },
+        "advanced": { "id": "advanced", "min_duration_seconds": 120, "max_duration_seconds": 7200, "min_breaths_per_minute": 1.0, "max_breaths_per_minute": 2.5 }
+      }
+    },
+    {
+      "id": "diaphragmatic",
+      "presets": {
+        "beginner": { "id": "beginner", "min_duration_seconds": 120, "max_duration_seconds": 1800, "min_breaths_per_minute": 3.0, "max_breaths_per_minute": 10.0 },
+        "intermediate": { "id": "intermediate", "min_duration_seconds": 120, "max_duration_seconds": 3600, "min_breaths_per_minute": 3.0, "max_breaths_per_minute": 10.0 },
+        "advanced": { "id": "advanced", "min_duration_seconds": 120, "max_duration_seconds": 5400, "min_breaths_per_minute": 3.0, "max_breaths_per_minute": 10.0 }
+      }
+    },
+    {
+      "id": "box",
+      "presets": {
+        "beginner": { "id": "beginner", "min_duration_seconds": 120, "max_duration_seconds": 1800, "min_breaths_per_minute": 2.0, "max_breaths_per_minute": 8.0 },
+        "intermediate": { "id": "intermediate", "min_duration_seconds": 120, "max_duration_seconds": 3600, "min_breaths_per_minute": 2.0, "max_breaths_per_minute": 8.0 },
+        "advanced": { "id": "advanced", "min_duration_seconds": 120, "max_duration_seconds": 5400, "min_breaths_per_minute": 2.0, "max_breaths_per_minute": 8.0 }
+      }
+    },
+    {
+      "id": "four_seven_eight",
+      "presets": {
+        "beginner": { "id": "beginner", "min_duration_seconds": 120, "max_duration_seconds": 1200, "min_breaths_per_minute": 2.0, "max_breaths_per_minute": 6.0 },
+        "intermediate": { "id": "intermediate", "min_duration_seconds": 120, "max_duration_seconds": 1800, "min_breaths_per_minute": 2.0, "max_breaths_per_minute": 6.0 },
+        "advanced": { "id": "advanced", "min_duration_seconds": 120, "max_duration_seconds": 3600, "min_breaths_per_minute": 2.0, "max_breaths_per_minute": 6.0 }
+      }
+    },
+    {
+      "id": "yogic_three_part",
+      "presets": {
+        "beginner": { "id": "beginner", "min_duration_seconds": 120, "max_duration_seconds": 1800, "min_breaths_per_minute": 3.0, "max_breaths_per_minute": 10.0 },
+        "intermediate": { "id": "intermediate", "min_duration_seconds": 120, "max_duration_seconds": 3600, "min_breaths_per_minute": 3.0, "max_breaths_per_minute": 10.0 },
+        "advanced": { "id": "advanced", "min_duration_seconds": 120, "max_duration_seconds": 5400, "min_breaths_per_minute": 3.0, "max_breaths_per_minute": 10.0 }
+      }
+    },
+    {
+      "id": "anulom_vilom",
+      "presets": {
+        "beginner": { "id": "beginner", "min_duration_seconds": 120, "max_duration_seconds": 1800, "min_breaths_per_minute": 3.0, "max_breaths_per_minute": 10.0 },
+        "intermediate": { "id": "intermediate", "min_duration_seconds": 120, "max_duration_seconds": 3600, "min_breaths_per_minute": 3.0, "max_breaths_per_minute": 10.0 },
+        "advanced": { "id": "advanced", "min_duration_seconds": 120, "max_duration_seconds": 5400, "min_breaths_per_minute": 3.0, "max_breaths_per_minute": 10.0 }
+      }
+    },
+    {
+      "id": "ujjayi",
+      "presets": {
+        "beginner": { "id": "beginner", "min_duration_seconds": 120, "max_duration_seconds": 1800, "min_breaths_per_minute": 3.0, "max_breaths_per_minute": 10.0 },
+        "intermediate": { "id": "intermediate", "min_duration_seconds": 120, "max_duration_seconds": 3600, "min_breaths_per_minute": 3.0, "max_breaths_per_minute": 10.0 },
+        "advanced": { "id": "advanced", "min_duration_seconds": 120, "max_duration_seconds": 5400, "min_breaths_per_minute": 3.0, "max_breaths_per_minute": 10.0 }
+      }
+    },
+    {
+      "id": "bhramari",
+      "presets": {
+        "beginner": { "id": "beginner", "min_duration_seconds": 120, "max_duration_seconds": 1800, "min_breaths_per_minute": 3.0, "max_breaths_per_minute": 10.0 },
+        "intermediate": { "id": "intermediate", "min_duration_seconds": 120, "max_duration_seconds": 3600, "min_breaths_per_minute": 3.0, "max_breaths_per_minute": 10.0 },
+        "advanced": { "id": "advanced", "min_duration_seconds": 120, "max_duration_seconds": 5400, "min_breaths_per_minute": 3.0, "max_breaths_per_minute": 10.0 }
+      }
+    },
+    {
+      "id": "kapalbhati",
+      "presets": {
+        "beginner": { "id": "beginner", "min_duration_seconds": 60, "max_duration_seconds": 1800, "min_breaths_per_minute": 20.0, "max_breaths_per_minute": 160.0 },
+        "intermediate": { "id": "intermediate", "min_duration_seconds": 60, "max_duration_seconds": 1800, "min_breaths_per_minute": 20.0, "max_breaths_per_minute": 160.0 },
+        "advanced": { "id": "advanced", "min_duration_seconds": 60, "max_duration_seconds": 1800, "min_breaths_per_minute": 20.0, "max_breaths_per_minute": 160.0 }
+      }
+    },
+    {
+      "id": "bhastrika",
+      "presets": {
+        "beginner": { "id": "beginner", "min_duration_seconds": 60, "max_duration_seconds": 1800, "min_breaths_per_minute": 15.0, "max_breaths_per_minute": 120.0 },
+        "intermediate": { "id": "intermediate", "min_duration_seconds": 60, "max_duration_seconds": 1800, "min_breaths_per_minute": 15.0, "max_breaths_per_minute": 120.0 },
+        "advanced": { "id": "advanced", "min_duration_seconds": 60, "max_duration_seconds": 1800, "min_breaths_per_minute": 15.0, "max_breaths_per_minute": 120.0 }
+      }
+    }
+  ]
+}
+
