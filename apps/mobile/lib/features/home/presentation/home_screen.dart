@@ -29,7 +29,7 @@ class HomeScreen extends StatelessWidget {
               ),
               SizedBox(height: spacing.xl),
               FilledButton(
-                onPressed: () => context.push('/design-system'),
+                onPressed: () => context.push('/home/design-system'),
                 child: const Text('Open Design System'),
               ),
             ],
