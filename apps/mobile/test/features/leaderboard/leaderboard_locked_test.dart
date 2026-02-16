@@ -3,7 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 void main() {
-  testWidgets('navigates from home to design system', (tester) async {
+  testWidgets('leaderboard shows locked gate and CTA', (tester) async {
     await tester.pumpWidget(
       const ProviderScope(
         child: ClearBreathApp(),
@@ -14,11 +14,15 @@ void main() {
     await tester.pump(const Duration(seconds: 2));
     await tester.pumpAndSettle();
 
-    expect(find.text('Open Design System'), findsOneWidget);
-    await tester.tap(find.text('Open Design System'));
+    await tester.tap(find.text('Leaderboard'));
     await tester.pumpAndSettle();
 
-    expect(find.text('Design System'), findsOneWidget);
-    expect(find.text('Typography'), findsOneWidget);
+    expect(find.text('Leaderboard is locked'), findsOneWidget);
+    expect(find.text('Sign in'), findsOneWidget);
+
+    await tester.tap(find.text('Sign in'));
+    await tester.pump();
+
+    expect(find.text('Sign in is coming soon.'), findsOneWidget);
   });
 }
