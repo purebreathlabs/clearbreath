@@ -12,6 +12,7 @@ FROM scratch
 
 COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
 COPY --from=builder /api /api
+COPY --from=builder /build/registry /registry
 
 EXPOSE 8080
 
