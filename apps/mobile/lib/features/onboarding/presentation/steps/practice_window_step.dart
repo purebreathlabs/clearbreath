@@ -8,12 +8,12 @@ import '../widgets/onboarding_question.dart';
 class PracticeWindowStep extends StatelessWidget {
   const PracticeWindowStep({
     super.key,
-    required this.value,
-    required this.onChanged,
+    required this.values,
+    required this.onToggle,
   });
 
-  final PracticeWindow value;
-  final ValueChanged<PracticeWindow> onChanged;
+  final Set<PracticeWindow> values;
+  final ValueChanged<PracticeWindow> onToggle;
 
   @override
   Widget build(BuildContext context) {
@@ -21,31 +21,32 @@ class PracticeWindowStep extends StatelessWidget {
 
     return OnboardingQuestion(
       title: 'When do you usually practice?',
-      subtitle: 'This helps us tune your recommendation timing.',
+      subtitle:
+          'Select all that apply. Choose Varies if it changes day to day.',
       child: Column(
         children: [
           OnboardingOptionButton(
             label: 'Morning',
-            selected: value == PracticeWindow.morning,
-            onTap: () => onChanged(PracticeWindow.morning),
+            selected: values.contains(PracticeWindow.morning),
+            onTap: () => onToggle(PracticeWindow.morning),
           ),
           SizedBox(height: spacing.md),
           OnboardingOptionButton(
             label: 'Afternoon',
-            selected: value == PracticeWindow.afternoon,
-            onTap: () => onChanged(PracticeWindow.afternoon),
+            selected: values.contains(PracticeWindow.afternoon),
+            onTap: () => onToggle(PracticeWindow.afternoon),
           ),
           SizedBox(height: spacing.md),
           OnboardingOptionButton(
             label: 'Evening',
-            selected: value == PracticeWindow.evening,
-            onTap: () => onChanged(PracticeWindow.evening),
+            selected: values.contains(PracticeWindow.evening),
+            onTap: () => onToggle(PracticeWindow.evening),
           ),
           SizedBox(height: spacing.md),
           OnboardingOptionButton(
             label: 'Varies',
-            selected: value == PracticeWindow.varies,
-            onTap: () => onChanged(PracticeWindow.varies),
+            selected: values.contains(PracticeWindow.varies),
+            onTap: () => onToggle(PracticeWindow.varies),
           ),
         ],
       ),

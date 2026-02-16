@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:drift/drift.dart';
 
 import '../domain/onboarding_answers.dart';
@@ -25,12 +27,12 @@ class OnboardingRepository {
             id: const Value(_rowId),
             onboardingComplete: const Value(true),
             experienceLevel: Value(answers.experienceLevel.name),
-            primaryGoal: Value(answers.primaryGoal.name),
-            practiceWindow: Value(answers.practiceWindow.name),
+            primaryGoalsJson: Value(_encodeEnumSet(answers.primaryGoals)),
+            practiceWindowsJson: Value(_encodeEnumSet(answers.practiceWindows)),
             sessionLengthMinutes: Value(answers.sessionLengthMinutes),
             hapticsEnabled: Value(answers.hapticsEnabled),
-            keepScreenAwake: Value(answers.keepScreenAwake),
             reminderTimeMinutes: Value(answers.reminderTimeMinutes),
+            displayName: Value(_sanitizeDisplayName(answers.displayName)),
           ),
         );
   }
@@ -43,26 +45,32 @@ class OnboardingRepository {
       return null;
     }
 
+    final primaryGoals = _decodeEnumSet(
+      PrimaryGoal.values,
+      row.primaryGoalsJson,
+      fallback: const {PrimaryGoal.calm},
+    );
+
+    final practiceWindows = _sanitizePracticeWindows(
+      _decodeEnumSet(
+        PracticeWindow.values,
+        row.practiceWindowsJson,
+        fallback: const {PracticeWindow.varies},
+      ),
+    );
+
     return OnboardingAnswers(
       experienceLevel: _safeEnum(
         ExperienceLevel.values,
         row.experienceLevel,
         ExperienceLevel.beginner,
       ),
-      primaryGoal: _safeEnum(
-        PrimaryGoal.values,
-        row.primaryGoal,
-        PrimaryGoal.calm,
-      ),
-      practiceWindow: _safeEnum(
-        PracticeWindow.values,
-        row.practiceWindow,
-        PracticeWindow.morning,
-      ),
+      primaryGoals: primaryGoals,
+      practiceWindows: practiceWindows,
       sessionLengthMinutes: row.sessionLengthMinutes,
       hapticsEnabled: row.hapticsEnabled,
-      keepScreenAwake: row.keepScreenAwake,
       reminderTimeMinutes: row.reminderTimeMinutes,
+      displayName: row.displayName,
     );
   }
 
@@ -73,5 +81,62 @@ class OnboardingRepository {
       }
     }
     return fallback;
+  }
+
+  String _encodeEnumSet<T extends Enum>(Set<T> values) {
+    final names = values.map((value) => value.name).toList()..sort();
+    return jsonEncode(names);
+  }
+
+  Set<T> _decodeEnumSet<T extends Enum>(
+    List<T> values,
+    String encoded, {
+    required Set<T> fallback,
+  }) {
+    try {
+      final decoded = jsonDecode(encoded);
+      if (decoded is! List) {
+        return fallback;
+      }
+      final result = <T>{};
+      for (final item in decoded) {
+        if (item is! String) {
+          continue;
+        }
+        final value = _tryEnum(values, item);
+        if (value != null) {
+          result.add(value);
+        }
+      }
+      if (result.isEmpty) {
+        return fallback;
+      }
+      return result;
+    } catch (_) {
+      return fallback;
+    }
+  }
+
+  T? _tryEnum<T extends Enum>(List<T> values, String name) {
+    for (final value in values) {
+      if (value.name == name) {
+        return value;
+      }
+    }
+    return null;
+  }
+
+  Set<PracticeWindow> _sanitizePracticeWindows(Set<PracticeWindow> value) {
+    if (value.isEmpty) {
+      return const {PracticeWindow.varies};
+    }
+    if (value.contains(PracticeWindow.varies) && value.length > 1) {
+      return value.where((window) => window != PracticeWindow.varies).toSet();
+    }
+    return value;
+  }
+
+  String _sanitizeDisplayName(String value) {
+    return value.trim();
   }
 }

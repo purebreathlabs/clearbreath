@@ -1,0 +1,48 @@
+PODS:
+  - audio_session (0.0.1):
+    - Flutter
+  - Flutter (1.0.0)
+  - flutter_secure_storage_darwin (10.0.0):
+    - Flutter
+    - FlutterMacOS
+  - just_audio (0.0.1):
+    - Flutter
+    - FlutterMacOS
+  - package_info_plus (0.4.5):
+    - Flutter
+  - wakelock_plus (0.0.1):
+    - Flutter
+
+DEPENDENCIES:
+  - audio_session (from `.symlinks/plugins/audio_session/ios`)
+  - Flutter (from `Flutter`)
+  - flutter_secure_storage_darwin (from `.symlinks/plugins/flutter_secure_storage_darwin/darwin`)
+  - just_audio (from `.symlinks/plugins/just_audio/darwin`)
+  - package_info_plus (from `.symlinks/plugins/package_info_plus/ios`)
+  - wakelock_plus (from `.symlinks/plugins/wakelock_plus/ios`)
+
+EXTERNAL SOURCES:
+  audio_session:
+    :path: ".symlinks/plugins/audio_session/ios"
+  Flutter:
+    :path: Flutter
+  flutter_secure_storage_darwin:
+    :path: ".symlinks/plugins/flutter_secure_storage_darwin/darwin"
+  just_audio:
+    :path: ".symlinks/plugins/just_audio/darwin"
+  package_info_plus:
+    :path: ".symlinks/plugins/package_info_plus/ios"
+  wakelock_plus:
+    :path: ".symlinks/plugins/wakelock_plus/ios"
+
+SPEC CHECKSUMS:
+  audio_session: 9bb7f6c970f21241b19f5a3658097ae459681ba0
+  Flutter: cabc95a1d2626b1b06e7179b784ebcf0c0cde467
+  flutter_secure_storage_darwin: acdb3f316ed05a3e68f856e0353b133eec373a23
+  just_audio: 4e391f57b79cad2b0674030a00453ca5ce817eed
+  package_info_plus: af8e2ca6888548050f16fa2f1938db7b5a5df499
+  wakelock_plus: e29112ab3ef0b318e58cfa5c32326458be66b556
+
+PODFILE CHECKSUM: 3c63482e143d1b91d2d2560aee9fb04ecc74ac7e
+
+COCOAPODS: 1.16.2

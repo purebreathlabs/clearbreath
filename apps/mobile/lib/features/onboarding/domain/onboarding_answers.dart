@@ -8,55 +8,56 @@ enum PracticeWindow { morning, afternoon, evening, varies }
 
 @immutable
 class OnboardingAnswers {
-  const OnboardingAnswers({
+  OnboardingAnswers({
     required this.experienceLevel,
-    required this.primaryGoal,
-    required this.practiceWindow,
+    required Set<PrimaryGoal> primaryGoals,
+    required Set<PracticeWindow> practiceWindows,
     required this.sessionLengthMinutes,
     required this.hapticsEnabled,
-    required this.keepScreenAwake,
     required this.reminderTimeMinutes,
-  });
+    required this.displayName,
+  }) : primaryGoals = Set.unmodifiable(primaryGoals),
+       practiceWindows = Set.unmodifiable(practiceWindows);
 
   static const int defaultReminderTimeMinutes = 22 * 60;
 
   factory OnboardingAnswers.defaults() {
-    return const OnboardingAnswers(
+    return OnboardingAnswers(
       experienceLevel: ExperienceLevel.beginner,
-      primaryGoal: PrimaryGoal.calm,
-      practiceWindow: PracticeWindow.morning,
+      primaryGoals: {PrimaryGoal.calm},
+      practiceWindows: {PracticeWindow.varies},
       sessionLengthMinutes: 5,
       hapticsEnabled: true,
-      keepScreenAwake: true,
       reminderTimeMinutes: defaultReminderTimeMinutes,
+      displayName: '',
     );
   }
 
   final ExperienceLevel experienceLevel;
-  final PrimaryGoal primaryGoal;
-  final PracticeWindow practiceWindow;
+  final Set<PrimaryGoal> primaryGoals;
+  final Set<PracticeWindow> practiceWindows;
   final int sessionLengthMinutes;
   final bool hapticsEnabled;
-  final bool keepScreenAwake;
   final int reminderTimeMinutes;
+  final String displayName;
 
   OnboardingAnswers copyWith({
     ExperienceLevel? experienceLevel,
-    PrimaryGoal? primaryGoal,
-    PracticeWindow? practiceWindow,
+    Set<PrimaryGoal>? primaryGoals,
+    Set<PracticeWindow>? practiceWindows,
     int? sessionLengthMinutes,
     bool? hapticsEnabled,
-    bool? keepScreenAwake,
     int? reminderTimeMinutes,
+    String? displayName,
   }) {
     return OnboardingAnswers(
       experienceLevel: experienceLevel ?? this.experienceLevel,
-      primaryGoal: primaryGoal ?? this.primaryGoal,
-      practiceWindow: practiceWindow ?? this.practiceWindow,
+      primaryGoals: primaryGoals ?? this.primaryGoals,
+      practiceWindows: practiceWindows ?? this.practiceWindows,
       sessionLengthMinutes: sessionLengthMinutes ?? this.sessionLengthMinutes,
       hapticsEnabled: hapticsEnabled ?? this.hapticsEnabled,
-      keepScreenAwake: keepScreenAwake ?? this.keepScreenAwake,
       reminderTimeMinutes: reminderTimeMinutes ?? this.reminderTimeMinutes,
+      displayName: displayName ?? this.displayName,
     );
   }
 }

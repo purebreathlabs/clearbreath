@@ -5,7 +5,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
-  testWidgets('onboarding follows step order and shows skip confirm', (tester) async {
+  testWidgets('onboarding follows step order and shows skip confirm', (
+    tester,
+  ) async {
     await tester.pumpWidget(
       ProviderScope(
         child: MaterialApp(
@@ -19,7 +21,7 @@ void main() {
 
     await tester.tap(find.text('Continue'));
     await tester.pumpAndSettle();
-    expect(find.text('Your primary goal'), findsOneWidget);
+    expect(find.text('Your goals'), findsOneWidget);
 
     await tester.tap(find.text('Back'));
     await tester.pumpAndSettle();
@@ -34,4 +36,3 @@ void main() {
     expect(find.text('Skip setup?'), findsNothing);
   });
 }
-

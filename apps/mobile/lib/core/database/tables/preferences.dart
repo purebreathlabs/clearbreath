@@ -11,8 +11,14 @@ class Preferences extends Table {
 
   TextColumn get primaryGoal => text().withDefault(const Constant('calm'))();
 
+  TextColumn get primaryGoalsJson =>
+      text().withDefault(const Constant('["calm"]'))();
+
   TextColumn get practiceWindow =>
       text().withDefault(const Constant('morning'))();
+
+  TextColumn get practiceWindowsJson =>
+      text().withDefault(const Constant('["varies"]'))();
 
   IntColumn get sessionLengthMinutes =>
       integer().withDefault(const Constant(5))();
@@ -25,6 +31,8 @@ class Preferences extends Table {
 
   IntColumn get reminderTimeMinutes =>
       integer().withDefault(const Constant(22 * 60))();
+
+  TextColumn get displayName => text().withDefault(const Constant(''))();
 
   @override
   Set<Column> get primaryKey => {id};

@@ -1,14 +1,17 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../core/theme/theme_extensions.dart';
 import '../domain/onboarding_gate.dart';
 import '../domain/onboarding_controller.dart';
 import '../domain/onboarding_answers.dart';
+import 'steps/display_name_step.dart';
 import 'steps/experience_step.dart';
 import 'steps/haptics_step.dart';
-import 'steps/keep_awake_step.dart';
 import 'steps/practice_window_step.dart';
 import 'steps/primary_goal_step.dart';
 import 'steps/reminder_time_step.dart';
@@ -24,6 +27,8 @@ class OnboardingScreen extends ConsumerStatefulWidget {
 }
 
 class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
+  static const int _hapticsStepIndex = 4;
+
   late final PageController _pageController;
   bool _saving = false;
 
@@ -61,7 +66,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
         title: const Text('Setup'),
         actions: [
           TextButton(
-            onPressed: _saving ? null : () => _confirmSkip(state.answers),
+            onPressed: _saving ? null : _confirmSkip,
             style: TextButton.styleFrom(
               foregroundColor: colors.textTertiary,
               textStyle: typography.labelMedium,
@@ -100,6 +105,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                 child: PageView(
                   controller: _pageController,
                   physics: const NeverScrollableScrollPhysics(),
+                  onPageChanged: _handlePageChanged,
                   children: [
                     step(
                       ExperienceStep(
@@ -109,14 +115,14 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                     ),
                     step(
                       PrimaryGoalStep(
-                        value: state.answers.primaryGoal,
-                        onChanged: controller.setPrimaryGoal,
+                        values: state.answers.primaryGoals,
+                        onToggle: controller.togglePrimaryGoal,
                       ),
                     ),
                     step(
                       PracticeWindowStep(
-                        value: state.answers.practiceWindow,
-                        onChanged: controller.setPracticeWindow,
+                        values: state.answers.practiceWindows,
+                        onToggle: controller.togglePracticeWindow,
                       ),
                     ),
                     step(
@@ -128,19 +134,25 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                     step(
                       HapticsStep(
                         enabled: state.answers.hapticsEnabled,
-                        onChanged: controller.setHapticsEnabled,
-                      ),
-                    ),
-                    step(
-                      KeepAwakeStep(
-                        enabled: state.answers.keepScreenAwake,
-                        onChanged: controller.setKeepScreenAwake,
+                        onChanged: (enabled) {
+                          final wasEnabled = state.answers.hapticsEnabled;
+                          controller.setHapticsEnabled(enabled);
+                          if (enabled && !wasEnabled) {
+                            unawaited(HapticFeedback.mediumImpact());
+                          }
+                        },
                       ),
                     ),
                     step(
                       ReminderTimeStep(
                         timeMinutes: state.answers.reminderTimeMinutes,
                         onPickTime: () => _pickReminderTime(controller),
+                      ),
+                    ),
+                    step(
+                      DisplayNameStep(
+                        value: state.answers.displayName,
+                        onChanged: controller.setDisplayName,
                       ),
                     ),
                   ],
@@ -179,7 +191,23 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
     );
   }
 
-  Future<void> _confirmSkip(OnboardingAnswers answers) async {
+  void _handlePageChanged(int index) {
+    if (index != _hapticsStepIndex) {
+      return;
+    }
+
+    final enabled = ref
+        .read(onboardingControllerProvider)
+        .answers
+        .hapticsEnabled;
+    if (!enabled) {
+      return;
+    }
+
+    unawaited(HapticFeedback.mediumImpact());
+  }
+
+  Future<void> _confirmSkip() async {
     final typography = Theme.of(context).extension<AppTypographyTokens>()!;
 
     final confirmed = await showDialog<bool>(
@@ -209,7 +237,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
       return;
     }
 
-    await _finish(answers);
+    await _finish(OnboardingAnswers.defaults());
   }
 
   void _goBack(OnboardingState state, OnboardingController controller) {

@@ -350,7 +350,7 @@ Per-technique breathing direction (nose inhale, mouth exhale, etc.) is SUGGESTED
 
 ## 7. Core UX Flows
 
-ClearBreath uses four bottom tabs: Home, Techniques, Stats/Profile, Leaderboard. The Leaderboard tab is visible but locked for guests.
+ClearBreath uses four bottom tabs: Home, Techniques, Leaderboard, Profile. The Leaderboard tab is visible but locked for guests. Stats and Settings live inside Profile.
 
 ### 7.1 First-Time User Flow (Guest Mode)
 
@@ -456,7 +456,7 @@ Each technique has a short educational card accessible from the library:
 
 **Weekly definition:** Week starts Monday in the user-local timezone.
 
-**Display:** Stats/Profile tab (with Settings embedded inside Profile).
+**Display:** Profile tab (includes Stats and Settings).
 
 **Guest data:** Stored locally (Drift/SQLite). Syncs to the Go API on sign-in with server-side dedupe and authoritative recompute.
 
@@ -606,7 +606,7 @@ Every session gets a `client_session_id` (UUID v4, generated on device at sessio
 
 **Mobile (Flutter):**
 
-- 4-tab shell: Home, Techniques, Stats/Profile, Leaderboard (locked for guests)
+- 4-tab shell: Home, Techniques, Leaderboard (locked for guests), Profile
 - Strict black/white theme, Manrope typography, splash breathing pulse
 - Onboarding: exactly 7 questions, one per screen; notification permission only after first completed session
 - Technique library (11 techniques) with detail screens and one-time safety gates
