@@ -9,23 +9,25 @@ import (
 	"testing"
 )
 
-type mockPinger struct{ err error }
+type readyMockPinger struct{ err error }
 
-func (m mockPinger) Ping(_ context.Context) error { return m.err }
+func (m readyMockPinger) Ping(_ context.Context) error { return m.err }
 
-func TestHealthCheck(t *testing.T) {
+func TestReadyCheck(t *testing.T) {
 	errDown := errors.New("connection refused")
 
 	tests := []struct {
 		name       string
 		dbErr      error
 		cacheErr   error
+		wantCode   int
 		wantStatus string
 		wantPG     string
 		wantRedis  string
 	}{
 		{
 			name:       "all healthy",
+			wantCode:   http.StatusOK,
 			wantStatus: "ok",
 			wantPG:     "connected",
 			wantRedis:  "connected",
@@ -33,6 +35,7 @@ func TestHealthCheck(t *testing.T) {
 		{
 			name:       "postgres down",
 			dbErr:      errDown,
+			wantCode:   http.StatusServiceUnavailable,
 			wantStatus: "degraded",
 			wantPG:     "disconnected",
 			wantRedis:  "connected",
@@ -40,6 +43,7 @@ func TestHealthCheck(t *testing.T) {
 		{
 			name:       "redis down",
 			cacheErr:   errDown,
+			wantCode:   http.StatusServiceUnavailable,
 			wantStatus: "degraded",
 			wantPG:     "connected",
 			wantRedis:  "disconnected",
@@ -48,6 +52,7 @@ func TestHealthCheck(t *testing.T) {
 			name:       "both down",
 			dbErr:      errDown,
 			cacheErr:   errDown,
+			wantCode:   http.StatusServiceUnavailable,
 			wantStatus: "degraded",
 			wantPG:     "disconnected",
 			wantRedis:  "disconnected",
@@ -56,14 +61,14 @@ func TestHealthCheck(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			h := NewHealthHandler(mockPinger{tt.dbErr}, mockPinger{tt.cacheErr})
-			req := httptest.NewRequest(http.MethodGet, "/health", nil)
+			h := NewReadyHandler(readyMockPinger{tt.dbErr}, readyMockPinger{tt.cacheErr})
+			req := httptest.NewRequest(http.MethodGet, "/ready", nil)
 			rec := httptest.NewRecorder()
 
 			h.Check(rec, req)
 
-			if rec.Code != http.StatusOK {
-				t.Fatalf("status code: got %d, want %d", rec.Code, http.StatusOK)
+			if rec.Code != tt.wantCode {
+				t.Fatalf("status code: got %d, want %d", rec.Code, tt.wantCode)
 			}
 
 			var resp healthResponse
