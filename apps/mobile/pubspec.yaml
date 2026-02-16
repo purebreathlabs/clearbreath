@@ -10,6 +10,7 @@ dependencies:
   flutter:
     sdk: flutter
   flutter_riverpod: ^3.2.1
+  flutter_svg: ^2.0.10
   go_router: ^17.1.0
   drift: ^2.31.0
   dio: ^5.9.1
@@ -26,6 +27,8 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+  assets:
+    - assets/branding/clearbreath_logo.svg
   fonts:
     - family: Manrope
       fonts:
