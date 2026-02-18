@@ -1,6 +1,5 @@
 import 'package:clearbreath/app.dart';
 import 'package:clearbreath/core/router/app_router.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -21,10 +20,7 @@ void main() {
 
     expect(find.text('Meet ClearBreath'), findsOneWidget);
 
-    final slider = find.byKey(const Key('intro_slide_to_begin'));
-    await tester.ensureVisible(slider);
-
-    await tester.drag(slider, const Offset(500, 0));
+    await tester.tap(find.text('Get started'));
     await tester.pumpAndSettle();
 
     expect(find.text('Your experience level'), findsOneWidget);

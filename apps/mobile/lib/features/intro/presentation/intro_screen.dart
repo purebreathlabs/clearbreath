@@ -4,7 +4,6 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../core/theme/theme_extensions.dart';
-import '../../../shared/widgets/slide_to_begin.dart';
 import '../domain/intro_gate.dart';
 
 class IntroScreen extends ConsumerWidget {
@@ -114,10 +113,9 @@ class IntroScreen extends ConsumerWidget {
                       textAlign: TextAlign.center,
                     ),
                     SizedBox(height: spacing.md),
-                    SlideToBegin(
-                      key: const Key('intro_slide_to_begin'),
-                      label: 'Slide to begin',
-                      onSubmitted: handleSubmit,
+                    FilledButton(
+                      onPressed: handleSubmit,
+                      child: const Text('Get started'),
                     ),
                     SizedBox(height: spacing.sm),
                   ],

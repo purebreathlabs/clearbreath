@@ -24,6 +24,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
 
   late final AnimationController _controller;
   late final Animation<double> _scale;
+  late final Animation<double> _textOpacity;
   Timer? _navigationTimer;
   Timer? _readinessTimer;
 
@@ -35,19 +36,18 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
     _scale = TweenSequence<double>([
       TweenSequenceItem(
         tween: Tween<double>(
-          begin: 0.72,
-          end: 1.16,
+          begin: 0.6,
+          end: 1.0,
         ).chain(CurveTween(curve: Curves.easeOutCubic)),
         weight: 70,
       ),
-      TweenSequenceItem(
-        tween: Tween<double>(
-          begin: 1.16,
-          end: 1.08,
-        ).chain(CurveTween(curve: Curves.easeInOutSine)),
-        weight: 30,
-      ),
+      TweenSequenceItem(tween: ConstantTween<double>(1.0), weight: 30),
     ]).animate(_controller);
+
+    _textOpacity = CurvedAnimation(
+      parent: _controller,
+      curve: const Interval(0.35, 0.70, curve: Curves.easeIn),
+    );
 
     _controller.forward();
     _navigationTimer = Timer(_duration, _waitForReadiness);
@@ -139,18 +139,14 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
                     ),
                   ),
                 ),
-                SizedBox(height: spacing.lg),
-                Text(
-                  'ClearBreath',
-                  style: typography.headlineLarge.copyWith(
-                    color: colors.textPrimary,
-                  ),
-                ),
-                SizedBox(height: spacing.xs),
-                Text(
-                  'Breathe with intention.',
-                  style: typography.bodyMedium.copyWith(
-                    color: colors.textSecondary,
+                SizedBox(height: spacing.xxl),
+                FadeTransition(
+                  opacity: _textOpacity,
+                  child: Text(
+                    'ClearBreath',
+                    style: typography.headlineLarge.copyWith(
+                      color: colors.textPrimary,
+                    ),
                   ),
                 ),
               ],
