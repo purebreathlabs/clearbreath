@@ -10,6 +10,7 @@ import '../../features/leaderboard/presentation/leaderboard_screen.dart';
 import '../../features/onboarding/domain/onboarding_gate.dart';
 import '../../features/onboarding/presentation/onboarding_screen.dart';
 import '../../features/profile/presentation/profile_screen.dart';
+import '../../features/session/presentation/session_screen.dart';
 import '../../features/shell/presentation/app_shell.dart';
 import '../../features/splash/domain/splash_gate.dart';
 import '../../features/splash/presentation/splash_screen.dart';
@@ -99,6 +100,10 @@ final appRouterProvider = Provider<GoRouter>((ref) {
           final from = state.uri.queryParameters['from'] ?? '/home';
           return SplashScreen(from: from);
         },
+      ),
+      GoRoute(
+        path: '/session',
+        builder: (context, state) => const SessionScreen(),
       ),
       StatefulShellRoute.indexedStack(
         builder: (context, state, navigationShell) {
