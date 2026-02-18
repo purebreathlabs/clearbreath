@@ -65,7 +65,7 @@ The MVP excludes monetization and advanced social/community complexity to maximi
 
 - Strict black background and white text/lines only
 - Single brand typeface: Manrope
-- Splash screen with subtle breathing pulse animation
+- Splash screen with subtle scale-in logo animation
 
 ### 4.3 Core Breathing Guidance
 
@@ -148,7 +148,7 @@ The MVP excludes monetization and advanced social/community complexity to maximi
 
 ### 6.1 First-Time Guest Journey
 
-1. Splash with breathing pulse
+1. Splash with scale-in logo
 2. Seven-question onboarding
 3. Home opens with Today’s Practice card
 4. User taps Start and begins session in one tap

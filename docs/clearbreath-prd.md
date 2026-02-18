@@ -355,7 +355,7 @@ ClearBreath uses four bottom tabs: Home, Techniques, Leaderboard, Profile. The L
 ### 7.1 First-Time User Flow (Guest Mode)
 
 1. User downloads ClearBreath from App Store / Play Store → App opens
-2. Splash screen with subtle breathing pulse animation
+2. Splash screen with subtle scale-in logo animation
 3. Seven-question onboarding (one question per screen, <2 minutes total):
    - Experience level (Beginner/Intermediate/Advanced)
    - Primary goal (Calm, Sleep, Focus, Energy, HRV, Spiritual)
@@ -607,7 +607,7 @@ Every session gets a `client_session_id` (UUID v4, generated on device at sessio
 **Mobile (Flutter):**
 
 - 4-tab shell: Home, Techniques, Leaderboard (locked for guests), Profile
-- Strict black/white theme, Manrope typography, splash breathing pulse
+- Strict black/white theme, Manrope typography, splash scale-in logo
 - Onboarding: exactly 7 questions, one per screen; notification permission only after first completed session
 - Technique library (11 techniques) with detail screens and one-time safety gates
 - Session engine: countdown, phase scheduler, pause/resume, end early, slow/rapid visuals, phase-start cues, in-session volume + mute
@@ -821,7 +821,7 @@ Each page explains the technique + CTA to download ClearBreath from App Store / 
 - **Brand Voice:** Clean, calm, confident. Not clinical. Not "woo-woo." The intersection of authentic tradition and modern technology.
 - **Visual direction:** Strict black background with white text/lines only
 - **Typeface:** Manrope
-- **Splash:** Subtle breathing pulse animation
+- **Splash:** Subtle scale-in logo animation
 - **Core visuals:** Breathing circle for slow techniques, metronome pulse for rapid techniques
 
 ### Still Open (To Be Resolved During Development)
