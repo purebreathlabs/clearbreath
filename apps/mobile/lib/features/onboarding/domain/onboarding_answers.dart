@@ -25,7 +25,7 @@ class OnboardingAnswers {
     return OnboardingAnswers(
       experienceLevel: ExperienceLevel.beginner,
       primaryGoals: {PrimaryGoal.calm},
-      practiceWindows: {PracticeWindow.varies},
+      practiceWindows: {PracticeWindow.morning},
       sessionLengthMinutes: 5,
       hapticsEnabled: true,
       reminderTimeMinutes: defaultReminderTimeMinutes,
