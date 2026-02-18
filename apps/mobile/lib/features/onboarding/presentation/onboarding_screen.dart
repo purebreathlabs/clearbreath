@@ -134,13 +134,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                     step(
                       HapticsStep(
                         enabled: state.answers.hapticsEnabled,
-                        onChanged: (enabled) {
-                          final wasEnabled = state.answers.hapticsEnabled;
-                          controller.setHapticsEnabled(enabled);
-                          if (enabled && !wasEnabled) {
-                            unawaited(HapticFeedback.mediumImpact());
-                          }
-                        },
+                        onChanged: controller.setHapticsEnabled,
                       ),
                     ),
                     step(
@@ -191,21 +185,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
     );
   }
 
-  void _handlePageChanged(int index) {
-    if (index != _hapticsStepIndex) {
-      return;
-    }
-
-    final enabled = ref
-        .read(onboardingControllerProvider)
-        .answers
-        .hapticsEnabled;
-    if (!enabled) {
-      return;
-    }
-
-    unawaited(HapticFeedback.mediumImpact());
-  }
+  void _handlePageChanged(int index) {}
 
   Future<void> _confirmSkip() async {
     final typography = Theme.of(context).extension<AppTypographyTokens>()!;
@@ -241,21 +221,29 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
   }
 
   void _goBack(OnboardingState state, OnboardingController controller) {
+    final targetIndex = state.stepIndex - 1;
     controller.back();
     _pageController.animateToPage(
-      state.stepIndex - 1,
+      targetIndex,
       duration: const Duration(milliseconds: 220),
       curve: Curves.easeOutCubic,
     );
+    if (targetIndex == _hapticsStepIndex && state.answers.hapticsEnabled) {
+      unawaited(HapticFeedback.mediumImpact());
+    }
   }
 
   void _goNext(OnboardingState state, OnboardingController controller) {
+    final targetIndex = state.stepIndex + 1;
     controller.next();
     _pageController.animateToPage(
-      state.stepIndex + 1,
+      targetIndex,
       duration: const Duration(milliseconds: 220),
       curve: Curves.easeOutCubic,
     );
+    if (targetIndex == _hapticsStepIndex && state.answers.hapticsEnabled) {
+      unawaited(HapticFeedback.mediumImpact());
+    }
   }
 
   Future<void> _pickReminderTime(OnboardingController controller) async {
