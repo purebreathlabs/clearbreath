@@ -20,6 +20,6 @@ void main() {
     expect(find.text('Authentic techniques'), findsOneWidget);
     expect(find.text('Guided sessions'), findsOneWidget);
     expect(find.text('Streaks that motivate'), findsOneWidget);
-    expect(find.text('Slide to begin'), findsOneWidget);
+    expect(find.text('Get started'), findsOneWidget);
   });
 }

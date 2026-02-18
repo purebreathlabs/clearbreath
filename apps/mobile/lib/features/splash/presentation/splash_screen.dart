@@ -36,17 +36,11 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
       TweenSequenceItem(
         tween: Tween<double>(
           begin: 0.72,
-          end: 1.16,
+          end: 1.0,
         ).chain(CurveTween(curve: Curves.easeOutCubic)),
-        weight: 70,
+        weight: 45,
       ),
-      TweenSequenceItem(
-        tween: Tween<double>(
-          begin: 1.16,
-          end: 1.08,
-        ).chain(CurveTween(curve: Curves.easeInOutSine)),
-        weight: 30,
-      ),
+      TweenSequenceItem(tween: ConstantTween<double>(1.0), weight: 55),
     ]).animate(_controller);
 
     _controller.forward();
@@ -139,18 +133,11 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
                     ),
                   ),
                 ),
-                SizedBox(height: spacing.lg),
+                SizedBox(height: spacing.xxl),
                 Text(
                   'ClearBreath',
                   style: typography.headlineLarge.copyWith(
                     color: colors.textPrimary,
-                  ),
-                ),
-                SizedBox(height: spacing.xs),
-                Text(
-                  'Breathe with intention.',
-                  style: typography.bodyMedium.copyWith(
-                    color: colors.textSecondary,
                   ),
                 ),
               ],
