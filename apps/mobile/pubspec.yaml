@@ -19,6 +19,7 @@ dependencies:
   path: ^1.9.1
   path_provider: ^2.1.5
   sqlite3_flutter_libs: ">=0.5.0 <0.6.0"
+  vibration: ^3.1.7
   wakelock_plus: ^1.4.0
 
 dev_dependencies:

@@ -1,7 +1,5 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+import 'package:vibration/vibration.dart';
 
 import '../../../../core/theme/theme_extensions.dart';
 import '../widgets/onboarding_option_button.dart';
@@ -38,7 +36,7 @@ class HapticsStep extends StatelessWidget {
               ),
               clipBehavior: Clip.antiAlias,
               child: InkWell(
-                onTap: () => unawaited(HapticFeedback.mediumImpact()),
+                onTap: () => Vibration.vibrate(duration: 40),
                 child: Padding(
                   padding: EdgeInsets.symmetric(
                     horizontal: spacing.lg,
