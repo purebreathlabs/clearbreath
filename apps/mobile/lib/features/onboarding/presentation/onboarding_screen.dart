@@ -1,8 +1,6 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter/services.dart';
+import 'package:vibration/vibration.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../core/theme/theme_extensions.dart';
@@ -229,7 +227,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
       curve: Curves.easeOutCubic,
     );
     if (targetIndex == _hapticsStepIndex && state.answers.hapticsEnabled) {
-      unawaited(HapticFeedback.mediumImpact());
+      Vibration.vibrate(duration: 40);
     }
   }
 
@@ -242,7 +240,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
       curve: Curves.easeOutCubic,
     );
     if (targetIndex == _hapticsStepIndex && state.answers.hapticsEnabled) {
-      unawaited(HapticFeedback.mediumImpact());
+      Vibration.vibrate(duration: 40);
     }
   }
 

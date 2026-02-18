@@ -1,7 +1,5 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+import 'package:vibration/vibration.dart';
 
 import '../../core/theme/theme_extensions.dart';
 
@@ -67,7 +65,7 @@ class _SlideToBeginState extends State<SlideToBegin>
         duration: const Duration(milliseconds: 140),
         curve: Curves.easeOutCubic,
       );
-      unawaited(HapticFeedback.mediumImpact());
+      Vibration.vibrate(duration: 40);
       if (!mounted) {
         return;
       }
