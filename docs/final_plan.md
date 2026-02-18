@@ -212,8 +212,8 @@ The MVP excludes monetization and advanced social/community complexity to maximi
 3. Typical practice window (Morning/Afternoon/Evening/Varies)
 4. Typical session length (2/5/10/20 min)
 5. Haptics preference (On/Off)
-6. Keep-screen-awake preference (On/Off)
-7. Daily reminder preferred time
+6. Daily reminder preferred time
+7. Display name
 
 ## 8.2 UX Rules
 
@@ -324,6 +324,7 @@ Must include:
 ## 11.6 Keep Awake
 
 - Keep screen awake during active session when enabled
+- Default ON
 - User setting available in Profile/Settings
 
 ## 11.7 Session Completion Screen

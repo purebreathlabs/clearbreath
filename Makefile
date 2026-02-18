@@ -3,12 +3,13 @@
        fmt-check \
        web-dev web-build \
        docker-up docker-down \
-       db-create setup clean \
+       db-create db-migrate db-migrate-status db-migrate-new sqlc-generate setup clean \
        version version-sync version-bump-patch version-bump-minor version-bump-major
 
 FLUTTER := /Users/rahul/sdk/flutter/bin/flutter
 GOLANGCI_LINT := $(HOME)/go/bin/golangci-lint
 SQLC := $(HOME)/go/bin/sqlc
+GOOSE := $(HOME)/go/bin/goose
 PSQL := /opt/homebrew/opt/postgresql@17/bin/psql
 VERSION := $(shell cat VERSION 2>/dev/null || echo 0.0.0)
 BUILD := $(shell git rev-list --count HEAD 2>/dev/null || echo 1)
@@ -78,9 +79,24 @@ docker-down:
 db-create:
 	$(PSQL) -c "CREATE DATABASE clearbreath;" 2>/dev/null || true
 
+db-migrate:
+	if [ -z "$$DATABASE_URL" ]; then echo "DATABASE_URL is required"; exit 1; fi
+	$(GOOSE) -dir server/migrations postgres "$$DATABASE_URL" up
+
+db-migrate-status:
+	if [ -z "$$DATABASE_URL" ]; then echo "DATABASE_URL is required"; exit 1; fi
+	$(GOOSE) -dir server/migrations postgres "$$DATABASE_URL" status
+
+db-migrate-new:
+	if [ -z "$$NAME" ]; then echo "NAME is required"; exit 1; fi
+	$(GOOSE) -dir server/migrations create "$$NAME" sql
+
+sqlc-generate: server-sqlc
+
 setup:
 	go install github.com/sqlc-dev/sqlc/cmd/sqlc@latest
 	go install github.com/golangci/golangci-lint/v2/cmd/golangci-lint@latest
+	go install github.com/pressly/goose/v3/cmd/goose@latest
 	cd server && go mod download
 	cd apps/mobile && $(FLUTTER) pub get
 	cd apps/web && bun install
