@@ -10,6 +10,7 @@
     "server:test": "make server-test",
     "mobile": "make mobile-run",
     "mobile:build": "make mobile-build",
+    "apk": "make apk",
     "mobile:analyze": "make mobile-analyze",
     "mobile:get": "make mobile-get",
     "web": "make web-dev",

@@ -24,6 +24,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
 
   late final AnimationController _controller;
   late final Animation<double> _scale;
+  late final Animation<double> _textOpacity;
   Timer? _navigationTimer;
   Timer? _readinessTimer;
 
@@ -35,13 +36,18 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
     _scale = TweenSequence<double>([
       TweenSequenceItem(
         tween: Tween<double>(
-          begin: 0.72,
+          begin: 0.6,
           end: 1.0,
         ).chain(CurveTween(curve: Curves.easeOutCubic)),
-        weight: 45,
+        weight: 70,
       ),
-      TweenSequenceItem(tween: ConstantTween<double>(1.0), weight: 55),
+      TweenSequenceItem(tween: ConstantTween<double>(1.0), weight: 30),
     ]).animate(_controller);
+
+    _textOpacity = CurvedAnimation(
+      parent: _controller,
+      curve: const Interval(0.35, 0.70, curve: Curves.easeIn),
+    );
 
     _controller.forward();
     _navigationTimer = Timer(_duration, _waitForReadiness);
@@ -134,10 +140,13 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
                   ),
                 ),
                 SizedBox(height: spacing.xxl),
-                Text(
-                  'ClearBreath',
-                  style: typography.headlineLarge.copyWith(
-                    color: colors.textPrimary,
+                FadeTransition(
+                  opacity: _textOpacity,
+                  child: Text(
+                    'ClearBreath',
+                    style: typography.headlineLarge.copyWith(
+                      color: colors.textPrimary,
+                    ),
                   ),
                 ),
               ],

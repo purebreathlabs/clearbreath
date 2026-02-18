@@ -1,5 +1,5 @@
 .PHONY: server-dev server-build server-lint server-test server-test-ci server-test-integration server-fmt-check server-sqlc \
-       mobile-run mobile-build mobile-analyze mobile-get mobile-gen mobile-fmt mobile-fmt-check mobile-test \
+       mobile-run mobile-build apk mobile-analyze mobile-get mobile-gen mobile-fmt mobile-fmt-check mobile-test \
        fmt-check \
        web-dev web-build \
        docker-up docker-down \
@@ -43,6 +43,9 @@ mobile-run:
 
 mobile-build:
 	cd apps/mobile && $(FLUTTER) build apk --release
+
+apk:
+	cd apps/mobile && $(FLUTTER) build apk --release --split-per-abi
 
 mobile-analyze:
 	cd apps/mobile && $(FLUTTER) analyze
