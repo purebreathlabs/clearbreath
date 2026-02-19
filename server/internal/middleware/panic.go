@@ -1,10 +1,11 @@
 package middleware
 
 import (
-	"encoding/json"
 	"log/slog"
 	"net/http"
 	"runtime/debug"
+
+	"github.com/clearbreath/server/internal/httpx"
 )
 
 func PanicRecovery(next http.Handler) http.Handler {
@@ -16,11 +17,7 @@ func PanicRecovery(next http.Handler) http.Handler {
 					"stack", string(debug.Stack()),
 					"request_id", RequestIDFromContext(r.Context()),
 				)
-				w.Header().Set("Content-Type", "application/json")
-				w.WriteHeader(http.StatusInternalServerError)
-				_ = json.NewEncoder(w).Encode(map[string]string{
-					"error": "internal server error",
-				})
+				httpx.WriteError(w, http.StatusInternalServerError, "internal", "internal server error", RequestIDFromContext(r.Context()))
 			}
 		}()
 		next.ServeHTTP(w, r)
