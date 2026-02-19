@@ -298,9 +298,6 @@ func clampBreathsEstimate(breaths int, durationSeconds int, preset technique.Pre
 	if breaths == 0 || durationSeconds <= 0 {
 		return breaths
 	}
-	if durationSeconds < 60 {
-		return breaths
-	}
 
 	minBreaths := int(preset.MinBreathsPerMinute * float64(durationSeconds) / 60.0)
 	maxBreaths := int(preset.MaxBreathsPerMinute*float64(durationSeconds)/60.0 + 0.9999)

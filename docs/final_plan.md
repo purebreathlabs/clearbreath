@@ -954,22 +954,26 @@ Required before submission:
 
 | Variable | Purpose | Required stage |
 | --- | --- | --- |
-| APP_ENV | Runtime mode selection | Dev, staging, prod |
+| ENV | Runtime mode selection | Dev, staging, prod |
 | PORT | API listen port | Dev, staging, prod |
 | DATABASE_URL | PostgreSQL connection string | Dev, staging, prod |
-| REDIS_URL | Redis connection string for cache and rate limiting | Dev, staging, prod |
+| REDIS_ADDR | Redis host:port for cache and rate limiting | Dev, staging, prod |
+| REDIS_PASSWORD | Redis password (if required) | Dev, staging, prod |
 | JWT_ACCESS_SECRET | Access token signing secret | Dev, staging, prod |
 | JWT_REFRESH_SECRET | Refresh token signing secret | Dev, staging, prod |
 | JWT_ACCESS_TTL_MINUTES | Access token lifetime | Dev, staging, prod |
 | JWT_REFRESH_TTL_MINUTES | Refresh token lifetime | Dev, staging, prod |
 | GOOGLE_OAUTH_CLIENT_ID | Google token audience validation | Staging, prod |
 | APPLE_OAUTH_AUDIENCE | Apple token audience validation | Staging, prod |
-| APPLE_OAUTH_TEAM_ID | Apple token verification metadata | Staging, prod |
-| APPLE_OAUTH_KEY_ID | Apple token verification metadata | Staging, prod |
-| CORS_ALLOWED_ORIGINS | Allowed web origins list | Dev, staging, prod |
+| CORS_ORIGINS | Allowed web origins list | Dev, staging, prod |
+| TECHNIQUE_REGISTRY_PATH | Technique registry JSON path | Dev, staging, prod |
+| DEV_AUTH_ENABLED | Enable dev provider sign-in | Dev |
+| DEV_AUTH_SECRET | Dev provider sign-in secret | Dev |
+| RATE_LIMIT_AUTH_BURST_PER_MIN | Auth endpoint burst throttling | Dev, staging, prod |
 | RATE_LIMIT_AUTH_PER_HOUR | Auth endpoint throttling | Dev, staging, prod |
 | RATE_LIMIT_SESSION_WRITES_PER_DAY | Session write throttling baseline | Dev, staging, prod |
 | RATE_LIMIT_LEADERBOARD_READS_PER_MIN | Leaderboard read throttling | Dev, staging, prod |
+| LEADERBOARD_DAILY_CAP_MINUTES | Leaderboard minutes cap per day | Dev, staging, prod |
 
 ### Deployment readiness checklist
 

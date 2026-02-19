@@ -204,8 +204,11 @@ func (s *Service) Refresh(ctx context.Context, in RefreshInput) (*AuthResult, er
 			return apierr.New(http.StatusUnauthorized, "unauthorized", "invalid refresh token")
 		}
 
-		if rt.RevokedAt.Valid || rt.ReplacedBy.Valid {
+		if rt.ReplacedBy.Valid {
 			return apierr.New(http.StatusConflict, "refresh_replay", "refresh token replay detected")
+		}
+		if rt.RevokedAt.Valid {
+			return apierr.New(http.StatusUnauthorized, "unauthorized", "refresh token revoked")
 		}
 
 		if rt.ExpiresAt.Before(now) {
