@@ -20,9 +20,46 @@ import (
 
 type Service struct {
 	store        *repository.Store
-	redis        *redis.Client
+	redis        redisOps
 	clock        clock.Clock
 	dailyCapMins int64
+}
+
+type redisOps interface {
+	Del(ctx context.Context, keys ...string) error
+	ZAdd(ctx context.Context, key string, members ...redis.Z) error
+	Rename(ctx context.Context, key string, newkey string) error
+	ZRevRangeWithScores(ctx context.Context, key string, start int64, stop int64) ([]redis.Z, error)
+	ZRevRank(ctx context.Context, key string, member string) (int64, error)
+	ZScore(ctx context.Context, key string, member string) (float64, error)
+}
+
+type redisClientOps struct {
+	c *redis.Client
+}
+
+func (r redisClientOps) Del(ctx context.Context, keys ...string) error {
+	return r.c.Del(ctx, keys...).Err()
+}
+
+func (r redisClientOps) ZAdd(ctx context.Context, key string, members ...redis.Z) error {
+	return r.c.ZAdd(ctx, key, members...).Err()
+}
+
+func (r redisClientOps) Rename(ctx context.Context, key string, newkey string) error {
+	return r.c.Rename(ctx, key, newkey).Err()
+}
+
+func (r redisClientOps) ZRevRangeWithScores(ctx context.Context, key string, start int64, stop int64) ([]redis.Z, error) {
+	return r.c.ZRevRangeWithScores(ctx, key, start, stop).Result()
+}
+
+func (r redisClientOps) ZRevRank(ctx context.Context, key string, member string) (int64, error) {
+	return r.c.ZRevRank(ctx, key, member).Result()
+}
+
+func (r redisClientOps) ZScore(ctx context.Context, key string, member string) (float64, error) {
+	return r.c.ZScore(ctx, key, member).Result()
 }
 
 type Ranking string
@@ -73,7 +110,7 @@ func NewService(store *repository.Store, rdb *redis.Client, clk clock.Clock, dai
 
 	return &Service{
 		store:        store,
-		redis:        rdb,
+		redis:        redisClientOps{c: rdb},
 		clock:        clk,
 		dailyCapMins: int64(dailyCapMinutes),
 	}, nil
@@ -115,7 +152,7 @@ func (s *Service) Refresh(ctx context.Context) error {
 func (s *Service) writeZSet(ctx context.Context, key string, rows any) error {
 	tmp := key + ":tmp"
 
-	if err := s.redis.Del(ctx, tmp).Err(); err != nil {
+	if err := s.redis.Del(ctx, tmp); err != nil {
 		return err
 	}
 
@@ -142,17 +179,17 @@ func (s *Service) writeZSet(ctx context.Context, key string, rows any) error {
 	}
 
 	if len(zs) == 0 {
-		if err := s.redis.Del(ctx, key).Err(); err != nil {
+		if err := s.redis.Del(ctx, key); err != nil {
 			return err
 		}
 		return nil
 	}
 
-	if err := s.redis.ZAdd(ctx, tmp, zs...).Err(); err != nil {
+	if err := s.redis.ZAdd(ctx, tmp, zs...); err != nil {
 		return err
 	}
 
-	if err := s.redis.Rename(ctx, tmp, key).Err(); err != nil {
+	if err := s.redis.Rename(ctx, tmp, key); err != nil {
 		if errors.Is(err, redis.Nil) {
 			return nil
 		}
@@ -172,7 +209,7 @@ func (s *Service) List(ctx context.Context, ranking Ranking, limit int) (ListRes
 	}
 
 	key := rankingKey(r)
-	zs, err := s.redis.ZRevRangeWithScores(ctx, key, 0, int64(limit-1)).Result()
+	zs, err := s.redis.ZRevRangeWithScores(ctx, key, 0, int64(limit-1))
 	if err != nil {
 		return ListResponse{}, fmt.Errorf("redis zrevrange: %w", err)
 	}
@@ -202,6 +239,7 @@ func (s *Service) List(ctx context.Context, ranking Ranking, limit int) (ListRes
 	}
 
 	top := make([]Row, 0, len(ids))
+	rank := 1
 	for i, id := range ids {
 		u, ok := userMap[id]
 		if !ok {
@@ -212,12 +250,13 @@ func (s *Service) List(ctx context.Context, ranking Ranking, limit int) (ListRes
 			name = initials(name)
 		}
 		top = append(top, Row{
-			Rank:                  i + 1,
+			Rank:                  rank,
 			DisplayNameOrInitials: name,
 			AvatarSeed:            u.AvatarSeed,
 			MetricValue:           metrics[i],
 			UserID:                id.String(),
 		})
+		rank++
 	}
 
 	return ListResponse{
@@ -234,12 +273,12 @@ func (s *Service) Self(ctx context.Context, userID uuid.UUID, ranking Ranking) (
 	}
 
 	key := rankingKey(r)
-	rankRes, rankErr := s.redis.ZRevRank(ctx, key, userID.String()).Result()
+	rankRes, rankErr := s.redis.ZRevRank(ctx, key, userID.String())
 	if rankErr != nil && !errors.Is(rankErr, redis.Nil) {
 		return SelfResponse{}, fmt.Errorf("redis rank: %w", rankErr)
 	}
 
-	scoreRes, scoreErr := s.redis.ZScore(ctx, key, userID.String()).Result()
+	scoreRes, scoreErr := s.redis.ZScore(ctx, key, userID.String())
 	if scoreErr != nil && !errors.Is(scoreErr, redis.Nil) {
 		return SelfResponse{}, fmt.Errorf("redis score: %w", scoreErr)
 	}

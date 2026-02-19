@@ -30,6 +30,12 @@ type RefreshToken struct {
 	CreatedAt  time.Time          `json:"created_at"`
 }
 
+type SafetyAcknowledgement struct {
+	UserID         uuid.UUID `json:"user_id"`
+	TechniqueID    string    `json:"technique_id"`
+	AcknowledgedAt time.Time `json:"acknowledged_at"`
+}
+
 type Session struct {
 	ID                        uuid.UUID `json:"id"`
 	UserID                    uuid.UUID `json:"user_id"`

@@ -78,3 +78,8 @@ func (r *Registry) Preset(techniqueID string, presetID string) (Preset, bool) {
 	}
 	return p, true
 }
+
+func (r *Registry) HasTechnique(techniqueID string) bool {
+	_, ok := r.byTechnique[techniqueID]
+	return ok
+}

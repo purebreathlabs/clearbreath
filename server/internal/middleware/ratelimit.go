@@ -75,19 +75,34 @@ func allow(ctx context.Context, rdb *redis.Client, key string, limit int, window
 }
 
 func clientIP(r *http.Request) string {
-	if xff := strings.TrimSpace(r.Header.Get("X-Forwarded-For")); xff != "" {
-		parts := strings.Split(xff, ",")
-		if len(parts) > 0 {
-			return strings.TrimSpace(parts[0])
-		}
-	}
-	if xrip := strings.TrimSpace(r.Header.Get("X-Real-IP")); xrip != "" {
-		return xrip
+	remote := strings.TrimSpace(r.RemoteAddr)
+	host, _, err := net.SplitHostPort(remote)
+	if err != nil {
+		host = remote
 	}
 
-	host, _, err := net.SplitHostPort(strings.TrimSpace(r.RemoteAddr))
-	if err == nil && host != "" {
-		return host
+	remoteIP := net.ParseIP(strings.TrimSpace(host))
+	if remoteIP != nil && !remoteIP.IsLoopback() && !remoteIP.IsPrivate() {
+		return remoteIP.String()
 	}
-	return strings.TrimSpace(r.RemoteAddr)
+
+	if xrip := strings.TrimSpace(r.Header.Get("X-Real-IP")); xrip != "" {
+		if ip := net.ParseIP(xrip); ip != nil {
+			return ip.String()
+		}
+	}
+	if xff := strings.TrimSpace(r.Header.Get("X-Forwarded-For")); xff != "" {
+		parts := strings.Split(xff, ",")
+		for i := len(parts) - 1; i >= 0; i-- {
+			s := strings.TrimSpace(parts[i])
+			if ip := net.ParseIP(s); ip != nil {
+				return ip.String()
+			}
+		}
+	}
+
+	if remoteIP != nil {
+		return remoteIP.String()
+	}
+	return host
 }

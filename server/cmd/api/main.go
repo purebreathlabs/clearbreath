@@ -25,6 +25,7 @@ import (
 	"github.com/clearbreath/server/internal/repository"
 	authsvc "github.com/clearbreath/server/internal/service/auth"
 	lbsvc "github.com/clearbreath/server/internal/service/leaderboard"
+	safetysvc "github.com/clearbreath/server/internal/service/safety"
 	sessionsvc "github.com/clearbreath/server/internal/service/session"
 	statssvc "github.com/clearbreath/server/internal/service/stats"
 	usersvc "github.com/clearbreath/server/internal/service/user"
@@ -108,6 +109,12 @@ func main() {
 		os.Exit(1)
 	}
 
+	safetyService, err := safetysvc.NewService(store, registry)
+	if err != nil {
+		slog.Error("failed to init safety service", "error", err)
+		os.Exit(1)
+	}
+
 	statsService, err := statssvc.NewService(store, clk)
 	if err != nil {
 		slog.Error("failed to init stats service", "error", err)
@@ -150,6 +157,10 @@ func main() {
 	r.With(middleware.Auth(accessTokens, store)).Get("/v1/me", meHandler.Get)
 	r.With(middleware.Auth(accessTokens, store)).Patch("/v1/me", meHandler.Patch)
 	r.With(middleware.AuthAllowDeleted(accessTokens, store)).Delete("/v1/me", meHandler.Delete)
+
+	safetyHandler := handler.NewSafetyAcknowledgementsHandler(safetyService)
+	r.With(middleware.Auth(accessTokens, store)).Get("/v1/me/safety_acknowledgements", safetyHandler.Get)
+	r.With(middleware.Auth(accessTokens, store)).Post("/v1/me/safety_acknowledgements", safetyHandler.Post)
 
 	sessionsHandler := handler.NewSessionsHandler(sessionService)
 	sessionRateLimitDay := middleware.RateLimitUser(rdb, "rl:sessions:day", cfg.RateLimitSessionPerDay, 24*time.Hour)
