@@ -630,9 +630,9 @@ Route naming remains implementation-defined, but behavior is normative.
 
 | Capability | Auth requirement | Request field constraints | Response semantics | Idempotency | Rate-limit policy | Error classes |
 | --- | --- | --- | --- | --- | --- | --- |
-| Provider sign-in (Apple/Google) | No prior JWT required | Must include valid provider identity token and client context metadata; reject malformed or expired provider tokens | Returns access token, refresh token, and normalized user profile state | Not idempotent for token issuance; idempotent for user identity linkage | Strict per-IP and per-device limit with short burst + hourly cap | 400 validation, 401 invalid provider token, 429 rate-limited, 500 internal |
-| Refresh access token | Valid refresh token required | Refresh token must be active, unrevoked, unexpired, and bound to user/session policy | Rotates refresh token and returns new access token | Single-use rotation required; replay of old token must fail | Per-user and per-device throttling | 400 validation, 401 invalid/expired token, 409 replay detected, 429 rate-limited |
-| Logout/revoke | Valid JWT or valid refresh token | Must identify session/token family to revoke | Revokes active refresh token family according to policy | Idempotent | Moderate per-user throttling | 400 validation, 401 unauthorized, 429 rate-limited |
+| Provider sign-in (Apple/Google) | No prior JWT required | Must include valid provider identity token and client context metadata; reject malformed or expired provider tokens | Returns access token, refresh token, and normalized user profile state | Not idempotent for token issuance; idempotent for user identity linkage | Strict per-IP limit with short burst (per-minute) + hourly cap. Device ID is client-submitted and not used for rate limiting because it is trivially spoofable. | 400 validation, 401 invalid provider token, 429 rate-limited, 500 internal |
+| Refresh access token | Valid refresh token required | Refresh token must be active, unrevoked, unexpired, and bound to user/session policy | Rotates refresh token and returns new access token | Single-use rotation required; replay of old token must fail and return 409 | Per-IP limit with short burst (per-minute) + hourly cap | 400 validation, 401 invalid/expired token, 409 replay detected, 429 rate-limited |
+| Logout/revoke | Valid JWT required | Must include device_id to identify token family to revoke | Revokes active refresh tokens for user+device pair | Idempotent | Standard authenticated limits | 400 validation, 401 unauthorized, 429 rate-limited |
 
 ### User contract table
 
@@ -641,14 +641,14 @@ Route naming remains implementation-defined, but behavior is normative.
 | Get profile | JWT required | User scope must match requester unless explicitly allowed by privacy rules | Returns canonical profile and privacy preferences | Idempotent | Standard authenticated read limits | 401 unauthorized, 403 forbidden, 404 not found |
 | Update display name | JWT required | 3-20 chars, letters/numbers/space, profanity filter enforced | Returns updated profile snapshot | Idempotent by same value | Standard authenticated write limits | 400 validation, 401 unauthorized, 409 constraint conflict |
 | Update leaderboard/privacy flags | JWT required | Boolean flags only; visibility defaults ON, user may opt out | Returns updated visibility/initials settings | Idempotent by same value | Standard authenticated write limits | 400 validation, 401 unauthorized |
-| Delete account | JWT required | Must satisfy re-auth or high-confidence session policy | Deletes account data per retention policy and revokes tokens | Idempotent | Low-frequency sensitive action limit | 401 unauthorized, 403 policy failure, 409 state conflict |
+| Delete account | JWT required (AuthAllowDeleted — permits already soft-deleted users to complete cleanup) | Valid short-lived JWT serves as high-confidence session proof. Re-auth can be enforced client-side before calling DELETE if desired. | Soft-deletes user, wipes auth identities, refresh tokens, safety acknowledgements, sessions, and stats snapshot | Idempotent | Standard authenticated limits | 401 unauthorized, 204 success |
 
 ### Sessions contract table
 
 | Capability | Auth requirement | Request field constraints | Response semantics | Idempotency | Rate-limit policy | Error classes |
 | --- | --- | --- | --- | --- | --- | --- |
-| Submit completed session(s) | JWT required for server persistence | client_session_id required; technique/preset must exist; duration and timestamps must be plausible; timezone offset required | Stores valid session rows, returns accepted/rejected counts and normalized stats delta | Idempotent on client_session_id | Write limits per user/day with abuse controls | 400 validation, 401 unauthorized, 409 dedupe conflict handled as no-op, 422 plausibility fail, 429 rate-limited |
-| Bulk sync (guest->account merge) | JWT required | All sessions require client_session_id and required timing fields | Upserts deduplicated sessions and returns authoritative stats + streak | Idempotent on client_session_id set | Larger payload limits with capped batch size | 400 validation, 401 unauthorized, 413 payload too large, 429 rate-limited |
+| Submit completed session(s) | JWT required for server persistence | client_session_id required; technique/preset must exist; duration and timestamps must be plausible; timezone offset required | Returns 200 with per-session breakdown: accepted_count, duplicate_count, rejected[] (with per-session code/message), and refreshed stats_snapshot. Duplicates are silent no-ops. Rejections include validation and plausibility codes. | Idempotent on client_session_id (ON CONFLICT DO NOTHING) | Write limits per user/day (Redis-backed) | 400 validation (empty/oversized batch), 401 unauthorized, 413 payload too large (>200 sessions), 429 rate-limited |
+| Bulk sync (guest->account merge) | JWT required | All sessions require client_session_id and required timing fields | Same response shape as submit. Higher batch limit (500). Upserts deduplicated sessions and returns authoritative stats + streak. | Idempotent on client_session_id set (ON CONFLICT DO NOTHING) | Same per-user/day limit, capped at 500 sessions per request | 400 validation, 401 unauthorized, 413 payload too large (>500 sessions), 429 rate-limited |
 | Fetch stats snapshot | JWT required | Optional filter params must be bounded and validated | Returns authoritative streak/stats snapshot | Idempotent | Standard authenticated read limits | 400 validation, 401 unauthorized |
 
 ### Leaderboard contract table
@@ -661,10 +661,11 @@ Route naming remains implementation-defined, but behavior is normative.
 ### Cross-cutting middleware contract
 
 - CORS: allow only approved app/web origins per environment registry.
-- Auth middleware: verifies access token, checks revocation, enforces scope.
-- Rate limiting: Redis-backed policies for auth, sessions, and leaderboard reads.
-- Validation middleware: schema + semantic checks before handlers.
-- Structured logging: request_id, user_id (if present), path, status, latency_ms.
+- Auth middleware: verifies access token, checks user existence in DB, injects user_id into request context.
+- Rate limiting: Redis-backed fixed-window counters. Per-IP for auth and leaderboard reads. Per-user for session writes.
+- Strict JSON decoding: unknown fields rejected, trailing data rejected, body size limits enforced per endpoint.
+- Structured logging: request_id, method, path, status, duration_ms, user_id (if present). Note: user_id relies on auth middleware enriching the request context; Logger middleware captures it post-response.
+- Panic recovery: catches handler panics, returns safe 500 JSON error envelope with request_id.
 
 ## 17.3 Data Model Requirements
 
@@ -727,8 +728,8 @@ Route naming remains implementation-defined, but behavior is normative.
 | client_session_id | UUID | Yes | Must be UUID v4 or equivalent stable unique value from client | Unique | Internal dedupe key | Client generated, server enforced | Deduplicate on conflict |
 | technique_id | String | Yes | Must match bundled canonical technique set | Indexed | Non-sensitive usage | Client submitted, server validated | Reject unknown values |
 | preset_id | String | Yes | Must map to known preset/duration profile | Indexed | Non-sensitive usage | Client submitted, server validated | Reject unknown values |
-| started_at_utc | Timestamp | Yes | UTC required | N/A | Internal event time | Client submitted, server validated | Preserve earliest valid for duplicate |
-| ended_at_utc | Timestamp | Yes | Must be >= started_at_utc | N/A | Internal event time | Client submitted, server validated | Preserve latest valid for duplicate |
+| started_at_utc | Timestamp | Yes | UTC required | N/A | Internal event time | Client submitted, server validated | First-write-wins (ON CONFLICT DO NOTHING). A client_session_id represents one immutable session — resubmissions with different timestamps indicate a client bug, not a merge opportunity. |
+| ended_at_utc | Timestamp | Yes | Must be >= started_at_utc | N/A | Internal event time | Client submitted, server validated | First-write-wins (ON CONFLICT DO NOTHING). Merging timestamps from duplicate submissions could inflate durations and corrupt stats/leaderboard metrics. |
 | timezone_offset_minutes | Int | Yes | Must be within realistic offset bounds | N/A | Internal locale context | Client submitted, server validated | Preserve submitted value per session |
 | duration_seconds_actual | Int | Yes | Must be positive and plausible for technique/preset | N/A | Non-sensitive usage | Server normalized from timestamps and request | Server canonical value |
 | breaths_completed_estimated | Int | Yes | Non-negative and bounded by duration/technique | N/A | Non-sensitive usage | Client estimate, server sanity check | Server may clamp |
