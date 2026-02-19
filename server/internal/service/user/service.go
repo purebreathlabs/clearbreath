@@ -142,6 +142,9 @@ func (s *Service) DeleteAccount(ctx context.Context, userID uuid.UUID) error {
 		if err := q.DeleteRefreshTokensByUserID(ctx, userID); err != nil {
 			return fmt.Errorf("delete refresh tokens: %w", err)
 		}
+		if err := q.DeleteSafetyAcknowledgementsByUserID(ctx, userID); err != nil {
+			return fmt.Errorf("delete safety acknowledgements: %w", err)
+		}
 		if err := q.DeleteSessionsByUserID(ctx, userID); err != nil {
 			return fmt.Errorf("delete sessions: %w", err)
 		}

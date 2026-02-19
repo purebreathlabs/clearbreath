@@ -1,5 +1,6 @@
 # Go
 server/bin/
+coverage.out
 *.exe
 *.dll
 *.so

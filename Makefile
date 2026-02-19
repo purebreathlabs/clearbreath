@@ -1,4 +1,4 @@
-.PHONY: server-dev server-build server-lint server-test server-test-ci server-test-integration server-fmt-check server-sqlc \
+.PHONY: server-dev server-build server-docker-build server-lint server-test server-test-ci server-test-integration server-coverage server-fmt-check server-sqlc \
        mobile-run mobile-build apk mobile-analyze mobile-get mobile-gen mobile-fmt mobile-fmt-check mobile-test \
        fmt-check \
        web-dev web-build \
@@ -20,6 +20,9 @@ server-dev:
 server-build:
 	cd server && go build -ldflags="-X main.version=$(VERSION)" -o bin/api ./cmd/api
 
+server-docker-build:
+	DOCKER_BUILDKIT=0 docker build -t clearbreath-api:local --build-arg VERSION=$(VERSION)+$(BUILD) -f server/Dockerfile server
+
 server-lint:
 	cd server && $(GOLANGCI_LINT) run
 
@@ -31,6 +34,10 @@ server-test-ci:
 
 server-test-integration:
 	cd server && CLEARBREATH_INTEGRATION=1 go test ./...
+
+server-coverage:
+	cd server && CLEARBREATH_INTEGRATION=1 go test -count=1 -coverpkg=./... -coverprofile=coverage.out ./...
+	cd server && go tool cover -func=coverage.out | tail -n 1
 
 server-fmt-check:
 	cd server && test -z "$$(gofmt -l .)"

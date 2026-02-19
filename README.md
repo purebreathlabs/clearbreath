@@ -17,7 +17,7 @@ docs/            Product requirements and architecture
 - Flutter 3.38+ (at `~/sdk/flutter/bin/flutter` if not in PATH)
 - Bun 1.3+
 - PostgreSQL 17
-- Redis 8+
+- Redis 7+
 - Docker (optional, for containerized dev)
 
 ## Setup
@@ -110,7 +110,7 @@ bun run docker:down
 ## Lint & Test
 
 ```
-bun run server:lint     # go vet
+bun run server:lint     # golangci-lint
 bun run server:test     # go test
 bun run mobile:analyze  # flutter analyze
 ```
