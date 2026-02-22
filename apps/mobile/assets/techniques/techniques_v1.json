@@ -1,0 +1,454 @@
+[
+  {
+    "id": "diaphragmatic",
+    "name": "Diaphragmatic",
+    "shortDescription": "Gentle belly breathing to calm and steady.",
+    "animationMode": "circle",
+    "safety": { "requiresAck": false, "title": "", "body": "" },
+    "about": {
+      "what": "A simple, slow breath that emphasizes belly expansion.",
+      "how": "Inhale softly through the nose, letting the belly rise. Exhale longer and relaxed.",
+      "bestTime": "Anytime you want to settle your body and mind.",
+      "benefits": "Supports relaxation, reduces tension, and builds breath awareness.",
+      "warnings": "Stop if you feel lightheaded. Keep the breath gentle and unforced."
+    },
+    "presets": {
+      "beginner": {
+        "mode": "phases",
+        "inhaleSeconds": 4,
+        "holdSeconds": 0,
+        "exhaleSeconds": 6,
+        "holdAfterExhaleSeconds": 0,
+        "recommendedDurationsMinutes": [2, 5, 10, 20]
+      },
+      "intermediate": {
+        "mode": "phases",
+        "inhaleSeconds": 5,
+        "holdSeconds": 0,
+        "exhaleSeconds": 7,
+        "holdAfterExhaleSeconds": 0,
+        "recommendedDurationsMinutes": [2, 5, 10, 20]
+      },
+      "advanced": {
+        "mode": "phases",
+        "inhaleSeconds": 6,
+        "holdSeconds": 0,
+        "exhaleSeconds": 8,
+        "holdAfterExhaleSeconds": 0,
+        "recommendedDurationsMinutes": [2, 5, 10, 20]
+      }
+    }
+  },
+  {
+    "id": "box",
+    "name": "Box",
+    "shortDescription": "A balanced four-part breath for focus and control.",
+    "animationMode": "circle",
+    "safety": { "requiresAck": false, "title": "", "body": "" },
+    "about": {
+      "what": "Equal inhale, hold, exhale, and hold-after-exhale.",
+      "how": "Breathe in for a count, hold, breathe out for the same count, then hold again.",
+      "bestTime": "Before demanding work or when you need steady focus.",
+      "benefits": "Builds calm focus and steadies breathing rhythm.",
+      "warnings": "If holds feel stressful, switch to a no-hold technique."
+    },
+    "presets": {
+      "beginner": {
+        "mode": "phases",
+        "inhaleSeconds": 4,
+        "holdSeconds": 4,
+        "exhaleSeconds": 4,
+        "holdAfterExhaleSeconds": 4,
+        "recommendedDurationsMinutes": [2, 5, 10, 20]
+      },
+      "intermediate": {
+        "mode": "phases",
+        "inhaleSeconds": 5,
+        "holdSeconds": 5,
+        "exhaleSeconds": 5,
+        "holdAfterExhaleSeconds": 5,
+        "recommendedDurationsMinutes": [2, 5, 10, 20]
+      },
+      "advanced": {
+        "mode": "phases",
+        "inhaleSeconds": 6,
+        "holdSeconds": 6,
+        "exhaleSeconds": 6,
+        "holdAfterExhaleSeconds": 6,
+        "recommendedDurationsMinutes": [2, 5, 10, 20]
+      }
+    }
+  },
+  {
+    "id": "four_seven_eight",
+    "name": "4-7-8",
+    "shortDescription": "A classic calming pattern with a long exhale.",
+    "animationMode": "circle",
+    "safety": { "requiresAck": false, "title": "", "body": "" },
+    "about": {
+      "what": "Inhale for 4, hold for 7, exhale for 8.",
+      "how": "Keep the inhale soft. Let the exhale be slow, smooth, and unforced.",
+      "bestTime": "Evening wind-down or whenever you want to quiet your system.",
+      "benefits": "Encourages relaxation through a longer exhale and structured pacing.",
+      "warnings": "If the hold feels too intense, choose a slower no-hold technique."
+    },
+    "presets": {
+      "beginner": {
+        "mode": "phases",
+        "inhaleSeconds": 4,
+        "holdSeconds": 7,
+        "exhaleSeconds": 8,
+        "holdAfterExhaleSeconds": 0,
+        "recommendedDurationsMinutes": [2, 5, 10, 20]
+      },
+      "intermediate": {
+        "mode": "phases",
+        "inhaleSeconds": 4,
+        "holdSeconds": 7,
+        "exhaleSeconds": 8,
+        "holdAfterExhaleSeconds": 0,
+        "recommendedDurationsMinutes": [2, 5, 10, 20]
+      },
+      "advanced": {
+        "mode": "phases",
+        "inhaleSeconds": 4,
+        "holdSeconds": 7,
+        "exhaleSeconds": 8,
+        "holdAfterExhaleSeconds": 0,
+        "recommendedDurationsMinutes": [2, 5, 10, 20]
+      }
+    }
+  },
+  {
+    "id": "yogic_three_part",
+    "name": "Yogic Three-Part",
+    "shortDescription": "A deep, full breath that expands capacity and awareness.",
+    "animationMode": "circle",
+    "safety": { "requiresAck": false, "title": "", "body": "" },
+    "about": {
+      "what": "A fuller breath that gently engages belly, ribs, and upper chest.",
+      "how": "Inhale smoothly, expanding from belly to ribs to chest. Exhale slow and complete.",
+      "bestTime": "Morning or pre-practice when you want to feel energized and open.",
+      "benefits": "Builds awareness, supports posture, and encourages a calm steady rhythm.",
+      "warnings": "Avoid forcing a large breath. Keep it comfortable."
+    },
+    "presets": {
+      "beginner": {
+        "mode": "phases",
+        "inhaleSeconds": 4,
+        "holdSeconds": 2,
+        "exhaleSeconds": 6,
+        "holdAfterExhaleSeconds": 0,
+        "recommendedDurationsMinutes": [2, 5, 10, 20]
+      },
+      "intermediate": {
+        "mode": "phases",
+        "inhaleSeconds": 5,
+        "holdSeconds": 3,
+        "exhaleSeconds": 7,
+        "holdAfterExhaleSeconds": 0,
+        "recommendedDurationsMinutes": [2, 5, 10, 20]
+      },
+      "advanced": {
+        "mode": "phases",
+        "inhaleSeconds": 6,
+        "holdSeconds": 4,
+        "exhaleSeconds": 8,
+        "holdAfterExhaleSeconds": 0,
+        "recommendedDurationsMinutes": [2, 5, 10, 20]
+      }
+    }
+  },
+  {
+    "id": "anulom_vilom",
+    "name": "Anulom Vilom",
+    "shortDescription": "Alternate nostril breathing for balance and steadiness.",
+    "animationMode": "alternate_nostril",
+    "safety": { "requiresAck": false, "title": "", "body": "" },
+    "about": {
+      "what": "A paced alternate nostril breath that emphasizes smooth, steady switching.",
+      "how": "Breathe in and out through alternating nostrils in a calm, even rhythm.",
+      "bestTime": "Anytime you want to feel centered and composed.",
+      "benefits": "Supports focus, steadiness, and mindful breathing.",
+      "warnings": "If you feel congested or strained, breathe naturally through both nostrils."
+    },
+    "presets": {
+      "beginner": {
+        "mode": "phases",
+        "inhaleSeconds": 4,
+        "holdSeconds": 0,
+        "exhaleSeconds": 4,
+        "holdAfterExhaleSeconds": 0,
+        "recommendedDurationsMinutes": [2, 5, 10, 20]
+      },
+      "intermediate": {
+        "mode": "phases",
+        "inhaleSeconds": 4,
+        "holdSeconds": 4,
+        "exhaleSeconds": 8,
+        "holdAfterExhaleSeconds": 0,
+        "recommendedDurationsMinutes": [2, 5, 10, 20]
+      },
+      "advanced": {
+        "mode": "phases",
+        "inhaleSeconds": 4,
+        "holdSeconds": 16,
+        "exhaleSeconds": 8,
+        "holdAfterExhaleSeconds": 0,
+        "recommendedDurationsMinutes": [2, 5, 10, 20]
+      }
+    }
+  },
+  {
+    "id": "ujjayi",
+    "name": "Ujjayi",
+    "shortDescription": "A slow, steady breath with gentle throat control.",
+    "animationMode": "circle",
+    "safety": { "requiresAck": false, "title": "", "body": "" },
+    "about": {
+      "what": "A controlled breath that feels smooth and steady, often with a subtle sound.",
+      "how": "Breathe through the nose with a gentle constriction, keeping the rhythm relaxed.",
+      "bestTime": "During yoga or when you want stable, focused breathing.",
+      "benefits": "Supports concentration and a calm, steady pace.",
+      "warnings": "Keep it subtle. If it feels strained, reduce effort or return to normal breathing."
+    },
+    "presets": {
+      "beginner": {
+        "mode": "phases",
+        "inhaleSeconds": 4,
+        "holdSeconds": 0,
+        "exhaleSeconds": 6,
+        "holdAfterExhaleSeconds": 0,
+        "recommendedDurationsMinutes": [2, 5, 10, 20]
+      },
+      "intermediate": {
+        "mode": "phases",
+        "inhaleSeconds": 5,
+        "holdSeconds": 2,
+        "exhaleSeconds": 7,
+        "holdAfterExhaleSeconds": 0,
+        "recommendedDurationsMinutes": [2, 5, 10, 20]
+      },
+      "advanced": {
+        "mode": "phases",
+        "inhaleSeconds": 6,
+        "holdSeconds": 4,
+        "exhaleSeconds": 8,
+        "holdAfterExhaleSeconds": 0,
+        "recommendedDurationsMinutes": [2, 5, 10, 20]
+      }
+    }
+  },
+  {
+    "id": "bhramari",
+    "name": "Bhramari",
+    "shortDescription": "A soothing hum on the exhale for relaxation.",
+    "animationMode": "circle",
+    "safety": { "requiresAck": false, "title": "", "body": "" },
+    "about": {
+      "what": "A calm breath with a gentle humming exhale.",
+      "how": "Inhale softly, then exhale slowly while humming at a comfortable volume.",
+      "bestTime": "Evening wind-down or after stressful moments.",
+      "benefits": "Encourages relaxation and supports a longer exhale.",
+      "warnings": "Keep the hum gentle. Stop if you feel any discomfort."
+    },
+    "presets": {
+      "beginner": {
+        "mode": "phases",
+        "inhaleSeconds": 4,
+        "holdSeconds": 0,
+        "exhaleSeconds": 8,
+        "holdAfterExhaleSeconds": 0,
+        "recommendedDurationsMinutes": [2, 5, 10, 20]
+      },
+      "intermediate": {
+        "mode": "phases",
+        "inhaleSeconds": 4,
+        "holdSeconds": 0,
+        "exhaleSeconds": 10,
+        "holdAfterExhaleSeconds": 0,
+        "recommendedDurationsMinutes": [2, 5, 10, 20]
+      },
+      "advanced": {
+        "mode": "phases",
+        "inhaleSeconds": 4,
+        "holdSeconds": 0,
+        "exhaleSeconds": 12,
+        "holdAfterExhaleSeconds": 0,
+        "recommendedDurationsMinutes": [2, 5, 10, 20]
+      }
+    }
+  },
+  {
+    "id": "hrv_resonance",
+    "name": "HRV Resonance",
+    "shortDescription": "Slow, even breathing tuned for heart rate variability.",
+    "animationMode": "circle",
+    "safety": { "requiresAck": false, "title": "", "body": "" },
+    "about": {
+      "what": "A steady inhale and exhale at a resonance rhythm.",
+      "how": "Breathe evenly, keeping the inhale and exhale smooth and the same length.",
+      "bestTime": "Midday reset or when you want calm focus without holds.",
+      "benefits": "Builds a steady rhythm and supports relaxation through consistency.",
+      "warnings": "If you feel dizzy, shorten the breath and keep it comfortable."
+    },
+    "presets": {
+      "beginner": {
+        "mode": "phases",
+        "inhaleSeconds": 5,
+        "holdSeconds": 0,
+        "exhaleSeconds": 5,
+        "holdAfterExhaleSeconds": 0,
+        "recommendedDurationsMinutes": [2, 5, 10, 20]
+      },
+      "intermediate": {
+        "mode": "phases",
+        "inhaleSeconds": 6,
+        "holdSeconds": 0,
+        "exhaleSeconds": 6,
+        "holdAfterExhaleSeconds": 0,
+        "recommendedDurationsMinutes": [2, 5, 10, 20]
+      },
+      "advanced": {
+        "mode": "phases",
+        "inhaleSeconds": 6.7,
+        "holdSeconds": 0,
+        "exhaleSeconds": 6.7,
+        "holdAfterExhaleSeconds": 0,
+        "recommendedDurationsMinutes": [2, 5, 10, 20]
+      }
+    }
+  },
+  {
+    "id": "ultra_slow",
+    "name": "Ultra Slow",
+    "shortDescription": "Very slow breathing for deep calm and control.",
+    "animationMode": "circle",
+    "safety": {
+      "requiresAck": true,
+      "title": "Ultra slow breathing safety",
+      "body": "Ultra slow breathing may feel intense. Practice seated. Stop if you feel dizzy, anxious, or uncomfortable. Avoid if you have a condition where long slow breaths are not recommended."
+    },
+    "about": {
+      "what": "A very slow inhale and exhale with no holds.",
+      "how": "Breathe gently and evenly. Keep the breath smooth, not forceful.",
+      "bestTime": "When you have time for a deep reset and can stay relaxed.",
+      "benefits": "Builds patience and steady control with a very slow rhythm.",
+      "warnings": "Keep it gentle. If you feel unwell, shorten the breath or stop."
+    },
+    "presets": {
+      "beginner": {
+        "mode": "phases",
+        "inhaleSeconds": 10,
+        "holdSeconds": 0,
+        "exhaleSeconds": 10,
+        "holdAfterExhaleSeconds": 0,
+        "recommendedDurationsMinutes": [2, 5, 10, 20]
+      },
+      "intermediate": {
+        "mode": "phases",
+        "inhaleSeconds": 15,
+        "holdSeconds": 0,
+        "exhaleSeconds": 15,
+        "holdAfterExhaleSeconds": 0,
+        "recommendedDurationsMinutes": [2, 5, 10, 20]
+      },
+      "advanced": {
+        "mode": "phases",
+        "inhaleSeconds": 20,
+        "holdSeconds": 0,
+        "exhaleSeconds": 20,
+        "holdAfterExhaleSeconds": 0,
+        "recommendedDurationsMinutes": [2, 5, 10, 20]
+      }
+    }
+  },
+  {
+    "id": "kapalbhati",
+    "name": "Kapalbhati",
+    "shortDescription": "Fast breathing with rounds and rests for energy and heat.",
+    "animationMode": "metronome",
+    "safety": {
+      "requiresAck": true,
+      "title": "Kapalbhati safety",
+      "body": "Kapalbhati is a forceful practice. Do not practice if you are pregnant, have uncontrolled high blood pressure, heart conditions, or feel unwell. Practice seated and stop immediately if you feel dizzy or strained."
+    },
+    "about": {
+      "what": "A rapid breath performed in rounds with rest periods.",
+      "how": "Follow the tempo. Keep the practice controlled, with smooth rests between rounds.",
+      "bestTime": "Morning or daytime, not right before sleep.",
+      "benefits": "Can feel energizing and warming when practiced comfortably.",
+      "warnings": "Keep effort moderate. Stop if you feel lightheaded or uncomfortable."
+    },
+    "presets": {
+      "beginner": {
+        "mode": "bpm_rounds",
+        "bpm": 60,
+        "rounds": 3,
+        "roundSeconds": 30,
+        "restSeconds": 30,
+        "recommendedDurationsMinutes": [2, 5, 10, 20]
+      },
+      "intermediate": {
+        "mode": "bpm_rounds",
+        "bpm": 80,
+        "rounds": 3,
+        "roundSeconds": 45,
+        "restSeconds": 30,
+        "recommendedDurationsMinutes": [2, 5, 10, 20]
+      },
+      "advanced": {
+        "mode": "bpm_rounds",
+        "bpm": 120,
+        "rounds": 3,
+        "roundSeconds": 60,
+        "restSeconds": 45,
+        "recommendedDurationsMinutes": [2, 5, 10, 20]
+      }
+    }
+  },
+  {
+    "id": "bhastrika",
+    "name": "Bhastrika",
+    "shortDescription": "Powerful breathing in rounds for alertness and strength.",
+    "animationMode": "metronome",
+    "safety": {
+      "requiresAck": true,
+      "title": "Bhastrika safety",
+      "body": "Bhastrika is an intense practice. Do not practice if you are pregnant, have uncontrolled high blood pressure, heart conditions, or feel unwell. Practice seated and stop immediately if you feel dizzy or strained."
+    },
+    "about": {
+      "what": "A strong, rhythmic breath performed in rounds with rests.",
+      "how": "Follow the tempo. Keep the practice controlled and stop if effort spikes.",
+      "bestTime": "Morning or daytime when you want alertness.",
+      "benefits": "May feel invigorating and warming when practiced gently.",
+      "warnings": "Avoid pushing intensity. Stop if you feel lightheaded or uncomfortable."
+    },
+    "presets": {
+      "beginner": {
+        "mode": "bpm_rounds",
+        "bpm": 30,
+        "rounds": 3,
+        "roundSeconds": 30,
+        "restSeconds": 60,
+        "recommendedDurationsMinutes": [2, 5, 10, 20]
+      },
+      "intermediate": {
+        "mode": "bpm_rounds",
+        "bpm": 60,
+        "rounds": 3,
+        "roundSeconds": 30,
+        "restSeconds": 90,
+        "recommendedDurationsMinutes": [2, 5, 10, 20]
+      },
+      "advanced": {
+        "mode": "bpm_rounds",
+        "bpm": 90,
+        "rounds": 3,
+        "roundSeconds": 40,
+        "restSeconds": 120,
+        "recommendedDurationsMinutes": [2, 5, 10, 20]
+      }
+    }
+  }
+]

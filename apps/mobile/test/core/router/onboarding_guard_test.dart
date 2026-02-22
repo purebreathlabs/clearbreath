@@ -1,5 +1,6 @@
 import 'package:clearbreath/app.dart';
 import 'package:clearbreath/core/router/app_router.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -32,5 +33,8 @@ void main() {
 
     expect(find.text('Your experience level'), findsNothing);
     expect(find.text('Leaderboard is locked'), findsOneWidget);
+
+    await tester.pumpWidget(const SizedBox.shrink());
+    await tester.pumpAndSettle();
   });
 }

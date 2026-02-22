@@ -3,17 +3,24 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../features/design_system/presentation/design_system_screen.dart';
+import '../../features/auth/presentation/sign_in_screen.dart';
 import '../../features/home/presentation/home_screen.dart';
 import '../../features/intro/domain/intro_gate.dart';
 import '../../features/intro/presentation/intro_screen.dart';
 import '../../features/leaderboard/presentation/leaderboard_screen.dart';
 import '../../features/onboarding/domain/onboarding_gate.dart';
 import '../../features/onboarding/presentation/onboarding_screen.dart';
+import '../../features/profile/presentation/legal_screen.dart';
 import '../../features/profile/presentation/profile_screen.dart';
+import '../../features/settings/presentation/settings_screen.dart';
+import '../../features/session/domain/local_session.dart';
+import '../../features/session/presentation/session_completion_screen.dart';
 import '../../features/session/presentation/session_screen.dart';
 import '../../features/shell/presentation/app_shell.dart';
 import '../../features/splash/domain/splash_gate.dart';
 import '../../features/splash/presentation/splash_screen.dart';
+import '../../features/stats/presentation/stats_screen.dart';
+import '../../features/techniques/presentation/technique_detail_screen.dart';
 import '../../features/techniques/presentation/techniques_screen.dart';
 
 final appInitialLocationProvider = Provider<String?>((ref) => null);
@@ -34,7 +41,10 @@ final appRouterProvider = Provider<GoRouter>((ref) {
 
     if (splashGate.completed && onboardingGate.isLoaded) {
       if (!onboardingGate.isComplete) {
-        if (!introGate.completed) {
+        if (!introGate.isLoaded) {
+          return null;
+        }
+        if (!introGate.isComplete) {
           if (isOnboarding) {
             final from = Uri.encodeComponent(
               state.uri.queryParameters['from'] ?? '/home',
@@ -75,7 +85,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
     redirect: redirect,
     routes: [
       GoRoute(path: '/', redirect: (context, state) => '/home'),
-      GoRoute(path: '/stats', redirect: (context, state) => '/profile'),
+      GoRoute(path: '/stats', redirect: (context, state) => '/profile/stats'),
       GoRoute(
         path: '/design-system',
         redirect: (context, state) => '/home/design-system',
@@ -102,8 +112,21 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         },
       ),
       GoRoute(
+        path: '/auth/sign-in',
+        builder: (context, state) => const SignInScreen(),
+      ),
+      GoRoute(
         path: '/session',
         builder: (context, state) => const SessionScreen(),
+      ),
+      GoRoute(
+        path: '/session/complete',
+        builder: (context, state) {
+          final extra = state.extra;
+          return SessionCompletionScreen(
+            session: extra is LocalSession ? extra : null,
+          );
+        },
       ),
       StatefulShellRoute.indexedStack(
         builder: (context, state, navigationShell) {
@@ -129,6 +152,15 @@ final appRouterProvider = Provider<GoRouter>((ref) {
               GoRoute(
                 path: '/techniques',
                 builder: (context, state) => const TechniquesScreen(),
+                routes: [
+                  GoRoute(
+                    path: ':id',
+                    builder: (context, state) {
+                      final id = state.pathParameters['id'] ?? '';
+                      return TechniqueDetailScreen(techniqueId: id);
+                    },
+                  ),
+                ],
               ),
             ],
           ),
@@ -145,6 +177,23 @@ final appRouterProvider = Provider<GoRouter>((ref) {
               GoRoute(
                 path: '/profile',
                 builder: (context, state) => const ProfileScreen(),
+                routes: [
+                  GoRoute(
+                    path: 'settings',
+                    builder: (context, state) => const SettingsScreen(),
+                  ),
+                  GoRoute(
+                    path: 'stats',
+                    builder: (context, state) => const StatsScreen(),
+                  ),
+                  GoRoute(
+                    path: 'legal/:type',
+                    builder: (context, state) {
+                      final type = state.pathParameters['type'] ?? '';
+                      return LegalScreen(type: type);
+                    },
+                  ),
+                ],
               ),
             ],
           ),

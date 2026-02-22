@@ -1,5 +1,6 @@
 import 'package:clearbreath/app.dart';
 import 'package:clearbreath/features/onboarding/domain/onboarding_gate.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -34,8 +35,12 @@ void main() {
     expect(find.text('Sign in'), findsOneWidget);
 
     await tester.tap(find.text('Sign in'));
-    await tester.pump();
+    await tester.pumpAndSettle();
 
-    expect(find.text('Sign in is coming soon.'), findsOneWidget);
+    expect(find.text('Birth year'), findsOneWidget);
+    expect(find.text('Continue with'), findsOneWidget);
+
+    await tester.pumpWidget(const SizedBox.shrink());
+    await tester.pumpAndSettle();
   });
 }

@@ -1,0 +1,146 @@
+[
+  {
+    "goal": "calm",
+    "daypart": "morning",
+    "techniqueId": "diaphragmatic",
+    "rationale": "Gentle belly breathing to set a calm tone for your morning."
+  },
+  {
+    "goal": "calm",
+    "daypart": "afternoon",
+    "techniqueId": "ujjayi",
+    "rationale": "Steady Ujjayi breathing to reset and soften midday stress."
+  },
+  {
+    "goal": "calm",
+    "daypart": "evening",
+    "techniqueId": "diaphragmatic",
+    "rationale": "Slow diaphragmatic breathing to unwind your evening."
+  },
+  {
+    "goal": "calm",
+    "daypart": "night",
+    "techniqueId": "four_seven_eight",
+    "rationale": "4-7-8 breathing to downshift and prepare for sleep."
+  },
+  {
+    "goal": "sleep",
+    "daypart": "morning",
+    "techniqueId": "four_seven_eight",
+    "rationale": "A slow 4-7-8 pattern to quiet the mind and body."
+  },
+  {
+    "goal": "sleep",
+    "daypart": "afternoon",
+    "techniqueId": "bhramari",
+    "rationale": "Bhramari humming to ease tension and promote rest later."
+  },
+  {
+    "goal": "sleep",
+    "daypart": "evening",
+    "techniqueId": "four_seven_eight",
+    "rationale": "4-7-8 breathing to support your evening wind-down."
+  },
+  {
+    "goal": "sleep",
+    "daypart": "night",
+    "techniqueId": "four_seven_eight",
+    "rationale": "4-7-8 breathing to help you fall asleep more easily."
+  },
+  {
+    "goal": "focus",
+    "daypart": "morning",
+    "techniqueId": "box",
+    "rationale": "Box breathing to steady attention for your morning."
+  },
+  {
+    "goal": "focus",
+    "daypart": "afternoon",
+    "techniqueId": "box",
+    "rationale": "Box breathing to stay clear and focused through the afternoon."
+  },
+  {
+    "goal": "focus",
+    "daypart": "evening",
+    "techniqueId": "hrv_resonance",
+    "rationale": "Resonant breathing to smooth your nervous system after the day."
+  },
+  {
+    "goal": "focus",
+    "daypart": "night",
+    "techniqueId": "box",
+    "rationale": "A short box breath to settle a busy mind."
+  },
+  {
+    "goal": "energy",
+    "daypart": "morning",
+    "techniqueId": "kapalbhati",
+    "rationale": "Kapalbhati to energize and clear morning sluggishness."
+  },
+  {
+    "goal": "energy",
+    "daypart": "afternoon",
+    "techniqueId": "bhastrika",
+    "rationale": "Bhastrika to boost alertness during the afternoon dip."
+  },
+  {
+    "goal": "energy",
+    "daypart": "evening",
+    "techniqueId": "ujjayi",
+    "rationale": "Ujjayi to stay energized without overstimulation."
+  },
+  {
+    "goal": "energy",
+    "daypart": "night",
+    "techniqueId": "diaphragmatic",
+    "rationale": "Gentle breathing to keep you balanced at night."
+  },
+  {
+    "goal": "hrv",
+    "daypart": "morning",
+    "techniqueId": "hrv_resonance",
+    "rationale": "Resonant breathing to support HRV and a calm start."
+  },
+  {
+    "goal": "hrv",
+    "daypart": "afternoon",
+    "techniqueId": "hrv_resonance",
+    "rationale": "Resonant breathing to steady your rhythm midday."
+  },
+  {
+    "goal": "hrv",
+    "daypart": "evening",
+    "techniqueId": "hrv_resonance",
+    "rationale": "Resonant breathing to return to balance in the evening."
+  },
+  {
+    "goal": "hrv",
+    "daypart": "night",
+    "techniqueId": "hrv_resonance",
+    "rationale": "Resonant breathing to relax while supporting HRV."
+  },
+  {
+    "goal": "spiritual",
+    "daypart": "morning",
+    "techniqueId": "yogic_three_part",
+    "rationale": "Three-part breathing to connect body and mind in the morning."
+  },
+  {
+    "goal": "spiritual",
+    "daypart": "afternoon",
+    "techniqueId": "anulom_vilom",
+    "rationale": "Alternate nostril breathing to balance and center."
+  },
+  {
+    "goal": "spiritual",
+    "daypart": "evening",
+    "techniqueId": "anulom_vilom",
+    "rationale": "Alternate nostril breathing to restore balance in the evening."
+  },
+  {
+    "goal": "spiritual",
+    "daypart": "night",
+    "techniqueId": "yogic_three_part",
+    "rationale": "A slow three-part breath to end the day grounded."
+  }
+]

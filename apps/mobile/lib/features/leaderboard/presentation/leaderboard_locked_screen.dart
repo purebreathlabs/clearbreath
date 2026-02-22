@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../core/theme/theme_extensions.dart';
 
@@ -10,7 +11,6 @@ class LeaderboardLockedScreen extends StatelessWidget {
     final typography = Theme.of(context).extension<AppTypographyTokens>()!;
     final spacing = Theme.of(context).extension<AppSpacingTokens>()!;
     final colors = Theme.of(context).extension<AppColorTokens>()!;
-    final components = Theme.of(context).extension<AppComponentTokens>()!;
 
     return Scaffold(
       body: SafeArea(
@@ -55,27 +55,7 @@ class LeaderboardLockedScreen extends StatelessWidget {
                   SizedBox(
                     width: double.infinity,
                     child: FilledButton(
-                      onPressed: () {
-                        final messenger = ScaffoldMessenger.of(context);
-                        messenger.hideCurrentSnackBar();
-                        messenger.showSnackBar(
-                          SnackBar(
-                            content: Text(
-                              'Sign in is coming soon.',
-                              style: typography.bodyMedium.copyWith(
-                                color: colors.inverseText,
-                              ),
-                            ),
-                            backgroundColor: colors.inverseSurface,
-                            behavior: SnackBarBehavior.floating,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(
-                                components.buttonRadius,
-                              ),
-                            ),
-                          ),
-                        );
-                      },
+                      onPressed: () => context.push('/auth/sign-in'),
                       child: const Text('Sign in'),
                     ),
                   ),

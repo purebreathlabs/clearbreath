@@ -1,0 +1,115 @@
+import 'package:clearbreath/core/database/app_database.dart';
+import 'package:clearbreath/core/theme/app_theme.dart';
+import 'package:clearbreath/features/profile/presentation/profile_screen.dart';
+import 'package:clearbreath/features/stats/domain/stats_engine.dart';
+import 'package:clearbreath/features/stats/domain/stats_snapshot.dart';
+import 'package:clearbreath/features/stats/domain/weekly_minutes_provider.dart';
+import 'package:clearbreath/features/techniques/data/technique_repository.dart';
+import 'package:clearbreath/features/techniques/domain/technique.dart';
+import 'package:clearbreath/features/techniques/domain/technique_preset.dart';
+import 'package:clearbreath/shared/providers/preferences_provider.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_test/flutter_test.dart';
+
+void main() {
+  TestWidgetsFlutterBinding.ensureInitialized();
+
+  testWidgets('renders stats and guest sign-in CTA', (tester) async {
+    const prefs = Preference(
+      id: 1,
+      introComplete: true,
+      onboardingComplete: true,
+      experienceLevel: 'beginner',
+      primaryGoal: 'calm',
+      primaryGoalsJson: '["calm"]',
+      practiceWindow: 'morning',
+      practiceWindowsJson: '["morning"]',
+      sessionLengthMinutes: 5,
+      hapticsEnabled: true,
+      keepScreenAwake: true,
+      reminderTimeMinutes: 22 * 60,
+      reminderEnabled: true,
+      streakWarningEnabled: true,
+      firstSessionCompleted: false,
+      notificationPermissionAsked: false,
+      displayName: 'Rahul',
+    );
+
+    final snapshot = StatsSnapshot(
+      currentStreakDays: 3,
+      longestStreakDays: 5,
+      minutesThisWeek: 12,
+      minutesAllTime: 34,
+      sessionsAllTime: 7,
+      minutesByTechnique: const {'box': 12},
+      longestSessionMinutes: 10,
+      favoriteTechniqueId: 'box',
+      totalBreathsEstimated: 123,
+      updatedAt: DateTime.utc(2026, 2, 21),
+    );
+
+    final technique = Technique(
+      id: 'box',
+      name: 'Box',
+      shortDescription: 'Box breathing.',
+      animationMode: AnimationMode.circle,
+      safety: const TechniqueSafety(requiresAck: false, title: '', body: ''),
+      about: const TechniqueAbout(
+        what: '',
+        how: '',
+        bestTime: '',
+        benefits: '',
+        warnings: '',
+      ),
+      presets: {
+        'beginner': PhasePreset(
+          id: 'beginner',
+          label: 'Beginner',
+          recommendedDurationsMinutes: const [2, 5, 10, 20],
+          inhaleMs: 4000,
+          holdMs: 4000,
+          exhaleMs: 4000,
+          holdAfterExhaleMs: 4000,
+        ),
+      },
+    );
+
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          preferencesProvider.overrideWith(
+            (ref) => Stream<Preference?>.value(prefs),
+          ),
+          localStatsProvider.overrideWith((ref) async => snapshot),
+          weeklyMinutesProvider.overrideWith(
+            (ref) async => const [0, 1, 2, 3, 4, 5, 6],
+          ),
+          allTechniquesProvider.overrideWith((ref) async => [technique]),
+        ],
+        child: MaterialApp(theme: AppTheme.dark(), home: const ProfileScreen()),
+      ),
+    );
+
+    await tester.pumpAndSettle();
+
+    expect(find.text('Rahul'), findsOneWidget);
+    expect(
+      find.text('Create an account to sync sessions across devices.'),
+      findsOneWidget,
+    );
+    expect(find.text('Sign in'), findsOneWidget);
+
+    expect(find.text('Stats'), findsOneWidget);
+    expect(find.text('Streak'), findsOneWidget);
+    expect(find.text('Minutes'), findsOneWidget);
+    expect(find.text('Sessions'), findsOneWidget);
+    expect(find.text('This week'), findsNWidgets(2));
+    expect(find.text('By technique'), findsOneWidget);
+    expect(find.text('Box'), findsOneWidget);
+    expect(find.text('12m'), findsOneWidget);
+
+    await tester.pumpWidget(const SizedBox.shrink());
+    await tester.pumpAndSettle();
+  });
+}
