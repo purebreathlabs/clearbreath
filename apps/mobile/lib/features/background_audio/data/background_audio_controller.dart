@@ -131,11 +131,7 @@ class AudioServiceBackgroundAudioController implements BackgroundAudioController
   }
 
   Future<void> _ensureRemote() async {
-    if (_remote != null) {
-      return;
-    }
-    final remote = _remoteControls ?? _AudioServiceRemoteControls();
-    _remote = remote;
+    final remote = _remote ??= (_remoteControls ?? _AudioServiceRemoteControls());
     await remote.ensureInitialized();
     _remoteSub ??= remote.commands.listen(_handleRemoteCommand);
   }
@@ -155,11 +151,7 @@ class AudioServiceBackgroundAudioController implements BackgroundAudioController
       return;
     }
 
-    if (_session != null) {
-      return;
-    }
-    final session = await AudioSession.instance;
-    _session = session;
+    final session = _session ??= await AudioSession.instance;
 
     final base = const AudioSessionConfiguration.music();
     final config = base.copyWith(
