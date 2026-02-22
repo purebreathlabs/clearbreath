@@ -194,7 +194,7 @@ class _CategoryPill extends StatelessWidget {
       decoration: BoxDecoration(
         color: Color.alphaBlend(
           style.color.withValues(alpha: 0.35),
-          Colors.black.withValues(alpha: 0.65),
+          Colors.black,
         ),
         borderRadius: BorderRadius.circular(10),
         border: Border.all(
