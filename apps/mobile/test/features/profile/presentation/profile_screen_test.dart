@@ -146,7 +146,7 @@ void main() {
 
     final context = tester.element(dialogBox);
     final spacing = Theme.of(context).extension<AppSpacingTokens>()!;
-    final screenWidth = tester.binding.renderView.size.width;
+    final screenWidth = tester.binding.renderViews.single.size.width;
     final expectedDialogWidth = (screenWidth - spacing.sm * 2).clamp(
       0.0,
       420.0,
