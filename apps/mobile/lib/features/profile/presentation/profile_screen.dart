@@ -50,89 +50,13 @@ class ProfileScreen extends ConsumerWidget {
     final initials = _initials(nameLabel);
 
     Future<void> editName() async {
-      final controller = TextEditingController(
-        text: auth is AuthStateSignedIn ? signedInName : localDisplayName,
+      final initialValue = auth is AuthStateSignedIn
+          ? signedInName
+          : localDisplayName;
+      final next = await showDialog<String>(
+        context: context,
+        builder: (context) => _EditNameDialog(initialValue: initialValue),
       );
-      String? next;
-      try {
-        next = await showDialog<String>(
-          context: context,
-          builder: (context) {
-            final screenWidth = MediaQuery.sizeOf(context).width;
-            final horizontalInset = spacing.sm;
-            final dialogWidth = (screenWidth - horizontalInset * 2).clamp(
-              0.0,
-              420.0,
-            );
-
-            return Dialog(
-              insetPadding: EdgeInsets.symmetric(
-                horizontal: horizontalInset,
-                vertical: spacing.lg,
-              ),
-              backgroundColor: colors.surface,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(components.cardRadius),
-                side: BorderSide(color: colors.border),
-              ),
-              child: SizedBox(
-                key: const Key('edit_name_dialog'),
-                width: dialogWidth,
-                child: Padding(
-                  padding: EdgeInsets.fromLTRB(
-                    spacing.md,
-                    spacing.lg,
-                    spacing.md,
-                    spacing.lg,
-                  ),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      Text(
-                        'Edit name',
-                        style: typography.titleLarge.copyWith(
-                          color: colors.textPrimary,
-                        ),
-                      ),
-                      SizedBox(height: spacing.md),
-                      TextField(
-                        controller: controller,
-                        autofocus: true,
-                        textInputAction: TextInputAction.done,
-                        decoration: const InputDecoration(
-                          hintText: 'Display name',
-                        ),
-                        onSubmitted: (_) =>
-                            Navigator.of(context).pop(controller.text.trim()),
-                      ),
-                      SizedBox(height: spacing.lg),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: [
-                          TextButton(
-                            onPressed: () => Navigator.of(context).pop(),
-                            child: const Text('Cancel'),
-                          ),
-                          SizedBox(width: spacing.sm),
-                          FilledButton(
-                            onPressed: () => Navigator.of(
-                              context,
-                            ).pop(controller.text.trim()),
-                            child: const Text('Save'),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            );
-          },
-        );
-      } finally {
-        controller.dispose();
-      }
 
       if (next == null) {
         return;
@@ -300,6 +224,115 @@ class ProfileScreen extends ConsumerWidget {
                     onTap: () => context.push('/profile/legal/terms'),
                   ),
                 ]),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _EditNameDialog extends StatefulWidget {
+  const _EditNameDialog({required this.initialValue});
+
+  final String initialValue;
+
+  @override
+  State<_EditNameDialog> createState() => _EditNameDialogState();
+}
+
+class _EditNameDialogState extends State<_EditNameDialog> {
+  late final TextEditingController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = TextEditingController(text: widget.initialValue);
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  void _close([String? value]) {
+    FocusScope.of(context).unfocus();
+    Navigator.of(context).pop(value);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final spacing = Theme.of(context).extension<AppSpacingTokens>()!;
+    final typography = Theme.of(context).extension<AppTypographyTokens>()!;
+    final colors = Theme.of(context).extension<AppColorTokens>()!;
+    final components = Theme.of(context).extension<AppComponentTokens>()!;
+
+    final screenWidth = MediaQuery.sizeOf(context).width;
+    final horizontalInset = spacing.sm;
+    final dialogWidth = (screenWidth - horizontalInset * 2).clamp(0.0, 420.0);
+
+    return PopScope<String>(
+      onPopInvokedWithResult: (didPop, result) {
+        FocusScope.of(context).unfocus();
+      },
+      child: Dialog(
+        insetPadding: EdgeInsets.symmetric(
+          horizontal: horizontalInset,
+          vertical: spacing.lg,
+        ),
+        backgroundColor: colors.surface,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(components.cardRadius),
+          side: BorderSide(color: colors.border),
+        ),
+        child: SizedBox(
+          key: const Key('edit_name_dialog'),
+          width: dialogWidth,
+          child: Padding(
+            padding: EdgeInsets.fromLTRB(
+              spacing.md,
+              spacing.lg,
+              spacing.md,
+              spacing.lg,
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Text(
+                  'Edit name',
+                  style: typography.titleLarge.copyWith(
+                    color: colors.textPrimary,
+                  ),
+                ),
+                SizedBox(height: spacing.md),
+                TextField(
+                  controller: _controller,
+                  autofocus: true,
+                  keyboardType: TextInputType.name,
+                  textCapitalization: TextCapitalization.words,
+                  textInputAction: TextInputAction.done,
+                  maxLength: 20,
+                  decoration: const InputDecoration(hintText: 'Display name'),
+                  onSubmitted: (_) => _close(_controller.text.trim()),
+                ),
+                SizedBox(height: spacing.lg),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    TextButton(
+                      onPressed: () => _close(),
+                      child: const Text('Cancel'),
+                    ),
+                    SizedBox(width: spacing.sm),
+                    FilledButton(
+                      onPressed: () => _close(_controller.text.trim()),
+                      child: const Text('Save'),
+                    ),
+                  ],
+                ),
               ],
             ),
           ),
