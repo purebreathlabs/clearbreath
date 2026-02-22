@@ -8,6 +8,7 @@
 
 FLUTTER ?= flutter
 DART ?= $(shell if command -v dart >/dev/null 2>&1; then echo dart; else FLUTTER_PATH="$$(command -v $(FLUTTER) 2>/dev/null || echo $(FLUTTER))"; echo "$$(dirname "$$FLUTTER_PATH")/dart"; fi)
+MOBILE_RUN_ARGS ?=
 GOLANGCI_LINT := $(HOME)/go/bin/golangci-lint
 SQLC := $(HOME)/go/bin/sqlc
 GOOSE := $(HOME)/go/bin/goose
@@ -47,7 +48,7 @@ server-sqlc:
 	cd server && $(SQLC) generate -f sqlc/sqlc.yaml
 
 mobile-run:
-	cd apps/mobile && $(FLUTTER) run
+	cd apps/mobile && $(FLUTTER) run $(MOBILE_RUN_ARGS)
 
 mobile-build:
 	cd apps/mobile && $(FLUTTER) build apk --release
