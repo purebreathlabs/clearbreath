@@ -48,10 +48,7 @@ class LeaderboardRowWidget extends StatelessWidget {
             ),
           ),
           SizedBox(width: spacing.md),
-          SeededAvatar(
-            seed: entry.avatarSeed,
-            size: 36,
-          ),
+          SeededAvatar(seed: entry.avatarSeed, size: 36),
           SizedBox(width: spacing.md),
           Expanded(
             child: Text(

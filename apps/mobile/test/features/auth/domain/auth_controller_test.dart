@@ -228,9 +228,13 @@ AuthResponse _authResponse({
 }) {
   return AuthResponse(
     accessToken: accessToken,
-    accessTokenExpiresAtUtc: DateTime.now().toUtc().add(const Duration(hours: 1)),
+    accessTokenExpiresAtUtc: DateTime.now().toUtc().add(
+      const Duration(hours: 1),
+    ),
     refreshToken: refreshToken,
-    refreshTokenExpiresAtUtc: DateTime.now().toUtc().add(const Duration(days: 30)),
+    refreshTokenExpiresAtUtc: DateTime.now().toUtc().add(
+      const Duration(days: 30),
+    ),
     user: UserProfile(
       id: userId,
       displayName: displayName,
@@ -242,4 +246,3 @@ AuthResponse _authResponse({
     ),
   );
 }
-

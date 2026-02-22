@@ -25,4 +25,3 @@ DateTime? nextStreakWarningTime(
 
   return candidate;
 }
-

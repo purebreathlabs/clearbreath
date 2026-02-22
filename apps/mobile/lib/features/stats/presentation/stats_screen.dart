@@ -61,7 +61,9 @@ class StatsScreen extends ConsumerWidget {
                     padding: EdgeInsets.all(components.cardPadding),
                     decoration: BoxDecoration(
                       color: colors.surface,
-                      borderRadius: BorderRadius.circular(components.cardRadius),
+                      borderRadius: BorderRadius.circular(
+                        components.cardRadius,
+                      ),
                       border: Border.all(color: colors.border),
                     ),
                     child: const Center(child: CircularProgressIndicator()),
@@ -70,7 +72,9 @@ class StatsScreen extends ConsumerWidget {
                     padding: EdgeInsets.all(components.cardPadding),
                     decoration: BoxDecoration(
                       color: colors.surface,
-                      borderRadius: BorderRadius.circular(components.cardRadius),
+                      borderRadius: BorderRadius.circular(
+                        components.cardRadius,
+                      ),
                       border: Border.all(color: colors.border),
                     ),
                     child: Text(
@@ -146,13 +150,18 @@ String? _findTechniqueName(List<Technique> techniques, String id) {
 }
 
 String _titleCaseId(String value) {
-  final parts = value.trim().split(RegExp(r'[_\\s-]+')).where((p) => p.isNotEmpty);
-  final words = parts.map((part) {
-    if (part.isEmpty) {
-      return part;
-    }
-    final lower = part.toLowerCase();
-    return lower[0].toUpperCase() + lower.substring(1);
-  }).toList(growable: false);
+  final parts = value
+      .trim()
+      .split(RegExp(r'[_\\s-]+'))
+      .where((p) => p.isNotEmpty);
+  final words = parts
+      .map((part) {
+        if (part.isEmpty) {
+          return part;
+        }
+        final lower = part.toLowerCase();
+        return lower[0].toUpperCase() + lower.substring(1);
+      })
+      .toList(growable: false);
   return words.isEmpty ? value : words.join(' ');
 }

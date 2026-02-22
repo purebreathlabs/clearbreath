@@ -22,7 +22,9 @@ class ShareCardWidget extends StatelessWidget {
 
     final safeStreak = streakDays.clamp(0, 9999);
     final safeMinutes = minutesToday.clamp(0, 999);
-    final minutesLine = safeMinutes == 1 ? '1 min today' : '$safeMinutes min today';
+    final minutesLine = safeMinutes == 1
+        ? '1 min today'
+        : '$safeMinutes min today';
 
     return DecoratedBox(
       decoration: BoxDecoration(
@@ -76,9 +78,7 @@ class ShareCardWidget extends StatelessWidget {
             Text(
               minutesLine,
               textAlign: TextAlign.center,
-              style: typography.bodyMedium.copyWith(
-                color: colors.textTertiary,
-              ),
+              style: typography.bodyMedium.copyWith(color: colors.textTertiary),
             ),
           ],
         ),
@@ -86,4 +86,3 @@ class ShareCardWidget extends StatelessWidget {
     );
   }
 }
-

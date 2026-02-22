@@ -42,10 +42,7 @@ class SelfRankCard extends StatelessWidget {
       ),
       child: Row(
         children: [
-          SeededAvatar(
-            seed: entry?.avatarSeed ?? '',
-            size: 44,
-          ),
+          SeededAvatar(seed: entry?.avatarSeed ?? '', size: 44),
           SizedBox(width: spacing.md),
           Expanded(
             child: Column(
@@ -53,12 +50,16 @@ class SelfRankCard extends StatelessWidget {
               children: [
                 Text(
                   'You',
-                  style: typography.titleMedium.copyWith(color: colors.textPrimary),
+                  style: typography.titleMedium.copyWith(
+                    color: colors.textPrimary,
+                  ),
                 ),
                 SizedBox(height: spacing.xs),
                 Text(
                   rankLabel,
-                  style: typography.bodyMedium.copyWith(color: colors.textSecondary),
+                  style: typography.bodyMedium.copyWith(
+                    color: colors.textSecondary,
+                  ),
                 ),
               ],
             ),

@@ -31,26 +31,20 @@ class SessionTimerDisplay extends StatelessWidget {
           Text(
             roundLabel,
             key: const Key('session_round_label'),
-            style: typography.bodyLarge.copyWith(
-              color: colors.textSecondary,
-            ),
+            style: typography.bodyLarge.copyWith(color: colors.textSecondary),
           ),
         if (roundLabel != null) SizedBox(height: spacing.sm),
         Text(
           _formatDuration(phaseRemaining),
           key: const Key('session_phase_remaining'),
-          style: typography.displayLarge.copyWith(
-            color: colors.textPrimary,
-          ),
+          style: typography.displayLarge.copyWith(color: colors.textPrimary),
           textAlign: TextAlign.center,
         ),
         SizedBox(height: spacing.sm),
         Text(
           'Elapsed ${_formatDuration(totalElapsed)}',
           key: const Key('session_total_elapsed'),
-          style: typography.bodyMedium.copyWith(
-            color: colors.textSecondary,
-          ),
+          style: typography.bodyMedium.copyWith(color: colors.textSecondary),
           textAlign: TextAlign.center,
         ),
       ],
@@ -73,4 +67,3 @@ class SessionTimerDisplay extends StatelessWidget {
     return '$mm:$ss';
   }
 }
-

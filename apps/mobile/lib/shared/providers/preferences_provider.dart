@@ -5,8 +5,9 @@ import 'app_database_provider.dart';
 
 final preferencesProvider = StreamProvider<Preference?>((ref) {
   final db = ref.watch(appDatabaseProvider);
-  return (db.select(db.preferences)..where((row) => row.id.equals(1)))
-      .watchSingleOrNull();
+  return (db.select(
+    db.preferences,
+  )..where((row) => row.id.equals(1))).watchSingleOrNull();
 });
 
 final hapticsEnabledProvider = Provider<bool>((ref) {

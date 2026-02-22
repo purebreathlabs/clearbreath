@@ -14,11 +14,7 @@ void main() {
       name: id,
       shortDescription: id,
       animationMode: AnimationMode.circle,
-      safety: const TechniqueSafety(
-        requiresAck: false,
-        title: '',
-        body: '',
-      ),
+      safety: const TechniqueSafety(requiresAck: false, title: '', body: ''),
       about: const TechniqueAbout(
         what: '',
         how: '',

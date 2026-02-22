@@ -29,7 +29,9 @@ class _ShareButtonState extends ConsumerState<ShareButton> {
     setState(() => _busy = true);
     try {
       await WidgetsBinding.instance.endOfFrame;
-      await ref.read(shareCardRendererProvider).renderAndShare(
+      await ref
+          .read(shareCardRendererProvider)
+          .renderAndShare(
             widget.repaintBoundaryKey,
             filename: 'clearbreath_share.png',
             text: 'ClearBreath',
@@ -79,4 +81,3 @@ class _ShareButtonState extends ConsumerState<ShareButton> {
     );
   }
 }
-

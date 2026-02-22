@@ -113,8 +113,12 @@ class _WeeklyBarPainter extends CustomPainter {
       final fraction = (value.clamp(0, safeMax) / safeMax).toDouble();
       final barHeight = size.height * fraction;
       final left = i * (barWidth + gap);
-      final rect =
-          Rect.fromLTWH(left, size.height - barHeight, barWidth, barHeight);
+      final rect = Rect.fromLTWH(
+        left,
+        size.height - barHeight,
+        barWidth,
+        barHeight,
+      );
       final radius = Radius.circular(barWidth / 2);
 
       final bgRect = Rect.fromLTWH(left, 0, barWidth, size.height);
@@ -130,4 +134,3 @@ class _WeeklyBarPainter extends CustomPainter {
         oldDelegate.backgroundColor != backgroundColor;
   }
 }
-

@@ -33,7 +33,9 @@ class SafetySyncService {
       if (data is! Map) {
         return;
       }
-      final parsed = SafetyAcknowledgements.fromJson(data.cast<String, dynamic>());
+      final parsed = SafetyAcknowledgements.fromJson(
+        data.cast<String, dynamic>(),
+      );
       for (final id in parsed.techniqueIds) {
         await local.acknowledge(id);
       }
@@ -53,11 +55,8 @@ class SafetySyncService {
     try {
       await _dio.post<dynamic>(
         '/v1/me/safety_acknowledgements',
-        data: SafetyAcknowledgements(
-          techniqueIds: techniqueIds,
-        ).toJson(),
+        data: SafetyAcknowledgements(techniqueIds: techniqueIds).toJson(),
       );
     } catch (_) {}
   }
 }
-

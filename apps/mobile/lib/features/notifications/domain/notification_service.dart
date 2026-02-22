@@ -34,11 +34,14 @@ class _FlutterLocalNotificationService implements NotificationService {
   static const int _dailyReminderId = 2001;
   static const int _streakWarningId = 2002;
 
-  static const String _channelId = 'life.clearbreath.clearbreath.channel.reminders';
+  static const String _channelId =
+      'life.clearbreath.clearbreath.channel.reminders';
   static const String _channelName = 'Reminders';
-  static const String _channelDescription = 'Daily practice reminders and streak warnings';
+  static const String _channelDescription =
+      'Daily practice reminders and streak warnings';
 
-  final FlutterLocalNotificationsPlugin _plugin = FlutterLocalNotificationsPlugin();
+  final FlutterLocalNotificationsPlugin _plugin =
+      FlutterLocalNotificationsPlugin();
   Future<void>? _initFuture;
 
   Future<void> _ensureInitialized() {
@@ -95,15 +98,19 @@ class _FlutterLocalNotificationService implements NotificationService {
 
     try {
       if (Platform.isAndroid) {
-        final android = _plugin.resolvePlatformSpecificImplementation<
-            AndroidFlutterLocalNotificationsPlugin>();
+        final android = _plugin
+            .resolvePlatformSpecificImplementation<
+              AndroidFlutterLocalNotificationsPlugin
+            >();
         final granted = await android?.requestNotificationsPermission();
         return granted ?? true;
       }
 
       if (Platform.isIOS) {
-        final ios = _plugin.resolvePlatformSpecificImplementation<
-            IOSFlutterLocalNotificationsPlugin>();
+        final ios = _plugin
+            .resolvePlatformSpecificImplementation<
+              IOSFlutterLocalNotificationsPlugin
+            >();
         final granted = await ios?.requestPermissions(
           alert: true,
           badge: true,

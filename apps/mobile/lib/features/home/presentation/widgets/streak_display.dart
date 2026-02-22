@@ -3,7 +3,11 @@ import 'package:flutter/material.dart';
 import '../../../../core/theme/theme_extensions.dart';
 
 class StreakDisplay extends StatelessWidget {
-  const StreakDisplay({super.key, required this.streakDays, this.loading = false});
+  const StreakDisplay({
+    super.key,
+    required this.streakDays,
+    this.loading = false,
+  });
 
   final int? streakDays;
   final bool loading;

@@ -60,4 +60,3 @@ void main() {
     expect(find.text('00:02'), findsOneWidget);
   });
 }
-

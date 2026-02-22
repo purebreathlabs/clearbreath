@@ -11,8 +11,9 @@ void main() {
     required int durationSecondsActual,
     required int breathsCompletedEstimated,
   }) {
-    final endedAtUtc =
-        startedAtUtc.toUtc().add(Duration(seconds: durationSecondsActual));
+    final endedAtUtc = startedAtUtc.toUtc().add(
+      Duration(seconds: durationSecondsActual),
+    );
     return LocalSession(
       clientSessionId: id,
       techniqueId: techniqueId,
@@ -56,11 +57,7 @@ void main() {
       ),
     ];
 
-    final snapshot = computeStats(
-      sessions,
-      DateTime.utc(2026, 2, 25, 12),
-      0,
-    );
+    final snapshot = computeStats(sessions, DateTime.utc(2026, 2, 25, 12), 0);
 
     expect(snapshot.sessionsAllTime, equals(3));
     expect(snapshot.minutesAllTime, equals(17));
@@ -74,16 +71,17 @@ void main() {
   test('computes weekly minutes with Monday start', () {
     final now = DateTime.utc(2026, 2, 25, 12);
     final todayKey = DateTime.utc(now.year, now.month, now.day);
-    final startOfWeekKey =
-        todayKey.subtract(Duration(days: todayKey.weekday - DateTime.monday));
+    final startOfWeekKey = todayKey.subtract(
+      Duration(days: todayKey.weekday - DateTime.monday),
+    );
 
     final sessions = [
       buildSession(
         id: 'sun',
         techniqueId: 'box',
-        startedAtUtc: startOfWeekKey.subtract(const Duration(days: 1)).add(
-              const Duration(hours: 10),
-            ),
+        startedAtUtc: startOfWeekKey
+            .subtract(const Duration(days: 1))
+            .add(const Duration(hours: 10)),
         timezoneOffsetMinutes: 0,
         durationSecondsActual: 600,
         breathsCompletedEstimated: 1,
@@ -106,11 +104,7 @@ void main() {
       ),
     ];
 
-    final snapshot = computeStats(
-      sessions,
-      now,
-      0,
-    );
+    final snapshot = computeStats(sessions, now, 0);
 
     expect(snapshot.minutesThisWeek, equals(7));
   });
@@ -135,11 +129,7 @@ void main() {
       ),
     ];
 
-    final snapshot = computeStats(
-      sessions,
-      DateTime.utc(2026, 2, 25, 12),
-      0,
-    );
+    final snapshot = computeStats(sessions, DateTime.utc(2026, 2, 25, 12), 0);
 
     expect(snapshot.favoriteTechniqueId, equals('alpha'));
   });
@@ -156,11 +146,7 @@ void main() {
       ),
     ];
 
-    final snapshot = computeStats(
-      sessions,
-      DateTime.utc(2026, 2, 22, 1),
-      60,
-    );
+    final snapshot = computeStats(sessions, DateTime.utc(2026, 2, 22, 1), 60);
 
     expect(snapshot.currentStreakDays, equals(1));
     expect(snapshot.longestStreakDays, equals(1));

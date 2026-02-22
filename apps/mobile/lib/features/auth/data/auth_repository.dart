@@ -58,7 +58,10 @@ class AuthRepository {
   }) async {
     final resp = await _raw.post<dynamic>(
       '/v1/auth/refresh',
-      data: RefreshRequest(refreshToken: refreshToken, deviceId: deviceId).toJson(),
+      data: RefreshRequest(
+        refreshToken: refreshToken,
+        deviceId: deviceId,
+      ).toJson(),
     );
     final data = resp.data;
     if (data is! Map) {
@@ -88,10 +91,7 @@ class AuthRepository {
   }
 
   Future<UserProfile> updateProfile(MePatchRequest request) async {
-    final resp = await _authed.patch<dynamic>(
-      '/v1/me',
-      data: request.toJson(),
-    );
+    final resp = await _authed.patch<dynamic>('/v1/me', data: request.toJson());
     final data = resp.data;
     if (data is! Map) {
       throw FormatException('Invalid profile response.');
@@ -99,4 +99,3 @@ class AuthRepository {
     return UserProfile.fromJson(data.cast<String, dynamic>());
   }
 }
-

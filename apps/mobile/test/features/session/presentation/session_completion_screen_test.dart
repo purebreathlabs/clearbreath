@@ -84,10 +84,7 @@ void main() {
             _TestTechniqueRepository([technique]),
           ),
         ],
-        child: MaterialApp.router(
-          theme: AppTheme.dark(),
-          routerConfig: router,
-        ),
+        child: MaterialApp.router(theme: AppTheme.dark(), routerConfig: router),
       ),
     );
 
@@ -126,4 +123,3 @@ class _TestTechniqueRepository extends TechniqueRepository {
   @override
   Future<List<Technique>> all() async => _techniques;
 }
-

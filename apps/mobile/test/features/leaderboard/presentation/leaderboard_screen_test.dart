@@ -30,7 +30,9 @@ void main() {
     expect(find.text('Leaderboard is locked'), findsOneWidget);
   });
 
-  testWidgets('ranking toggle updates list and self rank is visible', (tester) async {
+  testWidgets('ranking toggle updates list and self rank is visible', (
+    tester,
+  ) async {
     final repo = _FakeLeaderboardRepository();
     addTearDown(repo.dispose);
 

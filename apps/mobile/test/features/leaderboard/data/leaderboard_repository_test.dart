@@ -29,7 +29,9 @@ void main() {
           return ResponseBody.fromString(
             '{"error":"internal","code":"internal","request_id":"r"}',
             500,
-            headers: {'content-type': ['application/json']},
+            headers: {
+              'content-type': ['application/json'],
+            },
           );
         }
 
@@ -37,14 +39,18 @@ void main() {
         return ResponseBody.fromString(
           _weeklyListJson(),
           200,
-          headers: {'content-type': ['application/json']},
+          headers: {
+            'content-type': ['application/json'],
+          },
         );
       }
 
       return ResponseBody.fromString(
         '{"error":"not_found","code":"not_found","request_id":"r"}',
         404,
-        headers: {'content-type': ['application/json']},
+        headers: {
+          'content-type': ['application/json'],
+        },
       );
     });
 
@@ -107,4 +113,3 @@ String _weeklyListJson() {
 }
 ''';
 }
-

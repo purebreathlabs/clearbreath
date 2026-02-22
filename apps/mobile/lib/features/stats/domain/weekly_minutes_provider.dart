@@ -3,8 +3,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../session/data/session_repository.dart';
 
 final weeklyMinutesProvider = FutureProvider<List<int>>((ref) async {
-  final minutesByDay =
-      await ref.watch(sessionRepositoryProvider).minutesByLocalDay();
+  final minutesByDay = await ref
+      .watch(sessionRepositoryProvider)
+      .minutesByLocalDay();
 
   final nowUtc = DateTime.now().toUtc();
   final offsetMinutes = DateTime.now().timeZoneOffset.inMinutes;
@@ -24,4 +25,3 @@ DateTime _startOfWeekKey(DateTime todayKey) {
   final daysSinceMonday = todayKey.weekday - DateTime.monday;
   return todayKey.subtract(Duration(days: daysSinceMonday));
 }
-

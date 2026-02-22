@@ -6,4 +6,3 @@ Future<void> testExecutable(FutureOr<void> Function() testMain) async {
   driftRuntimeOptions.dontWarnAboutMultipleDatabases = true;
   await testMain();
 }
-

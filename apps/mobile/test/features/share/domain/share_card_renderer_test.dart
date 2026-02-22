@@ -19,10 +19,7 @@ void main() {
               child: const SizedBox(
                 width: 360,
                 height: 360,
-                child: ShareCardWidget(
-                  streakDays: 5,
-                  minutesToday: 2,
-                ),
+                child: ShareCardWidget(streakDays: 5, minutesToday: 2),
               ),
             ),
           ),
@@ -41,9 +38,6 @@ void main() {
     expect(bytes, isNotNull);
     final data = bytes!;
     expect(data.length, greaterThan(100));
-    expect(
-      data.sublist(0, 8),
-      equals(<int>[137, 80, 78, 71, 13, 10, 26, 10]),
-    );
+    expect(data.sublist(0, 8), equals(<int>[137, 80, 78, 71, 13, 10, 26, 10]));
   });
 }

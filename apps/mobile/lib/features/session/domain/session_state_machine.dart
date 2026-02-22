@@ -215,7 +215,8 @@ class SessionStateMachine {
     }
 
     if (plan is RoundSessionPlan) {
-      if (plan.roundDuration == Duration.zero && plan.restDuration == Duration.zero) {
+      if (plan.roundDuration == Duration.zero &&
+          plan.restDuration == Duration.zero) {
         stop(completed: true);
         return;
       }
@@ -223,8 +224,9 @@ class SessionStateMachine {
       _phase = plan.roundDuration > Duration.zero
           ? SessionPhase.round
           : SessionPhase.rest;
-      _phaseRemaining =
-          _phase == SessionPhase.round ? plan.roundDuration : plan.restDuration;
+      _phaseRemaining = _phase == SessionPhase.round
+          ? plan.roundDuration
+          : plan.restDuration;
       _currentRound = plan.rounds > 0 ? 1 : null;
       _totalRounds = plan.rounds > 0 ? plan.rounds : null;
       _beatCarry = Duration.zero;
@@ -262,7 +264,8 @@ class SessionStateMachine {
     }
 
     if (plan is RoundSessionPlan) {
-      if (plan.roundDuration == Duration.zero && plan.restDuration == Duration.zero) {
+      if (plan.roundDuration == Duration.zero &&
+          plan.restDuration == Duration.zero) {
         stop(completed: true);
         return;
       }
@@ -358,9 +361,8 @@ class SessionStateMachine {
     final inhaleSide = nostrils[_cycleIndex % nostrils.length];
     return switch (phase) {
       SessionPhase.inhale => inhaleSide,
-      SessionPhase.exhale => inhaleSide == NostrilSide.left
-          ? NostrilSide.right
-          : NostrilSide.left,
+      SessionPhase.exhale =>
+        inhaleSide == NostrilSide.left ? NostrilSide.right : NostrilSide.left,
       _ => null,
     };
   }

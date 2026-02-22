@@ -40,9 +40,9 @@ void main() {
       await controller1.setDisplayName('Rahul');
 
       final db1 = c1.read(appDatabaseProvider);
-      final row1 = await (db1.select(db1.preferences)
-            ..where((row) => row.id.equals(1)))
-          .getSingleOrNull();
+      final row1 = await (db1.select(
+        db1.preferences,
+      )..where((row) => row.id.equals(1))).getSingleOrNull();
       expect(row1, isNotNull);
       expect(row1!.sessionLengthMinutes, equals(10));
       expect(row1.hapticsEnabled, isFalse);
@@ -61,16 +61,12 @@ void main() {
       ) async {
         final completer = Completer<SettingsState>();
         late final ProviderSubscription<SettingsState> sub;
-        sub = c2.listen(
-          settingsControllerProvider,
-          (previous, next) {
-            if (!completer.isCompleted && predicate(next)) {
-              completer.complete(next);
-              sub.close();
-            }
-          },
-          fireImmediately: true,
-        );
+        sub = c2.listen(settingsControllerProvider, (previous, next) {
+          if (!completer.isCompleted && predicate(next)) {
+            completer.complete(next);
+            sub.close();
+          }
+        }, fireImmediately: true);
         return completer.future.timeout(const Duration(seconds: 2));
       }
 

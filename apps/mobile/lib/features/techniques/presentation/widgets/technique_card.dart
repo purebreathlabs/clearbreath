@@ -75,14 +75,18 @@ class TechniqueCard extends StatelessWidget {
               SizedBox(height: spacing.md),
               Text(
                 technique.name,
-                style: typography.titleMedium.copyWith(color: colors.textPrimary),
+                style: typography.titleMedium.copyWith(
+                  color: colors.textPrimary,
+                ),
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
               ),
               SizedBox(height: spacing.xs),
               Text(
                 technique.shortDescription,
-                style: typography.bodyMedium.copyWith(color: colors.textSecondary),
+                style: typography.bodyMedium.copyWith(
+                  color: colors.textSecondary,
+                ),
                 maxLines: 3,
                 overflow: TextOverflow.ellipsis,
               ),

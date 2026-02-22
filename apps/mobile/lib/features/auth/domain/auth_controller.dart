@@ -114,7 +114,9 @@ class AuthController extends Notifier<AuthState> {
     final storage = ref.read(tokenStorageProvider);
 
     try {
-      final updated = await repo.updateProfile(MePatchRequest(displayName: next));
+      final updated = await repo.updateProfile(
+        MePatchRequest(displayName: next),
+      );
       await storage.writeUserProfile(updated);
       state = AuthStateSignedIn(profile: updated);
     } on DioException catch (e) {
@@ -198,8 +200,9 @@ class AuthController extends Notifier<AuthState> {
       state = AuthStateSignedIn(profile: cachedProfile);
     }
 
-    final shouldRefresh =
-        !stored.accessTokenExpiresAtUtc.isAfter(now.add(const Duration(seconds: 30)));
+    final shouldRefresh = !stored.accessTokenExpiresAtUtc.isAfter(
+      now.add(const Duration(seconds: 30)),
+    );
 
     if (shouldRefresh) {
       await _refreshAndSetState(
@@ -259,8 +262,12 @@ class AuthController extends Notifier<AuthState> {
     }
   }
 
-  Future<void> _syncDisplayNameFromOnboarding({required UserProfile current}) async {
-    final next = (await ref.read(onboardingAnswersProvider.future)).displayName.trim();
+  Future<void> _syncDisplayNameFromOnboarding({
+    required UserProfile current,
+  }) async {
+    final next = (await ref.read(
+      onboardingAnswersProvider.future,
+    )).displayName.trim();
     if (next.isEmpty) {
       return;
     }
@@ -272,7 +279,9 @@ class AuthController extends Notifier<AuthState> {
     final storage = ref.read(tokenStorageProvider);
 
     try {
-      final updated = await repo.updateProfile(MePatchRequest(displayName: next));
+      final updated = await repo.updateProfile(
+        MePatchRequest(displayName: next),
+      );
       await storage.writeUserProfile(updated);
       state = AuthStateSignedIn(profile: updated);
     } on DioException catch (e) {

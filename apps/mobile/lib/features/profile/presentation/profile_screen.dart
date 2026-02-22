@@ -178,7 +178,9 @@ class ProfileScreen extends ConsumerWidget {
                     padding: EdgeInsets.all(components.cardPadding),
                     decoration: BoxDecoration(
                       color: colors.surface,
-                      borderRadius: BorderRadius.circular(components.cardRadius),
+                      borderRadius: BorderRadius.circular(
+                        components.cardRadius,
+                      ),
                       border: Border.all(color: colors.border),
                     ),
                     child: Column(
@@ -202,7 +204,9 @@ class ProfileScreen extends ConsumerWidget {
                 SizedBox(height: spacing.xl),
                 Text(
                   'Stats',
-                  style: typography.titleMedium.copyWith(color: colors.textPrimary),
+                  style: typography.titleMedium.copyWith(
+                    color: colors.textPrimary,
+                  ),
                 ),
                 SizedBox(height: spacing.sm),
                 const StatsSection(),
@@ -217,30 +221,30 @@ class ProfileScreen extends ConsumerWidget {
                 SizedBox(height: spacing.xl),
                 Text(
                   'Settings',
-                  style: typography.titleMedium.copyWith(color: colors.textPrimary),
+                  style: typography.titleMedium.copyWith(
+                    color: colors.textPrimary,
+                  ),
                 ),
                 SizedBox(height: spacing.sm),
-                sectionCard(
-                  [
-                    ListTile(
-                      title: const Text('Settings'),
-                      trailing: const Icon(Icons.chevron_right_rounded),
-                      onTap: () => context.push('/profile/settings'),
-                    ),
-                    divider(),
-                    ListTile(
-                      title: const Text('Privacy policy'),
-                      trailing: const Icon(Icons.chevron_right_rounded),
-                      onTap: () => context.push('/profile/legal/privacy'),
-                    ),
-                    divider(),
-                    ListTile(
-                      title: const Text('Terms of service'),
-                      trailing: const Icon(Icons.chevron_right_rounded),
-                      onTap: () => context.push('/profile/legal/terms'),
-                    ),
-                  ],
-                ),
+                sectionCard([
+                  ListTile(
+                    title: const Text('Settings'),
+                    trailing: const Icon(Icons.chevron_right_rounded),
+                    onTap: () => context.push('/profile/settings'),
+                  ),
+                  divider(),
+                  ListTile(
+                    title: const Text('Privacy policy'),
+                    trailing: const Icon(Icons.chevron_right_rounded),
+                    onTap: () => context.push('/profile/legal/privacy'),
+                  ),
+                  divider(),
+                  ListTile(
+                    title: const Text('Terms of service'),
+                    trailing: const Icon(Icons.chevron_right_rounded),
+                    onTap: () => context.push('/profile/legal/terms'),
+                  ),
+                ]),
               ],
             ),
           ),
@@ -255,8 +259,10 @@ String _initials(String name) {
   if (trimmed.isEmpty) {
     return 'C';
   }
-  final parts =
-      trimmed.split(RegExp(r'\\s+')).where((p) => p.trim().isNotEmpty).toList();
+  final parts = trimmed
+      .split(RegExp(r'\\s+'))
+      .where((p) => p.trim().isNotEmpty)
+      .toList();
   if (parts.isEmpty) {
     return 'C';
   }

@@ -23,4 +23,3 @@ void main() {
     expect(nextStreakWarningTime(2, false, now), isNull);
   });
 }
-

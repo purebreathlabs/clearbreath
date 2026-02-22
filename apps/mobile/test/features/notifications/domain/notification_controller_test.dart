@@ -44,9 +44,9 @@ void main() {
 
     expect(fake.requestPermissionCalls, equals(0));
 
-    await container.read(settingsRepositoryProvider).setReminderTimeMinutes(
-          21 * 60 + 30,
-        );
+    await container
+        .read(settingsRepositoryProvider)
+        .setReminderTimeMinutes(21 * 60 + 30);
     await Future<void>.delayed(const Duration(milliseconds: 10));
     expect(fake.requestPermissionCalls, equals(0));
     expect(fake.dailySchedules, equals(0));
@@ -110,9 +110,9 @@ void main() {
     expect(fake.dailySchedules, equals(1));
     expect(fake.lastDailyTime, const TimeOfDay(hour: 22, minute: 0));
 
-    await container.read(settingsRepositoryProvider).setReminderTimeMinutes(
-          7 * 60 + 45,
-        );
+    await container
+        .read(settingsRepositoryProvider)
+        .setReminderTimeMinutes(7 * 60 + 45);
 
     await _waitFor(() => fake.dailySchedules >= 2);
     expect(fake.lastDailyTime, const TimeOfDay(hour: 7, minute: 45));

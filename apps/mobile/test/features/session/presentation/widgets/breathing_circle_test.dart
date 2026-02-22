@@ -37,4 +37,3 @@ void main() {
     expect(find.text('HOLD'), findsOneWidget);
   });
 }
-

@@ -11,11 +11,7 @@ final localStatsProvider = FutureProvider<StatsSnapshot>((ref) async {
   final now = DateTime.now().toUtc();
   final offset = DateTime.now().timeZoneOffset.inMinutes;
 
-  final snapshot = computeStats(
-    sessions,
-    now,
-    offset,
-  );
+  final snapshot = computeStats(sessions, now, offset);
 
   final cache = ref.watch(statsCacheRepositoryProvider);
   try {
@@ -113,8 +109,8 @@ DateTime _localDayKey({
   required int timezoneOffsetMinutes,
 }) {
   final localStart = startedAtUtc.toUtc().add(
-        Duration(minutes: timezoneOffsetMinutes),
-      );
+    Duration(minutes: timezoneOffsetMinutes),
+  );
   return DateTime.utc(localStart.year, localStart.month, localStart.day);
 }
 
@@ -146,4 +142,3 @@ String? _favoriteTechniqueId(Map<String, int> secondsByTechnique) {
 
   return bestSeconds > 0 ? bestId : null;
 }
-

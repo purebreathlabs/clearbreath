@@ -93,15 +93,15 @@ class _BreathingCircleState extends State<BreathingCircle>
                   height: size,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    border: Border.all(
-                      color: colors.textPrimary,
-                      width: 2,
-                    ),
+                    border: Border.all(color: colors.textPrimary, width: 2),
                     boxShadow: _isHoldPhase(widget.phase)
                         ? [
                             BoxShadow(
                               color: colors.textPrimary.withAlpha(
-                                (shadowOpacity * 255).round().clamp(0, 255).toInt(),
+                                (shadowOpacity * 255)
+                                    .round()
+                                    .clamp(0, 255)
+                                    .toInt(),
                               ),
                               blurRadius: 32,
                               spreadRadius: 2,

@@ -51,9 +51,7 @@ class SettingsState {
 }
 
 final settingsControllerProvider =
-    NotifierProvider<SettingsController, SettingsState>(
-      SettingsController.new,
-    );
+    NotifierProvider<SettingsController, SettingsState>(SettingsController.new);
 
 class SettingsController extends Notifier<SettingsState> {
   @override
@@ -65,7 +63,9 @@ class SettingsController extends Notifier<SettingsState> {
 
   Future<void> setSessionLength(int minutes) async {
     final sanitized = _sanitizeSessionLength(minutes);
-    await ref.read(settingsRepositoryProvider).setSessionLengthMinutes(sanitized);
+    await ref
+        .read(settingsRepositoryProvider)
+        .setSessionLengthMinutes(sanitized);
   }
 
   Future<void> setHapticsEnabled(bool value) async {
@@ -86,9 +86,7 @@ class SettingsController extends Notifier<SettingsState> {
   }
 
   Future<void> setStreakWarningEnabled(bool value) async {
-    await ref
-        .read(settingsRepositoryProvider)
-        .setStreakWarningEnabled(value);
+    await ref.read(settingsRepositoryProvider).setStreakWarningEnabled(value);
   }
 
   Future<void> setDisplayName(String value) async {
@@ -103,4 +101,3 @@ class SettingsController extends Notifier<SettingsState> {
     return 5;
   }
 }
-

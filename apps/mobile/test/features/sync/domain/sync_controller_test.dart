@@ -81,20 +81,17 @@ void main() {
     Future<SyncState> waitForComplete() {
       final completer = Completer<SyncState>();
       late final ProviderSubscription<SyncState> sub;
-      sub = container.listen(
-        syncControllerProvider,
-        (previous, next) {
-          if (next is SyncComplete && !completer.isCompleted) {
-            completer.complete(next);
-            sub.close();
-          }
-        },
-        fireImmediately: true,
-      );
+      sub = container.listen(syncControllerProvider, (previous, next) {
+        if (next is SyncComplete && !completer.isCompleted) {
+          completer.complete(next);
+          sub.close();
+        }
+      }, fireImmediately: true);
       return completer.future.timeout(const Duration(seconds: 2));
     }
 
-    final auth = container.read(authStateProvider.notifier) as _TestAuthController;
+    final auth =
+        container.read(authStateProvider.notifier) as _TestAuthController;
     auth.setSignedIn(_profile('user1'));
 
     final done = await waitForComplete();
@@ -106,7 +103,9 @@ void main() {
     final remaining = await sessions.unsynced();
     expect(remaining.map((s) => s.clientSessionId), equals(['s2']));
 
-    final cached = await container.read(statsCacheRepositoryProvider).readCached();
+    final cached = await container
+        .read(statsCacheRepositoryProvider)
+        .readCached();
     expect(cached, isNotNull);
     expect(cached!.minutesAllTime, equals(34));
     expect(cached.currentStreakDays, equals(2));
@@ -166,7 +165,8 @@ class _TestAuthController extends AuthController {
 }
 
 class _SpySafetySyncService extends SafetySyncService {
-  _SpySafetySyncService({required super.ref, required super.local}) : super(dio: Dio());
+  _SpySafetySyncService({required super.ref, required super.local})
+    : super(dio: Dio());
 
   int pullCalls = 0;
 

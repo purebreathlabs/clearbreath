@@ -93,14 +93,16 @@ class LeaderboardRepository {
       final rowsJson = jsonEncode(_encodeApiRows(parsed.top));
 
       try {
-        await _db.into(_db.leaderboardCache).insertOnConflictUpdate(
-          LeaderboardCacheCompanion.insert(
-            ranking: rankingParam,
-            rowsJson: rowsJson,
-            generatedAtUtc: parsed.generatedAtUtc.toUtc(),
-            fetchedAt: now,
-          ),
-        );
+        await _db
+            .into(_db.leaderboardCache)
+            .insertOnConflictUpdate(
+              LeaderboardCacheCompanion.insert(
+                ranking: rankingParam,
+                rowsJson: rowsJson,
+                generatedAtUtc: parsed.generatedAtUtc.toUtc(),
+                fetchedAt: now,
+              ),
+            );
       } catch (_) {}
 
       return LeaderboardListResult(
@@ -120,7 +122,10 @@ class LeaderboardRepository {
     } catch (_) {
       final cached = await _readCachedList(rankingParam);
       if (cached != null) {
-        return cached.copyWith(fromCache: true, errorMessage: 'Could not refresh.');
+        return cached.copyWith(
+          fromCache: true,
+          errorMessage: 'Could not refresh.',
+        );
       }
       rethrow;
     }

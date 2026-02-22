@@ -37,9 +37,10 @@ class LeaderboardListResponse {
     return LeaderboardListResponse(
       ranking: readString(json, 'ranking'),
       generatedAtUtc: readDateTimeUtc(json, 'generated_at_utc'),
-      top: readMapList(json, 'top')
-          .map(LeaderboardRow.fromJson)
-          .toList(growable: false),
+      top: readMapList(
+        json,
+        'top',
+      ).map(LeaderboardRow.fromJson).toList(growable: false),
     );
   }
 
@@ -49,10 +50,7 @@ class LeaderboardListResponse {
 }
 
 class LeaderboardSelfUser {
-  const LeaderboardSelfUser({
-    required this.rank,
-    required this.metricValue,
-  });
+  const LeaderboardSelfUser({required this.rank, required this.metricValue});
 
   factory LeaderboardSelfUser.fromJson(JsonMap json) {
     return LeaderboardSelfUser(
@@ -66,10 +64,7 @@ class LeaderboardSelfUser {
 }
 
 class LeaderboardSelfResponse {
-  const LeaderboardSelfResponse({
-    required this.ranking,
-    required this.user,
-  });
+  const LeaderboardSelfResponse({required this.ranking, required this.user});
 
   factory LeaderboardSelfResponse.fromJson(JsonMap json) {
     return LeaderboardSelfResponse(
@@ -81,4 +76,3 @@ class LeaderboardSelfResponse {
   final String ranking;
   final LeaderboardSelfUser user;
 }
-

@@ -16,4 +16,3 @@ class LeaderboardEntry {
   final int metricValue;
   final String? userId;
 }
-

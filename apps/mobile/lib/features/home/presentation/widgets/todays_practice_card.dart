@@ -57,10 +57,7 @@ class TodaysPracticeCard extends StatelessWidget {
             style: typography.bodyMedium.copyWith(color: colors.textSecondary),
           ),
           SizedBox(height: spacing.lg),
-          FilledButton(
-            onPressed: onStart,
-            child: const Text('Start'),
-          ),
+          FilledButton(onPressed: onStart, child: const Text('Start')),
         ],
       ),
     );

@@ -75,7 +75,8 @@ class HomeScreen extends ConsumerWidget {
             final confirmed = await showModalBottomSheet<bool>(
               context: context,
               isScrollControlled: true,
-              builder: (context) => SafetyWarningSheet(technique: rec.technique),
+              builder: (context) =>
+                  SafetyWarningSheet(technique: rec.technique),
             );
             if (confirmed != true) {
               return;
@@ -83,7 +84,9 @@ class HomeScreen extends ConsumerWidget {
           }
         }
 
-        ref.read(activeSessionConfigProvider.notifier).setConfig(
+        ref
+            .read(activeSessionConfigProvider.notifier)
+            .setConfig(
               ActiveSessionConfig(
                 technique: rec.technique,
                 preset: rec.preset,
@@ -206,7 +209,8 @@ class HomeScreen extends ConsumerWidget {
                 SizedBox(height: spacing.sm),
                 GoalShortcutRow(
                   selectedGoal: selectedGoal,
-                  onSelect: (goal) => ref.read(activeGoalProvider.notifier).select(goal),
+                  onSelect: (goal) =>
+                      ref.read(activeGoalProvider.notifier).select(goal),
                 ),
                 SizedBox(height: spacing.xl),
                 Text(
@@ -220,33 +224,26 @@ class HomeScreen extends ConsumerWidget {
                   data: (items) {
                     return FavoritesRow(
                       favorites: items,
-                      onOpen: (technique) => context.go(
-                        '/techniques/${technique.id}',
-                      ),
+                      onOpen: (technique) =>
+                          context.go('/techniques/${technique.id}'),
                     );
                   },
                   loading: () => const FavoritesRow(
                     favorites: <Technique>[],
                     onOpen: _ignoreOpen,
                   ),
-                  error: (error, stackTrace) =>
-                      const FavoritesRow(
-                        favorites: <Technique>[],
-                        onOpen: _ignoreOpen,
-                      ),
+                  error: (error, stackTrace) => const FavoritesRow(
+                    favorites: <Technique>[],
+                    onOpen: _ignoreOpen,
+                  ),
                 ),
                 SizedBox(height: spacing.xl),
-                StreakDisplay(
-                  streakDays: streakDays,
-                  loading: stats.isLoading,
-                ),
+                StreakDisplay(streakDays: streakDays, loading: stats.isLoading),
                 SizedBox(height: spacing.lg),
                 weeklyMinutes.when(
                   data: (minutes) => WeeklyBarChart(minutes: minutes),
-                  loading: () => const WeeklyBarChart(
-                    minutes: <int>[],
-                    loading: true,
-                  ),
+                  loading: () =>
+                      const WeeklyBarChart(minutes: <int>[], loading: true),
                   error: (error, stackTrace) =>
                       const WeeklyBarChart(minutes: <int>[]),
                 ),
@@ -268,10 +265,7 @@ PrimaryGoal _selectGoal(Set<PrimaryGoal> goals) {
   return PrimaryGoal.calm;
 }
 
-String _greeting({
-  required DayPart dayPart,
-  required String displayName,
-}) {
+String _greeting({required DayPart dayPart, required String displayName}) {
   final safeName = displayName.trim();
   final base = switch (dayPart) {
     DayPart.morning => 'Good morning',

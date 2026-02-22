@@ -51,7 +51,9 @@ class SessionController extends Notifier<SessionState> {
     _backgroundAudio = ref.read(backgroundAudioControllerProvider);
     _sessions = ref.read(sessionRepositoryProvider);
 
-    _backgroundEventsSub = _backgroundAudio.events.listen(_handleBackgroundEvent);
+    _backgroundEventsSub = _backgroundAudio.events.listen(
+      _handleBackgroundEvent,
+    );
     return SessionState.idle();
   }
 
@@ -187,7 +189,9 @@ class SessionController extends Notifier<SessionState> {
         await _sessions.insert(local);
         ref.invalidate(localStatsProvider);
         if (ref.read(authStateProvider) is AuthStateSignedIn) {
-          unawaited(ref.read(syncControllerProvider.notifier).submitSession(local));
+          unawaited(
+            ref.read(syncControllerProvider.notifier).submitSession(local),
+          );
         }
       } catch (_) {}
     }

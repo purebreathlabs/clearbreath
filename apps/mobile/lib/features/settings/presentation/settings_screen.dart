@@ -79,7 +79,7 @@ class SettingsScreen extends ConsumerWidget {
                     style: typography.titleLarge.copyWith(
                       color: colors.textPrimary,
                     ),
-                    ),
+                  ),
                   SizedBox(height: spacing.md),
                   for (final minutes in const [2, 5, 10, 20]) ...[
                     ListTile(
@@ -135,206 +135,199 @@ class SettingsScreen extends ConsumerWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                section(
-                  'Practice',
-                  [
-                    ListTile(
-                      title: const Text('Session length'),
-                      subtitle: Text('${state.sessionLengthMinutes} minutes'),
-                      trailing: const Icon(Icons.chevron_right_rounded),
-                      onTap: pickSessionLength,
-                    ),
-                    divider(),
-                    SwitchListTile(
-                      title: const Text('Haptics'),
-                      value: state.hapticsEnabled,
-                      onChanged: (value) => controller.setHapticsEnabled(value),
-                    ),
-                    divider(),
-                    SwitchListTile(
-                      title: const Text('Keep screen awake'),
-                      value: state.keepScreenAwake,
-                      onChanged: (value) =>
-                          controller.setKeepScreenAwake(value),
-                    ),
-                  ],
-                ),
+                section('Practice', [
+                  ListTile(
+                    title: const Text('Session length'),
+                    subtitle: Text('${state.sessionLengthMinutes} minutes'),
+                    trailing: const Icon(Icons.chevron_right_rounded),
+                    onTap: pickSessionLength,
+                  ),
+                  divider(),
+                  SwitchListTile(
+                    title: const Text('Haptics'),
+                    value: state.hapticsEnabled,
+                    onChanged: (value) => controller.setHapticsEnabled(value),
+                  ),
+                  divider(),
+                  SwitchListTile(
+                    title: const Text('Keep screen awake'),
+                    value: state.keepScreenAwake,
+                    onChanged: (value) => controller.setKeepScreenAwake(value),
+                  ),
+                ]),
                 SizedBox(height: spacing.xl),
-                section(
-                  'Reminders',
-                  [
-                    SwitchListTile(
-                      title: const Text('Daily reminder'),
-                      value: state.reminderEnabled,
-                      onChanged: (value) =>
-                          controller.setReminderEnabled(value),
-                    ),
-                    divider(),
-                    ListTile(
-                      title: const Text('Reminder time'),
-                      subtitle: Text(reminderTimeOfDay.format(context)),
-                      trailing: const Icon(Icons.chevron_right_rounded),
-                      enabled: state.reminderEnabled,
-                      onTap: state.reminderEnabled ? pickReminderTime : null,
-                    ),
-                    divider(),
-                    SwitchListTile(
-                      title: const Text('Streak warning'),
-                      value: state.streakWarningEnabled,
-                      onChanged: (value) =>
-                          controller.setStreakWarningEnabled(value),
-                    ),
-                  ],
-                ),
+                section('Reminders', [
+                  SwitchListTile(
+                    title: const Text('Daily reminder'),
+                    value: state.reminderEnabled,
+                    onChanged: (value) => controller.setReminderEnabled(value),
+                  ),
+                  divider(),
+                  ListTile(
+                    title: const Text('Reminder time'),
+                    subtitle: Text(reminderTimeOfDay.format(context)),
+                    trailing: const Icon(Icons.chevron_right_rounded),
+                    enabled: state.reminderEnabled,
+                    onTap: state.reminderEnabled ? pickReminderTime : null,
+                  ),
+                  divider(),
+                  SwitchListTile(
+                    title: const Text('Streak warning'),
+                    value: state.streakWarningEnabled,
+                    onChanged: (value) =>
+                        controller.setStreakWarningEnabled(value),
+                  ),
+                ]),
                 SizedBox(height: spacing.xl),
-                section(
-                  'Account',
-                  [
-                    if (auth.isGuest)
-                      ListTile(
-                        title: const Text('Sign in'),
-                        trailing: const Icon(Icons.chevron_right_rounded),
-                        onTap: () => context.push('/auth/sign-in'),
-                      )
-                    else ...[
-                      if (auth is AuthStateSignedIn) ...[
-                        SwitchListTile(
-                          title: const Text('Show me on leaderboard'),
-                          value: auth.profile.leaderboardOptIn,
-                          onChanged: (value) async {
-                            try {
-                              await ref
-                                  .read(authStateProvider.notifier)
-                                  .setLeaderboardOptIn(value);
-                            } on ApiError catch (e) {
-                              showMessage(e.message);
-                            } catch (_) {
-                              showMessage(
-                                'Could not update leaderboard setting.',
-                              );
-                            }
-                          },
-                        ),
-                        divider(),
-                        SwitchListTile(
-                          title: const Text('Initials only'),
-                          value: auth.profile.leaderboardInitialsOnly,
-                          onChanged: auth.profile.leaderboardOptIn
-                              ? (value) async {
-                                  try {
-                                    await ref
-                                        .read(authStateProvider.notifier)
-                                        .setLeaderboardInitialsOnly(value);
-                                  } on ApiError catch (e) {
-                                    showMessage(e.message);
-                                  } catch (_) {
-                                    showMessage(
-                                      'Could not update leaderboard setting.',
-                                    );
-                                  }
-                                }
-                              : null,
-                        ),
-                        divider(),
-                      ],
-                      ListTile(
-                        title: const Text('Sign out'),
-                        onTap: () async {
+                section('Account', [
+                  if (auth.isGuest)
+                    ListTile(
+                      title: const Text('Sign in'),
+                      trailing: const Icon(Icons.chevron_right_rounded),
+                      onTap: () => context.push('/auth/sign-in'),
+                    )
+                  else ...[
+                    if (auth is AuthStateSignedIn) ...[
+                      SwitchListTile(
+                        title: const Text('Show me on leaderboard'),
+                        value: auth.profile.leaderboardOptIn,
+                        onChanged: (value) async {
                           try {
-                            await ref.read(authStateProvider.notifier).signOut();
-                            if (context.mounted) {
-                              showMessage('Signed out.');
-                            }
+                            await ref
+                                .read(authStateProvider.notifier)
+                                .setLeaderboardOptIn(value);
+                          } on ApiError catch (e) {
+                            showMessage(e.message);
                           } catch (_) {
-                            if (context.mounted) {
-                              showMessage('Could not sign out. Please try again.');
-                            }
+                            showMessage(
+                              'Could not update leaderboard setting.',
+                            );
                           }
                         },
                       ),
                       divider(),
-                      ListTile(
-                        title: const Text('Delete account'),
-                        onTap: () async {
-                          final confirmed = await showDialog<bool>(
-                            context: context,
-                            builder: (context) {
-                              return AlertDialog(
-                                title: const Text('Delete account'),
-                                content: const Text(
-                                  'This will permanently delete your account and server data.',
-                                ),
-                                actions: [
-                                  TextButton(
-                                    onPressed: () => Navigator.of(context).pop(false),
-                                    child: const Text('Cancel'),
-                                  ),
-                                  FilledButton(
-                                    onPressed: () => Navigator.of(context).pop(true),
-                                    child: const Text('Delete'),
-                                  ),
-                                ],
-                              );
-                            },
-                          );
-
-                          if (confirmed != true) {
-                            return;
-                          }
-
-                          try {
-                            await ref.read(authStateProvider.notifier).deleteAccount();
-                            if (context.mounted) {
-                              showMessage('Account deleted.');
-                            }
-                          } on ApiError catch (e) {
-                            if (context.mounted) {
-                              showMessage(e.message);
-                            }
-                          } catch (_) {
-                            if (context.mounted) {
-                              showMessage(
-                                'Could not delete account. Please try again.',
-                              );
-                            }
-                          }
-                        },
+                      SwitchListTile(
+                        title: const Text('Initials only'),
+                        value: auth.profile.leaderboardInitialsOnly,
+                        onChanged: auth.profile.leaderboardOptIn
+                            ? (value) async {
+                                try {
+                                  await ref
+                                      .read(authStateProvider.notifier)
+                                      .setLeaderboardInitialsOnly(value);
+                                } on ApiError catch (e) {
+                                  showMessage(e.message);
+                                } catch (_) {
+                                  showMessage(
+                                    'Could not update leaderboard setting.',
+                                  );
+                                }
+                              }
+                            : null,
                       ),
+                      divider(),
                     ],
+                    ListTile(
+                      title: const Text('Sign out'),
+                      onTap: () async {
+                        try {
+                          await ref.read(authStateProvider.notifier).signOut();
+                          if (context.mounted) {
+                            showMessage('Signed out.');
+                          }
+                        } catch (_) {
+                          if (context.mounted) {
+                            showMessage(
+                              'Could not sign out. Please try again.',
+                            );
+                          }
+                        }
+                      },
+                    ),
+                    divider(),
+                    ListTile(
+                      title: const Text('Delete account'),
+                      onTap: () async {
+                        final confirmed = await showDialog<bool>(
+                          context: context,
+                          builder: (context) {
+                            return AlertDialog(
+                              title: const Text('Delete account'),
+                              content: const Text(
+                                'This will permanently delete your account and server data.',
+                              ),
+                              actions: [
+                                TextButton(
+                                  onPressed: () =>
+                                      Navigator.of(context).pop(false),
+                                  child: const Text('Cancel'),
+                                ),
+                                FilledButton(
+                                  onPressed: () =>
+                                      Navigator.of(context).pop(true),
+                                  child: const Text('Delete'),
+                                ),
+                              ],
+                            );
+                          },
+                        );
+
+                        if (confirmed != true) {
+                          return;
+                        }
+
+                        try {
+                          await ref
+                              .read(authStateProvider.notifier)
+                              .deleteAccount();
+                          if (context.mounted) {
+                            showMessage('Account deleted.');
+                          }
+                        } on ApiError catch (e) {
+                          if (context.mounted) {
+                            showMessage(e.message);
+                          }
+                        } catch (_) {
+                          if (context.mounted) {
+                            showMessage(
+                              'Could not delete account. Please try again.',
+                            );
+                          }
+                        }
+                      },
+                    ),
                   ],
-                ),
+                ]),
                 SizedBox(height: spacing.xl),
-                section(
-                  'About',
-                  [
-                    ListTile(
-                      title: const Text('Version'),
-                      subtitle: packageInfo.when(
-                        data: (info) => Text('${info.version}+${info.buildNumber}'),
-                        loading: () => const Text('—'),
-                        error: (error, stackTrace) => const Text('—'),
-                      ),
+                section('About', [
+                  ListTile(
+                    title: const Text('Version'),
+                    subtitle: packageInfo.when(
+                      data: (info) =>
+                          Text('${info.version}+${info.buildNumber}'),
+                      loading: () => const Text('—'),
+                      error: (error, stackTrace) => const Text('—'),
                     ),
-                    divider(),
-                    ListTile(
-                      title: const Text('Privacy policy'),
-                      trailing: const Icon(Icons.chevron_right_rounded),
-                      onTap: () => context.push('/profile/legal/privacy'),
-                    ),
-                    divider(),
-                    ListTile(
-                      title: const Text('Terms of service'),
-                      trailing: const Icon(Icons.chevron_right_rounded),
-                      onTap: () => context.push('/profile/legal/terms'),
-                    ),
-                    divider(),
-                    ListTile(
-                      title: const Text('Disclaimer'),
-                      trailing: const Icon(Icons.chevron_right_rounded),
-                      onTap: () => context.push('/profile/legal/disclaimer'),
-                    ),
-                  ],
-                ),
+                  ),
+                  divider(),
+                  ListTile(
+                    title: const Text('Privacy policy'),
+                    trailing: const Icon(Icons.chevron_right_rounded),
+                    onTap: () => context.push('/profile/legal/privacy'),
+                  ),
+                  divider(),
+                  ListTile(
+                    title: const Text('Terms of service'),
+                    trailing: const Icon(Icons.chevron_right_rounded),
+                    onTap: () => context.push('/profile/legal/terms'),
+                  ),
+                  divider(),
+                  ListTile(
+                    title: const Text('Disclaimer'),
+                    trailing: const Icon(Icons.chevron_right_rounded),
+                    onTap: () => context.push('/profile/legal/disclaimer'),
+                  ),
+                ]),
               ],
             ),
           ),

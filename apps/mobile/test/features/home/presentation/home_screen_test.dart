@@ -22,11 +22,7 @@ void main() {
       name: 'Box',
       shortDescription: 'A balanced four-part breath.',
       animationMode: AnimationMode.circle,
-      safety: const TechniqueSafety(
-        requiresAck: false,
-        title: '',
-        body: '',
-      ),
+      safety: const TechniqueSafety(requiresAck: false, title: '', body: ''),
       about: const TechniqueAbout(
         what: '',
         how: '',
@@ -75,10 +71,7 @@ void main() {
             (ref) async => const [0, 1, 2, 3, 4, 5, 6],
           ),
         ],
-        child: MaterialApp(
-          theme: AppTheme.dark(),
-          home: const HomeScreen(),
-        ),
+        child: MaterialApp(theme: AppTheme.dark(), home: const HomeScreen()),
       ),
     );
 

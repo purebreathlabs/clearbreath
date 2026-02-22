@@ -72,10 +72,10 @@ class LocalSession {
   }
 }
 
-final lastCompletedSessionProvider = NotifierProvider<
-  LastCompletedSessionController,
-  LocalSession?
->(LastCompletedSessionController.new);
+final lastCompletedSessionProvider =
+    NotifierProvider<LastCompletedSessionController, LocalSession?>(
+      LastCompletedSessionController.new,
+    );
 
 class LastCompletedSessionController extends Notifier<LocalSession?> {
   @override

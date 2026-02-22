@@ -66,7 +66,10 @@ void main() {
     expect(session.techniqueId, equals('box'));
     expect(session.presetId, equals('beginner'));
     expect(session.startedAtUtc, equals(startedAtUtc));
-    expect(session.endedAtUtc, equals(startedAtUtc.add(const Duration(minutes: 5))));
+    expect(
+      session.endedAtUtc,
+      equals(startedAtUtc.add(const Duration(minutes: 5))),
+    );
     expect(session.timezoneOffsetMinutes, equals(-480));
     expect(session.durationSecondsActual, equals(300));
     expect(session.breathsCompletedEstimated, equals(42));
@@ -147,4 +150,3 @@ void main() {
     expect(session.endedEarly, isTrue);
   });
 }
-

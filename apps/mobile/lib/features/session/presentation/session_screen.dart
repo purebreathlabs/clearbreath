@@ -100,8 +100,9 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
 
     final techniques = ref.watch(allTechniquesProvider);
     final technique = _findTechnique(techniques, state.techniqueId);
-    final preset =
-        technique != null ? technique.presets[state.presetId ?? ''] : null;
+    final preset = technique != null
+        ? technique.presets[state.presetId ?? '']
+        : null;
 
     final animationMode =
         technique?.animationMode ?? _fallbackAnimationMode(state.techniqueId);
@@ -144,9 +145,7 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
         unawaited(_requestExit(confirm: true));
       },
       child: Scaffold(
-        appBar: AppBar(
-          title: Text(technique?.name ?? 'Session'),
-        ),
+        appBar: AppBar(title: Text(technique?.name ?? 'Session')),
         body: SafeArea(
           child: Padding(
             padding: EdgeInsets.all(spacing.lg),
@@ -190,7 +189,8 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
                         Expanded(
                           child: OutlinedButton(
                             onPressed: state.canStop
-                                ? () => _requestExit(confirm: !state.isCompleted)
+                                ? () =>
+                                      _requestExit(confirm: !state.isCompleted)
                                 : null,
                             child: const Text('Stop'),
                           ),
@@ -225,7 +225,10 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
     );
   }
 
-  Technique? _findTechnique(AsyncValue<List<Technique>> techniques, String? id) {
+  Technique? _findTechnique(
+    AsyncValue<List<Technique>> techniques,
+    String? id,
+  ) {
     final list = techniques.asData?.value;
     if (list == null || id == null || id.isEmpty) {
       return null;
@@ -256,8 +259,9 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
         SessionPhase.inhale => Duration(milliseconds: preset.inhaleMs),
         SessionPhase.hold => Duration(milliseconds: preset.holdMs),
         SessionPhase.exhale => Duration(milliseconds: preset.exhaleMs),
-        SessionPhase.holdAfterExhale =>
-          Duration(milliseconds: preset.holdAfterExhaleMs),
+        SessionPhase.holdAfterExhale => Duration(
+          milliseconds: preset.holdAfterExhaleMs,
+        ),
         _ => const Duration(seconds: 1),
       };
     }

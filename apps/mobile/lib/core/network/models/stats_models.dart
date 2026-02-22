@@ -31,4 +31,3 @@ class StatsSnapshot {
   final Map<String, int> minutesByTechnique;
   final DateTime updatedAtUtc;
 }
-

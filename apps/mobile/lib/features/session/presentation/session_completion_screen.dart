@@ -24,35 +24,32 @@ class SessionCompletionScreen extends ConsumerStatefulWidget {
       _SessionCompletionScreenState();
 }
 
-class _SessionCompletionScreenState extends ConsumerState<SessionCompletionScreen> {
+class _SessionCompletionScreenState
+    extends ConsumerState<SessionCompletionScreen> {
   var _permissionDialogShowing = false;
   final _shareCardKey = GlobalKey();
 
   @override
   void initState() {
     super.initState();
-    ref.listenManual(
-      notificationControllerProvider,
-      (previous, next) {
-        if (!next.showPermissionPrompt) {
+    ref.listenManual(notificationControllerProvider, (previous, next) {
+      if (!next.showPermissionPrompt) {
+        return;
+      }
+      if (_permissionDialogShowing) {
+        return;
+      }
+      _permissionDialogShowing = true;
+      WidgetsBinding.instance.addPostFrameCallback((_) async {
+        if (!mounted) {
           return;
         }
-        if (_permissionDialogShowing) {
-          return;
+        await _showPermissionDialog();
+        if (mounted) {
+          _permissionDialogShowing = false;
         }
-        _permissionDialogShowing = true;
-        WidgetsBinding.instance.addPostFrameCallback((_) async {
-          if (!mounted) {
-            return;
-          }
-          await _showPermissionDialog();
-          if (mounted) {
-            _permissionDialogShowing = false;
-          }
-        });
-      },
-      fireImmediately: true,
-    );
+      });
+    }, fireImmediately: true);
   }
 
   Future<void> _showPermissionDialog() async {
@@ -114,10 +111,7 @@ class _SessionCompletionScreenState extends ConsumerState<SessionCompletionScree
     final stats = ref.watch(mergedStatsProvider);
     final technique = current == null
         ? null
-        : _findTechnique(
-            techniques.asData?.value,
-            current.techniqueId,
-          );
+        : _findTechnique(techniques.asData?.value, current.techniqueId);
 
     final title = current == null
         ? 'Session complete'
@@ -125,7 +119,7 @@ class _SessionCompletionScreenState extends ConsumerState<SessionCompletionScree
     final presetLabel = current == null
         ? null
         : (technique?.presets[current.presetId]?.label ??
-            _titleCaseId(current.presetId));
+              _titleCaseId(current.presetId));
     final minutes = current == null
         ? null
         : max(0, (current.durationSecondsActual / 60).round());
@@ -267,10 +261,7 @@ class _SessionCompletionScreenState extends ConsumerState<SessionCompletionScree
                 child: const Text('Done'),
               ),
               SizedBox(height: spacing.sm),
-              ShareButton(
-                repaintBoundaryKey: _shareCardKey,
-                enabled: canShare,
-              ),
+              ShareButton(repaintBoundaryKey: _shareCardKey, enabled: canShare),
             ],
           ),
         ),
@@ -291,15 +282,19 @@ class _SessionCompletionScreenState extends ConsumerState<SessionCompletionScree
   }
 
   String _titleCaseId(String value) {
-    final parts =
-        value.trim().split(RegExp(r'[_\\s-]+')).where((p) => p.isNotEmpty);
-    final words = parts.map((part) {
-      if (part.isEmpty) {
-        return part;
-      }
-      final lower = part.toLowerCase();
-      return lower[0].toUpperCase() + lower.substring(1);
-    }).toList(growable: false);
+    final parts = value
+        .trim()
+        .split(RegExp(r'[_\\s-]+'))
+        .where((p) => p.isNotEmpty);
+    final words = parts
+        .map((part) {
+          if (part.isEmpty) {
+            return part;
+          }
+          final lower = part.toLowerCase();
+          return lower[0].toUpperCase() + lower.substring(1);
+        })
+        .toList(growable: false);
     return words.isEmpty ? value : words.join(' ');
   }
 

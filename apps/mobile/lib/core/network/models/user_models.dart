@@ -19,7 +19,10 @@ class UserProfile {
       leaderboardOptIn: readBool(json, 'leaderboard_opt_in'),
       leaderboardInitialsOnly: readBool(json, 'leaderboard_initials_only'),
       createdAtUtc: readDateTimeUtc(json, 'created_at_utc'),
-      timezoneOffsetMinutesLatest: readInt(json, 'timezone_offset_minutes_latest'),
+      timezoneOffsetMinutesLatest: readInt(
+        json,
+        'timezone_offset_minutes_latest',
+      ),
     );
   }
 

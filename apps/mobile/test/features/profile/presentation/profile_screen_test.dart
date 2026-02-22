@@ -87,17 +87,17 @@ void main() {
           ),
           allTechniquesProvider.overrideWith((ref) async => [technique]),
         ],
-        child: MaterialApp(
-          theme: AppTheme.dark(),
-          home: const ProfileScreen(),
-        ),
+        child: MaterialApp(theme: AppTheme.dark(), home: const ProfileScreen()),
       ),
     );
 
     await tester.pumpAndSettle();
 
     expect(find.text('Rahul'), findsOneWidget);
-    expect(find.text('Create an account to sync sessions across devices.'), findsOneWidget);
+    expect(
+      find.text('Create an account to sync sessions across devices.'),
+      findsOneWidget,
+    );
     expect(find.text('Sign in'), findsOneWidget);
 
     expect(find.text('Stats'), findsOneWidget);

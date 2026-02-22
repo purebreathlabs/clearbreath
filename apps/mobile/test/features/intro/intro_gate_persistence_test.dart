@@ -26,9 +26,7 @@ Future<void> _waitForLoaded(IntroGate gate) async {
 
 void main() {
   test('persists intro completion across restart', () async {
-    final tempDir = await Directory.systemTemp.createTemp(
-      'clearbreath_intro_',
-    );
+    final tempDir = await Directory.systemTemp.createTemp('clearbreath_intro_');
     final dbFile = File('${tempDir.path}/prefs.sqlite');
 
     try {

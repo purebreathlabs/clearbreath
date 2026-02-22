@@ -6,7 +6,9 @@ sealed class TechniquePreset {
     required this.id,
     required this.label,
     required List<int> recommendedDurationsMinutes,
-  }) : recommendedDurationsMinutes = List.unmodifiable(recommendedDurationsMinutes);
+  }) : recommendedDurationsMinutes = List.unmodifiable(
+         recommendedDurationsMinutes,
+       );
 
   final String id;
   final String label;

@@ -49,4 +49,3 @@ final hapticServiceProvider = Provider<HapticService>((ref) {
     vibrate: (durationMs) => Vibration.vibrate(duration: durationMs),
   );
 });
-

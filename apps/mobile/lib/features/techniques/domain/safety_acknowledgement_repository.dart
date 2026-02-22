@@ -4,7 +4,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/database/app_database.dart';
 import '../../../shared/providers/app_database_provider.dart';
 
-final safetyAckRepositoryProvider = Provider<SafetyAcknowledgementRepository>((ref) {
+final safetyAckRepositoryProvider = Provider<SafetyAcknowledgementRepository>((
+  ref,
+) {
   final db = ref.watch(appDatabaseProvider);
   return SafetyAcknowledgementRepository(db);
 });
@@ -27,12 +29,14 @@ class SafetyAcknowledgementRepository {
   }
 
   Future<void> acknowledge(String techniqueId) async {
-    await _db.into(_db.safetyAck).insertOnConflictUpdate(
-      SafetyAckCompanion(
-        techniqueId: Value(techniqueId),
-        acknowledgedAt: Value(DateTime.now().toUtc()),
-      ),
-    );
+    await _db
+        .into(_db.safetyAck)
+        .insertOnConflictUpdate(
+          SafetyAckCompanion(
+            techniqueId: Value(techniqueId),
+            acknowledgedAt: Value(DateTime.now().toUtc()),
+          ),
+        );
   }
 
   Future<Set<String>> allAcknowledged() async {

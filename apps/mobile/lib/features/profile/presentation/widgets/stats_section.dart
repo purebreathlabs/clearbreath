@@ -40,7 +40,9 @@ class StatsSection extends ConsumerWidget {
           children: [
             Text(
               message,
-              style: typography.bodyMedium.copyWith(color: colors.textSecondary),
+              style: typography.bodyMedium.copyWith(
+                color: colors.textSecondary,
+              ),
             ),
             SizedBox(height: spacing.md),
             OutlinedButton(
@@ -111,8 +113,10 @@ class StatsSection extends ConsumerWidget {
             SizedBox(height: spacing.lg),
             weekly.when(
               data: (minutes) => WeeklyBarChart(minutes: minutes),
-              loading: () => const WeeklyBarChart(minutes: <int>[], loading: true),
-              error: (error, stackTrace) => const WeeklyBarChart(minutes: <int>[]),
+              loading: () =>
+                  const WeeklyBarChart(minutes: <int>[], loading: true),
+              error: (error, stackTrace) =>
+                  const WeeklyBarChart(minutes: <int>[]),
             ),
             SizedBox(height: spacing.lg),
             Text(
@@ -184,15 +188,19 @@ class StatsSection extends ConsumerWidget {
   }
 
   String _titleCaseId(String value) {
-    final parts =
-        value.trim().split(RegExp(r'[_\\s-]+')).where((p) => p.isNotEmpty);
-    final words = parts.map((part) {
-      if (part.isEmpty) {
-        return part;
-      }
-      final lower = part.toLowerCase();
-      return lower[0].toUpperCase() + lower.substring(1);
-    }).toList(growable: false);
+    final parts = value
+        .trim()
+        .split(RegExp(r'[_\\s-]+'))
+        .where((p) => p.isNotEmpty);
+    final words = parts
+        .map((part) {
+          if (part.isEmpty) {
+            return part;
+          }
+          final lower = part.toLowerCase();
+          return lower[0].toUpperCase() + lower.substring(1);
+        })
+        .toList(growable: false);
     return words.isEmpty ? value : words.join(' ');
   }
 }

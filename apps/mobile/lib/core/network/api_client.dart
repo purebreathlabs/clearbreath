@@ -12,9 +12,7 @@ final rawApiClientProvider = Provider<Dio>((ref) {
       connectTimeout: const Duration(seconds: 10),
       receiveTimeout: const Duration(seconds: 15),
       sendTimeout: const Duration(seconds: 15),
-      headers: const {
-        'Content-Type': 'application/json',
-      },
+      headers: const {'Content-Type': 'application/json'},
     ),
   );
 });
@@ -29,19 +27,12 @@ final apiClientProvider = Provider<Dio>((ref) {
       connectTimeout: const Duration(seconds: 10),
       receiveTimeout: const Duration(seconds: 15),
       sendTimeout: const Duration(seconds: 15),
-      headers: const {
-        'Content-Type': 'application/json',
-      },
+      headers: const {'Content-Type': 'application/json'},
     ),
   );
 
   dio.interceptors.add(
-    AuthInterceptor(
-      ref: ref,
-      dio: dio,
-      refreshDio: refreshDio,
-      tokens: tokens,
-    ),
+    AuthInterceptor(ref: ref, dio: dio, refreshDio: refreshDio, tokens: tokens),
   );
 
   return dio;

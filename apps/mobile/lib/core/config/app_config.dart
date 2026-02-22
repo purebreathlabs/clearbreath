@@ -40,4 +40,3 @@ String _sanitizeBaseUrl(String value) {
 
   return normalized;
 }
-

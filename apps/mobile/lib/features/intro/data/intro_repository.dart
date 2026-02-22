@@ -17,21 +17,22 @@ class IntroRepository {
   }
 
   Future<void> setIntroComplete() async {
-    final updated = await (_db.update(
-      _db.preferences,
-    )..where((row) => row.id.equals(_rowId))).write(
-      PreferencesCompanion(introComplete: const Value(true)),
-    );
+    final updated =
+        await (_db.update(_db.preferences)
+              ..where((row) => row.id.equals(_rowId)))
+            .write(PreferencesCompanion(introComplete: const Value(true)));
     if (updated > 0) {
       return;
     }
 
-    await _db.into(_db.preferences).insert(
-      PreferencesCompanion(
-        id: const Value(_rowId),
-        introComplete: const Value(true),
-      ),
-      mode: InsertMode.insertOrIgnore,
-    );
+    await _db
+        .into(_db.preferences)
+        .insert(
+          PreferencesCompanion(
+            id: const Value(_rowId),
+            introComplete: const Value(true),
+          ),
+          mode: InsertMode.insertOrIgnore,
+        );
   }
 }

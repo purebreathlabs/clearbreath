@@ -27,7 +27,10 @@ class AuthInterceptor extends Interceptor {
   static const _kRetriedKey = 'auth.retried';
 
   @override
-  void onRequest(RequestOptions options, RequestInterceptorHandler handler) async {
+  void onRequest(
+    RequestOptions options,
+    RequestInterceptorHandler handler,
+  ) async {
     try {
       final access = await tokens.readAccessToken();
       if (access != null) {
@@ -124,7 +127,10 @@ class AuthInterceptor extends Interceptor {
     try {
       final resp = await refreshDio.post<dynamic>(
         '/v1/auth/refresh',
-        data: RefreshRequest(refreshToken: refreshToken, deviceId: deviceId).toJson(),
+        data: RefreshRequest(
+          refreshToken: refreshToken,
+          deviceId: deviceId,
+        ).toJson(),
       );
 
       final data = resp.data;
