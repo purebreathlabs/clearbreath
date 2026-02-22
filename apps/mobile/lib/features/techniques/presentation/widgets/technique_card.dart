@@ -24,6 +24,13 @@ class TechniqueCard extends StatelessWidget {
     final colors = Theme.of(context).extension<AppColorTokens>()!;
     final components = Theme.of(context).extension<AppComponentTokens>()!;
 
+    final goalLabels =
+        technique.goals
+            .map((goal) => _goalLabel(goal.name))
+            .toList(growable: false)
+          ..sort();
+    final goalsText = goalLabels.take(2).join(' • ');
+
     final shape = RoundedRectangleBorder(
       borderRadius: BorderRadius.circular(components.cardRadius),
       side: BorderSide(color: components.cardBorder),
@@ -75,7 +82,7 @@ class TechniqueCard extends StatelessWidget {
                   ),
                 ],
               ),
-              SizedBox(height: spacing.md),
+              SizedBox(height: spacing.sm),
               Text(
                 technique.name,
                 style: typography.titleMedium.copyWith(
@@ -90,14 +97,35 @@ class TechniqueCard extends StatelessWidget {
                 style: typography.bodyMedium.copyWith(
                   color: colors.textSecondary,
                 ),
-                maxLines: 2,
+                maxLines: 1,
                 overflow: TextOverflow.ellipsis,
               ),
+              if (goalsText.isNotEmpty) ...[
+                SizedBox(height: spacing.xs),
+                Text(
+                  goalsText,
+                  style: typography.labelMedium.copyWith(
+                    color: colors.textTertiary,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ],
             ],
           ),
         ),
       ),
     );
+  }
+
+  String _goalLabel(String value) {
+    if (value == 'hrv') {
+      return 'HRV';
+    }
+    if (value.isEmpty) {
+      return value;
+    }
+    return value[0].toUpperCase() + value.substring(1);
   }
 
   IconData _animationIcon(AnimationMode mode) {

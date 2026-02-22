@@ -1,10 +1,8 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../core/theme/theme_extensions.dart';
-import '../../onboarding/domain/onboarding_answers.dart';
 import '../../auth/domain/auth_state.dart';
 import '../../auth/domain/auth_state_provider.dart';
 import '../../session/domain/active_session_config.dart';
@@ -17,10 +15,8 @@ import '../../techniques/presentation/widgets/safety_warning_sheet.dart';
 import '../../../shared/widgets/weekly_bar_chart.dart';
 import '../../../shared/providers/preferences_provider.dart';
 import '../../../shared/widgets/brand_mark.dart';
-import '../domain/active_goal_provider.dart';
 import '../domain/recommendation_engine.dart';
 import 'widgets/favorites_row.dart';
-import 'widgets/goal_shortcut_row.dart';
 import 'widgets/streak_display.dart';
 import 'widgets/todays_practice_card.dart';
 
@@ -53,7 +49,6 @@ class HomeScreen extends ConsumerWidget {
     }
 
     final recommendation = ref.watch(dailyRecommendationProvider);
-    final selectedGoal = _selectGoal(ref.watch(activeGoalProvider));
     final favorites = ref.watch(favoriteTechniquesProvider);
     final stats = ref.watch(mergedStatsProvider);
     final weeklyMinutes = ref.watch(weeklyMinutesProvider);
@@ -214,28 +209,8 @@ class HomeScreen extends ConsumerWidget {
                     ),
                   ),
                 ),
-                if (kDebugMode) ...[
-                  SizedBox(height: spacing.md),
-                  OutlinedButton(
-                    onPressed: () => context.push('/home/design-system'),
-                    child: const Text('Open Design System'),
-                  ),
-                ],
                 SizedBox(height: spacing.xl),
                 recommendationCard,
-                SizedBox(height: spacing.xl),
-                Text(
-                  'Goals',
-                  style: typography.titleMedium.copyWith(
-                    color: colors.textPrimary,
-                  ),
-                ),
-                SizedBox(height: spacing.sm),
-                GoalShortcutRow(
-                  selectedGoal: selectedGoal,
-                  onSelect: (goal) =>
-                      ref.read(activeGoalProvider.notifier).select(goal),
-                ),
                 SizedBox(height: spacing.xl),
                 Text(
                   'Favorites',
@@ -278,15 +253,6 @@ class HomeScreen extends ConsumerWidget {
       ),
     );
   }
-}
-
-PrimaryGoal _selectGoal(Set<PrimaryGoal> goals) {
-  for (final goal in PrimaryGoal.values) {
-    if (goals.contains(goal)) {
-      return goal;
-    }
-  }
-  return PrimaryGoal.calm;
 }
 
 String _greeting({required DayPart dayPart, required String displayName}) {

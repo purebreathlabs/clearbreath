@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 
+import '../../onboarding/domain/onboarding_answers.dart';
 import 'technique_preset.dart';
 
 enum AnimationMode { circle, metronome, alternateNostril }
@@ -41,15 +42,18 @@ class Technique {
     required this.name,
     required this.shortDescription,
     required this.animationMode,
+    required Set<PrimaryGoal> goals,
     required this.safety,
     required this.about,
     required Map<String, TechniquePreset> presets,
-  }) : presets = Map.unmodifiable(presets);
+  }) : goals = Set.unmodifiable(goals),
+       presets = Map.unmodifiable(presets);
 
   final String id;
   final String name;
   final String shortDescription;
   final AnimationMode animationMode;
+  final Set<PrimaryGoal> goals;
   final TechniqueSafety safety;
   final TechniqueAbout about;
   final Map<String, TechniquePreset> presets;

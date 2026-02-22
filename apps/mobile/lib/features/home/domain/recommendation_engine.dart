@@ -8,7 +8,6 @@ import '../../onboarding/domain/onboarding_answers_provider.dart';
 import '../../techniques/data/technique_repository.dart';
 import '../../techniques/domain/technique.dart';
 import '../../techniques/domain/technique_preset.dart';
-import 'active_goal_provider.dart';
 
 enum DayPart { morning, afternoon, evening, night }
 
@@ -51,8 +50,7 @@ final dailyRecommendationProvider = FutureProvider<Recommendation>((ref) async {
   final answers = await ref.watch(onboardingAnswersProvider.future);
   final techniques = await ref.watch(allTechniquesProvider.future);
 
-  final goals = ref.watch(activeGoalProvider);
-  final goal = _selectGoal(goals);
+  final goal = _selectGoal(answers.primaryGoals);
 
   final dayPart = currentDayPart(DateTime.now());
   return engine.recommend(
