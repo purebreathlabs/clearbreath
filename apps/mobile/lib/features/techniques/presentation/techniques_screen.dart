@@ -87,7 +87,7 @@ class TechniquesScreen extends ConsumerWidget {
                 crossAxisCount: 2,
                 crossAxisSpacing: spacing.md,
                 mainAxisSpacing: spacing.md,
-                childAspectRatio: 0.9,
+                childAspectRatio: 0.85,
                 children: [
                   for (final technique in items)
                     TechniqueCard(
