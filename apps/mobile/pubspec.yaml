@@ -49,6 +49,7 @@ flutter:
   uses-material-design: true
   assets:
     - assets/branding/clearbreath_logo.svg
+    - assets/branding/google_g.svg
     - assets/audio/
     - assets/techniques/
     - assets/recommendations/

@@ -46,17 +46,10 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
     }
 
     Widget googleIcon() {
-      return Builder(
-        builder: (context) {
-          return Text(
-            'G',
-            style: typography.titleMedium.copyWith(
-              fontWeight: FontWeight.w700,
-              height: 1,
-              color: IconTheme.of(context).color,
-            ),
-          );
-        },
+      return SvgPicture.asset(
+        'assets/branding/google_g.svg',
+        width: 20,
+        height: 20,
       );
     }
 
