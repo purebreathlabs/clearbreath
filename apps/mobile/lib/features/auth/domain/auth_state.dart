@@ -1,3 +1,5 @@
+import '../../../core/network/models/user_models.dart';
+
 sealed class AuthState {
   const AuthState();
 
@@ -10,7 +12,9 @@ final class AuthStateGuest extends AuthState {
 }
 
 final class AuthStateSignedIn extends AuthState {
-  const AuthStateSignedIn({required this.userId});
+  const AuthStateSignedIn({required this.profile});
 
-  final String userId;
+  final UserProfile profile;
+
+  String get userId => profile.id;
 }

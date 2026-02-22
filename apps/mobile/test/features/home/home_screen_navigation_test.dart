@@ -1,5 +1,6 @@
 import 'package:clearbreath/app.dart';
 import 'package:clearbreath/features/onboarding/domain/onboarding_gate.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -33,5 +34,8 @@ void main() {
 
     expect(find.text('Design System'), findsOneWidget);
     expect(find.text('Typography'), findsOneWidget);
+
+    await tester.pumpWidget(const SizedBox.shrink());
+    await tester.pumpAndSettle();
   });
 }

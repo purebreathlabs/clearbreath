@@ -1,0 +1,164 @@
+---
+import { readFile } from 'node:fs/promises';
+import { fileURLToPath } from 'node:url';
+
+import Layout from '../layouts/Layout.astro';
+import { seoPages, type SeoPage } from '../lib/seo_pages';
+
+type MobileTechnique = {
+  id: string;
+  name: string;
+  shortDescription: string;
+  safety: {
+    requiresAck: boolean;
+    title: string;
+    body: string;
+  };
+  about: {
+    what: string;
+    how: string;
+    bestTime: string;
+    benefits: string;
+    warnings: string;
+  };
+};
+
+const techniquesPath = fileURLToPath(
+  new URL('../../../mobile/assets/techniques/techniques_v1.json', import.meta.url),
+);
+const techniques = JSON.parse(
+  await readFile(techniquesPath, 'utf8'),
+) as MobileTechnique[];
+
+export function getStaticPaths() {
+  return seoPages.map((page) => ({
+    params: { slug: page.slug },
+    props: { page },
+  }));
+}
+
+const { page } = Astro.props as { page: SeoPage };
+const technique =
+  page.kind === 'technique'
+    ? techniques.find((t) => t.id === page.techniqueId)
+    : null;
+
+if (page.kind === 'technique' && !technique) {
+  throw new Error(`Missing technique data for ${page.slug}`);
+}
+
+const sleepSuggestions = [
+  '478-breathing-timer',
+  'diaphragmatic-breathing',
+  'bhramari-bee-breathing',
+  'hrv-resonance-breathing',
+];
+const sleepPages = seoPages.filter((p) => sleepSuggestions.includes(p.slug));
+---
+
+<Layout title={page.title} description={page.description}>
+  <article class="space-y-8">
+    <header class="space-y-3">
+      <p class="text-sm text-white/60">
+        {page.kind === 'technique' ? 'Technique guide' : 'Guide'}
+      </p>
+      <h1 class="text-4xl tracking-tight font-light text-white">{page.h1}</h1>
+      <p class="text-white/70">{page.description}</p>
+      <div class="pt-2 flex flex-wrap gap-3">
+        <a
+          href="/#download"
+          class="inline-flex items-center justify-center rounded-xl bg-white text-black px-5 py-3 text-sm font-semibold"
+        >
+          Get ClearBreath
+        </a>
+        <a
+          href="/terms"
+          class="inline-flex items-center justify-center rounded-xl border border-white/15 text-white px-5 py-3 text-sm font-semibold hover:border-white/25"
+        >
+          Not medical advice
+        </a>
+      </div>
+    </header>
+
+    {page.kind === 'hub' ? (
+      <section class="space-y-4">
+        <h2 class="text-xl font-semibold text-white">Techniques to try</h2>
+        <p class="text-white/70">
+          If you are winding down for the night, start gentle and keep the breath
+          comfortable. If any technique feels uncomfortable, stop and return to
+          normal breathing.
+        </p>
+        <div class="grid gap-3">
+          {sleepPages.map((p) => (
+            <a
+              href={`/${p.slug}`}
+              class="rounded-2xl border border-white/10 px-5 py-4 hover:border-white/20 transition-colors"
+            >
+              <div class="text-white font-semibold">{p.h1}</div>
+              <div class="mt-1 text-sm text-white/65">{p.description}</div>
+            </a>
+          ))}
+        </div>
+      </section>
+    ) : (
+      <>
+        <section class="space-y-5">
+          <div class="rounded-2xl border border-white/10 px-5 py-5">
+            <div class="text-white font-semibold">{technique!.name}</div>
+            <div class="mt-1 text-sm text-white/65">
+              {technique!.shortDescription}
+            </div>
+          </div>
+        </section>
+
+        <section class="space-y-5">
+          <div class="space-y-2">
+            <h2 class="text-xl font-semibold text-white">What it is</h2>
+            <p class="text-white/70">{technique!.about.what}</p>
+          </div>
+          <div class="space-y-2">
+            <h2 class="text-xl font-semibold text-white">How to do it</h2>
+            <p class="text-white/70">{technique!.about.how}</p>
+          </div>
+          <div class="space-y-2">
+            <h2 class="text-xl font-semibold text-white">Best time</h2>
+            <p class="text-white/70">{technique!.about.bestTime}</p>
+          </div>
+          <div class="space-y-2">
+            <h2 class="text-xl font-semibold text-white">Benefits</h2>
+            <p class="text-white/70">{technique!.about.benefits}</p>
+          </div>
+          <div class="space-y-2">
+            <h2 class="text-xl font-semibold text-white">Warnings</h2>
+            <p class="text-white/70">{technique!.about.warnings}</p>
+          </div>
+        </section>
+
+        {(technique!.safety.requiresAck || technique!.safety.body.trim()) && (
+          <section class="space-y-3">
+            <h2 class="text-xl font-semibold text-white">Safety</h2>
+            <div class="rounded-2xl border border-white/10 px-5 py-5">
+              <div class="text-white font-semibold">
+                {technique!.safety.title || 'Safety guidance'}
+              </div>
+              <p class="mt-2 text-white/70">
+                {technique!.safety.body.trim() ||
+                  'Practice gently. Stop if you feel unwell.'}
+              </p>
+            </div>
+          </section>
+        )}
+      </>
+    )}
+
+    <section class="space-y-3 border-t border-white/10 pt-8">
+      <h2 class="text-xl font-semibold text-white">About ClearBreath</h2>
+      <p class="text-white/70">
+        ClearBreath is for wellness and relaxation purposes only. It is not
+        medical advice and does not diagnose, treat, cure, or prevent any
+        disease.
+      </p>
+    </section>
+  </article>
+</Layout>
+

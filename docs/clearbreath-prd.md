@@ -218,9 +218,9 @@ Per-technique breathing direction (nose inhale, mouth exhale, etc.) is SUGGESTED
 - **Difficulty:** Intermediate-Advanced
 - **What it is:** Breathing at the scientifically-studied resonance frequency (~5-6 BPM) commonly used in HRV training protocols. ClearBreath's unique differentiator.
 - **Presets:**
-  - Beginner: 6 BPM (5s inhale, 5s exhale) — 5 min session
-  - Intermediate: 5 BPM (6s inhale, 6s exhale) — 10 min session
-  - Advanced: 4.5 BPM (6.5s inhale, 6.5s exhale + optional 2s holds) — 15 min session
+  - Beginner: ~6 BPM (5s inhale, 5s exhale) — choose 2/5/10/20 min
+  - Intermediate: ~5 BPM (6s inhale, 6s exhale) — choose 2/5/10/20 min
+  - Advanced: ~4.5 BPM (6.7s inhale, 6.7s exhale) — choose 2/5/10/20 min
 - **Contraindications:** Not recommended for people with severe respiratory conditions. Start at 6 BPM and work down.
 - **Cues:** "Breathe smoothly and evenly. Match your breath to the guide. If you feel dizzy, return to normal breathing."
 
@@ -229,9 +229,9 @@ Per-technique breathing direction (nose inhale, mouth exhale, etc.) is SUGGESTED
 - **Difficulty:** Advanced
 - **What it is:** Extremely slow breathing at 1-3 BPM for advanced respiratory control training. Builds on HRV resonance.
 - **Presets:**
-  - Beginner: 3 BPM (10s inhale, 10s exhale) — 5 min session
-  - Intermediate: 2 BPM (15s inhale, 15s exhale) — 10 min session
-  - Advanced: 1.5 BPM (20s inhale, 20s exhale) — 15 min session
+  - Beginner: ~3 BPM (10s inhale, 10s exhale) — choose 2/5/10/20 min
+  - Intermediate: ~2 BPM (15s inhale, 15s exhale) — choose 2/5/10/20 min
+  - Advanced: ~1.5 BPM (20s inhale, 20s exhale) — choose 2/5/10/20 min
 - **Contraindications:** ⚠️ Advanced practice only. Not for beginners or anyone with respiratory conditions. Mandatory interstitial warning before first session below 2 BPM.
 - **Cues:** "This is an advanced practice. Breathe as slowly and smoothly as possible. If uncomfortable at any point, return to your natural rhythm immediately."
 
@@ -240,9 +240,9 @@ Per-technique breathing direction (nose inhale, mouth exhale, etc.) is SUGGESTED
 - **Difficulty:** Beginner
 - **What it is:** Foundation breathing technique. Breathe deep into the belly, expanding the diaphragm.
 - **Presets:**
-  - Beginner: 4s inhale, 4s exhale — 3 min session
-  - Intermediate: 5s inhale, 6s exhale — 5 min session
-  - Advanced: 6s inhale, 8s exhale — 10 min session
+  - Beginner: 4s inhale, 6s exhale — choose 2/5/10/20 min
+  - Intermediate: 5s inhale, 7s exhale — choose 2/5/10/20 min
+  - Advanced: 6s inhale, 8s exhale — choose 2/5/10/20 min
 - **Contraindications:** None. Safe for everyone.
 - **Cues:** "Place one hand on your chest and one on your belly. Only your belly hand should rise."
 
@@ -251,9 +251,9 @@ Per-technique breathing direction (nose inhale, mouth exhale, etc.) is SUGGESTED
 - **Difficulty:** Beginner
 - **What it is:** Equal-ratio breathing with holds. Used by Navy SEALs for stress management.
 - **Presets:**
-  - Beginner: 3-3-3-3 (inhale-hold-exhale-hold) — 3 min
-  - Intermediate: 4-4-4-4 — 5 min
-  - Advanced: 6-6-6-6 — 10 min
+  - Beginner: 4-4-4-4 (inhale-hold-exhale-hold) — choose 2/5/10/20 min
+  - Intermediate: 5-5-5-5 — choose 2/5/10/20 min
+  - Advanced: 6-6-6-6 — choose 2/5/10/20 min
 - **Contraindications:** Breath holds not recommended during pregnancy or for people with uncontrolled high blood pressure.
 - **Cues:** "Inhale... Hold... Exhale... Hold... Keep each phase equal."
 
@@ -262,9 +262,9 @@ Per-technique breathing direction (nose inhale, mouth exhale, etc.) is SUGGESTED
 - **Difficulty:** Beginner
 - **What it is:** Dr. Andrew Weil's calming technique. Excellent for sleep and anxiety.
 - **Presets:**
-  - Beginner: 4s inhale, 7s hold, 8s exhale — 4 cycles
-  - Intermediate: 4s inhale, 7s hold, 8s exhale — 8 cycles
-  - Advanced: 4s inhale, 7s hold, 8s exhale — 12 cycles
+  - Beginner: 4s inhale, 7s hold, 8s exhale — choose 2/5/10/20 min
+  - Intermediate: 4s inhale, 7s hold, 8s exhale — choose 2/5/10/20 min
+  - Advanced: 4s inhale, 7s hold, 8s exhale — choose 2/5/10/20 min
 - **Contraindications:** The long hold may be uncomfortable for beginners. Stop if dizzy.
 - **Cues:** "Inhale through your nose for 4... Hold for 7... Exhale slowly through your mouth for 8."
 
@@ -273,9 +273,9 @@ Per-technique breathing direction (nose inhale, mouth exhale, etc.) is SUGGESTED
 - **Difficulty:** Beginner
 - **What it is:** Sequential filling of belly, ribs, and chest. Teaches full lung capacity awareness.
 - **Presets:**
-  - Beginner: 4s inhale (3-part), 4s exhale — 5 min
-  - Intermediate: 6s inhale, 6s exhale — 7 min
-  - Advanced: 8s inhale, 2s hold, 8s exhale — 10 min
+  - Beginner: 4s inhale, 2s hold, 6s exhale — choose 2/5/10/20 min
+  - Intermediate: 5s inhale, 3s hold, 7s exhale — choose 2/5/10/20 min
+  - Advanced: 6s inhale, 4s hold, 8s exhale — choose 2/5/10/20 min
 - **Contraindications:** None. Safe for everyone.
 - **Cues:** "Fill your belly first... then your ribs... then your chest. Exhale in reverse."
 
@@ -284,9 +284,9 @@ Per-technique breathing direction (nose inhale, mouth exhale, etc.) is SUGGESTED
 - **Difficulty:** Intermediate
 - **What it is:** Alternate nostril breathing for balance and calm. Core pranayama technique.
 - **Presets:**
-  - Beginner: 4s left inhale, 4s right exhale — 5 min
-  - Intermediate: 4s inhale, 2s hold, 4s exhale — 7 min
-  - Advanced: 4s inhale, 4s hold, 6s exhale, 2s hold — 10 min
+  - Beginner: 4s inhale, 4s exhale — choose 2/5/10/20 min
+  - Intermediate: 4s inhale, 4s hold, 8s exhale — choose 2/5/10/20 min
+  - Advanced: 4s inhale, 16s hold, 8s exhale — choose 2/5/10/20 min
 - **Visual:** Simplified nostril sequencing in MVP — left/right indicator showing which nostril is active. Full detailed hand-position animation deferred to Phase 2.
 - **Contraindications:** Avoid during cold/nasal congestion. Not recommended with severe sinus issues.
 - **Cues:** "Close right nostril... Inhale left... Close left... Exhale right..."
@@ -296,9 +296,9 @@ Per-technique breathing direction (nose inhale, mouth exhale, etc.) is SUGGESTED
 - **Difficulty:** Intermediate
 - **What it is:** Breath with slight throat constriction creating an ocean-like sound. Commonly used in yoga.
 - **Presets:**
-  - Beginner: 4s inhale, 4s exhale — 5 min
-  - Intermediate: 5s inhale, 7s exhale — 7 min
-  - Advanced: 6s inhale, 2s hold, 8s exhale — 10 min
+  - Beginner: 4s inhale, 6s exhale — choose 2/5/10/20 min
+  - Intermediate: 5s inhale, 2s hold, 7s exhale — choose 2/5/10/20 min
+  - Advanced: 6s inhale, 4s hold, 8s exhale — choose 2/5/10/20 min
 - **Contraindications:** Avoid if you have a sore throat or throat infection.
 - **Cues:** "Slightly constrict the back of your throat, as if you're fogging a mirror. Breathe through your nose."
 
@@ -307,9 +307,9 @@ Per-technique breathing direction (nose inhale, mouth exhale, etc.) is SUGGESTED
 - **Difficulty:** Intermediate
 - **What it is:** Humming exhalation that creates vibration. Calms the nervous system rapidly.
 - **Presets:**
-  - Beginner: 4s inhale, 6s humming exhale — 5 min
-  - Intermediate: 5s inhale, 10s humming exhale — 7 min
-  - Advanced: 6s inhale, 2s hold, 12s humming exhale — 10 min
+  - Beginner: 4s inhale, 8s humming exhale — choose 2/5/10/20 min
+  - Intermediate: 4s inhale, 10s humming exhale — choose 2/5/10/20 min
+  - Advanced: 4s inhale, 12s humming exhale — choose 2/5/10/20 min
 - **Contraindications:** Avoid during ear infection. Not recommended while lying down.
 - **Cues:** "Inhale deeply... Now exhale with a steady humming sound like a bee. Feel the vibration."
 
@@ -321,9 +321,9 @@ Per-technique breathing direction (nose inhale, mouth exhale, etc.) is SUGGESTED
 - **Pacing:** Audio tick at each exhale (metronome-style pacing) + haptic pulse.
 - **Rounds & Rest:** App FORCES rest timers between rounds. User cannot skip rest.
 - **Presets:**
-  - Beginner: 30 breaths/min, 1 min session (1 round)
-  - Intermediate: 60 breaths/min, 3 min (3 rounds with 30s forced rest between)
-  - Advanced: 90 breaths/min, 5 min (5 rounds with 30s forced rest between)
+  - Beginner: 60 bpm, 30s work, 30s rest (round-based pacing)
+  - Intermediate: 80 bpm, 45s work, 30s rest (round-based pacing)
+  - Advanced: 120 bpm, 60s work, 45s rest (round-based pacing)
 - **Contraindications:** ⚠️ NOT safe for: pregnancy, high blood pressure, heart conditions, hernia, recent abdominal surgery, epilepsy. Show prominent warning before starting.
 - **Safety:** Mandatory one-time "I understand the risks" interstitial before first session. Visible to ALL user levels (not locked behind Advanced onboarding) but warning is prominent.
 - **Mid-round stop:** If user stops mid-round, partial session still counts (time spent is logged). Session marked as incomplete but contributes to daily total minutes and can help qualify the streak (≥2 minutes/day).
@@ -337,9 +337,9 @@ Per-technique breathing direction (nose inhale, mouth exhale, etc.) is SUGGESTED
 - **Pacing:** Audio tick at each breath (metronome-style) + haptic pulse.
 - **Rounds & Rest:** Forced rest timers between rounds.
 - **Presets:**
-  - Beginner: 20 breaths/min, 1 min (1 round)
-  - Intermediate: 30 breaths/min, 3 min (3 rounds with 45s forced rest)
-  - Advanced: 40 breaths/min, 5 min (5 rounds with 30s forced rest)
+  - Beginner: 30 bpm, 30s work, 60s rest (round-based pacing)
+  - Intermediate: 60 bpm, 30s work, 90s rest (round-based pacing)
+  - Advanced: 90 bpm, 40s work, 120s rest (round-based pacing)
 - **Contraindications:** ⚠️ Same as Kapalbhati plus: asthma (can trigger bronchospasm), nosebleeds, retinal issues. Show prominent warning.
 - **Safety:** Same one-time interstitial gate as Kapalbhati.
 - **Cues:** "Forceful inhale AND exhale through the nose. Pump your belly like bellows. Equal force both ways."
