@@ -78,9 +78,11 @@ void main() {
 
     await tester.pumpAndSettle();
 
-    expect(find.text('Today’s practice'), findsOneWidget);
+    expect(find.textContaining('practice'), findsOneWidget);
     expect(find.text('Favorites'), findsOneWidget);
     expect(find.text('Start session'), findsOneWidget);
+    expect(find.text('Streak'), findsOneWidget);
+    expect(find.text('This week'), findsOneWidget);
 
     await tester.pumpWidget(const SizedBox.shrink());
     await tester.pumpAndSettle();

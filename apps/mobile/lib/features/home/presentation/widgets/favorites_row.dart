@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 
 import '../../../../core/theme/theme_extensions.dart';
+import '../../../../shared/utils/category_colors.dart';
+import '../../../../shared/utils/technique_assets.dart';
+import '../../../onboarding/domain/onboarding_answers.dart';
 import '../../../techniques/domain/technique.dart';
 
 class FavoritesRow extends StatelessWidget {
@@ -21,22 +24,45 @@ class FavoritesRow extends StatelessWidget {
     final components = Theme.of(context).extension<AppComponentTokens>()!;
 
     if (favorites.isEmpty) {
-      return Container(
+      return SizedBox(
+        width: double.infinity,
+        child: Container(
         padding: EdgeInsets.all(components.cardPadding),
         decoration: BoxDecoration(
-          color: colors.surface,
+          color: colors.surfaceHigh,
           borderRadius: BorderRadius.circular(components.cardRadius),
-          border: Border.all(color: colors.border),
         ),
-        child: Text(
-          'Favorite techniques will show up here.',
-          style: typography.bodyMedium.copyWith(color: colors.textSecondary),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              Icons.favorite_border_rounded,
+              size: 32,
+              color: colors.textTertiary,
+            ),
+            SizedBox(height: spacing.sm),
+            Text(
+              'No favorites yet',
+              style: typography.titleMedium.copyWith(
+                color: colors.textPrimary,
+              ),
+            ),
+            SizedBox(height: spacing.xs),
+            Text(
+              'Tap the heart on any technique to add it here.',
+              style: typography.bodyMedium.copyWith(
+                color: colors.textTertiary,
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ],
         ),
+      ),
       );
     }
 
     return SizedBox(
-      height: 120,
+      height: 160,
       child: ListView.separated(
         scrollDirection: Axis.horizontal,
         physics: const ClampingScrollPhysics(),
@@ -67,60 +93,99 @@ class _FavoriteCard extends StatelessWidget {
     final colors = Theme.of(context).extension<AppColorTokens>()!;
     final components = Theme.of(context).extension<AppComponentTokens>()!;
 
-    final shape = RoundedRectangleBorder(
-      borderRadius: BorderRadius.circular(components.cardRadius),
-      side: BorderSide(color: colors.border),
-    );
+    final imagePath = techniqueImageAsset(technique.id);
+    final firstGoal = technique.goals.firstOrNull;
 
     return Material(
-      color: colors.surface,
-      shape: shape,
+      color: Colors.transparent,
       clipBehavior: Clip.antiAlias,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(components.cardRadius),
+      ),
       child: InkWell(
         onTap: onTap,
         child: SizedBox(
-          width: 160,
-          child: Padding(
-            padding: EdgeInsets.all(spacing.md),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Icon(
-                  _animationIcon(technique.animationMode),
-                  color: colors.textTertiary,
-                  size: 18,
-                ),
-                const Spacer(),
-                Text(
-                  technique.name,
-                  style: typography.titleMedium.copyWith(
-                    color: colors.textPrimary,
+          width: 140,
+          child: Stack(
+            fit: StackFit.expand,
+            children: [
+              if (imagePath != null)
+                Image.asset(
+                  imagePath,
+                  fit: BoxFit.cover,
+                  errorBuilder: (_, _, _) => Container(
+                    color: colors.surfaceHigh,
                   ),
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                ),
-                SizedBox(height: spacing.xs),
-                Text(
-                  technique.shortDescription,
-                  style: typography.bodyMedium.copyWith(
-                    color: colors.textSecondary,
+                )
+              else
+                Container(color: colors.surfaceHigh),
+              DecoratedBox(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [
+                      Colors.transparent,
+                      Colors.black.withValues(alpha: 0.8),
+                    ],
+                    stops: const [0.3, 1.0],
                   ),
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
                 ),
-              ],
-            ),
+              ),
+              Positioned(
+                left: spacing.sm,
+                right: spacing.sm,
+                bottom: spacing.sm,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      technique.name,
+                      style: typography.titleMedium.copyWith(
+                        color: colors.textPrimary,
+                        fontSize: 14,
+                      ),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    if (firstGoal != null) ...[
+                      SizedBox(height: spacing.xs),
+                      _MiniCategoryPill(goal: firstGoal),
+                    ],
+                  ],
+                ),
+              ),
+            ],
           ),
         ),
       ),
     );
   }
+}
 
-  IconData _animationIcon(AnimationMode mode) {
-    return switch (mode) {
-      AnimationMode.circle => Icons.circle_outlined,
-      AnimationMode.metronome => Icons.speed_rounded,
-      AnimationMode.alternateNostril => Icons.swap_horiz_rounded,
-    };
+class _MiniCategoryPill extends StatelessWidget {
+  const _MiniCategoryPill({required this.goal});
+
+  final PrimaryGoal goal;
+
+  @override
+  Widget build(BuildContext context) {
+    final style = categoryStyleFor(goal);
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+      decoration: BoxDecoration(
+        color: style.color.withValues(alpha: 0.2),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Text(
+        style.label,
+        style: TextStyle(
+          color: style.color,
+          fontSize: 10,
+          fontWeight: FontWeight.w600,
+        ),
+      ),
+    );
   }
 }

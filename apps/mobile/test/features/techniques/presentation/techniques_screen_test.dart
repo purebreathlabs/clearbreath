@@ -38,10 +38,30 @@ void main() {
 
     for (final id in ids) {
       final card = find.byKey(Key('technique_card_$id'));
-      await tester.scrollUntilVisible(card, 300, scrollable: scrollable);
+      await tester.scrollUntilVisible(card, 500, scrollable: scrollable);
       expect(card, findsOneWidget);
     }
 
     expect(find.byType(TechniqueCard), findsWidgets);
+  });
+
+  testWidgets('search field and filter chips exist', (tester) async {
+    await tester.pumpWidget(
+      ProviderScope(
+        child: MaterialApp(
+          theme: AppTheme.dark(),
+          home: const TechniquesScreen(),
+        ),
+      ),
+    );
+
+    await tester.pump(const Duration(seconds: 1));
+
+    expect(
+      find.byKey(const Key('techniques_search_field')),
+      findsOneWidget,
+    );
+    expect(find.byKey(const Key('filter_chip_all')), findsOneWidget);
+    expect(find.byKey(const Key('filter_chip_calm')), findsOneWidget);
   });
 }
