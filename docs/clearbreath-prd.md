@@ -141,7 +141,7 @@ ClearBreath adapts to user level. Beginners see educational "About" cards, simpl
 
 ### Website
 
-- **Astro** for landing page, Privacy, Terms, and 12 SEO pages
+- **Astro** for landing page, Privacy, Terms, and 10 SEO pages
 
 ### Storage & Assets
 
@@ -175,7 +175,9 @@ ClearBreath adapts to user level. Beginners see educational "About" cards, simpl
 
 ---
 
-## 6. Canonical Exercise Library (MVP — 11 Techniques)
+## 6. Canonical Exercise Library (v1 — 9 Techniques + 2 Planned Additions)
+
+The initial release ships with 9 techniques. Diaphragmatic (Belly) Breathing and Three-Part Breath are planned additions and are not included in the initial build.
 
 ### BPM Definition
 
@@ -235,7 +237,7 @@ Per-technique breathing direction (nose inhale, mouth exhale, etc.) is SUGGESTED
 - **Contraindications:** ⚠️ Advanced practice only. Not for beginners or anyone with respiratory conditions. Mandatory interstitial warning before first session below 2 BPM.
 - **Cues:** "This is an advanced practice. Breathe as slowly and smoothly as possible. If uncomfortable at any point, return to your natural rhythm immediately."
 
-### 3. Diaphragmatic (Belly) Breathing
+### 3. Diaphragmatic (Belly) Breathing (Planned)
 
 - **Difficulty:** Beginner
 - **What it is:** Foundation breathing technique. Breathe deep into the belly, expanding the diaphragm.
@@ -268,7 +270,7 @@ Per-technique breathing direction (nose inhale, mouth exhale, etc.) is SUGGESTED
 - **Contraindications:** The long hold may be uncomfortable for beginners. Stop if dizzy.
 - **Cues:** "Inhale through your nose for 4... Hold for 7... Exhale slowly through your mouth for 8."
 
-### 6. Yogic Breathing (Three-Part Breath / Dirga Pranayama)
+### 6. Yogic Breathing (Three-Part Breath / Dirga Pranayama) (Planned)
 
 - **Difficulty:** Beginner
 - **What it is:** Sequential filling of belly, ribs, and chest. Teaches full lung capacity awareness.
@@ -344,7 +346,7 @@ Per-technique breathing direction (nose inhale, mouth exhale, etc.) is SUGGESTED
 - **Safety:** Same one-time interstitial gate as Kapalbhati.
 - **Cues:** "Forceful inhale AND exhale through the nose. Pump your belly like bellows. Equal force both ways."
 
-> **Note:** Exercise list is 11 total (original 10 + Ultra-Slow split from HRV Resonance). Both HRV Resonance and Ultra-Slow are ClearBreath's signature features.
+> **Note:** Planned technique catalog is 11 total (9 in v1 + 2 planned additions). Ultra-Slow is split from HRV Resonance; both are ClearBreath's signature features.
 
 ---
 
@@ -607,7 +609,7 @@ Every session gets a `client_session_id` (UUID v4, generated on device at sessio
 - 4-tab shell: Home, Techniques, Leaderboard (locked for guests), Profile
 - Strict black/white theme, Manrope typography, splash scale-in logo
 - Onboarding: exactly 7 questions, one per screen; notification permission only after first completed session
-- Technique library (11 techniques) with detail screens and one-time safety gates
+- Technique library (9 techniques at launch; 2 planned additions) with detail screens and one-time safety gates
 - Session engine: countdown, phase scheduler, pause/resume, end early, slow/rapid visuals, phase-start cues, in-session volume + mute
 - Background continuation + lock-screen controls + interruption handling
 - Stats + streaks: daily streak qualifies at ≥2 minutes/day; Monday-start week; share streak card
@@ -623,7 +625,7 @@ Every session gets a `client_session_id` (UUID v4, generated on device at sessio
 
 **Website (Astro):**
 
-- Landing page, Privacy, Terms, and 12 SEO pages (11 technique pages + breathing-for-sleep hub)
+- Landing page, Privacy, Terms, and 10 SEO pages (9 technique pages + breathing-for-sleep hub)
 
 Execution plan and module breakdown live in docs/final_plan.md and are the delivery source of truth.
 
@@ -642,7 +644,7 @@ Execution plan and module breakdown live in docs/final_plan.md and are the deliv
 ## 11. Unique Selling Points (Why ClearBreath)
 
 1. **The only app with serious low-BPM breathing tools.** HRV resonance (5-6 BPM) AND ultra-slow (1-3 BPM) training with precision-synced animations. No competitor does this.
-2. **Complete pranayama library in one place.** From beginner belly breathing to advanced Bhastrika — 11 techniques with proper presets, safety warnings, and educational cards.
+2. **Complete pranayama library in one place.** From beginner belly breathing to advanced Bhastrika — 9 techniques at launch (with more added over time) with proper presets, safety warnings, and educational cards.
 3. **Zero friction to start.** No sign-up wall. Download, open, and breathe in under 30 seconds.
 4. **Streak + leaderboard motivation.** Breathing apps lack any social/gamification layer. ClearBreath adds it thoughtfully with privacy-first defaults.
 5. **Authentic technique education.** Proper "About" cards with traditional context, not just "breathe in, breathe out."
@@ -724,7 +726,7 @@ Execution plan and module breakdown live in docs/final_plan.md and are the deliv
 
 ### Exercise Configuration
 
-All 11 techniques defined as JSON config files bundled with the app:
+All 9 launch techniques defined as JSON config files bundled with the app:
 
 - Technique ID, name, slug, description, difficulty
 - Preset levels with exact timing ratios (inhale/hold/exhale/hold in seconds)

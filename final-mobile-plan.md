@@ -45,7 +45,7 @@
 
  Missing Entirely
 
- - Technique JSON data layer (11 techniques × 3 presets)
+ - Technique JSON data layer (9 techniques × 3 presets)
  - Technique grid/list + detail screens + safety warnings
  - Session-to-technique connection
  - Breathing animations (circle, metronome, alternate nostril)
@@ -243,7 +243,7 @@
  ---
  Phase 2 — Technique Data System (JSON Assets as Source-of-Truth) (DONE)
 
- Objective: Create the foundational technique data layer. 11 techniques with metadata,
+ Objective: Create the foundational technique data layer. 9 techniques at launch (2 planned additions) with metadata,
  breathing presets, safety flags, loaded from bundled JSON. This is what everything else
  depends on.
 
@@ -269,9 +269,10 @@
      - For "bpm_rounds" mode (kapalbhati/bhastrika): bpm, rounds, roundSeconds,
  restSeconds, recommendedDurationsMinutes
 
- Technique IDs (must match backend): hrv_resonance, ultra_slow, diaphragmatic, box,
- four_seven_eight, yogic_three_part, anulom_vilom, ujjayi, bhramari, kapalbhati,
- bhastrika
+ Technique IDs (must match backend): hrv_resonance, ultra_slow, box, four_seven_eight,
+ anulom_vilom, ujjayi, bhramari, kapalbhati, bhastrika
+
+ Planned additions: diaphragmatic, yogic_three_part
 
  Safety-gated: kapalbhati, bhastrika, ultra_slow
  Metronome visual: kapalbhati, bhastrika
@@ -313,7 +314,7 @@
 
  Breathing Timings (key reference for JSON content)
 
- Technique: diaphragmatic
+ Technique (planned): diaphragmatic
  Beginner: 4s-0s-6s-0s
  Intermediate: 5s-0s-7s-0s
  Advanced: 6s-0s-8s-0s
@@ -328,7 +329,7 @@
  Intermediate: 4s-7s-8s-0s
  Advanced: 4s-7s-8s-0s
  ────────────────────────────────────────
- Technique: yogic_three_part
+ Technique (planned): yogic_three_part
  Beginner: 4s-2s-6s-0s
  Intermediate: 5s-3s-7s-0s
  Advanced: 6s-4s-8s-0s
@@ -370,7 +371,7 @@
 
  Tests to add/run
 
- - test/features/techniques/data/technique_repository_test.dart — loads 11 techniques,
+ - test/features/techniques/data/technique_repository_test.dart — loads 9 techniques,
  each has 3 presets, IDs match canonical set, safety-gated list correct, animation modes
  assigned correctly
  - Run: flutter test + flutter analyze
@@ -912,25 +913,24 @@
  - Deterministic mapping keyed by: goal (6) × daypart (4) × experienceLevel (3)
  - Each entry: { "techniqueId": "...", "presetId": "...", "rationale": "..." }
  - Example: { "goal": "calm", "daypart": "evening", "experience": "beginner",
- "techniqueId": "diaphragmatic", "presetId": "beginner", "rationale": "Gentle belly
- breathing to wind down your evening" }
+ "techniqueId": "bhramari", "presetId": "beginner", "rationale": "Bhramari humming to wind down your evening" }
 
  Mapping baseline:
 
  ┌───────────┬──────────────────┬───────────────┬──────────────────┬──────────────────┐
  │   Goal    │     Morning      │   Afternoon   │     Evening      │      Night       │
  ├───────────┼──────────────────┼───────────────┼──────────────────┼──────────────────┤
- │ calm      │ diaphragmatic    │ ujjayi        │ diaphragmatic    │ four_seven_eight │
+ │ calm      │ anulom_vilom     │ ujjayi        │ bhramari         │ four_seven_eight │
  ├───────────┼──────────────────┼───────────────┼──────────────────┼──────────────────┤
  │ sleep     │ four_seven_eight │ bhramari      │ four_seven_eight │ four_seven_eight │
  ├───────────┼──────────────────┼───────────────┼──────────────────┼──────────────────┤
  │ focus     │ box              │ box           │ hrv_resonance    │ box              │
  ├───────────┼──────────────────┼───────────────┼──────────────────┼──────────────────┤
- │ energy    │ kapalbhati       │ bhastrika     │ ujjayi           │ diaphragmatic    │
+ │ energy    │ kapalbhati       │ bhastrika     │ ujjayi           │ ujjayi           │
  ├───────────┼──────────────────┼───────────────┼──────────────────┼──────────────────┤
  │ hrv       │ hrv_resonance    │ hrv_resonance │ hrv_resonance    │ hrv_resonance    │
  ├───────────┼──────────────────┼───────────────┼──────────────────┼──────────────────┤
- │ spiritual │ yogic_three_part │ anulom_vilom  │ anulom_vilom     │ yogic_three_part │
+ │ spiritual │ anulom_vilom     │ anulom_vilom  │ anulom_vilom     │ anulom_vilom     │
  └───────────┴──────────────────┴───────────────┴──────────────────┴──────────────────┘
 
  Preset selected by experience level. Beginner gets beginner preset, etc.
@@ -945,16 +945,11 @@
  - Provider: final dailyRecommendationProvider = FutureProvider<Recommendation>((ref) =>
  ...); — reads onboarding answers for goal/experience, computes daypart from clock
 
- lib/features/home/domain/active_goal_provider.dart
- - final activeGoalProvider = StateProvider<Set<PrimaryGoal>>((ref) => ...);
- - Initialized from onboarding preferences, user can override from home shortcuts
-
  lib/features/home/presentation/home_screen.dart (full rewrite)
  - ScrollView:
    - Display name greeting from preferences ("Good morning, {name}" / "Good evening"
  etc.)
    - TodaysPracticeCard — recommended technique + rationale + "Start" FilledButton
-   - GoalShortcutRow — 6 horizontal chips (calm, sleep, focus, energy, hrv, spiritual)
    - FavoritesRow — horizontal scroll of favorited technique mini-cards (or empty state)
    - StreakDisplay — large streak number + "day streak" label
    - WeeklyBarChart — 7 white bars Mon-Sun
@@ -1402,7 +1397,7 @@
  - App restart → skips intro + onboarding (persistence)
  - Home shows recommendation based on goal + time of day
  - Switch goal on home → recommendation updates
- - Technique grid shows 11 techniques
+ - Technique grid shows 9 techniques
  - Technique detail shows presets, start button works
  - Safety warning fires for kapalbhati/bhastrika/ultra_slow (first time only)
  - Session with circle animation (e.g., box breathing)

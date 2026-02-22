@@ -10,7 +10,7 @@ void main() {
     final repo = TechniqueRepository();
 
     final techniques = await repo.all();
-    expect(techniques, hasLength(11));
+    expect(techniques, hasLength(9));
 
     final ids = techniques.map((technique) => technique.id).toSet();
     expect(
@@ -18,10 +18,8 @@ void main() {
       equals({
         'hrv_resonance',
         'ultra_slow',
-        'diaphragmatic',
         'box',
         'four_seven_eight',
-        'yogic_three_part',
         'anulom_vilom',
         'ujjayi',
         'bhramari',

@@ -39,15 +39,18 @@ From `server/registry/techniques.json`:
 
 - `hrv_resonance`
 - `ultra_slow`
-- `diaphragmatic`
 - `box`
 - `four_seven_eight`
-- `yogic_three_part`
 - `anulom_vilom`
 - `ujjayi`
 - `bhramari`
 - `kapalbhati`
 - `bhastrika`
+
+Planned additions (not in the registry yet):
+
+- `diaphragmatic`
+- `yogic_three_part`
 
 ### Preset IDs
 
