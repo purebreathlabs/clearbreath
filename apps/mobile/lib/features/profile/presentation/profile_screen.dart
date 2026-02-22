@@ -53,64 +53,86 @@ class ProfileScreen extends ConsumerWidget {
       final controller = TextEditingController(
         text: auth is AuthStateSignedIn ? signedInName : localDisplayName,
       );
-      final next = await showDialog<String>(
-        context: context,
-        builder: (context) {
-          final screenWidth = MediaQuery.sizeOf(context).width;
-          final dialogWidth = (screenWidth * 0.92).clamp(0.0, 420.0);
-          final horizontalPadding = spacing.md;
-          final contentWidth = (dialogWidth - horizontalPadding * 2).clamp(
-            0.0,
-            double.infinity,
-          );
+      String? next;
+      try {
+        next = await showDialog<String>(
+          context: context,
+          builder: (context) {
+            final screenWidth = MediaQuery.sizeOf(context).width;
+            final horizontalInset = spacing.sm;
+            final dialogWidth = (screenWidth - horizontalInset * 2).clamp(
+              0.0,
+              420.0,
+            );
 
-          return AlertDialog(
-            insetPadding: EdgeInsets.symmetric(
-              horizontal: spacing.md,
-              vertical: spacing.lg,
-            ),
-            titlePadding: EdgeInsets.fromLTRB(
-              horizontalPadding,
-              spacing.lg,
-              horizontalPadding,
-              spacing.sm,
-            ),
-            contentPadding: EdgeInsets.fromLTRB(
-              horizontalPadding,
-              spacing.sm,
-              horizontalPadding,
-              spacing.sm,
-            ),
-            actionsPadding: EdgeInsets.fromLTRB(
-              horizontalPadding,
-              0,
-              horizontalPadding,
-              spacing.lg,
-            ),
-            title: const Text('Edit name'),
-            content: SizedBox(
-              width: contentWidth,
-              child: TextField(
-                controller: controller,
-                autofocus: true,
-                textInputAction: TextInputAction.done,
-                decoration: const InputDecoration(hintText: 'Display name'),
+            return Dialog(
+              insetPadding: EdgeInsets.symmetric(
+                horizontal: horizontalInset,
+                vertical: spacing.lg,
               ),
-            ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.of(context).pop(),
-                child: const Text('Cancel'),
+              backgroundColor: colors.surface,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(components.cardRadius),
+                side: BorderSide(color: colors.border),
               ),
-              FilledButton(
-                onPressed: () =>
-                    Navigator.of(context).pop(controller.text.trim()),
-                child: const Text('Save'),
+              child: SizedBox(
+                key: const Key('edit_name_dialog'),
+                width: dialogWidth,
+                child: Padding(
+                  padding: EdgeInsets.fromLTRB(
+                    spacing.md,
+                    spacing.lg,
+                    spacing.md,
+                    spacing.lg,
+                  ),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      Text(
+                        'Edit name',
+                        style: typography.titleLarge.copyWith(
+                          color: colors.textPrimary,
+                        ),
+                      ),
+                      SizedBox(height: spacing.md),
+                      TextField(
+                        controller: controller,
+                        autofocus: true,
+                        textInputAction: TextInputAction.done,
+                        decoration: const InputDecoration(
+                          hintText: 'Display name',
+                        ),
+                        onSubmitted: (_) =>
+                            Navigator.of(context).pop(controller.text.trim()),
+                      ),
+                      SizedBox(height: spacing.lg),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          TextButton(
+                            onPressed: () => Navigator.of(context).pop(),
+                            child: const Text('Cancel'),
+                          ),
+                          SizedBox(width: spacing.sm),
+                          FilledButton(
+                            onPressed: () => Navigator.of(
+                              context,
+                            ).pop(controller.text.trim()),
+                            child: const Text('Save'),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
               ),
-            ],
-          );
-        },
-      );
+            );
+          },
+        );
+      } finally {
+        controller.dispose();
+      }
 
       if (next == null) {
         return;
