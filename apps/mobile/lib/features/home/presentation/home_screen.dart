@@ -68,6 +68,11 @@ class HomeScreen extends ConsumerWidget {
     final greetingName = signedInName.isNotEmpty
         ? signedInName
         : localDisplayName;
+    final greetingTextStyle =
+        (greetingName.isEmpty
+                ? typography.headlineLarge
+                : typography.titleLarge)
+            .copyWith(color: colors.textPrimary);
     final greeting = _greeting(
       dayPart: currentDayPart(DateTime.now()),
       displayName: greetingName,
@@ -193,13 +198,18 @@ class HomeScreen extends ConsumerWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  greeting,
-                  style: typography.headlineLarge.copyWith(
-                    color: colors.textPrimary,
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: FittedBox(
+                    fit: BoxFit.scaleDown,
+                    alignment: Alignment.centerLeft,
+                    child: Text(
+                      greeting,
+                      style: greetingTextStyle,
+                      maxLines: 1,
+                      softWrap: false,
+                    ),
                   ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
                 ),
                 if (kDebugMode) ...[
                   SizedBox(height: spacing.md),
