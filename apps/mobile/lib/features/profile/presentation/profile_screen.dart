@@ -56,14 +56,46 @@ class ProfileScreen extends ConsumerWidget {
       final next = await showDialog<String>(
         context: context,
         builder: (context) {
+          final screenWidth = MediaQuery.sizeOf(context).width;
+          final dialogWidth = (screenWidth * 0.92).clamp(0.0, 420.0);
+          final horizontalPadding = spacing.md;
+          final contentWidth = (dialogWidth - horizontalPadding * 2).clamp(
+            0.0,
+            double.infinity,
+          );
+
           return AlertDialog(
-            insetPadding: EdgeInsets.symmetric(horizontal: spacing.lg),
+            insetPadding: EdgeInsets.symmetric(
+              horizontal: spacing.md,
+              vertical: spacing.lg,
+            ),
+            titlePadding: EdgeInsets.fromLTRB(
+              horizontalPadding,
+              spacing.lg,
+              horizontalPadding,
+              spacing.sm,
+            ),
+            contentPadding: EdgeInsets.fromLTRB(
+              horizontalPadding,
+              spacing.sm,
+              horizontalPadding,
+              spacing.sm,
+            ),
+            actionsPadding: EdgeInsets.fromLTRB(
+              horizontalPadding,
+              0,
+              horizontalPadding,
+              spacing.lg,
+            ),
             title: const Text('Edit name'),
-            content: TextField(
-              controller: controller,
-              autofocus: true,
-              textInputAction: TextInputAction.done,
-              decoration: const InputDecoration(hintText: 'Display name'),
+            content: SizedBox(
+              width: contentWidth,
+              child: TextField(
+                controller: controller,
+                autofocus: true,
+                textInputAction: TextInputAction.done,
+                decoration: const InputDecoration(hintText: 'Display name'),
+              ),
             ),
             actions: [
               TextButton(
