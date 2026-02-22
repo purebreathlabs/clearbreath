@@ -87,7 +87,7 @@ class TechniqueCard extends StatelessWidget {
                 style: typography.bodyMedium.copyWith(
                   color: colors.textSecondary,
                 ),
-                maxLines: 3,
+                maxLines: 2,
                 overflow: TextOverflow.ellipsis,
               ),
             ],
