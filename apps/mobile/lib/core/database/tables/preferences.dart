@@ -3,6 +3,8 @@ import 'package:drift/drift.dart';
 class Preferences extends Table {
   IntColumn get id => integer().withDefault(const Constant(1))();
 
+  BoolColumn get introComplete => boolean().withDefault(const Constant(false))();
+
   BoolColumn get onboardingComplete =>
       boolean().withDefault(const Constant(false))();
 
@@ -31,6 +33,18 @@ class Preferences extends Table {
 
   IntColumn get reminderTimeMinutes =>
       integer().withDefault(const Constant(22 * 60))();
+
+  BoolColumn get reminderEnabled =>
+      boolean().withDefault(const Constant(true))();
+
+  BoolColumn get streakWarningEnabled =>
+      boolean().withDefault(const Constant(true))();
+
+  BoolColumn get firstSessionCompleted =>
+      boolean().withDefault(const Constant(false))();
+
+  BoolColumn get notificationPermissionAsked =>
+      boolean().withDefault(const Constant(false))();
 
   TextColumn get displayName => text().withDefault(const Constant(''))();
 

@@ -53,7 +53,7 @@
       "presets": {
         "beginner": { "id": "beginner", "min_duration_seconds": 120, "max_duration_seconds": 1800, "min_breaths_per_minute": 3.0, "max_breaths_per_minute": 10.0 },
         "intermediate": { "id": "intermediate", "min_duration_seconds": 120, "max_duration_seconds": 3600, "min_breaths_per_minute": 3.0, "max_breaths_per_minute": 10.0 },
-        "advanced": { "id": "advanced", "min_duration_seconds": 120, "max_duration_seconds": 5400, "min_breaths_per_minute": 3.0, "max_breaths_per_minute": 10.0 }
+        "advanced": { "id": "advanced", "min_duration_seconds": 120, "max_duration_seconds": 5400, "min_breaths_per_minute": 2.0, "max_breaths_per_minute": 10.0 }
       }
     },
     {
@@ -90,4 +90,3 @@
     }
   ]
 }
-

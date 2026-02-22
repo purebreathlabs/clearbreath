@@ -1,12 +1,13 @@
 .PHONY: server-dev server-build server-docker-build server-lint server-test server-test-ci server-test-integration server-coverage server-fmt-check server-sqlc \
-       mobile-run mobile-build apk mobile-analyze mobile-get mobile-gen mobile-fmt mobile-fmt-check mobile-test \
+       mobile-run mobile-build apk mobile-analyze mobile-get mobile-pub-add mobile-gen mobile-fmt mobile-fmt-check mobile-test \
        fmt-check \
        web-dev web-build \
        docker-up docker-down \
        db-create db-migrate db-migrate-status db-migrate-new sqlc-generate setup clean \
        version version-sync version-bump-patch version-bump-minor version-bump-major
 
-FLUTTER := /Users/rahul/sdk/flutter/bin/flutter
+FLUTTER ?= flutter
+DART ?= $(shell if command -v dart >/dev/null 2>&1; then echo dart; else FLUTTER_PATH="$$(command -v $(FLUTTER) 2>/dev/null || echo $(FLUTTER))"; echo "$$(dirname "$$FLUTTER_PATH")/dart"; fi)
 GOLANGCI_LINT := $(HOME)/go/bin/golangci-lint
 SQLC := $(HOME)/go/bin/sqlc
 GOOSE := $(HOME)/go/bin/goose
@@ -60,14 +61,18 @@ mobile-analyze:
 mobile-get:
 	cd apps/mobile && $(FLUTTER) pub get
 
+mobile-pub-add:
+	if [ -z "$(PKG)" ]; then echo "PKG is required"; exit 1; fi
+	cd apps/mobile && $(FLUTTER) pub add $(PKG)
+
 mobile-gen:
-	cd apps/mobile && dart run build_runner build --delete-conflicting-outputs
+	cd apps/mobile && $(FLUTTER) pub run build_runner build --delete-conflicting-outputs
 
 mobile-fmt:
-	cd apps/mobile && dart format lib/ test/
+	cd apps/mobile && $(DART) format lib/ test/
 
 mobile-fmt-check:
-	cd apps/mobile && dart format --set-exit-if-changed --output=none lib/
+	cd apps/mobile && $(DART) format --set-exit-if-changed --output=none lib/
 
 mobile-test:
 	cd apps/mobile && $(FLUTTER) test

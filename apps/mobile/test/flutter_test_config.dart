@@ -1,8 +1,9 @@
 import 'dart:async';
 
-import 'package:flutter_test/flutter_test.dart';
+import 'package:drift/drift.dart';
 
 Future<void> testExecutable(FutureOr<void> Function() testMain) async {
-  TestWidgetsFlutterBinding.ensureInitialized();
+  driftRuntimeOptions.dontWarnAboutMultipleDatabases = true;
   await testMain();
 }
+

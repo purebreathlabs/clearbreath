@@ -5,11 +5,27 @@ import 'package:drift/native.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 
+import 'tables/favorites.dart';
+import 'tables/leaderboard_cache.dart';
 import 'tables/preferences.dart';
+import 'tables/safety_ack.dart';
+import 'tables/sessions.dart';
+import 'tables/stats_cache.dart';
+import 'tables/sync_queue.dart';
 
 part 'app_database.g.dart';
 
-@DriftDatabase(tables: [Preferences])
+@DriftDatabase(
+  tables: [
+    Preferences,
+    Sessions,
+    Favorites,
+    SafetyAck,
+    StatsCache,
+    LeaderboardCache,
+    SyncQueue,
+  ],
+)
 class AppDatabase extends _$AppDatabase {
   AppDatabase(super.executor);
 
@@ -18,7 +34,7 @@ class AppDatabase extends _$AppDatabase {
   }
 
   @override
-  int get schemaVersion => 2;
+  int get schemaVersion => 6;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -45,6 +61,44 @@ class AppDatabase extends _$AppDatabase {
           "practice_windows_json = '[\"' || practice_window || '\"]' "
           "WHERE onboarding_complete = 1 AND primary_goals_json = '[\"calm\"]';",
         );
+      }
+      if (from < 3) {
+        try {
+          await migrator.addColumn(preferences, preferences.introComplete);
+        } catch (_) {}
+      }
+      if (from < 4) {
+        await migrator.createTable(sessions);
+        await migrator.createTable(favorites);
+        await migrator.createTable(safetyAck);
+        await migrator.createTable(statsCache);
+        await migrator.createTable(leaderboardCache);
+        await migrator.createTable(syncQueue);
+      }
+      if (from < 5) {
+        try {
+          await migrator.addColumn(preferences, preferences.reminderEnabled);
+        } catch (_) {}
+        try {
+          await migrator.addColumn(
+            preferences,
+            preferences.streakWarningEnabled,
+          );
+        } catch (_) {}
+      }
+      if (from < 6) {
+        try {
+          await migrator.addColumn(
+            preferences,
+            preferences.firstSessionCompleted,
+          );
+        } catch (_) {}
+        try {
+          await migrator.addColumn(
+            preferences,
+            preferences.notificationPermissionAsked,
+          );
+        } catch (_) {}
       }
     },
   );

@@ -44,7 +44,7 @@ class AppTheme {
       filledButtonTheme: FilledButtonThemeData(
         style: ButtonStyle(
           minimumSize: WidgetStateProperty.all(
-            Size.fromHeight(components.buttonHeightMedium),
+            Size(0, components.buttonHeightMedium),
           ),
           padding: WidgetStateProperty.all(
             EdgeInsets.symmetric(
@@ -74,7 +74,7 @@ class AppTheme {
       outlinedButtonTheme: OutlinedButtonThemeData(
         style: ButtonStyle(
           minimumSize: WidgetStateProperty.all(
-            Size.fromHeight(components.buttonHeightMedium),
+            Size(0, components.buttonHeightMedium),
           ),
           padding: WidgetStateProperty.all(
             EdgeInsets.symmetric(
