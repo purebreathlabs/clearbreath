@@ -5,6 +5,8 @@ import 'package:go_router/go_router.dart';
 
 import '../../../core/theme/theme_extensions.dart';
 import '../../onboarding/domain/onboarding_answers.dart';
+import '../../auth/domain/auth_state.dart';
+import '../../auth/domain/auth_state_provider.dart';
 import '../../session/domain/active_session_config.dart';
 import '../../stats/domain/weekly_minutes_provider.dart';
 import '../../sync/domain/merged_stats_provider.dart';
@@ -58,11 +60,21 @@ class HomeScreen extends ConsumerWidget {
     final prefs = ref.watch(preferencesProvider);
     final row = prefs.asData?.value;
     final durationMinutes = row?.sessionLengthMinutes ?? 5;
-    final displayName = row?.displayName ?? '';
+    final localDisplayName = row?.displayName.trim() ?? '';
+    final auth = ref.watch(authStateProvider);
+    final signedInName = auth is AuthStateSignedIn
+        ? auth.profile.displayName.trim()
+        : '';
+    final displayName = signedInName.isNotEmpty
+        ? signedInName
+        : localDisplayName;
     final greeting = _greeting(
       dayPart: currentDayPart(DateTime.now()),
       displayName: displayName,
     );
+    final greetingStyle =
+        (displayName.isEmpty ? typography.headlineLarge : typography.titleLarge)
+            .copyWith(color: colors.textPrimary);
 
     Future<void> startRecommendation(Recommendation rec) async {
       try {
@@ -184,10 +196,17 @@ class HomeScreen extends ConsumerWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  greeting,
-                  style: typography.headlineLarge.copyWith(
-                    color: colors.textPrimary,
+                SizedBox(
+                  width: double.infinity,
+                  child: FittedBox(
+                    fit: BoxFit.scaleDown,
+                    alignment: Alignment.centerLeft,
+                    child: Text(
+                      greeting,
+                      style: greetingStyle,
+                      maxLines: 1,
+                      softWrap: false,
+                    ),
                   ),
                 ),
                 if (kDebugMode) ...[
