@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../auth/domain/auth_state.dart';
 import '../../auth/domain/auth_state_provider.dart';
 import '../../../core/theme/theme_extensions.dart';
+import '../../../shared/widgets/brand_mark.dart';
 import '../domain/leaderboard_controller.dart';
 import 'widgets/leaderboard_row.dart';
 import 'widgets/ranking_selector.dart';
@@ -116,7 +117,10 @@ class _LeaderboardSignedInScreen extends ConsumerWidget {
     }
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Leaderboard')),
+      appBar: AppBar(
+        title: const BrandMark(),
+        automaticallyImplyLeading: false,
+      ),
       body: SafeArea(
         child: Padding(
           padding: EdgeInsets.all(spacing.lg),

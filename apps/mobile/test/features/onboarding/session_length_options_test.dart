@@ -17,14 +17,14 @@ void main() {
       ),
     );
 
-    expect(find.text('2 minutes'), findsOneWidget);
-    expect(find.text('5 minutes'), findsOneWidget);
-    expect(find.text('10 minutes'), findsOneWidget);
-    expect(find.text('20 minutes'), findsOneWidget);
-    expect(find.text('15 minutes'), findsNothing);
-    expect(find.text('30 minutes'), findsNothing);
+    expect(find.text('2 min'), findsOneWidget);
+    expect(find.text('5 min'), findsOneWidget);
+    expect(find.text('10 min'), findsOneWidget);
+    expect(find.text('20 min'), findsOneWidget);
+    expect(find.text('15 min'), findsNothing);
+    expect(find.text('30 min'), findsNothing);
 
-    await tester.tap(find.text('2 minutes'));
+    await tester.tap(find.text('2 min'));
     await tester.pump();
     expect(selected, 2);
   });

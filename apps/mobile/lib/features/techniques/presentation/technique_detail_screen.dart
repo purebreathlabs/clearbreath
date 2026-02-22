@@ -11,6 +11,7 @@ import '../domain/technique.dart';
 import '../domain/technique_preset.dart';
 import '../../session/domain/active_session_config.dart';
 import 'widgets/safety_warning_sheet.dart';
+import '../../../shared/widgets/selection_pill.dart';
 
 class TechniqueDetailScreen extends ConsumerStatefulWidget {
   const TechniqueDetailScreen({super.key, required this.techniqueId});
@@ -32,6 +33,7 @@ class _TechniqueDetailScreenState extends ConsumerState<TechniqueDetailScreen> {
     final spacing = Theme.of(context).extension<AppSpacingTokens>()!;
     final typography = Theme.of(context).extension<AppTypographyTokens>()!;
     final colors = Theme.of(context).extension<AppColorTokens>()!;
+    final components = Theme.of(context).extension<AppComponentTokens>()!;
 
     final techniques = ref.watch(allTechniquesProvider);
     final favorites = ref.watch(favoriteTechniqueIdsProvider);
@@ -40,6 +42,7 @@ class _TechniqueDetailScreenState extends ConsumerState<TechniqueDetailScreen> {
       orElse: () => const <String>{},
     );
     final favorited = favoriteIds.contains(widget.techniqueId);
+    final safetyAcks = ref.watch(safetyAcksProvider);
 
     return Scaffold(
       appBar: AppBar(
@@ -108,6 +111,8 @@ class _TechniqueDetailScreenState extends ConsumerState<TechniqueDetailScreen> {
             final durations = preset.recommendedDurationsMinutes;
             final effectiveMinutes =
                 _durationMinutes ?? _defaultMinutes(durations);
+            final safetyAcked =
+                safetyAcks.asData?.value.contains(technique.id) ?? false;
 
             return Padding(
               padding: EdgeInsets.all(spacing.lg),
@@ -133,53 +138,105 @@ class _TechniqueDetailScreenState extends ConsumerState<TechniqueDetailScreen> {
                               color: colors.textSecondary,
                             ),
                           ),
+                          if (technique.safety.requiresAck) ...[
+                            SizedBox(height: spacing.lg),
+                            Container(
+                              padding: EdgeInsets.all(components.cardPadding),
+                              decoration: BoxDecoration(
+                                color: colors.surface,
+                                borderRadius: BorderRadius.circular(
+                                  components.cardRadius,
+                                ),
+                                border: Border.all(color: colors.border),
+                              ),
+                              child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Icon(
+                                    safetyAcked
+                                        ? Icons.check_circle_outline_rounded
+                                        : Icons.warning_amber_rounded,
+                                    color: colors.textPrimary,
+                                    size: 20,
+                                  ),
+                                  SizedBox(width: spacing.md),
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          safetyAcked
+                                              ? 'Safety acknowledged'
+                                              : 'Safety notice',
+                                          style: typography.titleMedium
+                                              .copyWith(
+                                                color: colors.textPrimary,
+                                              ),
+                                        ),
+                                        SizedBox(height: spacing.xs),
+                                        Text(
+                                          safetyAcked
+                                              ? 'You’ve acknowledged the safety guidance for this technique.'
+                                              : 'You’ll be asked to acknowledge the safety guidance before your first session.',
+                                          style: typography.bodyMedium.copyWith(
+                                            color: colors.textSecondary,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
                           SizedBox(height: spacing.xl),
                           Text('Preset', style: typography.titleMedium),
                           SizedBox(height: spacing.sm),
-                          Row(
+                          GridView.count(
+                            crossAxisCount: 3,
+                            crossAxisSpacing: spacing.sm,
+                            mainAxisSpacing: spacing.sm,
+                            childAspectRatio: 3.0,
+                            shrinkWrap: true,
+                            physics: const NeverScrollableScrollPhysics(),
                             children: [
-                              Expanded(
-                                child: _SelectionPill(
-                                  key: const Key('preset_beginner'),
-                                  label: 'Beginner',
-                                  selected: _presetId == 'beginner',
-                                  onTap: () =>
-                                      _setPreset('beginner', technique),
-                                ),
+                              SelectionPill(
+                                key: const Key('preset_beginner'),
+                                label: 'Beginner',
+                                selected: _presetId == 'beginner',
+                                onTap: () => _setPreset('beginner', technique),
                               ),
-                              SizedBox(width: spacing.sm),
-                              Expanded(
-                                child: _SelectionPill(
-                                  key: const Key('preset_intermediate'),
-                                  label: 'Intermediate',
-                                  selected: _presetId == 'intermediate',
-                                  onTap: () =>
-                                      _setPreset('intermediate', technique),
-                                ),
+                              SelectionPill(
+                                key: const Key('preset_intermediate'),
+                                label: 'Intermediate',
+                                selected: _presetId == 'intermediate',
+                                onTap: () =>
+                                    _setPreset('intermediate', technique),
                               ),
-                              SizedBox(width: spacing.sm),
-                              Expanded(
-                                child: _SelectionPill(
-                                  key: const Key('preset_advanced'),
-                                  label: 'Advanced',
-                                  selected: _presetId == 'advanced',
-                                  onTap: () =>
-                                      _setPreset('advanced', technique),
-                                ),
+                              SelectionPill(
+                                key: const Key('preset_advanced'),
+                                label: 'Advanced',
+                                selected: _presetId == 'advanced',
+                                onTap: () => _setPreset('advanced', technique),
                               ),
                             ],
                           ),
                           SizedBox(height: spacing.lg),
                           Text('Duration', style: typography.titleMedium),
                           SizedBox(height: spacing.sm),
-                          Wrap(
-                            spacing: spacing.sm,
-                            runSpacing: spacing.sm,
+                          GridView.count(
+                            crossAxisCount: 2,
+                            crossAxisSpacing: spacing.sm,
+                            mainAxisSpacing: spacing.sm,
+                            childAspectRatio: 3.0,
+                            shrinkWrap: true,
+                            physics: const NeverScrollableScrollPhysics(),
                             children: [
                               for (final minutes in durations)
-                                _SelectionPill(
+                                SelectionPill(
                                   key: Key('duration_$minutes'),
-                                  label: '${minutes}m',
+                                  label: '$minutes min',
                                   selected: effectiveMinutes == minutes,
                                   onTap: () => setState(
                                     () => _durationMinutes = minutes,
@@ -382,54 +439,6 @@ class _Section extends StatelessWidget {
             style: typography.bodyMedium.copyWith(color: colors.textSecondary),
           ),
         ],
-      ),
-    );
-  }
-}
-
-class _SelectionPill extends StatelessWidget {
-  const _SelectionPill({
-    super.key,
-    required this.label,
-    required this.selected,
-    required this.onTap,
-  });
-
-  final String label;
-  final bool selected;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    final typography = Theme.of(context).extension<AppTypographyTokens>()!;
-    final spacing = Theme.of(context).extension<AppSpacingTokens>()!;
-    final colors = Theme.of(context).extension<AppColorTokens>()!;
-    final components = Theme.of(context).extension<AppComponentTokens>()!;
-
-    final shape = RoundedRectangleBorder(
-      borderRadius: BorderRadius.circular(components.buttonRadius),
-      side: BorderSide(color: selected ? colors.focus : colors.border),
-    );
-
-    return Material(
-      color: selected ? colors.surfaceHigh : colors.surface,
-      shape: shape,
-      clipBehavior: Clip.antiAlias,
-      child: InkWell(
-        onTap: onTap,
-        child: Padding(
-          padding: EdgeInsets.symmetric(
-            horizontal: spacing.md,
-            vertical: spacing.sm,
-          ),
-          child: Center(
-            child: Text(
-              label,
-              style: typography.labelLarge.copyWith(color: colors.textPrimary),
-              overflow: TextOverflow.ellipsis,
-            ),
-          ),
-        ),
       ),
     );
   }

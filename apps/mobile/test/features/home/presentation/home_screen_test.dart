@@ -82,7 +82,7 @@ void main() {
     expect(find.text('Calm'), findsOneWidget);
     expect(find.text('Favorites'), findsOneWidget);
     expect(find.text('Open Design System'), findsOneWidget);
-    expect(find.text('Start'), findsOneWidget);
+    expect(find.text('Start session'), findsOneWidget);
 
     await tester.pumpWidget(const SizedBox.shrink());
     await tester.pumpAndSettle();

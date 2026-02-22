@@ -48,7 +48,7 @@ class TodaysPracticeCard extends StatelessWidget {
           ),
           SizedBox(height: spacing.xs),
           Text(
-            '$presetLabel • ${durationMinutes}m',
+            '$presetLabel • $durationMinutes min',
             style: typography.bodyMedium.copyWith(color: colors.textTertiary),
           ),
           SizedBox(height: spacing.md),
@@ -57,7 +57,7 @@ class TodaysPracticeCard extends StatelessWidget {
             style: typography.bodyMedium.copyWith(color: colors.textSecondary),
           ),
           SizedBox(height: spacing.lg),
-          FilledButton(onPressed: onStart, child: const Text('Start')),
+          FilledButton(onPressed: onStart, child: const Text('Start session')),
         ],
       ),
     );

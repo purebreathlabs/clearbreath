@@ -16,6 +16,7 @@ import '../../techniques/domain/technique.dart';
 import '../../techniques/presentation/widgets/safety_warning_sheet.dart';
 import '../../../shared/widgets/weekly_bar_chart.dart';
 import '../../../shared/providers/preferences_provider.dart';
+import '../../../shared/widgets/brand_mark.dart';
 import '../domain/active_goal_provider.dart';
 import '../domain/recommendation_engine.dart';
 import 'widgets/favorites_row.dart';
@@ -188,6 +189,10 @@ class HomeScreen extends ConsumerWidget {
     final streakDays = stats.asData?.value.currentStreakDays;
 
     return Scaffold(
+      appBar: AppBar(
+        title: const BrandMark(),
+        automaticallyImplyLeading: false,
+      ),
       body: SafeArea(
         child: SingleChildScrollView(
           physics: const ClampingScrollPhysics(),

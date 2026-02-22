@@ -7,6 +7,7 @@ import '../../../core/network/api_error.dart';
 import '../../../core/theme/theme_extensions.dart';
 import '../../auth/domain/auth_state.dart';
 import '../../auth/domain/auth_state_provider.dart';
+import '../../../shared/widgets/selection_pill.dart';
 import '../domain/settings_controller.dart';
 
 final packageInfoProvider = FutureProvider<PackageInfo>((ref) async {
@@ -81,15 +82,27 @@ class SettingsScreen extends ConsumerWidget {
                     ),
                   ),
                   SizedBox(height: spacing.md),
-                  for (final minutes in const [2, 5, 10, 20]) ...[
-                    ListTile(
-                      title: Text('$minutes minutes'),
-                      trailing: minutes == state.sessionLengthMinutes
-                          ? const Icon(Icons.check_rounded)
-                          : null,
-                      onTap: () => Navigator.of(context).pop(minutes),
-                    ),
-                  ],
+                  LayoutBuilder(
+                    builder: (context, constraints) {
+                      final tileWidth =
+                          (constraints.maxWidth - spacing.md) / 2.0;
+                      return Wrap(
+                        spacing: spacing.md,
+                        runSpacing: spacing.md,
+                        children: [
+                          for (final minutes in const [2, 5, 10, 20])
+                            SizedBox(
+                              width: tileWidth,
+                              child: SelectionPill(
+                                label: '$minutes min',
+                                selected: minutes == state.sessionLengthMinutes,
+                                onTap: () => Navigator.of(context).pop(minutes),
+                              ),
+                            ),
+                        ],
+                      );
+                    },
+                  ),
                 ],
               ),
             ),
@@ -145,12 +158,14 @@ class SettingsScreen extends ConsumerWidget {
                   divider(),
                   SwitchListTile(
                     title: const Text('Haptics'),
+                    subtitle: const Text('Vibration on phase changes.'),
                     value: state.hapticsEnabled,
                     onChanged: (value) => controller.setHapticsEnabled(value),
                   ),
                   divider(),
                   SwitchListTile(
                     title: const Text('Keep screen awake'),
+                    subtitle: const Text('Prevents screen from sleeping.'),
                     value: state.keepScreenAwake,
                     onChanged: (value) => controller.setKeepScreenAwake(value),
                   ),
@@ -159,6 +174,7 @@ class SettingsScreen extends ConsumerWidget {
                 section('Reminders', [
                   SwitchListTile(
                     title: const Text('Daily reminder'),
+                    subtitle: const Text('A gentle reminder each day.'),
                     value: state.reminderEnabled,
                     onChanged: (value) => controller.setReminderEnabled(value),
                   ),
@@ -173,6 +189,7 @@ class SettingsScreen extends ConsumerWidget {
                   divider(),
                   SwitchListTile(
                     title: const Text('Streak warning'),
+                    subtitle: const Text('A reminder before midnight.'),
                     value: state.streakWarningEnabled,
                     onChanged: (value) =>
                         controller.setStreakWarningEnabled(value),
