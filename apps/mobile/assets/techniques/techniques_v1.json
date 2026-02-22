@@ -1,46 +1,5 @@
 [
   {
-    "id": "diaphragmatic",
-    "name": "Diaphragmatic",
-    "shortDescription": "Gentle belly breathing to calm and steady.",
-    "goals": ["calm", "sleep"],
-    "animationMode": "circle",
-    "safety": { "requiresAck": false, "title": "", "body": "" },
-    "about": {
-      "what": "A simple, slow breath that emphasizes belly expansion.",
-      "how": "Inhale softly through the nose, letting the belly rise. Exhale longer and relaxed.",
-      "bestTime": "Anytime you want to settle your body and mind.",
-      "benefits": "Supports relaxation, reduces tension, and builds breath awareness.",
-      "warnings": "Stop if you feel lightheaded. Keep the breath gentle and unforced."
-    },
-    "presets": {
-      "beginner": {
-        "mode": "phases",
-        "inhaleSeconds": 4,
-        "holdSeconds": 0,
-        "exhaleSeconds": 6,
-        "holdAfterExhaleSeconds": 0,
-        "recommendedDurationsMinutes": [2, 5, 10, 20]
-      },
-      "intermediate": {
-        "mode": "phases",
-        "inhaleSeconds": 5,
-        "holdSeconds": 0,
-        "exhaleSeconds": 7,
-        "holdAfterExhaleSeconds": 0,
-        "recommendedDurationsMinutes": [2, 5, 10, 20]
-      },
-      "advanced": {
-        "mode": "phases",
-        "inhaleSeconds": 6,
-        "holdSeconds": 0,
-        "exhaleSeconds": 8,
-        "holdAfterExhaleSeconds": 0,
-        "recommendedDurationsMinutes": [2, 5, 10, 20]
-      }
-    }
-  },
-  {
     "id": "box",
     "name": "Box",
     "shortDescription": "A balanced four-part breath for focus and control.",
@@ -116,47 +75,6 @@
         "mode": "phases",
         "inhaleSeconds": 4,
         "holdSeconds": 7,
-        "exhaleSeconds": 8,
-        "holdAfterExhaleSeconds": 0,
-        "recommendedDurationsMinutes": [2, 5, 10, 20]
-      }
-    }
-  },
-  {
-    "id": "yogic_three_part",
-    "name": "Three-Part Breath",
-    "shortDescription": "A deep, full breath that expands capacity and awareness.",
-    "goals": ["calm", "focus"],
-    "animationMode": "circle",
-    "safety": { "requiresAck": false, "title": "", "body": "" },
-    "about": {
-      "what": "A fuller breath that gently engages belly, ribs, and upper chest.",
-      "how": "Inhale smoothly, expanding from belly to ribs to chest. Exhale slow and complete.",
-      "bestTime": "Morning or pre-practice when you want to feel energized and open.",
-      "benefits": "Builds awareness, supports posture, and encourages a calm steady rhythm.",
-      "warnings": "Avoid forcing a large breath. Keep it comfortable."
-    },
-    "presets": {
-      "beginner": {
-        "mode": "phases",
-        "inhaleSeconds": 4,
-        "holdSeconds": 2,
-        "exhaleSeconds": 6,
-        "holdAfterExhaleSeconds": 0,
-        "recommendedDurationsMinutes": [2, 5, 10, 20]
-      },
-      "intermediate": {
-        "mode": "phases",
-        "inhaleSeconds": 5,
-        "holdSeconds": 3,
-        "exhaleSeconds": 7,
-        "holdAfterExhaleSeconds": 0,
-        "recommendedDurationsMinutes": [2, 5, 10, 20]
-      },
-      "advanced": {
-        "mode": "phases",
-        "inhaleSeconds": 6,
-        "holdSeconds": 4,
         "exhaleSeconds": 8,
         "holdAfterExhaleSeconds": 0,
         "recommendedDurationsMinutes": [2, 5, 10, 20]

@@ -31,7 +31,7 @@ void main() {
     await tester.tap(find.text('Techniques'));
     await tester.pumpAndSettle();
 
-    await tester.tap(find.byKey(const Key('technique_card_diaphragmatic')));
+    await tester.tap(find.byKey(const Key('technique_card_box')));
     await tester.pumpAndSettle();
     expect(
       find.byKey(const Key('technique_detail_favorite_toggle')),

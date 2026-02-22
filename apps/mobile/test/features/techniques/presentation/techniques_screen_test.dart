@@ -8,7 +8,7 @@ import 'package:flutter_test/flutter_test.dart';
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
-  testWidgets('grid renders 11 technique cards', (tester) async {
+  testWidgets('grid renders 9 technique cards', (tester) async {
     await tester.pumpWidget(
       ProviderScope(
         child: MaterialApp(
@@ -25,10 +25,8 @@ void main() {
         .descendant(of: grid, matching: find.byType(Scrollable))
         .first;
     final ids = [
-      'diaphragmatic',
       'box',
       'four_seven_eight',
-      'yogic_three_part',
       'anulom_vilom',
       'ujjayi',
       'bhramari',
