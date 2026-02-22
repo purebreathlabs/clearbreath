@@ -67,6 +67,31 @@ void main() {
     await Future<void>.delayed(Duration.zero);
     expect(events.last, isA<BackgroundAudioStopRequested>());
   });
+
+  test('remote controls still emit after stop and restart', () async {
+    final remote = _FakeRemoteControls();
+    addTearDown(remote.dispose);
+
+    final controller = AudioServiceBackgroundAudioController(
+      remoteControls: remote,
+      enableAudioSession: false,
+      enableSilentAudio: false,
+    );
+    addTearDown(controller.dispose);
+
+    final events = <BackgroundAudioEvent>[];
+    final sub = controller.events.listen(events.add);
+    addTearDown(sub.cancel);
+
+    await controller.start(techniqueName: 'Box');
+    await controller.stop();
+    await controller.start(techniqueName: 'Box');
+
+    remote.emit('pause');
+    await Future<void>.delayed(Duration.zero);
+
+    expect(events.last, isA<BackgroundAudioPauseRequested>());
+  });
 }
 
 class _FakeRemoteControls implements RemoteControls {
@@ -101,4 +126,3 @@ class _FakeRemoteControls implements RemoteControls {
     await _commands.close();
   }
 }
-
