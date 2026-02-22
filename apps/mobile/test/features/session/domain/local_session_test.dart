@@ -2,6 +2,7 @@ import 'package:clearbreath/features/session/domain/active_session_config.dart';
 import 'package:clearbreath/features/session/domain/local_session.dart';
 import 'package:clearbreath/features/session/domain/session_phase.dart';
 import 'package:clearbreath/features/session/domain/session_state.dart';
+import 'package:clearbreath/features/onboarding/domain/onboarding_answers.dart';
 import 'package:clearbreath/features/techniques/domain/technique.dart';
 import 'package:clearbreath/features/techniques/domain/technique_preset.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -13,6 +14,7 @@ void main() {
       name: 'Box',
       shortDescription: 'Box breathing.',
       animationMode: AnimationMode.circle,
+      goals: const {PrimaryGoal.focus},
       safety: const TechniqueSafety(requiresAck: false, title: '', body: ''),
       about: const TechniqueAbout(
         what: 'What',

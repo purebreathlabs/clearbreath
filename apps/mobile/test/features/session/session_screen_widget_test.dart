@@ -1,4 +1,5 @@
 import 'package:clearbreath/core/theme/app_theme.dart';
+import 'package:clearbreath/features/onboarding/domain/onboarding_answers.dart';
 import 'package:clearbreath/features/session/domain/active_session_config.dart';
 import 'package:clearbreath/features/session/domain/session_tick_source.dart';
 import 'package:clearbreath/features/session/presentation/session_screen.dart';
@@ -58,6 +59,7 @@ void main() {
       name: 'Box',
       shortDescription: 'A balanced four-part breath.',
       animationMode: AnimationMode.circle,
+      goals: const {PrimaryGoal.focus},
       safety: const TechniqueSafety(requiresAck: false, title: '', body: ''),
       about: const TechniqueAbout(
         what: 'What',
@@ -82,6 +84,7 @@ void main() {
       name: 'Kapalbhati',
       shortDescription: 'Fast rounds with rests.',
       animationMode: AnimationMode.metronome,
+      goals: const {PrimaryGoal.energy},
       safety: const TechniqueSafety(requiresAck: false, title: '', body: ''),
       about: const TechniqueAbout(
         what: 'What',
@@ -106,6 +109,7 @@ void main() {
       name: 'Anulom Vilom',
       shortDescription: 'Alternate nostrils.',
       animationMode: AnimationMode.alternateNostril,
+      goals: const {PrimaryGoal.calm},
       safety: const TechniqueSafety(requiresAck: false, title: '', body: ''),
       about: const TechniqueAbout(
         what: 'What',

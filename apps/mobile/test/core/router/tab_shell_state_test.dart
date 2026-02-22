@@ -28,17 +28,29 @@ void main() {
     await tester.pump(const Duration(seconds: 2));
     await tester.pumpAndSettle();
 
-    await tester.tap(find.text('Open Design System'));
-    await tester.pumpAndSettle();
-    expect(find.text('Design System'), findsOneWidget);
-
     await tester.tap(find.text('Techniques'));
     await tester.pumpAndSettle();
-    expect(find.text('Design System'), findsNothing);
+
+    await tester.tap(find.byKey(const Key('technique_card_diaphragmatic')));
+    await tester.pumpAndSettle();
+    expect(
+      find.byKey(const Key('technique_detail_favorite_toggle')),
+      findsOneWidget,
+    );
 
     await tester.tap(find.text('Home'));
     await tester.pumpAndSettle();
-    expect(find.text('Design System'), findsOneWidget);
+    expect(
+      find.byKey(const Key('technique_detail_favorite_toggle')),
+      findsNothing,
+    );
+
+    await tester.tap(find.text('Techniques'));
+    await tester.pumpAndSettle();
+    expect(
+      find.byKey(const Key('technique_detail_favorite_toggle')),
+      findsOneWidget,
+    );
 
     await tester.pumpWidget(const SizedBox.shrink());
     await tester.pumpAndSettle();

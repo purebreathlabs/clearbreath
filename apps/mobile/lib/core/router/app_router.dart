@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../features/design_system/presentation/design_system_screen.dart';
 import '../../features/auth/presentation/sign_in_screen.dart';
 import '../../features/home/presentation/home_screen.dart';
 import '../../features/intro/domain/intro_gate.dart';
@@ -87,10 +86,6 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(path: '/', redirect: (context, state) => '/home'),
       GoRoute(path: '/stats', redirect: (context, state) => '/profile/stats'),
       GoRoute(
-        path: '/design-system',
-        redirect: (context, state) => '/home/design-system',
-      ),
-      GoRoute(
         path: '/onboarding',
         builder: (context, state) {
           final from = state.uri.queryParameters['from'] ?? '/home';
@@ -138,12 +133,6 @@ final appRouterProvider = Provider<GoRouter>((ref) {
               GoRoute(
                 path: '/home',
                 builder: (context, state) => const HomeScreen(),
-                routes: [
-                  GoRoute(
-                    path: 'design-system',
-                    builder: (context, state) => const DesignSystemScreen(),
-                  ),
-                ],
               ),
             ],
           ),

@@ -3,6 +3,7 @@
     "id": "diaphragmatic",
     "name": "Diaphragmatic",
     "shortDescription": "Gentle belly breathing to calm and steady.",
+    "goals": ["calm", "sleep"],
     "animationMode": "circle",
     "safety": { "requiresAck": false, "title": "", "body": "" },
     "about": {
@@ -43,6 +44,7 @@
     "id": "box",
     "name": "Box",
     "shortDescription": "A balanced four-part breath for focus and control.",
+    "goals": ["focus", "calm"],
     "animationMode": "circle",
     "safety": { "requiresAck": false, "title": "", "body": "" },
     "about": {
@@ -83,6 +85,7 @@
     "id": "four_seven_eight",
     "name": "4-7-8",
     "shortDescription": "A classic calming pattern with a long exhale.",
+    "goals": ["sleep", "calm"],
     "animationMode": "circle",
     "safety": { "requiresAck": false, "title": "", "body": "" },
     "about": {
@@ -121,8 +124,9 @@
   },
   {
     "id": "yogic_three_part",
-    "name": "Yogic Three-Part",
+    "name": "Three-Part Breath",
     "shortDescription": "A deep, full breath that expands capacity and awareness.",
+    "goals": ["calm", "focus"],
     "animationMode": "circle",
     "safety": { "requiresAck": false, "title": "", "body": "" },
     "about": {
@@ -163,6 +167,7 @@
     "id": "anulom_vilom",
     "name": "Anulom Vilom",
     "shortDescription": "Alternate nostril breathing for balance and steadiness.",
+    "goals": ["calm", "spiritual"],
     "animationMode": "alternate_nostril",
     "safety": { "requiresAck": false, "title": "", "body": "" },
     "about": {
@@ -203,6 +208,7 @@
     "id": "ujjayi",
     "name": "Ujjayi",
     "shortDescription": "A slow, steady breath with gentle throat control.",
+    "goals": ["focus", "energy"],
     "animationMode": "circle",
     "safety": { "requiresAck": false, "title": "", "body": "" },
     "about": {
@@ -243,6 +249,7 @@
     "id": "bhramari",
     "name": "Bhramari",
     "shortDescription": "A soothing hum on the exhale for relaxation.",
+    "goals": ["calm", "sleep"],
     "animationMode": "circle",
     "safety": { "requiresAck": false, "title": "", "body": "" },
     "about": {
@@ -283,6 +290,7 @@
     "id": "hrv_resonance",
     "name": "HRV Resonance",
     "shortDescription": "Slow, even breathing tuned for heart rate variability.",
+    "goals": ["hrv", "focus"],
     "animationMode": "circle",
     "safety": { "requiresAck": false, "title": "", "body": "" },
     "about": {
@@ -323,6 +331,7 @@
     "id": "ultra_slow",
     "name": "Ultra Slow",
     "shortDescription": "Very slow breathing for deep calm and control.",
+    "goals": ["hrv", "spiritual"],
     "animationMode": "circle",
     "safety": {
       "requiresAck": true,
@@ -367,6 +376,7 @@
     "id": "kapalbhati",
     "name": "Kapalbhati",
     "shortDescription": "Fast breathing with rounds and rests for energy and heat.",
+    "goals": ["energy"],
     "animationMode": "metronome",
     "safety": {
       "requiresAck": true,
@@ -411,6 +421,7 @@
     "id": "bhastrika",
     "name": "Bhastrika",
     "shortDescription": "Powerful breathing in rounds for alertness and strength.",
+    "goals": ["energy"],
     "animationMode": "metronome",
     "safety": {
       "requiresAck": true,

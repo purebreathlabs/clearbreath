@@ -36,6 +36,7 @@ void main() {
         technique.presets.keys.toSet(),
         equals({'beginner', 'intermediate', 'advanced'}),
       );
+      expect(technique.goals, isNotEmpty);
     }
 
     final safetyGated = await repo.safetyGated();

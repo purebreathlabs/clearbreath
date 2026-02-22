@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../onboarding/domain/onboarding_answers.dart';
 import '../domain/technique.dart';
 import '../domain/technique_preset.dart';
 
@@ -68,6 +69,7 @@ class TechniqueRepository {
     final id = _readString(json, 'id');
     final name = _readString(json, 'name');
     final shortDescription = _readString(json, 'shortDescription');
+    final goals = _readGoals(json, 'goals');
 
     final animationMode = _parseAnimationMode(
       _readString(json, 'animationMode'),
@@ -105,6 +107,7 @@ class TechniqueRepository {
       name: name,
       shortDescription: shortDescription,
       animationMode: animationMode,
+      goals: goals,
       safety: safety,
       about: about,
       presets: presets,
@@ -150,6 +153,30 @@ class TechniqueRepository {
       'alternate_nostril' => AnimationMode.alternateNostril,
       _ => throw FormatException('Unknown animationMode: $value'),
     };
+  }
+
+  Set<PrimaryGoal> _readGoals(Map<String, dynamic> json, String key) {
+    final value = json[key];
+    if (value is! List) {
+      throw FormatException('Missing or invalid $key.');
+    }
+    final result = <PrimaryGoal>{};
+    for (final item in value) {
+      if (item is! String) {
+        throw FormatException('Invalid $key entry.');
+      }
+      result.add(_parseGoal(item));
+    }
+    return Set.unmodifiable(result);
+  }
+
+  PrimaryGoal _parseGoal(String value) {
+    for (final goal in PrimaryGoal.values) {
+      if (goal.name == value) {
+        return goal;
+      }
+    }
+    throw FormatException('Unknown goal: $value');
   }
 
   int _readDurationMs(Map<String, dynamic> json, String key) {
