@@ -64,10 +64,13 @@ class TechniqueCard extends StatelessWidget {
                           ? Icons.favorite_rounded
                           : Icons.favorite_border_rounded,
                     ),
-                    color: colors.textTertiary,
+                    color: favorited ? colors.textPrimary : colors.textTertiary,
                     padding: EdgeInsets.zero,
-                    constraints: const BoxConstraints(),
-                    splashRadius: 20,
+                    constraints: const BoxConstraints(
+                      minWidth: 48,
+                      minHeight: 48,
+                    ),
+                    splashRadius: 24,
                     tooltip: favorited ? 'Unfavorite' : 'Favorite',
                   ),
                 ],

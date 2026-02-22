@@ -6,6 +6,7 @@ import '../../../core/theme/theme_extensions.dart';
 import '../data/technique_repository.dart';
 import '../domain/favorites_provider.dart';
 import '../domain/favorites_repository.dart';
+import '../../../shared/widgets/brand_mark.dart';
 import 'widgets/technique_card.dart';
 
 class TechniquesScreen extends ConsumerWidget {
@@ -52,6 +53,10 @@ class TechniquesScreen extends ConsumerWidget {
     }
 
     return Scaffold(
+      appBar: AppBar(
+        title: const BrandMark(),
+        automaticallyImplyLeading: false,
+      ),
       body: SafeArea(
         child: techniques.when(
           loading: () => const Center(child: CircularProgressIndicator()),

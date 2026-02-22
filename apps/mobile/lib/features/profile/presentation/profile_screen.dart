@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../../core/network/api_error.dart';
 import '../../../core/theme/theme_extensions.dart';
 import '../../../shared/providers/preferences_provider.dart';
+import '../../../shared/widgets/brand_mark.dart';
 import '../../auth/domain/auth_state.dart';
 import '../../auth/domain/auth_state_provider.dart';
 import '../../settings/data/settings_repository.dart';
@@ -115,7 +116,10 @@ class ProfileScreen extends ConsumerWidget {
     Divider divider() => Divider(height: 1, color: colors.divider);
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Profile')),
+      appBar: AppBar(
+        title: const BrandMark(),
+        automaticallyImplyLeading: false,
+      ),
       body: SafeArea(
         child: SingleChildScrollView(
           physics: const ClampingScrollPhysics(),

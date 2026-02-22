@@ -189,6 +189,7 @@ void main() {
     await tester.tap(find.byKey(const Key('preset_advanced')));
     await tester.pump();
 
+    await tester.ensureVisible(find.byKey(const Key('duration_10')));
     await tester.tap(find.byKey(const Key('duration_10')));
     await tester.pump();
 

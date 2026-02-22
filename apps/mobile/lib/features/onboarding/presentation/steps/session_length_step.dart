@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../../core/theme/theme_extensions.dart';
-import '../widgets/onboarding_option_button.dart';
+import '../../../../shared/widgets/selection_pill.dart';
 import '../widgets/onboarding_question.dart';
 
 class SessionLengthStep extends StatelessWidget {
@@ -21,32 +21,48 @@ class SessionLengthStep extends StatelessWidget {
     return OnboardingQuestion(
       title: 'Typical session length',
       subtitle: 'Pick what feels realistic for most days.',
-      child: Column(
-        children: [
-          OnboardingOptionButton(
-            label: '2 minutes',
-            selected: valueMinutes == 2,
-            onTap: () => onChanged(2),
-          ),
-          SizedBox(height: spacing.md),
-          OnboardingOptionButton(
-            label: '5 minutes',
-            selected: valueMinutes == 5,
-            onTap: () => onChanged(5),
-          ),
-          SizedBox(height: spacing.md),
-          OnboardingOptionButton(
-            label: '10 minutes',
-            selected: valueMinutes == 10,
-            onTap: () => onChanged(10),
-          ),
-          SizedBox(height: spacing.md),
-          OnboardingOptionButton(
-            label: '20 minutes',
-            selected: valueMinutes == 20,
-            onTap: () => onChanged(20),
-          ),
-        ],
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final tileWidth = (constraints.maxWidth - spacing.md) / 2.0;
+          return Wrap(
+            spacing: spacing.md,
+            runSpacing: spacing.md,
+            children: [
+              SizedBox(
+                width: tileWidth,
+                child: SelectionPill(
+                  label: '2 min',
+                  selected: valueMinutes == 2,
+                  onTap: () => onChanged(2),
+                ),
+              ),
+              SizedBox(
+                width: tileWidth,
+                child: SelectionPill(
+                  label: '5 min',
+                  selected: valueMinutes == 5,
+                  onTap: () => onChanged(5),
+                ),
+              ),
+              SizedBox(
+                width: tileWidth,
+                child: SelectionPill(
+                  label: '10 min',
+                  selected: valueMinutes == 10,
+                  onTap: () => onChanged(10),
+                ),
+              ),
+              SizedBox(
+                width: tileWidth,
+                child: SelectionPill(
+                  label: '20 min',
+                  selected: valueMinutes == 20,
+                  onTap: () => onChanged(20),
+                ),
+              ),
+            ],
+          );
+        },
       ),
     );
   }
