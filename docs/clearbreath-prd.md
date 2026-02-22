@@ -421,7 +421,6 @@ Each technique has a short educational card accessible from the library:
 - **Guest mode (default):** Everything works. Sessions tracked locally.
 - **Sign-in policy:** Optional. Required only for leaderboard participation and cloud backup.
 - **Providers:** Apple Sign-In and Google Sign-In.
-- **Age gate:** Ask birth year before sign-in. If under 13, block sign-in and leaderboard participation, keep guest mode fully usable.
 - **Prompts:** After 3 guest sessions, and when tapping the locked Leaderboard tab.
 - No email/password.
 
@@ -544,7 +543,6 @@ Each technique has a short educational card accessible from the library:
 - **In-session safety:** If user has been in a forceful-technique session for >10 minutes continuously (abnormally long for Kapalbhati/Bhastrika), gentle prompt: "You've been going for a while. Consider taking a break."
 - No onboarding health questionnaire — too much friction for guest-first. Contraindications are shown per-technique instead.
 - **Cultural guidelines:** ClearBreath avoids culturally sensitive traditional guidelines (e.g., menstruation restrictions). Safety guidance is based purely on medical contraindications and physical comfort.
-- **Account age gate:** Under 13 cannot sign in or join the leaderboard; guest mode remains fully usable.
 - No medical claims anywhere. All benefit descriptions use "may help with," "traditionally used for," "commonly practiced for" language.
 
 ---
@@ -618,7 +616,7 @@ Every session gets a `client_session_id` (UUID v4, generated on device at sessio
 
 **Backend (Go):**
 
-- Auth: Apple/Google verification, access/refresh token lifecycle and rotation, age gate enforcement
+- Auth: Apple/Google verification, access/refresh token lifecycle and rotation
 - Sessions: ingest, validate, dedupe, aggregate, stats snapshot
 - Leaderboard: streak/weekly/all-time views, top 50 + pinned self rank, opt-out visibility + initials-only preference
 - 5-minute refresh cadence with Redis caching and anti-cheat baseline
@@ -756,7 +754,7 @@ All 11 techniques defined as JSON config files bundled with the app:
 
 - Standard "use at your own risk" wellness app terms.
 - Not medical advice disclaimer.
-- Accounts/leaderboard require 13+; under-13 sign-in is blocked via birth-year age gate while guest mode remains usable.
+- Accounts and leaderboard participation are optional.
 - Acceptable use policy for leaderboard (no offensive names, no cheating).
 - Right to shadow-ban or remove users from leaderboard.
 

@@ -39,7 +39,7 @@ void main() {
     addTearDown(container.dispose);
 
     final controller = container.read(authStateProvider.notifier);
-    await controller.signIn(AuthProvider.dev, birthYear: 2000, idToken: '');
+    await controller.signIn(AuthProvider.dev, idToken: '');
 
     final signedIn = container.read(authStateProvider);
     expect(signedIn, isA<AuthStateSignedIn>());
@@ -183,7 +183,6 @@ class _FakeAuthRepository extends AuthRepository {
     required String provider,
     required String idToken,
     required String deviceId,
-    required int birthYear,
   }) async {
     final result = signInResult;
     if (result == null) {

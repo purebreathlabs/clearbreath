@@ -249,12 +249,9 @@ func TestProviderSignInValidation(t *testing.T) {
 		code   string
 		msg    string
 	}{
-		{name: "missing provider", in: ProviderSignInInput{Provider: "", DeviceID: "d", BirthYear: 2000}, status: http.StatusBadRequest, code: "validation", msg: "provider is required"},
-		{name: "missing device id", in: ProviderSignInInput{Provider: "dev", DeviceID: "", BirthYear: 2000}, status: http.StatusBadRequest, code: "validation", msg: "device_id is required"},
-		{name: "device id too long", in: ProviderSignInInput{Provider: "dev", DeviceID: strings.Repeat("d", 201), BirthYear: 2000}, status: http.StatusBadRequest, code: "validation", msg: "device_id is too long"},
-		{name: "birth year required", in: ProviderSignInInput{Provider: "dev", DeviceID: "d", BirthYear: 0}, status: http.StatusBadRequest, code: "validation", msg: "birth_year is required"},
-		{name: "birth year invalid", in: ProviderSignInInput{Provider: "dev", DeviceID: "d", BirthYear: 1800}, status: http.StatusBadRequest, code: "validation", msg: "birth_year is invalid"},
-		{name: "age restricted", in: ProviderSignInInput{Provider: "dev", DeviceID: "d", BirthYear: 2016}, status: http.StatusForbidden, code: "age_restricted", msg: "sign-in is not available for this age"},
+		{name: "missing provider", in: ProviderSignInInput{Provider: "", DeviceID: "d"}, status: http.StatusBadRequest, code: "validation", msg: "provider is required"},
+		{name: "missing device id", in: ProviderSignInInput{Provider: "dev", DeviceID: ""}, status: http.StatusBadRequest, code: "validation", msg: "device_id is required"},
+		{name: "device id too long", in: ProviderSignInInput{Provider: "dev", DeviceID: strings.Repeat("d", 201)}, status: http.StatusBadRequest, code: "validation", msg: "device_id is too long"},
 	}
 
 	for _, tt := range tests {
@@ -353,45 +350,6 @@ func TestLogoutValidation(t *testing.T) {
 			}
 			if e.Message != tt.msg {
 				t.Fatalf("message: got %q, want %q", e.Message, tt.msg)
-			}
-		})
-	}
-}
-
-func TestAgeBandFromBirthYear(t *testing.T) {
-	now := time.Date(2026, 2, 16, 12, 0, 0, 0, time.UTC)
-
-	tests := []struct {
-		name      string
-		birthYear int
-		wantBand  string
-		wantErr   string
-	}{
-		{name: "missing", birthYear: 0, wantErr: "birth_year is required"},
-		{name: "too old", birthYear: 1800, wantErr: "birth_year is invalid"},
-		{name: "future", birthYear: 2027, wantErr: "birth_year is invalid"},
-		{name: "u13", birthYear: 2016, wantBand: "u13"},
-		{name: "13_17", birthYear: 2010, wantBand: "13_17"},
-		{name: "18_plus", birthYear: 2000, wantBand: "18_plus"},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			band, err := ageBandFromBirthYear(tt.birthYear, now)
-			if tt.wantErr != "" {
-				if err == nil {
-					t.Fatalf("expected error")
-				}
-				if err.Error() != tt.wantErr {
-					t.Fatalf("error: got %q, want %q", err.Error(), tt.wantErr)
-				}
-				return
-			}
-			if err != nil {
-				t.Fatalf("unexpected error: %v", err)
-			}
-			if band != tt.wantBand {
-				t.Fatalf("band: got %q, want %q", band, tt.wantBand)
 			}
 		})
 	}

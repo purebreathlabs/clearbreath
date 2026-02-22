@@ -114,7 +114,6 @@ func TestEndToEndDevAuthSessionsLeaderboard(t *testing.T) {
 		Provider:      "dev",
 		IDToken:       "user1",
 		DeviceID:      "device1",
-		BirthYear:     2000,
 		DevAuthHeader: cfg.DevAuthSecret,
 	})
 	if err != nil {

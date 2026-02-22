@@ -6,21 +6,14 @@ class ProviderSignInRequest {
     required this.provider,
     required this.idToken,
     required this.deviceId,
-    required this.birthYear,
   });
 
   final String provider;
   final String idToken;
   final String deviceId;
-  final int birthYear;
 
   JsonMap toJson() {
-    return {
-      'provider': provider,
-      'id_token': idToken,
-      'device_id': deviceId,
-      'birth_year': birthYear,
-    };
+    return {'provider': provider, 'id_token': idToken, 'device_id': deviceId};
   }
 }
 

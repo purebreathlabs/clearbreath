@@ -93,7 +93,6 @@ The MVP excludes monetization and advanced social/community complexity to maximi
 - Guest mode supports full breathing and local stats
 - Account required only for leaderboard and cloud backup
 - Providers: Apple and Google
-- Age gate for accounts: ask birth year; if under 13, block sign-in but keep guest mode
 - Leaderboard visibility default ON (opt-out available)
 
 ### 4.7 Leaderboard Rules
@@ -166,10 +165,9 @@ The MVP excludes monetization and advanced social/community complexity to maximi
 ### 6.3 Guest to Signed-In Journey
 
 1. User taps locked Leaderboard or sees post-session prompt (after 3 guest sessions)
-2. App asks birth year
-3. If 13+, continue with Apple or Google sign-in
-4. Merge local history into cloud account
-5. Leaderboard visibility is on by default; user can opt out from Profile settings
+2. Continue with Apple or Google sign-in
+3. Merge local history into cloud account
+4. Leaderboard visibility is on by default; user can opt out from Profile settings
 
 ### 6.4 Signed-In Leaderboard Journey
 
@@ -193,7 +191,7 @@ The MVP excludes monetization and advanced social/community complexity to maximi
 - Profile screen (Stats)
 - Settings sections (embedded in Profile)
 - Leaderboard screen
-- Sign-in gate and age gate screens
+- Sign-in gate screen
 - Legal screens (Privacy, Terms)
 
 ### 7.2 Website Pages
@@ -388,10 +386,7 @@ Must show:
 
 ## 14.3 Age Gate
 
-- Ask birth year before sign-in
-- If age under 13, block sign-in and leaderboard participation
-- Keep guest mode fully usable
-- Backend stores only eligibility or age band, not full date of birth
+- No age gate in v1.
 
 ## 14.4 Identity Defaults
 
@@ -1050,11 +1045,10 @@ Required tests in same week:
 ## Week 4 (Mar 4 to Mar 10)
 
 Objectives:
-- Auth, age gate, cloud sync foundations
+- Auth and cloud sync foundations
 
 Must-complete outputs:
 - Apple/Google sign-in backend + app flow
-- Birth-year age gate
 - Guest-to-account session merge and dedupe
 
 Required tests in same week:

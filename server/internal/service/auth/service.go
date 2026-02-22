@@ -44,7 +44,6 @@ type ProviderSignInInput struct {
 	Provider      string
 	IDToken       string
 	DeviceID      string
-	BirthYear     int
 	DevAuthHeader string
 }
 
@@ -112,20 +111,13 @@ func (s *Service) ProviderSignIn(ctx context.Context, in ProviderSignInInput) (*
 		return nil, apierr.New(http.StatusBadRequest, "validation", "device_id is too long")
 	}
 
-	ageBand, err := ageBandFromBirthYear(in.BirthYear, s.clock.Now().UTC())
-	if err != nil {
-		return nil, apierr.New(http.StatusBadRequest, "validation", err.Error())
-	}
-	if ageBand == "u13" {
-		return nil, apierr.New(http.StatusForbidden, "age_restricted", "sign-in is not available for this age")
-	}
-
 	subject, err := s.verifyProvider(ctx, in.Provider, in.IDToken, in.DeviceID, in.DevAuthHeader)
 	if err != nil {
 		return nil, err
 	}
 
 	now := s.clock.Now().UTC()
+	ageBand := "unknown"
 	refreshToken, err := internalauth.NewRefreshToken()
 	if err != nil {
 		return nil, fmt.Errorf("new refresh token: %w", err)
@@ -489,23 +481,6 @@ func isUniqueViolation(err error) bool {
 		return pgErr.Code == "23505"
 	}
 	return false
-}
-
-func ageBandFromBirthYear(birthYear int, now time.Time) (string, error) {
-	if birthYear <= 0 {
-		return "", fmt.Errorf("birth_year is required")
-	}
-	if birthYear < 1900 || birthYear > now.Year() {
-		return "", fmt.Errorf("birth_year is invalid")
-	}
-	age := now.Year() - birthYear
-	if age < 13 {
-		return "u13", nil
-	}
-	if age < 18 {
-		return "13_17", nil
-	}
-	return "18_plus", nil
 }
 
 func generateDisplayName() (string, error) {

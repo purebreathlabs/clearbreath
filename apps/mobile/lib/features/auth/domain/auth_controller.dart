@@ -10,7 +10,6 @@ import '../../onboarding/domain/onboarding_answers_provider.dart';
 import '../data/auth_repository.dart';
 import '../data/device_id_store.dart';
 import '../data/token_storage.dart';
-import 'age_gate.dart';
 import 'auth_state.dart';
 
 enum AuthProvider { apple, google, dev }
@@ -27,20 +26,7 @@ class AuthController extends Notifier<AuthState> {
     return const AuthStateGuest();
   }
 
-  Future<void> signIn(
-    AuthProvider provider, {
-    required int birthYear,
-    required String idToken,
-  }) async {
-    if (!isEligible(birthYear, DateTime.now().toUtc())) {
-      throw const ApiError(
-        statusCode: 403,
-        code: 'age_restricted',
-        message: 'Sign-in is not available for this age.',
-        requestId: null,
-      );
-    }
-
+  Future<void> signIn(AuthProvider provider, {required String idToken}) async {
     final repo = ref.read(authRepositoryProvider);
     final storage = ref.read(tokenStorageProvider);
     final deviceId = await ref.read(deviceIdProvider.future);
@@ -66,7 +52,6 @@ class AuthController extends Notifier<AuthState> {
         provider: providerKey,
         idToken: safeToken,
         deviceId: deviceId,
-        birthYear: birthYear,
       );
 
       await storage.writeTokens(
