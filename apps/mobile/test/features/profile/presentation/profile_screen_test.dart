@@ -141,24 +141,18 @@ void main() {
     await tester.tap(find.byTooltip('Edit name'));
     await tester.pumpAndSettle();
 
-    final context = tester.element(find.byType(ProfileScreen));
+    final dialogBox = find.byKey(const Key('edit_name_dialog'));
+    expect(dialogBox, findsOneWidget);
+
+    final context = tester.element(dialogBox);
     final spacing = Theme.of(context).extension<AppSpacingTokens>()!;
-    final screenWidth = MediaQuery.sizeOf(context).width;
-    final dialogWidth = (screenWidth * 0.92).clamp(0.0, 420.0);
-    final expectedContentWidth = (dialogWidth - spacing.md * 2).clamp(
+    final screenWidth = tester.binding.renderView.size.width;
+    final expectedDialogWidth = (screenWidth - spacing.sm * 2).clamp(
       0.0,
-      double.infinity,
+      420.0,
     );
 
-    final dialogFinder = find.byType(AlertDialog);
-    expect(dialogFinder, findsOneWidget);
-    final dialog = tester.widget<AlertDialog>(dialogFinder);
-
-    final insetPadding = dialog.insetPadding as EdgeInsets;
-    expect(insetPadding.horizontal, closeTo(spacing.md * 2, 0.1));
-
-    expect(dialog.content, isA<SizedBox>());
-    final content = dialog.content! as SizedBox;
-    expect(content.width, closeTo(expectedContentWidth, 0.1));
+    final size = tester.getSize(dialogBox);
+    expect(size.width, closeTo(expectedDialogWidth, 0.1));
   });
 }
