@@ -57,6 +57,7 @@ class ProfileScreen extends ConsumerWidget {
         context: context,
         builder: (context) {
           return AlertDialog(
+            insetPadding: EdgeInsets.symmetric(horizontal: spacing.lg),
             title: const Text('Edit name'),
             content: TextField(
               controller: controller,
