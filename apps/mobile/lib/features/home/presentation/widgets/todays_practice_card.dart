@@ -75,7 +75,7 @@ class TodaysPracticeCard extends StatelessWidget {
             ),
           ),
           Padding(
-            padding: EdgeInsets.all(components.cardPadding),
+            padding: EdgeInsets.symmetric(vertical: components.cardPadding),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
