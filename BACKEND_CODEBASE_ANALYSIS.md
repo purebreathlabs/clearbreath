@@ -1,6 +1,6 @@
 # ClearBreath Backend Codebase Analysis (Go)
 
-Last updated: 2026-02-19
+Last updated: 2026-02-22
 
 ## Scope
 
@@ -185,9 +185,6 @@ JSON decoding:
   - Stored as HMAC-SHA256 hash in DB (`server/internal/auth/refresh.go:20`)
   - Rotated single-use; replaced tokens return 409 `refresh_replay` (`server/internal/service/auth/service.go:207`)
   - Revoked (logout) tokens return 401 `unauthorized` (`server/internal/service/auth/service.go:210`)
-- Age gate:
-  - `birth_year` required at provider sign-in (`server/internal/handler/auth.go:18`)
-  - Under-13 returns 403 `age_restricted` (`server/internal/service/auth/service.go:119`)
 - Provider verification:
   - `dev` provider supported when `DEV_AUTH_ENABLED=true` and header `X-Dev-Auth` matches `DEV_AUTH_SECRET` (`server/internal/service/auth/service.go:360`)
   - `google`/`apple` use OIDC verifier and return 401 `invalid_provider_token` on verification failure (`server/internal/service/auth/service.go:441`)

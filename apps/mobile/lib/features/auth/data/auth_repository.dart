@@ -24,7 +24,6 @@ class AuthRepository {
     required String provider,
     required String idToken,
     required String deviceId,
-    required int birthYear,
   }) async {
     final headers = <String, dynamic>{};
     if (provider == 'dev' && AppConfig.devAuthEnabled) {
@@ -40,7 +39,6 @@ class AuthRepository {
         provider: provider,
         idToken: idToken,
         deviceId: deviceId,
-        birthYear: birthYear,
       ).toJson(),
       options: headers.isEmpty ? null : Options(headers: headers),
     );

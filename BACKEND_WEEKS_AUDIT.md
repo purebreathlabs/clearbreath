@@ -1,16 +1,14 @@
 # Backend Weeks Audit (Weeks 4–7)
 
-Last updated: 2026-02-19
+Last updated: 2026-02-22
 
 This maps the backend deliverables in `docs/final_plan.md` Week 4–Week 7 to the current Go backend implementation.
 
-## Week 4 (Auth, age gate, cloud sync foundations)
+## Week 4 (Auth and cloud sync foundations)
 
 - Provider sign-in backend + app flow
   - Implemented: `POST /v1/auth/provider_sign_in` (`server/cmd/api/main.go`)
   - Providers: `dev`, `google`, `apple` (`server/internal/service/auth/service.go`)
-- Birth-year age gate
-  - Implemented: `birth_year` required; under-13 blocked with `403 age_restricted` (`server/internal/service/auth/service.go`)
 - Token lifecycle (access + rotating refresh)
   - Implemented: JWT access tokens + refresh rotation + replay detection (`server/internal/service/auth/service.go`)
   - Revoked refresh token returns `401 unauthorized` (`server/internal/service/auth/service.go`)

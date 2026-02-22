@@ -1,6 +1,6 @@
 # Backend Security Audit
 
-Last updated: 2026-02-19
+Last updated: 2026-02-22
 
 ## Auth
 
@@ -8,7 +8,6 @@ Last updated: 2026-02-19
 - Refresh tokens are random and stored as HMAC-SHA256 hashes in Postgres.
 - Refresh tokens rotate on refresh; replaced tokens return `409 refresh_replay`.
 - Logout revokes device refresh tokens; revoked tokens return `401 unauthorized`.
-- Under-13 sign-in blocked via birth-year gate (`403 age_restricted`).
 
 ## Input validation
 

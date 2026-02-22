@@ -1,6 +1,6 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
@@ -8,7 +8,6 @@ import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 import '../../../core/config/app_config.dart';
 import '../../../core/network/api_error.dart';
 import '../../../core/theme/theme_extensions.dart';
-import '../domain/age_gate.dart';
 import '../domain/auth_controller.dart';
 import '../domain/auth_state_provider.dart';
 
@@ -20,15 +19,8 @@ class SignInScreen extends ConsumerStatefulWidget {
 }
 
 class _SignInScreenState extends ConsumerState<SignInScreen> {
-  late int _birthYear;
   var _loading = false;
   static Future<void>? _googleInit;
-
-  @override
-  void initState() {
-    super.initState();
-    _birthYear = DateTime.now().year - 25;
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -36,8 +28,6 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
     final typography = Theme.of(context).extension<AppTypographyTokens>()!;
     final colors = Theme.of(context).extension<AppColorTokens>()!;
     final components = Theme.of(context).extension<AppComponentTokens>()!;
-
-    final eligible = isEligible(_birthYear, DateTime.now());
 
     Widget card({required Widget child}) {
       return Container(
@@ -48,6 +38,25 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
         ),
         padding: EdgeInsets.all(components.cardPadding),
         child: child,
+      );
+    }
+
+    Widget iconBox(Widget child) {
+      return SizedBox(width: 20, height: 20, child: Center(child: child));
+    }
+
+    Widget googleIcon() {
+      return Builder(
+        builder: (context) {
+          return Text(
+            'G',
+            style: typography.titleMedium.copyWith(
+              fontWeight: FontWeight.w700,
+              height: 1,
+              color: IconTheme.of(context).color,
+            ),
+          );
+        },
       );
     }
 
@@ -72,44 +81,33 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
-                        card(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                'Birth year',
-                                style: typography.titleMedium.copyWith(
-                                  color: colors.textPrimary,
-                                ),
-                              ),
-                              SizedBox(height: spacing.sm),
-                              Row(
-                                children: [
-                                  Expanded(
-                                    child: Text(
-                                      '$_birthYear',
-                                      style: typography.titleLarge.copyWith(
-                                        color: colors.textPrimary,
-                                      ),
-                                    ),
-                                  ),
-                                  OutlinedButton(
-                                    onPressed: _loading ? null : _pickBirthYear,
-                                    child: const Text('Change'),
-                                  ),
-                                ],
-                              ),
-                              SizedBox(height: spacing.sm),
-                              Text(
-                                eligible
-                                    ? 'Sign-in is available for ages 13+.'
-                                    : 'Sign-in is not available for this age. Guest mode is fully functional.',
-                                style: typography.bodyMedium.copyWith(
-                                  color: colors.textSecondary,
-                                ),
-                              ),
-                            ],
+                        SizedBox(height: spacing.xl),
+                        Center(
+                          child: SvgPicture.asset(
+                            'assets/branding/clearbreath_logo.svg',
+                            width: 72,
+                            height: 72,
+                            colorFilter: ColorFilter.mode(
+                              colors.textPrimary,
+                              BlendMode.srcIn,
+                            ),
                           ),
+                        ),
+                        SizedBox(height: spacing.lg),
+                        Text(
+                          'ClearBreath',
+                          style: typography.headlineLarge.copyWith(
+                            color: colors.textPrimary,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                        SizedBox(height: spacing.xs),
+                        Text(
+                          'Sign in to sync sessions across devices and unlock the leaderboard.',
+                          style: typography.bodyMedium.copyWith(
+                            color: colors.textSecondary,
+                          ),
+                          textAlign: TextAlign.center,
                         ),
                         SizedBox(height: spacing.xl),
                         card(
@@ -124,10 +122,12 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
                               ),
                               SizedBox(height: spacing.md),
                               FilledButton.icon(
-                                onPressed: _loading || !eligible
+                                onPressed: _loading
                                     ? null
                                     : () => _signInApple(),
-                                icon: const Icon(Icons.apple),
+                                icon: iconBox(
+                                  const Icon(Icons.apple, size: 20),
+                                ),
                                 label: Text(
                                   _loading
                                       ? 'Signing in...'
@@ -136,10 +136,10 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
                               ),
                               SizedBox(height: spacing.sm),
                               FilledButton.icon(
-                                onPressed: _loading || !eligible
+                                onPressed: _loading
                                     ? null
                                     : () => _signInGoogle(),
-                                icon: const Icon(Icons.g_mobiledata_rounded),
+                                icon: iconBox(googleIcon()),
                                 label: Text(
                                   _loading
                                       ? 'Signing in...'
@@ -149,7 +149,7 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
                               if (AppConfig.devAuthEnabled) ...[
                                 SizedBox(height: spacing.sm),
                                 OutlinedButton(
-                                  onPressed: _loading || !eligible
+                                  onPressed: _loading
                                       ? null
                                       : () => _signInDev(),
                                   child: Text(
@@ -170,77 +170,6 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
         ),
       ),
     );
-  }
-
-  Future<void> _pickBirthYear() async {
-    final yearNow = DateTime.now().year;
-    final years = [for (var y = yearNow; y >= 1900; y--) y];
-    final index = years.indexOf(_birthYear).clamp(0, years.length - 1);
-
-    final picked = await showModalBottomSheet<int>(
-      context: context,
-      builder: (context) {
-        final spacing = Theme.of(context).extension<AppSpacingTokens>()!;
-        final colors = Theme.of(context).extension<AppColorTokens>()!;
-        final typography = Theme.of(context).extension<AppTypographyTokens>()!;
-
-        var selected = years[index];
-        return SafeArea(
-          child: Padding(
-            padding: EdgeInsets.all(spacing.lg),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Text(
-                  'Select birth year',
-                  style: typography.titleLarge.copyWith(
-                    color: colors.textPrimary,
-                  ),
-                ),
-                SizedBox(height: spacing.md),
-                SizedBox(
-                  height: 180,
-                  child: CupertinoPicker(
-                    scrollController: FixedExtentScrollController(
-                      initialItem: index,
-                    ),
-                    itemExtent: 36,
-                    onSelectedItemChanged: (i) => selected = years[i],
-                    children: [
-                      for (final y in years)
-                        Center(
-                          child: Text(
-                            '$y',
-                            style: typography.titleMedium.copyWith(
-                              color: colors.textPrimary,
-                            ),
-                          ),
-                        ),
-                    ],
-                  ),
-                ),
-                SizedBox(height: spacing.md),
-                FilledButton(
-                  onPressed: () => Navigator.of(context).pop(selected),
-                  child: const Text('Done'),
-                ),
-                SizedBox(height: spacing.sm),
-                TextButton(
-                  onPressed: () => Navigator.of(context).pop(),
-                  child: const Text('Cancel'),
-                ),
-              ],
-            ),
-          ),
-        );
-      },
-    );
-
-    if (picked == null) {
-      return;
-    }
-    setState(() => _birthYear = picked);
   }
 
   Future<void> _signInApple() async {
@@ -322,7 +251,7 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
       final token = await idTokenLoader();
       await ref
           .read(authStateProvider.notifier)
-          .signIn(provider, birthYear: _birthYear, idToken: token);
+          .signIn(provider, idToken: token);
       if (!mounted) {
         return;
       }
@@ -337,8 +266,6 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
       }
 
       final message = switch (e) {
-        ApiError(:final code) when code == 'age_restricted' =>
-          'Sign-in is not available for this age.',
         ApiError(:final code) when code == 'rate_limited' =>
           'Too many attempts. Please try again later.',
         ApiError(:final code) when code == 'provider_not_configured' =>

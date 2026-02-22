@@ -83,7 +83,6 @@ func TestLeaderboardListRanksAreContiguousAfterFiltering(t *testing.T) {
 		Provider:      "dev",
 		IDToken:       "user1",
 		DeviceID:      "device1",
-		BirthYear:     2000,
 		DevAuthHeader: cfg.DevAuthSecret,
 	})
 	if err != nil {
@@ -93,7 +92,6 @@ func TestLeaderboardListRanksAreContiguousAfterFiltering(t *testing.T) {
 		Provider:      "dev",
 		IDToken:       "user2",
 		DeviceID:      "device2",
-		BirthYear:     2000,
 		DevAuthHeader: cfg.DevAuthSecret,
 	})
 	if err != nil {

@@ -124,7 +124,7 @@
  │   │   └── app_router.dart          ← expand with new routes
  │   └── theme/                       ← unchanged (production ready)
  ├── features/
- │   ├── auth/                        ← expand: token storage, OAuth, age gate
+ │   ├── auth/                        ← expand: token storage, OAuth
  │   ├── background_audio/            ← NEW: audio_service, lock-screen, interruptions
  │   ├── home/                        ← rewrite: recommendation engine + full UI
  │   ├── leaderboard/                 ← expand: 3 views, cached offline, self-rank
@@ -152,7 +152,7 @@
 
  All under lib/core/network/models/:
 
- - auth_models.dart: ProviderSignInRequest {provider, idToken, deviceId, birthYear},
+ - auth_models.dart: ProviderSignInRequest {provider, idToken, deviceId},
  AuthResponse {accessToken, accessTokenExpiresAtUtc, refreshToken,
  refreshTokenExpiresAtUtc, user}
  - user_models.dart: UserProfile {id, displayName, avatarSeed, leaderboardOptIn,
@@ -1057,7 +1057,7 @@
  Phase 12 — Auth + Backend Integration (Dev Auth First, Apple/Google Abstracted) (DONE)
 
  Objective: Build-time config, Dio API client with auth interceptor, dev auth flow (for
- testing), age gate, token storage, session sync, stats sync, safety ack sync.
+ testing), token storage, session sync, stats sync, safety ack sync.
  Apple/Google OAuth immediately after dev auth validates the flow.
 
  Senior dev decision: Dev auth first to validate entire flow end-to-end without App Store
@@ -1116,27 +1116,22 @@
  - Provider: final deviceIdProvider = FutureProvider<String>((ref) => ...);
 
  lib/features/auth/data/auth_repository.dart
- - Methods: signInWithProvider(String provider, String idToken, String deviceId, int?
- birthYear), refreshToken(String refreshToken, String deviceId), logout(String deviceId),
+ - Methods: signInWithProvider(String provider, String idToken, String deviceId),
+ refreshToken(String refreshToken, String deviceId), logout(String deviceId),
   deleteAccount(), fetchProfile(), updateProfile(MePatchRequest)
  - Calls API endpoints via Dio
 
  lib/features/auth/domain/auth_controller.dart (replaces AuthStateController)
- - Full flow: age gate check → provider sign-in → API call → store tokens → update auth
- state
+ - Full flow: provider sign-in → API call → store tokens → update auth state
  - Methods: signIn(AuthProvider provider), signOut(), deleteAccount(), restoreSession()
  (check stored tokens on app start, refresh if expired)
  - On first sign-in: if onboarding displayName is non-empty, PATCH /v1/me to set it
  (handle profanity validation errors gracefully)
 
- lib/features/auth/domain/age_gate.dart
- - Pure function: bool isEligible(int birthYear, DateTime now) — true if age >= 13
-
  lib/features/auth/presentation/sign_in_screen.dart
  - Route: /auth/sign-in
- - Birth year input (number picker)
- - If under 13: message explaining guest mode is fully functional, sign-in blocked
- - If eligible: "Sign in with Apple" button, "Sign in with Google" button
+ - ClearBreath logo + brand copy
+ - "Sign in with Apple" button, "Sign in with Google" button
  - If DEV_AUTH_ENABLED: additional "Dev Sign In" button
  - Loading states, error handling
 
@@ -1188,8 +1183,6 @@
 
  Tests
 
- - test/features/auth/domain/age_gate_test.dart — boundary: birth year making age 12
- fails, 13 passes
  - test/features/auth/domain/auth_controller_test.dart — sign-in stores tokens, sign-out
  clears, restore checks stored tokens
  - test/core/network/auth_interceptor_test.dart — attaches token, refreshes on 401, hard

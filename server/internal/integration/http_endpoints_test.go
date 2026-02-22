@@ -326,10 +326,9 @@ func TestHTTPAPIContractSmoke(t *testing.T) {
 	}
 
 	status, hdr, body = doJSON(t, client, http.MethodPost, srv.URL+"/v1/auth/provider_sign_in", map[string]any{
-		"provider":   "dev",
-		"id_token":   "user1",
-		"device_id":  "device1",
-		"birth_year": 2000,
+		"provider":  "dev",
+		"id_token":  "user1",
+		"device_id": "device1",
 	}, map[string]string{
 		"X-Dev-Auth": "wrong",
 	})
@@ -339,10 +338,9 @@ func TestHTTPAPIContractSmoke(t *testing.T) {
 	}
 
 	status, hdr, body = doJSON(t, client, http.MethodPost, srv.URL+"/v1/auth/provider_sign_in", map[string]any{
-		"provider":   "nope",
-		"id_token":   "user1",
-		"device_id":  "device1",
-		"birth_year": 2000,
+		"provider":  "nope",
+		"id_token":  "user1",
+		"device_id": "device1",
 	}, nil)
 	requireRequestID(t, hdr, body)
 	if status != http.StatusBadRequest {
@@ -350,10 +348,9 @@ func TestHTTPAPIContractSmoke(t *testing.T) {
 	}
 
 	status, hdr, body = doJSON(t, client, http.MethodPost, srv.URL+"/v1/auth/provider_sign_in", map[string]any{
-		"provider":   "google",
-		"id_token":   "token",
-		"device_id":  "device1",
-		"birth_year": 2000,
+		"provider":  "google",
+		"id_token":  "token",
+		"device_id": "device1",
 	}, nil)
 	requireRequestID(t, hdr, body)
 	if status != http.StatusInternalServerError {
@@ -361,10 +358,9 @@ func TestHTTPAPIContractSmoke(t *testing.T) {
 	}
 
 	status, hdr, body = doJSON(t, client, http.MethodPost, srv.URL+"/v1/auth/provider_sign_in", map[string]any{
-		"provider":   "apple",
-		"id_token":   "token",
-		"device_id":  "device1",
-		"birth_year": 2000,
+		"provider":  "apple",
+		"id_token":  "token",
+		"device_id": "device1",
 	}, nil)
 	requireRequestID(t, hdr, body)
 	if status != http.StatusInternalServerError {
@@ -372,10 +368,9 @@ func TestHTTPAPIContractSmoke(t *testing.T) {
 	}
 
 	status, hdr, body = doJSON(t, client, http.MethodPost, srv.URL+"/v1/auth/provider_sign_in", map[string]any{
-		"provider":   "dev",
-		"id_token":   "user1",
-		"device_id":  "device1",
-		"birth_year": 2000,
+		"provider":  "dev",
+		"id_token":  "user1",
+		"device_id": "device1",
 	}, map[string]string{
 		"X-Dev-Auth": cfg.DevAuthSecret,
 	})
@@ -393,10 +388,9 @@ func TestHTTPAPIContractSmoke(t *testing.T) {
 	}
 
 	status, hdr, body = doJSON(t, client, http.MethodPost, srv.URL+"/v1/auth/provider_sign_in", map[string]any{
-		"provider":   "dev",
-		"id_token":   "user1",
-		"device_id":  "device2",
-		"birth_year": 2000,
+		"provider":  "dev",
+		"id_token":  "user1",
+		"device_id": "device2",
 	}, map[string]string{
 		"X-Dev-Auth": cfg.DevAuthSecret,
 	})
@@ -896,10 +890,9 @@ func TestHTTPAPIContractSmoke(t *testing.T) {
 	}
 
 	status, hdr, body = doJSON(t, client, http.MethodPost, srv.URL+"/v1/auth/provider_sign_in", map[string]any{
-		"provider":   "dev",
-		"id_token":   "user1",
-		"device_id":  "device3",
-		"birth_year": 2000,
+		"provider":  "dev",
+		"id_token":  "user1",
+		"device_id": "device3",
 	}, map[string]string{
 		"X-Dev-Auth": cfg.DevAuthSecret,
 	})
