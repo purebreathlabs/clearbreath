@@ -16,7 +16,7 @@ void main() {
     final answers = OnboardingAnswers.defaults().copyWith(
       primaryGoals: {PrimaryGoal.sleep, PrimaryGoal.focus},
       practiceWindows: {PracticeWindow.morning, PracticeWindow.evening},
-      sessionLengthMinutes: 15,
+      sessionLengthMinutes: 20,
       hapticsEnabled: false,
       reminderTimeMinutes: 21 * 60 + 30,
       displayName: ' Rahul ',
@@ -46,7 +46,7 @@ void main() {
         restored.practiceWindows,
         unorderedEquals([PracticeWindow.morning, PracticeWindow.evening]),
       );
-      expect(restored.sessionLengthMinutes, 15);
+      expect(restored.sessionLengthMinutes, 20);
       expect(restored.hapticsEnabled, isFalse);
       expect(restored.reminderTimeMinutes, 21 * 60 + 30);
       expect(restored.displayName, 'Rahul');

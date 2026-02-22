@@ -1,0 +1,24 @@
+---
+const nav = [
+  { href: '/', label: 'Home' },
+  { href: '/privacy', label: 'Privacy' },
+  { href: '/terms', label: 'Terms' },
+];
+---
+
+<header class="border-b border-white/10">
+  <div class="mx-auto w-full max-w-3xl px-6 py-5 flex items-center justify-between">
+    <a href="/" class="text-white font-semibold tracking-wide">ClearBreath</a>
+    <nav class="flex items-center gap-6" aria-label="Primary navigation">
+      {nav.map((item) => (
+        <a
+          href={item.href}
+          class="text-sm text-white/75 hover:text-white transition-colors"
+        >
+          {item.label}
+        </a>
+      ))}
+    </nav>
+  </div>
+</header>
+

@@ -18,10 +18,34 @@ class IntroScreen extends ConsumerWidget {
     final colors = Theme.of(context).extension<AppColorTokens>()!;
     final components = Theme.of(context).extension<AppComponentTokens>()!;
 
-    void handleSubmit() {
-      ref.read(introGateProvider).complete();
-      final encodedFrom = Uri.encodeComponent(from);
-      context.go('/onboarding?from=$encodedFrom');
+    Future<void> handleSubmit() async {
+      try {
+        await ref.read(introGateProvider).complete();
+        if (!context.mounted) {
+          return;
+        }
+        final encodedFrom = Uri.encodeComponent(from);
+        context.go('/onboarding?from=$encodedFrom');
+      } catch (_) {
+        if (!context.mounted) {
+          return;
+        }
+        final messenger = ScaffoldMessenger.of(context);
+        messenger.hideCurrentSnackBar();
+        messenger.showSnackBar(
+          SnackBar(
+            content: Text(
+              'Could not continue. Please try again.',
+              style: typography.bodyMedium.copyWith(color: colors.inverseText),
+            ),
+            backgroundColor: colors.inverseSurface,
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(components.buttonRadius),
+            ),
+          ),
+        );
+      }
     }
 
     return Scaffold(
@@ -114,7 +138,7 @@ class IntroScreen extends ConsumerWidget {
                     ),
                     SizedBox(height: spacing.md),
                     FilledButton(
-                      onPressed: handleSubmit,
+                      onPressed: () => handleSubmit(),
                       child: const Text('Get started'),
                     ),
                     SizedBox(height: spacing.sm),

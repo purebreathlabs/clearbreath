@@ -1,12 +1,23 @@
 import 'package:clearbreath/features/session/domain/session_phase.dart';
-import 'package:clearbreath/features/session/domain/session_preset.dart';
+import 'package:clearbreath/features/session/domain/session_plan.dart';
 import 'package:clearbreath/features/session/domain/session_state_machine.dart';
+import 'package:clearbreath/features/techniques/domain/technique_preset.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
   test('countdown transitions into inhale', () {
+    final preset = PhasePreset(
+      id: 'beginner',
+      label: 'Beginner',
+      recommendedDurationsMinutes: const [5],
+      inhaleMs: 1000,
+      holdMs: 1000,
+      exhaleMs: 1000,
+      holdAfterExhaleMs: 0,
+    );
+
     final machine = SessionStateMachine(
-      preset: const SessionPreset(inhaleMs: 1000, holdMs: 1000, exhaleMs: 1000),
+      plan: SessionPlan.fromPreset(preset, 60),
       countdown: const Duration(seconds: 3),
     );
 
@@ -26,65 +37,58 @@ void main() {
     expect(machine.state.totalElapsed, Duration.zero);
   });
 
-  test('box breathing cycles inhale hold exhale holdAfterExhale', () {
+  test('phase techniques cycle and count breaths', () {
+    final preset = PhasePreset(
+      id: 'beginner',
+      label: 'Beginner',
+      recommendedDurationsMinutes: const [5],
+      inhaleMs: 1000,
+      holdMs: 1000,
+      exhaleMs: 1000,
+      holdAfterExhaleMs: 1000,
+    );
+
     final machine = SessionStateMachine(
-      preset: const SessionPreset(
-        inhaleMs: 1000,
-        holdMs: 1000,
-        exhaleMs: 1000,
-        holdAfterExhaleMs: 1000,
-      ),
+      plan: SessionPlan.fromPreset(preset, 60),
       countdown: Duration.zero,
     );
 
     machine.start();
     expect(machine.state.phase, SessionPhase.inhale);
+    expect(machine.state.breathsCompleted, 0);
+    expect(machine.state.totalElapsed, Duration.zero);
 
     machine.tick(const Duration(milliseconds: 1000));
     expect(machine.state.phase, SessionPhase.hold);
+    expect(machine.state.totalElapsed, const Duration(milliseconds: 1000));
 
     machine.tick(const Duration(milliseconds: 1000));
     expect(machine.state.phase, SessionPhase.exhale);
+    expect(machine.state.totalElapsed, const Duration(milliseconds: 2000));
 
     machine.tick(const Duration(milliseconds: 1000));
     expect(machine.state.phase, SessionPhase.holdAfterExhale);
+    expect(machine.state.totalElapsed, const Duration(milliseconds: 3000));
 
     machine.tick(const Duration(milliseconds: 1000));
     expect(machine.state.phase, SessionPhase.inhale);
+    expect(machine.state.breathsCompleted, 1);
+    expect(machine.state.totalElapsed, const Duration(milliseconds: 4000));
   });
 
-  test('skips holdAfterExhale when duration is zero', () {
-    final machine = SessionStateMachine(
-      preset: const SessionPreset(
-        inhaleMs: 1000,
-        holdMs: 1000,
-        exhaleMs: 1000,
-        holdAfterExhaleMs: 0,
-      ),
-      countdown: Duration.zero,
+  test('skips phases with zero durations', () {
+    final preset = PhasePreset(
+      id: 'beginner',
+      label: 'Beginner',
+      recommendedDurationsMinutes: const [5],
+      inhaleMs: 1000,
+      holdMs: 0,
+      exhaleMs: 1000,
+      holdAfterExhaleMs: 0,
     );
 
-    machine.start();
-    expect(machine.state.phase, SessionPhase.inhale);
-
-    machine.tick(const Duration(milliseconds: 1000));
-    expect(machine.state.phase, SessionPhase.hold);
-
-    machine.tick(const Duration(milliseconds: 1000));
-    expect(machine.state.phase, SessionPhase.exhale);
-
-    machine.tick(const Duration(milliseconds: 1000));
-    expect(machine.state.phase, SessionPhase.inhale);
-  });
-
-  test('skips hold when duration is zero', () {
     final machine = SessionStateMachine(
-      preset: const SessionPreset(
-        inhaleMs: 1000,
-        holdMs: 0,
-        exhaleMs: 1000,
-        holdAfterExhaleMs: 0,
-      ),
+      plan: SessionPlan.fromPreset(preset, 60),
       countdown: Duration.zero,
     );
 
@@ -99,17 +103,24 @@ void main() {
   });
 
   test('pause freezes progression until resume', () {
+    final preset = PhasePreset(
+      id: 'beginner',
+      label: 'Beginner',
+      recommendedDurationsMinutes: const [5],
+      inhaleMs: 10000,
+      holdMs: 0,
+      exhaleMs: 0,
+      holdAfterExhaleMs: 0,
+    );
+
     final machine = SessionStateMachine(
-      preset: const SessionPreset(
-        inhaleMs: 10000,
-        holdMs: 0,
-        exhaleMs: 0,
-        holdAfterExhaleMs: 0,
-      ),
+      plan: SessionPlan.fromPreset(preset, 60),
       countdown: Duration.zero,
     );
 
     machine.start();
+    expect(machine.state.phase, SessionPhase.inhale);
+
     machine.tick(const Duration(milliseconds: 1000));
     expect(machine.state.phase, SessionPhase.inhale);
     expect(machine.state.phaseRemaining, const Duration(milliseconds: 9000));
@@ -132,14 +143,121 @@ void main() {
     expect(machine.state.totalElapsed, const Duration(milliseconds: 2000));
   });
 
-  test('uneven tick deltas preserve total elapsed time', () {
+  test('duration limit auto-completes', () {
+    final preset = PhasePreset(
+      id: 'beginner',
+      label: 'Beginner',
+      recommendedDurationsMinutes: const [5],
+      inhaleMs: 1000,
+      holdMs: 0,
+      exhaleMs: 1000,
+      holdAfterExhaleMs: 0,
+    );
+
     final machine = SessionStateMachine(
-      preset: const SessionPreset(
-        inhaleMs: 4000,
-        holdMs: 4000,
-        exhaleMs: 4000,
-        holdAfterExhaleMs: 4000,
-      ),
+      plan: SessionPlan.fromPreset(preset, 5),
+      countdown: Duration.zero,
+    );
+
+    machine.start();
+    machine.tick(const Duration(seconds: 10));
+    expect(machine.state.isCompleted, isTrue);
+    expect(machine.state.totalElapsed, const Duration(seconds: 5));
+    expect(machine.state.phaseRemaining, Duration.zero);
+    expect(machine.state.breathsCompleted, 2);
+  });
+
+  test('round plan progresses with rest and counts beats', () {
+    final preset = BpmRoundsPreset(
+      id: 'beginner',
+      label: 'Beginner',
+      recommendedDurationsMinutes: const [5],
+      bpm: 60,
+      rounds: 3,
+      roundSeconds: 2,
+      restSeconds: 1,
+    );
+
+    final machine = SessionStateMachine(
+      plan: SessionPlan.fromPreset(preset, 5),
+      countdown: Duration.zero,
+    );
+
+    machine.start();
+    expect(machine.state.phase, SessionPhase.round);
+    expect(machine.state.currentRound, 1);
+    expect(machine.state.totalRounds, 2);
+    expect(machine.state.breathsCompleted, 0);
+
+    machine.tick(const Duration(seconds: 1));
+    expect(machine.state.phase, SessionPhase.round);
+    expect(machine.state.breathsCompleted, 1);
+    expect(machine.state.totalElapsed, const Duration(seconds: 1));
+
+    machine.tick(const Duration(seconds: 1));
+    expect(machine.state.phase, SessionPhase.rest);
+    expect(machine.state.breathsCompleted, 2);
+    expect(machine.state.totalElapsed, const Duration(seconds: 2));
+
+    machine.tick(const Duration(seconds: 1));
+    expect(machine.state.phase, SessionPhase.round);
+    expect(machine.state.currentRound, 2);
+    expect(machine.state.totalRounds, 2);
+    expect(machine.state.totalElapsed, const Duration(seconds: 3));
+
+    machine.tick(const Duration(seconds: 2));
+    expect(machine.state.isCompleted, isTrue);
+    expect(machine.state.totalElapsed, const Duration(seconds: 5));
+    expect(machine.state.breathsCompleted, 4);
+    expect(machine.state.currentRound, 2);
+  });
+
+  test('alternate nostril switches sides per cycle', () {
+    final preset = PhasePreset(
+      id: 'beginner',
+      label: 'Beginner',
+      recommendedDurationsMinutes: const [5],
+      inhaleMs: 1000,
+      holdMs: 0,
+      exhaleMs: 1000,
+      holdAfterExhaleMs: 0,
+    );
+
+    final machine = SessionStateMachine(
+      plan: SessionPlan.fromPreset(preset, 10, alternateNostril: true),
+      countdown: Duration.zero,
+    );
+
+    machine.start();
+    expect(machine.state.phase, SessionPhase.inhale);
+    expect(machine.state.activeNostril, NostrilSide.left);
+
+    machine.tick(const Duration(seconds: 1));
+    expect(machine.state.phase, SessionPhase.exhale);
+    expect(machine.state.activeNostril, NostrilSide.right);
+
+    machine.tick(const Duration(seconds: 1));
+    expect(machine.state.phase, SessionPhase.inhale);
+    expect(machine.state.activeNostril, NostrilSide.right);
+
+    machine.tick(const Duration(seconds: 1));
+    expect(machine.state.phase, SessionPhase.exhale);
+    expect(machine.state.activeNostril, NostrilSide.left);
+  });
+
+  test('uneven tick deltas preserve total elapsed time', () {
+    final preset = PhasePreset(
+      id: 'beginner',
+      label: 'Beginner',
+      recommendedDurationsMinutes: const [5],
+      inhaleMs: 4000,
+      holdMs: 4000,
+      exhaleMs: 4000,
+      holdAfterExhaleMs: 4000,
+    );
+
+    final machine = SessionStateMachine(
+      plan: SessionPlan.fromPreset(preset, 20),
       countdown: Duration.zero,
     );
 
@@ -162,6 +280,7 @@ void main() {
       index += 1;
     }
 
+    expect(machine.state.isCompleted, isTrue);
     expect(machine.state.totalElapsed, const Duration(seconds: 20));
   });
 }

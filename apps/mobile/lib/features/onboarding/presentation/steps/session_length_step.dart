@@ -24,6 +24,12 @@ class SessionLengthStep extends StatelessWidget {
       child: Column(
         children: [
           OnboardingOptionButton(
+            label: '2 minutes',
+            selected: valueMinutes == 2,
+            onTap: () => onChanged(2),
+          ),
+          SizedBox(height: spacing.md),
+          OnboardingOptionButton(
             label: '5 minutes',
             selected: valueMinutes == 5,
             onTap: () => onChanged(5),
@@ -36,15 +42,9 @@ class SessionLengthStep extends StatelessWidget {
           ),
           SizedBox(height: spacing.md),
           OnboardingOptionButton(
-            label: '15 minutes',
-            selected: valueMinutes == 15,
-            onTap: () => onChanged(15),
-          ),
-          SizedBox(height: spacing.md),
-          OnboardingOptionButton(
-            label: '30 minutes',
-            selected: valueMinutes == 30,
-            onTap: () => onChanged(30),
+            label: '20 minutes',
+            selected: valueMinutes == 20,
+            onTap: () => onChanged(20),
           ),
         ],
       ),
