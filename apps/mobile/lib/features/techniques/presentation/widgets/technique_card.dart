@@ -73,9 +73,21 @@ class TechniqueCard extends StatelessWidget {
               bottom: 0,
               height: MediaQuery.sizeOf(context).height * 0.12,
               child: ClipRect(
-                child: BackdropFilter(
-                  filter: ImageFilter.blur(sigmaX: 2, sigmaY: 2),
-                  child: const SizedBox.expand(),
+                child: Stack(
+                  fit: StackFit.expand,
+                  children: [
+                    OverflowBox(
+                      maxHeight: double.infinity,
+                      alignment: Alignment.bottomCenter,
+                      child: ImageFiltered(
+                        imageFilter: ImageFilter.blur(sigmaX: 2, sigmaY: 2),
+                        child: imagePath != null
+                            ? Image.asset(imagePath, fit: BoxFit.cover)
+                            : Container(color: colors.surfaceHigh),
+                      ),
+                    ),
+                    ColoredBox(color: Colors.black.withValues(alpha: 0.65)),
+                  ],
                 ),
               ),
             ),

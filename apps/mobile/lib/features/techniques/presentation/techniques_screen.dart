@@ -285,7 +285,6 @@ class TechniquesScreen extends ConsumerWidget {
                   return Padding(
                     padding: EdgeInsets.symmetric(horizontal: spacing.lg),
                     child: GridView.count(
-                      physics: const ClampingScrollPhysics(),
                       key: const Key('techniques_grid'),
                       crossAxisCount: 2,
                       crossAxisSpacing: spacing.md,
