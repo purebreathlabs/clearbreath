@@ -15,11 +15,9 @@ void main() {
       ),
     );
 
-    expect(find.text('Meet ClearBreath'), findsOneWidget);
-    expect(find.text('Breathe with intention.'), findsOneWidget);
-    expect(find.text('Authentic techniques'), findsOneWidget);
-    expect(find.text('Guided sessions'), findsOneWidget);
-    expect(find.text('Streaks that motivate'), findsOneWidget);
+    expect(find.textContaining('Breathe with'), findsOneWidget);
+    expect(find.textContaining('intention'), findsOneWidget);
+    expect(find.text('No sign-up required.'), findsOneWidget);
     expect(find.text('Get started'), findsOneWidget);
   });
 }

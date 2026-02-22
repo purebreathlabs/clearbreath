@@ -54,6 +54,7 @@ flutter:
     - assets/techniques/
     - assets/recommendations/
     - assets/legal/
+    - assets/images/
   fonts:
     - family: Manrope
       fonts:

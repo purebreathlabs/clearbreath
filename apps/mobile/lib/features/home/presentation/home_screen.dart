@@ -12,12 +12,11 @@ import '../../techniques/domain/favorites_provider.dart';
 import '../../techniques/domain/safety_acknowledgement_repository.dart';
 import '../../techniques/domain/technique.dart';
 import '../../techniques/presentation/widgets/safety_warning_sheet.dart';
-import '../../../shared/widgets/weekly_bar_chart.dart';
 import '../../../shared/providers/preferences_provider.dart';
 import '../../../shared/widgets/brand_mark.dart';
 import '../domain/recommendation_engine.dart';
+import 'widgets/compact_progress_card.dart';
 import 'widgets/favorites_row.dart';
-import 'widgets/streak_display.dart';
 import 'widgets/todays_practice_card.dart';
 
 class HomeScreen extends ConsumerWidget {
@@ -123,15 +122,15 @@ class HomeScreen extends ConsumerWidget {
           durationMinutes: durationMinutes,
           rationale: rec.rationale,
           onStart: () => startRecommendation(rec),
+          techniqueId: rec.technique.id,
         );
       },
       loading: () {
         return Container(
           padding: EdgeInsets.all(components.cardPadding),
           decoration: BoxDecoration(
-            color: colors.surface,
+            color: colors.surfaceHigh,
             borderRadius: BorderRadius.circular(components.cardRadius),
-            border: Border.all(color: colors.border),
           ),
           child: Row(
             children: [
@@ -143,7 +142,7 @@ class HomeScreen extends ConsumerWidget {
               SizedBox(width: spacing.md),
               Expanded(
                 child: Text(
-                  'Loading today’s practice...',
+                  'Loading today\u2019s practice...',
                   style: typography.bodyMedium.copyWith(
                     color: colors.textSecondary,
                   ),
@@ -157,15 +156,14 @@ class HomeScreen extends ConsumerWidget {
         return Container(
           padding: EdgeInsets.all(components.cardPadding),
           decoration: BoxDecoration(
-            color: colors.surface,
+            color: colors.surfaceHigh,
             borderRadius: BorderRadius.circular(components.cardRadius),
-            border: Border.all(color: colors.border),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               Text(
-                'Could not load today’s practice.',
+                'Could not load today\u2019s practice.',
                 style: typography.bodyMedium.copyWith(
                   color: colors.textSecondary,
                 ),
@@ -237,14 +235,11 @@ class HomeScreen extends ConsumerWidget {
                   ),
                 ),
                 SizedBox(height: spacing.xl),
-                StreakDisplay(streakDays: streakDays, loading: stats.isLoading),
-                SizedBox(height: spacing.lg),
-                weeklyMinutes.when(
-                  data: (minutes) => WeeklyBarChart(minutes: minutes),
-                  loading: () =>
-                      const WeeklyBarChart(minutes: <int>[], loading: true),
-                  error: (error, stackTrace) =>
-                      const WeeklyBarChart(minutes: <int>[]),
+                CompactProgressCard(
+                  streakDays: streakDays,
+                  weeklyMinutes:
+                      weeklyMinutes.asData?.value ?? const [],
+                  loading: stats.isLoading || weeklyMinutes.isLoading,
                 ),
               ],
             ),

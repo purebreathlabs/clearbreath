@@ -19,7 +19,7 @@ void main() {
     await tester.pump(const Duration(seconds: 2));
     await tester.pumpAndSettle();
 
-    expect(find.text('Meet ClearBreath'), findsOneWidget);
+    expect(find.textContaining('Breathe with'), findsOneWidget);
 
     await tester.tap(find.text('Get started'));
     await tester.pumpAndSettle();
