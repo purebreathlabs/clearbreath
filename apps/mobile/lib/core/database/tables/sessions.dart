@@ -19,7 +19,8 @@ class Sessions extends Table {
 
   BoolColumn get endedEarly => boolean().withDefault(const Constant(false))();
 
-  BoolColumn get syncedToCloud => boolean().withDefault(const Constant(false))();
+  BoolColumn get syncedToCloud =>
+      boolean().withDefault(const Constant(false))();
 
   DateTimeColumn get createdAt => dateTime()();
 

@@ -43,18 +43,12 @@ class ShareCardRenderer {
     return file;
   }
 
-  Future<void> sharePngFile(
-    File file, {
-    String? text,
-  }) async {
+  Future<void> sharePngFile(File file, {String? text}) async {
     if (kIsWeb || Platform.environment.containsKey('FLUTTER_TEST')) {
       return;
     }
     await SharePlus.instance.share(
-      ShareParams(
-        files: [XFile(file.path)],
-        text: text,
-      ),
+      ShareParams(files: [XFile(file.path)], text: text),
     );
   }
 

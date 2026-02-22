@@ -19,10 +19,11 @@ void main() {
 
     expect(plan, isA<PhaseSessionPlan>());
     final phasePlan = plan as PhaseSessionPlan;
-    expect(
-      phasePlan.phaseSequence,
-      const [SessionPhase.inhale, SessionPhase.hold, SessionPhase.exhale],
-    );
+    expect(phasePlan.phaseSequence, const [
+      SessionPhase.inhale,
+      SessionPhase.hold,
+      SessionPhase.exhale,
+    ]);
     expect(phasePlan.totalCycles, 4);
     expect(phasePlan.totalDuration, const Duration(seconds: 10));
     expect(phasePlan.nostrilByCycle, isNull);
@@ -39,19 +40,16 @@ void main() {
       holdAfterExhaleMs: 0,
     );
 
-    final plan = SessionPlan.fromPreset(
-      preset,
-      5,
-      alternateNostril: true,
-    );
+    final plan = SessionPlan.fromPreset(preset, 5, alternateNostril: true);
 
     expect(plan, isA<PhaseSessionPlan>());
     final phasePlan = plan as PhaseSessionPlan;
     expect(phasePlan.totalCycles, 3);
-    expect(
-      phasePlan.nostrilByCycle,
-      const [NostrilSide.left, NostrilSide.right, NostrilSide.left],
-    );
+    expect(phasePlan.nostrilByCycle, const [
+      NostrilSide.left,
+      NostrilSide.right,
+      NostrilSide.left,
+    ]);
   });
 
   test('bpm rounds preset builds round plan with expected rounds', () {
@@ -76,4 +74,3 @@ void main() {
     expect(roundPlan.totalDuration, const Duration(seconds: 90));
   });
 }
-

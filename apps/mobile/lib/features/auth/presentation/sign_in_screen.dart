@@ -194,7 +194,9 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
               children: [
                 Text(
                   'Select birth year',
-                  style: typography.titleLarge.copyWith(color: colors.textPrimary),
+                  style: typography.titleLarge.copyWith(
+                    color: colors.textPrimary,
+                  ),
                 ),
                 SizedBox(height: spacing.md),
                 SizedBox(
@@ -304,10 +306,7 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
   }
 
   Future<void> _signInDev() async {
-    await _runSignIn(
-      provider: AuthProvider.dev,
-      idTokenLoader: () async => '',
-    );
+    await _runSignIn(provider: AuthProvider.dev, idTokenLoader: () async => '');
   }
 
   Future<void> _runSignIn({

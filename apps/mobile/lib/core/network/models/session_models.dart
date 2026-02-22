@@ -83,9 +83,10 @@ class SessionsIngestResponse {
     return SessionsIngestResponse(
       acceptedCount: readInt(json, 'accepted_count'),
       duplicateCount: readInt(json, 'duplicate_count'),
-      rejected: readMapList(json, 'rejected')
-          .map(RejectedSession.fromJson)
-          .toList(growable: false),
+      rejected: readMapList(
+        json,
+        'rejected',
+      ).map(RejectedSession.fromJson).toList(growable: false),
       statsSnapshot: StatsSnapshot.fromJson(readMap(json, 'stats_snapshot')),
     );
   }
@@ -99,4 +100,3 @@ class SessionsIngestResponse {
 String _formatUtc(DateTime value) {
   return value.toUtc().toIso8601String();
 }
-

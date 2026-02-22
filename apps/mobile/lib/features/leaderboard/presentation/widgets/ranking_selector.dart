@@ -97,4 +97,3 @@ class _Pill extends StatelessWidget {
     );
   }
 }
-

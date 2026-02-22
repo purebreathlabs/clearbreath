@@ -20,10 +20,7 @@ class SessionPhaseLabel extends StatelessWidget {
       switchInCurve: Curves.easeOut,
       switchOutCurve: Curves.easeIn,
       transitionBuilder: (child, animation) {
-        return FadeTransition(
-          opacity: animation,
-          child: child,
-        );
+        return FadeTransition(opacity: animation, child: child);
       },
       child: Text(
         label,
@@ -51,4 +48,3 @@ class SessionPhaseLabel extends StatelessWidget {
     };
   }
 }
-

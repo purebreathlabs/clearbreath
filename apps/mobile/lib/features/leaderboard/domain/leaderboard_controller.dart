@@ -164,8 +164,10 @@ String _initials(String name) {
   if (trimmed.isEmpty) {
     return 'C';
   }
-  final parts =
-      trimmed.split(RegExp(r'\\s+')).where((p) => p.trim().isNotEmpty).toList();
+  final parts = trimmed
+      .split(RegExp(r'\\s+'))
+      .where((p) => p.trim().isNotEmpty)
+      .toList();
   if (parts.isEmpty) {
     return 'C';
   }

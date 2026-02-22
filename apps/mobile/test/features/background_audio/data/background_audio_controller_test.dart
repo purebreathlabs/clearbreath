@@ -25,14 +25,21 @@ void main() {
     addTearDown(sub.cancel);
 
     await controller.start(techniqueName: 'Box');
-    expect(remote.actions, containsAllInOrder(['metadata:Box', 'playing:true']));
+    expect(
+      remote.actions,
+      containsAllInOrder(['metadata:Box', 'playing:true']),
+    );
 
-    interruptions.add(AudioInterruptionEvent(true, AudioInterruptionType.pause));
+    interruptions.add(
+      AudioInterruptionEvent(true, AudioInterruptionType.pause),
+    );
     await Future<void>.delayed(Duration.zero);
 
     expect(events.last, isA<BackgroundAudioInterruptionBegan>());
 
-    interruptions.add(AudioInterruptionEvent(false, AudioInterruptionType.pause));
+    interruptions.add(
+      AudioInterruptionEvent(false, AudioInterruptionType.pause),
+    );
     await Future<void>.delayed(Duration.zero);
 
     expect(events.last, isA<BackgroundAudioInterruptionEnded>());

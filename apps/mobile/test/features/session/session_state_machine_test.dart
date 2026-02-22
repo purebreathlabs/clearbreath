@@ -224,11 +224,7 @@ void main() {
     );
 
     final machine = SessionStateMachine(
-      plan: SessionPlan.fromPreset(
-        preset,
-        10,
-        alternateNostril: true,
-      ),
+      plan: SessionPlan.fromPreset(preset, 10, alternateNostril: true),
       countdown: Duration.zero,
     );
 

@@ -52,7 +52,9 @@ class _SafetyWarningSheetState extends ConsumerState<SafetyWarningSheet> {
                       ),
                     ),
                     IconButton(
-                      onPressed: _saving ? null : () => Navigator.of(context).pop(),
+                      onPressed: _saving
+                          ? null
+                          : () => Navigator.of(context).pop(),
                       icon: const Icon(Icons.close_rounded),
                       color: colors.textTertiary,
                       tooltip: 'Close',
@@ -96,9 +98,9 @@ class _SafetyWarningSheetState extends ConsumerState<SafetyWarningSheet> {
           .read(safetyAckRepositoryProvider)
           .acknowledge(widget.technique.id);
       ref.invalidate(safetyAcksProvider);
-      await ref
-          .read(safetySyncServiceProvider)
-          .pushAcknowledgements([widget.technique.id]);
+      await ref.read(safetySyncServiceProvider).pushAcknowledgements([
+        widget.technique.id,
+      ]);
       if (!mounted) {
         return;
       }

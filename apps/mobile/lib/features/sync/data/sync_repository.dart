@@ -55,4 +55,3 @@ class SyncRepository {
     return SessionsIngestResponse.fromJson(data.cast<String, dynamic>());
   }
 }
-

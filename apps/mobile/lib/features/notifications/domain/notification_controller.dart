@@ -80,7 +80,8 @@ class NotificationController extends Notifier<NotificationState> {
     return previous?.reminderEnabled != next?.reminderEnabled ||
         previous?.reminderTimeMinutes != next?.reminderTimeMinutes ||
         previous?.streakWarningEnabled != next?.streakWarningEnabled ||
-        previous?.notificationPermissionAsked != next?.notificationPermissionAsked;
+        previous?.notificationPermissionAsked !=
+            next?.notificationPermissionAsked;
   }
 
   Future<void> onSessionCompleted() async {
@@ -144,8 +145,9 @@ class NotificationController extends Notifier<NotificationState> {
   Future<Preference?> _readPreferences() async {
     try {
       final db = ref.read(appDatabaseProvider);
-      return (db.select(db.preferences)..where((row) => row.id.equals(_rowId)))
-          .getSingleOrNull();
+      return (db.select(
+        db.preferences,
+      )..where((row) => row.id.equals(_rowId))).getSingleOrNull();
     } catch (_) {
       return null;
     }
@@ -169,10 +171,7 @@ class NotificationController extends Notifier<NotificationState> {
 
     if (prefs.reminderEnabled) {
       final safeMinutes = prefs.reminderTimeMinutes.clamp(0, 23 * 60 + 59);
-      final time = TimeOfDay(
-        hour: safeMinutes ~/ 60,
-        minute: safeMinutes % 60,
-      );
+      final time = TimeOfDay(hour: safeMinutes ~/ 60, minute: safeMinutes % 60);
       await service.scheduleDailyReminder(time);
     } else {
       await service.cancelDailyReminder();
@@ -222,7 +221,11 @@ class NotificationController extends Notifier<NotificationState> {
       final nowUtc = now.toUtc();
       final offsetMinutes = now.timeZoneOffset.inMinutes;
       final nowLocal = nowUtc.add(Duration(minutes: offsetMinutes));
-      final todayKey = DateTime.utc(nowLocal.year, nowLocal.month, nowLocal.day);
+      final todayKey = DateTime.utc(
+        nowLocal.year,
+        nowLocal.month,
+        nowLocal.day,
+      );
 
       final minutes = minutesByDay[todayKey] ?? 0;
       return minutes >= 2;

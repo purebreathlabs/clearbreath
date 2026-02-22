@@ -39,7 +39,9 @@ void main() {
   test('time component is ignored for day keys', () {
     final day = DateTime.utc(2026, 2, 21);
     final minutes = {day: 2};
-    expect(currentStreak(minutes, DateTime.utc(2026, 2, 21, 23, 59)), equals(1));
+    expect(
+      currentStreak(minutes, DateTime.utc(2026, 2, 21, 23, 59)),
+      equals(1),
+    );
   });
 }
-

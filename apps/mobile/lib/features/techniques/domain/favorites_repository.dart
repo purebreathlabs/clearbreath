@@ -16,7 +16,9 @@ class FavoritesRepository {
   final AppDatabase _db;
 
   Future<void> add(String techniqueId) async {
-    await _db.into(_db.favorites).insertOnConflictUpdate(
+    await _db
+        .into(_db.favorites)
+        .insertOnConflictUpdate(
           FavoritesCompanion(
             techniqueId: Value(techniqueId),
             addedAt: Value(DateTime.now().toUtc()),
@@ -25,15 +27,15 @@ class FavoritesRepository {
   }
 
   Future<void> remove(String techniqueId) async {
-    await (_db.delete(_db.favorites)
-          ..where((row) => row.techniqueId.equals(techniqueId)))
-        .go();
+    await (_db.delete(
+      _db.favorites,
+    )..where((row) => row.techniqueId.equals(techniqueId))).go();
   }
 
   Future<void> toggle(String techniqueId) async {
-    final deleted = await (_db.delete(_db.favorites)
-          ..where((row) => row.techniqueId.equals(techniqueId)))
-        .go();
+    final deleted = await (_db.delete(
+      _db.favorites,
+    )..where((row) => row.techniqueId.equals(techniqueId))).go();
     if (deleted > 0) {
       return;
     }
@@ -41,9 +43,9 @@ class FavoritesRepository {
   }
 
   Future<bool> isFavorite(String techniqueId) async {
-    final row = await (_db.select(_db.favorites)
-          ..where((row) => row.techniqueId.equals(techniqueId)))
-        .getSingleOrNull();
+    final row = await (_db.select(
+      _db.favorites,
+    )..where((row) => row.techniqueId.equals(techniqueId))).getSingleOrNull();
     return row != null;
   }
 
@@ -54,13 +56,12 @@ class FavoritesRepository {
 
   Future<List<Technique>> allFavorites(List<Technique> allTechniques) async {
     final favorites =
-        await (_db.select(_db.favorites)
-              ..orderBy([
-                (row) => OrderingTerm(
-                  expression: row.addedAt,
-                  mode: OrderingMode.desc,
-                ),
-              ]))
+        await (_db.select(_db.favorites)..orderBy([
+              (row) => OrderingTerm(
+                expression: row.addedAt,
+                mode: OrderingMode.desc,
+              ),
+            ]))
             .get();
 
     final byId = <String, Technique>{};

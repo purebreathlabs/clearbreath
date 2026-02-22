@@ -17,7 +17,9 @@ class SettingsRepository {
   final AppDatabase _db;
 
   Future<void> setSessionLengthMinutes(int minutes) async {
-    await _db.into(_db.preferences).insertOnConflictUpdate(
+    await _db
+        .into(_db.preferences)
+        .insertOnConflictUpdate(
           PreferencesCompanion(
             id: const Value(_rowId),
             sessionLengthMinutes: Value(minutes),
@@ -26,7 +28,9 @@ class SettingsRepository {
   }
 
   Future<void> setHapticsEnabled(bool value) async {
-    await _db.into(_db.preferences).insertOnConflictUpdate(
+    await _db
+        .into(_db.preferences)
+        .insertOnConflictUpdate(
           PreferencesCompanion(
             id: const Value(_rowId),
             hapticsEnabled: Value(value),
@@ -35,7 +39,9 @@ class SettingsRepository {
   }
 
   Future<void> setKeepScreenAwake(bool value) async {
-    await _db.into(_db.preferences).insertOnConflictUpdate(
+    await _db
+        .into(_db.preferences)
+        .insertOnConflictUpdate(
           PreferencesCompanion(
             id: const Value(_rowId),
             keepScreenAwake: Value(value),
@@ -44,7 +50,9 @@ class SettingsRepository {
   }
 
   Future<void> setReminderEnabled(bool value) async {
-    await _db.into(_db.preferences).insertOnConflictUpdate(
+    await _db
+        .into(_db.preferences)
+        .insertOnConflictUpdate(
           PreferencesCompanion(
             id: const Value(_rowId),
             reminderEnabled: Value(value),
@@ -53,7 +61,9 @@ class SettingsRepository {
   }
 
   Future<void> setReminderTimeMinutes(int value) async {
-    await _db.into(_db.preferences).insertOnConflictUpdate(
+    await _db
+        .into(_db.preferences)
+        .insertOnConflictUpdate(
           PreferencesCompanion(
             id: const Value(_rowId),
             reminderTimeMinutes: Value(value),
@@ -62,7 +72,9 @@ class SettingsRepository {
   }
 
   Future<void> setStreakWarningEnabled(bool value) async {
-    await _db.into(_db.preferences).insertOnConflictUpdate(
+    await _db
+        .into(_db.preferences)
+        .insertOnConflictUpdate(
           PreferencesCompanion(
             id: const Value(_rowId),
             streakWarningEnabled: Value(value),
@@ -71,7 +83,9 @@ class SettingsRepository {
   }
 
   Future<void> setDisplayName(String value) async {
-    await _db.into(_db.preferences).insertOnConflictUpdate(
+    await _db
+        .into(_db.preferences)
+        .insertOnConflictUpdate(
           PreferencesCompanion(
             id: const Value(_rowId),
             displayName: Value(value.trim()),
@@ -79,4 +93,3 @@ class SettingsRepository {
         );
   }
 }
-

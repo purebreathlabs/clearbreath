@@ -18,7 +18,9 @@ void main() {
       return ResponseBody.fromString(
         '{}',
         500,
-        headers: {'content-type': ['application/json']},
+        headers: {
+          'content-type': ['application/json'],
+        },
       );
     });
 
@@ -31,14 +33,20 @@ void main() {
     );
     addTearDown(container.dispose);
 
-    await container.read(tokenStorageProvider).writeTokens(
-      AuthTokens(
-        accessToken: 'access1',
-        accessTokenExpiresAtUtc: DateTime.now().toUtc().add(const Duration(hours: 1)),
-        refreshToken: 'refresh1',
-        refreshTokenExpiresAtUtc: DateTime.now().toUtc().add(const Duration(days: 30)),
-      ),
-    );
+    await container
+        .read(tokenStorageProvider)
+        .writeTokens(
+          AuthTokens(
+            accessToken: 'access1',
+            accessTokenExpiresAtUtc: DateTime.now().toUtc().add(
+              const Duration(hours: 1),
+            ),
+            refreshToken: 'refresh1',
+            refreshTokenExpiresAtUtc: DateTime.now().toUtc().add(
+              const Duration(days: 30),
+            ),
+          ),
+        );
 
     final dio = container.read(apiClientProvider);
     dio.httpClientAdapter = _TestAdapter((options) async {
@@ -46,7 +54,9 @@ void main() {
       return ResponseBody.fromString(
         '{}',
         200,
-        headers: {'content-type': ['application/json']},
+        headers: {
+          'content-type': ['application/json'],
+        },
       );
     });
 
@@ -64,7 +74,9 @@ void main() {
         return ResponseBody.fromString(
           '{"error":"not_found","code":"not_found","request_id":"r"}',
           404,
-          headers: {'content-type': ['application/json']},
+          headers: {
+            'content-type': ['application/json'],
+          },
         );
       }
       refreshCalls += 1;
@@ -75,7 +87,9 @@ void main() {
           userId: 'user1',
         ),
         200,
-        headers: {'content-type': ['application/json']},
+        headers: {
+          'content-type': ['application/json'],
+        },
       );
     });
 
@@ -88,14 +102,20 @@ void main() {
     );
     addTearDown(container.dispose);
 
-    await container.read(tokenStorageProvider).writeTokens(
-      AuthTokens(
-        accessToken: 'expired_access',
-        accessTokenExpiresAtUtc: DateTime.now().toUtc().subtract(const Duration(minutes: 1)),
-        refreshToken: 'refresh1',
-        refreshTokenExpiresAtUtc: DateTime.now().toUtc().add(const Duration(days: 30)),
-      ),
-    );
+    await container
+        .read(tokenStorageProvider)
+        .writeTokens(
+          AuthTokens(
+            accessToken: 'expired_access',
+            accessTokenExpiresAtUtc: DateTime.now().toUtc().subtract(
+              const Duration(minutes: 1),
+            ),
+            refreshToken: 'refresh1',
+            refreshTokenExpiresAtUtc: DateTime.now().toUtc().add(
+              const Duration(days: 30),
+            ),
+          ),
+        );
 
     final dio = container.read(apiClientProvider);
     dio.httpClientAdapter = _TestAdapter((options) async {
@@ -104,14 +124,18 @@ void main() {
         return ResponseBody.fromString(
           '{"error":"unauthorized","code":"unauthorized","request_id":"r"}',
           401,
-          headers: {'content-type': ['application/json']},
+          headers: {
+            'content-type': ['application/json'],
+          },
         );
       }
       expect(auth, equals('Bearer access2'));
       return ResponseBody.fromString(
         '{}',
         200,
-        headers: {'content-type': ['application/json']},
+        headers: {
+          'content-type': ['application/json'],
+        },
       );
     });
 
@@ -133,7 +157,9 @@ void main() {
       return ResponseBody.fromString(
         '{"error":"replay","code":"refresh_replay","request_id":"r"}',
         409,
-        headers: {'content-type': ['application/json']},
+        headers: {
+          'content-type': ['application/json'],
+        },
       );
     });
 
@@ -146,21 +172,29 @@ void main() {
     );
     addTearDown(container.dispose);
 
-    await container.read(tokenStorageProvider).writeTokens(
-      AuthTokens(
-        accessToken: 'expired_access',
-        accessTokenExpiresAtUtc: DateTime.now().toUtc().subtract(const Duration(minutes: 1)),
-        refreshToken: 'refresh1',
-        refreshTokenExpiresAtUtc: DateTime.now().toUtc().add(const Duration(days: 30)),
-      ),
-    );
+    await container
+        .read(tokenStorageProvider)
+        .writeTokens(
+          AuthTokens(
+            accessToken: 'expired_access',
+            accessTokenExpiresAtUtc: DateTime.now().toUtc().subtract(
+              const Duration(minutes: 1),
+            ),
+            refreshToken: 'refresh1',
+            refreshTokenExpiresAtUtc: DateTime.now().toUtc().add(
+              const Duration(days: 30),
+            ),
+          ),
+        );
 
     final dio = container.read(apiClientProvider);
     dio.httpClientAdapter = _TestAdapter((options) async {
       return ResponseBody.fromString(
         '{"error":"unauthorized","code":"unauthorized","request_id":"r"}',
         401,
-        headers: {'content-type': ['application/json']},
+        headers: {
+          'content-type': ['application/json'],
+        },
       );
     });
 
@@ -184,7 +218,9 @@ void main() {
           userId: 'user1',
         ),
         200,
-        headers: {'content-type': ['application/json']},
+        headers: {
+          'content-type': ['application/json'],
+        },
       );
     });
 
@@ -197,14 +233,20 @@ void main() {
     );
     addTearDown(container.dispose);
 
-    await container.read(tokenStorageProvider).writeTokens(
-      AuthTokens(
-        accessToken: 'expired_access',
-        accessTokenExpiresAtUtc: DateTime.now().toUtc().subtract(const Duration(minutes: 1)),
-        refreshToken: 'refresh1',
-        refreshTokenExpiresAtUtc: DateTime.now().toUtc().add(const Duration(days: 30)),
-      ),
-    );
+    await container
+        .read(tokenStorageProvider)
+        .writeTokens(
+          AuthTokens(
+            accessToken: 'expired_access',
+            accessTokenExpiresAtUtc: DateTime.now().toUtc().subtract(
+              const Duration(minutes: 1),
+            ),
+            refreshToken: 'refresh1',
+            refreshTokenExpiresAtUtc: DateTime.now().toUtc().add(
+              const Duration(days: 30),
+            ),
+          ),
+        );
 
     final dio = container.read(apiClientProvider);
     dio.httpClientAdapter = _TestAdapter((options) async {
@@ -213,14 +255,18 @@ void main() {
         return ResponseBody.fromString(
           '{"error":"unauthorized","code":"unauthorized","request_id":"r"}',
           401,
-          headers: {'content-type': ['application/json']},
+          headers: {
+            'content-type': ['application/json'],
+          },
         );
       }
       expect(auth, equals('Bearer access2'));
       return ResponseBody.fromString(
         '{}',
         200,
-        headers: {'content-type': ['application/json']},
+        headers: {
+          'content-type': ['application/json'],
+        },
       );
     });
 

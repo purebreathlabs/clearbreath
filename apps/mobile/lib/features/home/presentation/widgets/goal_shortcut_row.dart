@@ -20,10 +20,7 @@ class GoalShortcutRow extends StatelessWidget {
     final colors = Theme.of(context).extension<AppColorTokens>()!;
     final components = Theme.of(context).extension<AppComponentTokens>()!;
 
-    Widget chip({
-      required PrimaryGoal goal,
-      required String label,
-    }) {
+    Widget chip({required PrimaryGoal goal, required String label}) {
       final selected = goal == selectedGoal;
       final shape = RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(components.buttonRadius),
@@ -45,7 +42,9 @@ class GoalShortcutRow extends StatelessWidget {
               ),
               child: Text(
                 label,
-                style: typography.labelLarge.copyWith(color: colors.textPrimary),
+                style: typography.labelLarge.copyWith(
+                  color: colors.textPrimary,
+                ),
               ),
             ),
           ),

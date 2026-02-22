@@ -67,7 +67,9 @@ void main() {
 }
 ''',
         200,
-        headers: {'content-type': ['application/json']},
+        headers: {
+          'content-type': ['application/json'],
+        },
       );
     });
 
@@ -97,4 +99,3 @@ class _Adapter implements HttpClientAdapter {
   @override
   void close({bool force = false}) {}
 }
-

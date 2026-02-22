@@ -31,10 +31,7 @@ class RefreshRequest {
   final String deviceId;
 
   JsonMap toJson() {
-    return {
-      'refresh_token': refreshToken,
-      'device_id': deviceId,
-    };
+    return {'refresh_token': refreshToken, 'device_id': deviceId};
   }
 }
 
@@ -79,4 +76,3 @@ class AuthResponse {
   final DateTime refreshTokenExpiresAtUtc;
   final UserProfile user;
 }
-

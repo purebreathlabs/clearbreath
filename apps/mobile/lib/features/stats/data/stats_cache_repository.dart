@@ -30,21 +30,25 @@ class StatsCacheRepository {
   }
 
   Future<void> writeCache(StatsSnapshot snapshot) async {
-    await _db.into(_db.statsCache).insertOnConflictUpdate(
-      StatsCacheCompanion(
-        id: const Value(_rowId),
-        currentStreakDays: Value(snapshot.currentStreakDays),
-        longestStreakDays: Value(snapshot.longestStreakDays),
-        minutesThisWeek: Value(snapshot.minutesThisWeek),
-        minutesAllTime: Value(snapshot.minutesAllTime),
-        sessionsAllTime: Value(snapshot.sessionsAllTime),
-        minutesByTechniqueJson: Value(jsonEncode(snapshot.minutesByTechnique)),
-        longestSessionMinutes: Value(snapshot.longestSessionMinutes),
-        favoriteTechniqueId: Value(snapshot.favoriteTechniqueId),
-        totalBreathsEstimated: Value(snapshot.totalBreathsEstimated),
-        updatedAt: Value(snapshot.updatedAt.toUtc()),
-      ),
-    );
+    await _db
+        .into(_db.statsCache)
+        .insertOnConflictUpdate(
+          StatsCacheCompanion(
+            id: const Value(_rowId),
+            currentStreakDays: Value(snapshot.currentStreakDays),
+            longestStreakDays: Value(snapshot.longestStreakDays),
+            minutesThisWeek: Value(snapshot.minutesThisWeek),
+            minutesAllTime: Value(snapshot.minutesAllTime),
+            sessionsAllTime: Value(snapshot.sessionsAllTime),
+            minutesByTechniqueJson: Value(
+              jsonEncode(snapshot.minutesByTechnique),
+            ),
+            longestSessionMinutes: Value(snapshot.longestSessionMinutes),
+            favoriteTechniqueId: Value(snapshot.favoriteTechniqueId),
+            totalBreathsEstimated: Value(snapshot.totalBreathsEstimated),
+            updatedAt: Value(snapshot.updatedAt.toUtc()),
+          ),
+        );
   }
 
   StatsSnapshot _toDomain(StatsCacheData row) {
@@ -90,4 +94,3 @@ class StatsCacheRepository {
     }
   }
 }
-

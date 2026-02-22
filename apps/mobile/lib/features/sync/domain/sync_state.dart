@@ -29,4 +29,3 @@ final class SyncFailed extends SyncState {
 
   final String error;
 }
-

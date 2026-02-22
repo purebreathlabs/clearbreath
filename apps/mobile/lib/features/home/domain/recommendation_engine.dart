@@ -42,8 +42,9 @@ class Recommendation {
   final TechniquePreset preset;
 }
 
-final recommendationEngineProvider =
-    Provider<RecommendationEngine>((ref) => RecommendationEngine());
+final recommendationEngineProvider = Provider<RecommendationEngine>(
+  (ref) => RecommendationEngine(),
+);
 
 final dailyRecommendationProvider = FutureProvider<Recommendation>((ref) async {
   final engine = ref.watch(recommendationEngineProvider);
@@ -84,7 +85,9 @@ class RecommendationEngine {
     final byDayPart = map[goal];
     final spec = byDayPart?[dayPart];
     if (spec == null) {
-      throw FormatException('Missing recommendation for ${goal.name}/${dayPart.name}.');
+      throw FormatException(
+        'Missing recommendation for ${goal.name}/${dayPart.name}.',
+      );
     }
 
     final technique = _findTechnique(techniques, spec.techniqueId);
@@ -95,7 +98,9 @@ class RecommendationEngine {
     final presetId = experienceLevel.name;
     final preset = technique.presets[presetId] ?? technique.presets['beginner'];
     if (preset == null) {
-      throw FormatException('Technique ${technique.id} missing preset: $presetId');
+      throw FormatException(
+        'Technique ${technique.id} missing preset: $presetId',
+      );
     }
 
     return Recommendation(
@@ -124,7 +129,9 @@ class RecommendationEngine {
     final result = <PrimaryGoal, Map<DayPart, _RecommendationSpec>>{};
     for (final item in decoded) {
       if (item is! Map) {
-        throw const FormatException('Each recommendation must be a JSON object.');
+        throw const FormatException(
+          'Each recommendation must be a JSON object.',
+        );
       }
       final json = item.cast<String, dynamic>();
       final goal = _parseGoal(_readString(json, 'goal'));
@@ -132,9 +139,14 @@ class RecommendationEngine {
       final techniqueId = _readString(json, 'techniqueId');
       final rationale = _readString(json, 'rationale');
 
-      final byDayPart = result.putIfAbsent(goal, () => <DayPart, _RecommendationSpec>{});
+      final byDayPart = result.putIfAbsent(
+        goal,
+        () => <DayPart, _RecommendationSpec>{},
+      );
       if (byDayPart.containsKey(dayPart)) {
-        throw FormatException('Duplicate recommendation for ${goal.name}/${dayPart.name}.');
+        throw FormatException(
+          'Duplicate recommendation for ${goal.name}/${dayPart.name}.',
+        );
       }
       byDayPart[dayPart] = _RecommendationSpec(
         techniqueId: techniqueId,
@@ -188,7 +200,10 @@ class RecommendationEngine {
 }
 
 class _RecommendationSpec {
-  const _RecommendationSpec({required this.techniqueId, required this.rationale});
+  const _RecommendationSpec({
+    required this.techniqueId,
+    required this.rationale,
+  });
 
   final String techniqueId;
   final String rationale;

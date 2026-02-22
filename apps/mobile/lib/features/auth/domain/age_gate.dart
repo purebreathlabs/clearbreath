@@ -6,4 +6,3 @@ bool isEligible(int birthYear, DateTime now) {
   final age = year - birthYear;
   return age >= 13;
 }
-

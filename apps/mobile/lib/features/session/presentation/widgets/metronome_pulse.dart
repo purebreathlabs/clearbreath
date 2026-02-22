@@ -97,13 +97,11 @@ class _MetronomePulseState extends State<MetronomePulse>
                 animation: _controller,
                 builder: (context, child) {
                   final t = Curves.easeOut.transform(_controller.value);
-                  final scale =
-                      widget.phase == SessionPhase.round ? 0.6 + 0.5 * t : 0.6;
+                  final scale = widget.phase == SessionPhase.round
+                      ? 0.6 + 0.5 * t
+                      : 0.6;
 
-                  return Transform.scale(
-                    scale: scale,
-                    child: child,
-                  );
+                  return Transform.scale(scale: scale, child: child);
                 },
                 child: Container(
                   width: dotBase,

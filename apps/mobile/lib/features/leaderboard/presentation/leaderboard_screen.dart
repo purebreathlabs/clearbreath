@@ -56,7 +56,9 @@ class _LeaderboardSignedInScreen extends ConsumerWidget {
             Expanded(
               child: Text(
                 message,
-                style: typography.bodyMedium.copyWith(color: colors.textPrimary),
+                style: typography.bodyMedium.copyWith(
+                  color: colors.textPrimary,
+                ),
               ),
             ),
           ],
@@ -78,7 +80,9 @@ class _LeaderboardSignedInScreen extends ConsumerWidget {
               children: [
                 Text(
                   state.errorMessage!,
-                  style: typography.bodyLarge.copyWith(color: colors.textSecondary),
+                  style: typography.bodyLarge.copyWith(
+                    color: colors.textSecondary,
+                  ),
                   textAlign: TextAlign.center,
                 ),
                 SizedBox(height: spacing.lg),
@@ -130,7 +134,9 @@ class _LeaderboardSignedInScreen extends ConsumerWidget {
               ],
               Text(
                 'Last updated $updatedLabel',
-                style: typography.bodyMedium.copyWith(color: colors.textSecondary),
+                style: typography.bodyMedium.copyWith(
+                  color: colors.textSecondary,
+                ),
               ),
               SizedBox(height: spacing.md),
               Expanded(child: content()),

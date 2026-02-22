@@ -41,4 +41,3 @@ final wakelockServiceProvider = Provider<WakelockService>((ref) {
     disablePlatform: () => WakelockPlus.disable(),
   );
 });
-

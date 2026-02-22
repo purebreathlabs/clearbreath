@@ -6,8 +6,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../domain/technique.dart';
 import '../domain/technique_preset.dart';
 
-final techniqueRepositoryProvider =
-    Provider<TechniqueRepository>((ref) => TechniqueRepository());
+final techniqueRepositoryProvider = Provider<TechniqueRepository>(
+  (ref) => TechniqueRepository(),
+);
 
 final allTechniquesProvider = FutureProvider<List<Technique>>((ref) {
   return ref.read(techniqueRepositoryProvider).all();
@@ -68,7 +69,9 @@ class TechniqueRepository {
     final name = _readString(json, 'name');
     final shortDescription = _readString(json, 'shortDescription');
 
-    final animationMode = _parseAnimationMode(_readString(json, 'animationMode'));
+    final animationMode = _parseAnimationMode(
+      _readString(json, 'animationMode'),
+    );
 
     final safetyJson = _readMap(json, 'safety');
     final safety = TechniqueSafety(

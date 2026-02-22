@@ -85,12 +85,10 @@ class _TechniqueDetailScreenState extends ConsumerState<TechniqueDetailScreen> {
             );
           },
           data: (items) {
-            final technique = items
-                .cast<Technique?>()
-                .firstWhere(
-                  (t) => t?.id == widget.techniqueId,
-                  orElse: () => null,
-                );
+            final technique = items.cast<Technique?>().firstWhere(
+              (t) => t?.id == widget.techniqueId,
+              orElse: () => null,
+            );
             if (technique == null) {
               return Center(
                 child: Padding(
@@ -108,7 +106,8 @@ class _TechniqueDetailScreenState extends ConsumerState<TechniqueDetailScreen> {
 
             final preset = technique.presets[_presetId]!;
             final durations = preset.recommendedDurationsMinutes;
-            final effectiveMinutes = _durationMinutes ?? _defaultMinutes(durations);
+            final effectiveMinutes =
+                _durationMinutes ?? _defaultMinutes(durations);
 
             return Padding(
               padding: EdgeInsets.all(spacing.lg),
@@ -144,7 +143,8 @@ class _TechniqueDetailScreenState extends ConsumerState<TechniqueDetailScreen> {
                                   key: const Key('preset_beginner'),
                                   label: 'Beginner',
                                   selected: _presetId == 'beginner',
-                                  onTap: () => _setPreset('beginner', technique),
+                                  onTap: () =>
+                                      _setPreset('beginner', technique),
                                 ),
                               ),
                               SizedBox(width: spacing.sm),
@@ -163,7 +163,8 @@ class _TechniqueDetailScreenState extends ConsumerState<TechniqueDetailScreen> {
                                   key: const Key('preset_advanced'),
                                   label: 'Advanced',
                                   selected: _presetId == 'advanced',
-                                  onTap: () => _setPreset('advanced', technique),
+                                  onTap: () =>
+                                      _setPreset('advanced', technique),
                                 ),
                               ),
                             ],
@@ -180,8 +181,9 @@ class _TechniqueDetailScreenState extends ConsumerState<TechniqueDetailScreen> {
                                   key: Key('duration_$minutes'),
                                   label: '${minutes}m',
                                   selected: effectiveMinutes == minutes,
-                                  onTap: () =>
-                                      setState(() => _durationMinutes = minutes),
+                                  onTap: () => setState(
+                                    () => _durationMinutes = minutes,
+                                  ),
                                 ),
                             ],
                           ),
@@ -215,11 +217,11 @@ class _TechniqueDetailScreenState extends ConsumerState<TechniqueDetailScreen> {
                     onPressed: _starting
                         ? null
                         : () => _startSession(
-                              technique: technique,
-                              preset: preset,
-                              presetId: _presetId,
-                              durationMinutes: effectiveMinutes,
-                            ),
+                            technique: technique,
+                            preset: preset,
+                            presetId: _presetId,
+                            durationMinutes: effectiveMinutes,
+                          ),
                     child: Text(_starting ? 'Starting...' : 'Start Session'),
                   ),
                 ],
@@ -311,14 +313,16 @@ class _TechniqueDetailScreenState extends ConsumerState<TechniqueDetailScreen> {
         }
       }
 
-      ref.read(activeSessionConfigProvider.notifier).setConfig(
-        ActiveSessionConfig(
-          technique: technique,
-          preset: preset,
-          presetId: presetId,
-          durationLimitSeconds: durationMinutes * 60,
-        ),
-      );
+      ref
+          .read(activeSessionConfigProvider.notifier)
+          .setConfig(
+            ActiveSessionConfig(
+              technique: technique,
+              preset: preset,
+              presetId: presetId,
+              durationLimitSeconds: durationMinutes * 60,
+            ),
+          );
 
       if (!mounted) {
         return;

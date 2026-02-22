@@ -66,10 +66,7 @@ class SyncController extends Notifier<SyncState> {
       }
 
       final resp = await ref.read(syncRepositoryProvider).sync(batch);
-      await _applyIngestResult(
-        submitted: batch,
-        response: resp,
-      );
+      await _applyIngestResult(submitted: batch, response: resp);
 
       state = SyncComplete(
         accepted: resp.acceptedCount,
@@ -99,10 +96,7 @@ class SyncController extends Notifier<SyncState> {
 
     try {
       final resp = await ref.read(syncRepositoryProvider).submit([session]);
-      await _applyIngestResult(
-        submitted: [session],
-        response: resp,
-      );
+      await _applyIngestResult(submitted: [session], response: resp);
       state = SyncComplete(
         accepted: resp.acceptedCount,
         duplicates: resp.duplicateCount,

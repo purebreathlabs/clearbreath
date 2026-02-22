@@ -14,8 +14,9 @@ void main() {
     required int durationSecondsActual,
     required bool syncedToCloud,
   }) {
-    final endedAtUtc =
-        startedAtUtc.toUtc().add(Duration(seconds: durationSecondsActual));
+    final endedAtUtc = startedAtUtc.toUtc().add(
+      Duration(seconds: durationSecondsActual),
+    );
     return LocalSession(
       clientSessionId: id,
       techniqueId: 'box',
@@ -77,7 +78,10 @@ void main() {
       expect(range.map((s) => s.clientSessionId), equals(['s3', 's2']));
 
       final unsynced = await repo.unsynced();
-      expect(unsynced.map((s) => s.clientSessionId).toSet(), equals({'s1', 's2', 's3'}));
+      expect(
+        unsynced.map((s) => s.clientSessionId).toSet(),
+        equals({'s1', 's2', 's3'}),
+      );
 
       await repo.markSynced(['s1', 's2']);
       final remaining = await repo.unsynced();
@@ -93,4 +97,3 @@ void main() {
     }
   });
 }
-

@@ -50,7 +50,8 @@ final backgroundAudioControllerProvider = Provider<BackgroundAudioController>((
   return controller;
 });
 
-class AudioServiceBackgroundAudioController implements BackgroundAudioController {
+class AudioServiceBackgroundAudioController
+    implements BackgroundAudioController {
   AudioServiceBackgroundAudioController({
     RemoteControls? remoteControls,
     Stream<AudioInterruptionEvent>? interruptionEvents,
@@ -131,7 +132,8 @@ class AudioServiceBackgroundAudioController implements BackgroundAudioController
   }
 
   Future<void> _ensureRemote() async {
-    final remote = _remote ??= (_remoteControls ?? _AudioServiceRemoteControls());
+    final remote = _remote ??=
+        (_remoteControls ?? _AudioServiceRemoteControls());
     await remote.ensureInitialized();
     _remoteSub ??= remote.commands.listen(_handleRemoteCommand);
   }
@@ -140,7 +142,9 @@ class AudioServiceBackgroundAudioController implements BackgroundAudioController
     if (!_enableAudioSession) {
       final interruptionStream = _interruptionEventsOverride;
       if (interruptionStream != null) {
-        _interruptionSub ??= interruptionStream.listen(_handleInterruptionEvent);
+        _interruptionSub ??= interruptionStream.listen(
+          _handleInterruptionEvent,
+        );
       }
       final noisyStream = _becomingNoisyEventsOverride;
       if (noisyStream != null) {
@@ -155,7 +159,8 @@ class AudioServiceBackgroundAudioController implements BackgroundAudioController
 
     final base = const AudioSessionConfiguration.music();
     final config = base.copyWith(
-      avAudioSessionCategoryOptions: AVAudioSessionCategoryOptions.mixWithOthers,
+      avAudioSessionCategoryOptions:
+          AVAudioSessionCategoryOptions.mixWithOthers,
     );
 
     try {
@@ -377,15 +382,14 @@ class _SessionAudioHandler extends BaseAudioHandler {
   }
 
   @override
-  Future<dynamic> customAction(String name, [Map<String, dynamic>? extras]) async {
+  Future<dynamic> customAction(
+    String name, [
+    Map<String, dynamic>? extras,
+  ]) async {
     if (name == 'setMetadata') {
       final title = extras?['title'] as String? ?? 'Session';
       mediaItem.add(
-        MediaItem(
-          id: 'session',
-          album: 'ClearBreath',
-          title: title,
-        ),
+        MediaItem(id: 'session', album: 'ClearBreath', title: title),
       );
       return null;
     }

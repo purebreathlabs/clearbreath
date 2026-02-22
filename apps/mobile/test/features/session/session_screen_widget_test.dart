@@ -171,7 +171,9 @@ void main() {
     await tester.pump(const Duration(milliseconds: 1));
   });
 
-  testWidgets('renders metronome pulse for metronome technique', (tester) async {
+  testWidgets('renders metronome pulse for metronome technique', (
+    tester,
+  ) async {
     final techniques = buildTechniques();
     final technique = techniques.firstWhere((t) => t.id == 'kapalbhati');
     final preset = technique.presets['beginner']!;
@@ -210,7 +212,9 @@ void main() {
     await tester.pump(const Duration(milliseconds: 1));
   });
 
-  testWidgets('renders alternate nostril indicator for anulom vilom', (tester) async {
+  testWidgets('renders alternate nostril indicator for anulom vilom', (
+    tester,
+  ) async {
     final techniques = buildTechniques();
     final technique = techniques.firstWhere((t) => t.id == 'anulom_vilom');
     final preset = technique.presets['beginner']!;

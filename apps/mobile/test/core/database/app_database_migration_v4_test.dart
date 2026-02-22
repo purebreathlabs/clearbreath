@@ -75,4 +75,3 @@ INSERT INTO preferences (
     }
   });
 }
-

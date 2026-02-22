@@ -66,11 +66,7 @@ void main() {
       name: 'Box',
       shortDescription: 'A balanced four-part breath.',
       animationMode: AnimationMode.circle,
-      safety: const TechniqueSafety(
-        requiresAck: false,
-        title: '',
-        body: '',
-      ),
+      safety: const TechniqueSafety(requiresAck: false, title: '', body: ''),
       about: const TechniqueAbout(
         what: 'What',
         how: 'How',
@@ -184,10 +180,7 @@ void main() {
     await tester.pumpWidget(
       UncontrolledProviderScope(
         container: container,
-        child: MaterialApp.router(
-          theme: AppTheme.dark(),
-          routerConfig: router,
-        ),
+        child: MaterialApp.router(theme: AppTheme.dark(), routerConfig: router),
       ),
     );
 
@@ -236,10 +229,7 @@ void main() {
     await tester.pumpWidget(
       UncontrolledProviderScope(
         container: container,
-        child: MaterialApp.router(
-          theme: AppTheme.dark(),
-          routerConfig: router,
-        ),
+        child: MaterialApp.router(theme: AppTheme.dark(), routerConfig: router),
       ),
     );
 

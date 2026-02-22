@@ -5,11 +5,7 @@ import 'package:flutter/material.dart';
 import '../../../../core/theme/theme_extensions.dart';
 
 class SeededAvatar extends StatelessWidget {
-  const SeededAvatar({
-    super.key,
-    required this.seed,
-    required this.size,
-  });
+  const SeededAvatar({super.key, required this.seed, required this.size});
 
   final String seed;
   final double size;
@@ -29,10 +25,7 @@ class SeededAvatar extends StatelessWidget {
       ),
       clipBehavior: Clip.antiAlias,
       child: CustomPaint(
-        painter: _IdenticonPainter(
-          hash: hash,
-          color: colors.textPrimary,
-        ),
+        painter: _IdenticonPainter(hash: hash, color: colors.textPrimary),
       ),
     );
   }
@@ -86,7 +79,8 @@ class _IdenticonPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(covariant _IdenticonPainter oldDelegate) {
-    return oldDelegate._hash != _hash || oldDelegate._paint.color != _paint.color;
+    return oldDelegate._hash != _hash ||
+        oldDelegate._paint.color != _paint.color;
   }
 }
 
@@ -98,4 +92,3 @@ int _fnv1a32(String input) {
   }
   return hash;
 }
-

@@ -26,7 +26,9 @@ class LegalScreen extends StatelessWidget {
             padding: EdgeInsets.all(spacing.lg),
             child: Text(
               'Document not found.',
-              style: typography.bodyMedium.copyWith(color: colors.textSecondary),
+              style: typography.bodyMedium.copyWith(
+                color: colors.textSecondary,
+              ),
             ),
           ),
         ),

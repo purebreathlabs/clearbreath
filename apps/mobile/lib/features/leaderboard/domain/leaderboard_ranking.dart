@@ -25,4 +25,3 @@ extension LeaderboardRankingX on LeaderboardRanking {
     };
   }
 }
-

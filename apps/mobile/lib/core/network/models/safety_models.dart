@@ -15,4 +15,3 @@ class SafetyAcknowledgements {
     return {'technique_ids': techniqueIds};
   }
 }
-

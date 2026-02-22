@@ -117,4 +117,3 @@ Map<String, int> readStringIntMap(JsonMap json, String key) {
   }
   return out;
 }
-

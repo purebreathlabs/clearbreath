@@ -46,4 +46,3 @@ void main() {
     expect(calls, [100]);
   });
 }
-

@@ -23,8 +23,9 @@ sealed class SessionPlan {
         SessionPhase.inhale: Duration(milliseconds: preset.inhaleMs),
         SessionPhase.hold: Duration(milliseconds: preset.holdMs),
         SessionPhase.exhale: Duration(milliseconds: preset.exhaleMs),
-        SessionPhase.holdAfterExhale:
-            Duration(milliseconds: preset.holdAfterExhaleMs),
+        SessionPhase.holdAfterExhale: Duration(
+          milliseconds: preset.holdAfterExhaleMs,
+        ),
       };
 
       final sequence = <SessionPhase>[
@@ -125,4 +126,3 @@ const _breathingPhases = [
   SessionPhase.exhale,
   SessionPhase.holdAfterExhale,
 ];
-

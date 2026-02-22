@@ -9,4 +9,3 @@ void main() {
     expect(isEligible(2013, now), isTrue);
   });
 }
-

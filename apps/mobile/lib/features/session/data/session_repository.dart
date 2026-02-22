@@ -16,32 +16,33 @@ class SessionRepository {
   final AppDatabase _db;
 
   Future<void> insert(LocalSession session) async {
-    await _db.into(_db.sessions).insertOnConflictUpdate(
-      SessionsCompanion(
-        clientSessionId: Value(session.clientSessionId),
-        techniqueId: Value(session.techniqueId),
-        presetId: Value(session.presetId),
-        startedAtUtc: Value(session.startedAtUtc),
-        endedAtUtc: Value(session.endedAtUtc),
-        timezoneOffsetMinutes: Value(session.timezoneOffsetMinutes),
-        durationSecondsActual: Value(session.durationSecondsActual),
-        breathsCompletedEstimated: Value(session.breathsCompletedEstimated),
-        endedEarly: Value(session.endedEarly),
-        syncedToCloud: Value(session.syncedToCloud),
-        createdAt: Value(session.createdAt),
-      ),
-    );
+    await _db
+        .into(_db.sessions)
+        .insertOnConflictUpdate(
+          SessionsCompanion(
+            clientSessionId: Value(session.clientSessionId),
+            techniqueId: Value(session.techniqueId),
+            presetId: Value(session.presetId),
+            startedAtUtc: Value(session.startedAtUtc),
+            endedAtUtc: Value(session.endedAtUtc),
+            timezoneOffsetMinutes: Value(session.timezoneOffsetMinutes),
+            durationSecondsActual: Value(session.durationSecondsActual),
+            breathsCompletedEstimated: Value(session.breathsCompletedEstimated),
+            endedEarly: Value(session.endedEarly),
+            syncedToCloud: Value(session.syncedToCloud),
+            createdAt: Value(session.createdAt),
+          ),
+        );
   }
 
   Future<List<LocalSession>> all() async {
     final rows =
-        await (_db.select(_db.sessions)
-              ..orderBy([
-                (row) => OrderingTerm(
-                  expression: row.startedAtUtc,
-                  mode: OrderingMode.desc,
-                ),
-              ]))
+        await (_db.select(_db.sessions)..orderBy([
+              (row) => OrderingTerm(
+                expression: row.startedAtUtc,
+                mode: OrderingMode.desc,
+              ),
+            ]))
             .get();
     return rows.map(_toDomain).toList(growable: false);
   }
@@ -69,7 +70,10 @@ class SessionRepository {
         .write(const SessionsCompanion(syncedToCloud: Value(true)));
   }
 
-  Future<List<LocalSession>> forDateRange(DateTime startUtc, DateTime endUtc) async {
+  Future<List<LocalSession>> forDateRange(
+    DateTime startUtc,
+    DateTime endUtc,
+  ) async {
     final rows =
         await (_db.select(_db.sessions)
               ..where(
@@ -95,7 +99,11 @@ class SessionRepository {
       final localStart = row.startedAtUtc.add(
         Duration(minutes: row.timezoneOffsetMinutes),
       );
-      final day = DateTime.utc(localStart.year, localStart.month, localStart.day);
+      final day = DateTime.utc(
+        localStart.year,
+        localStart.month,
+        localStart.day,
+      );
       secondsByDay[day] = (secondsByDay[day] ?? 0) + row.durationSecondsActual;
     }
 
@@ -122,4 +130,3 @@ class SessionRepository {
     );
   }
 }
-

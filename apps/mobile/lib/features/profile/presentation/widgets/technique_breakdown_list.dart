@@ -36,10 +36,7 @@ class TechniqueBreakdownList extends StatelessWidget {
     return Column(
       children: [
         for (final entry in entries) ...[
-          _BreakdownRow(
-            entry: entry,
-            maxMinutes: safeMax,
-          ),
+          _BreakdownRow(entry: entry, maxMinutes: safeMax),
           SizedBox(height: spacing.md),
         ],
       ],
@@ -70,7 +67,9 @@ class _BreakdownRow extends StatelessWidget {
             Expanded(
               child: Text(
                 entry.label,
-                style: typography.bodyMedium.copyWith(color: colors.textPrimary),
+                style: typography.bodyMedium.copyWith(
+                  color: colors.textPrimary,
+                ),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
               ),

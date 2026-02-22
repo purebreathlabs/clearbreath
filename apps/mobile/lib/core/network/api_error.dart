@@ -62,4 +62,3 @@ class ApiError implements Exception {
   }
   return (code: null, message: null, requestId: null);
 }
-

@@ -73,4 +73,3 @@ class AlternateNostrilIndicator extends StatelessWidget {
     );
   }
 }
-
