@@ -49,9 +49,7 @@ class TechniqueCard extends StatelessWidget {
               Image.asset(
                 imagePath,
                 fit: BoxFit.cover,
-                errorBuilder: (_, _, _) => Container(
-                  color: colors.surfaceHigh,
-                ),
+                errorBuilder: (_, _, _) => Container(color: colors.surfaceHigh),
               )
             else
               Container(color: colors.surfaceHigh),
@@ -75,9 +73,15 @@ class TechniqueCard extends StatelessWidget {
               bottom: 0,
               height: MediaQuery.sizeOf(context).height * 0.12,
               child: ClipRect(
-                child: BackdropFilter(
-                  filter: ImageFilter.blur(sigmaX: 2, sigmaY: 2),
-                  child: const SizedBox.expand(),
+                child: OverflowBox(
+                  maxHeight: double.infinity,
+                  alignment: Alignment.bottomCenter,
+                  child: ImageFiltered(
+                    imageFilter: ImageFilter.blur(sigmaX: 2, sigmaY: 2),
+                    child: imagePath != null
+                        ? Image.asset(imagePath, fit: BoxFit.cover)
+                        : Container(color: colors.surfaceHigh),
+                  ),
                 ),
               ),
             ),
@@ -130,9 +134,7 @@ class TechniqueCard extends StatelessWidget {
                   SizedBox(height: spacing.sm),
                   Row(
                     children: [
-                      _DifficultyDots(
-                        mode: technique.animationMode,
-                      ),
+                      _DifficultyDots(mode: technique.animationMode),
                       SizedBox(width: spacing.sm),
                       Text(
                         _durationText(technique),
@@ -170,13 +172,14 @@ class TechniqueCard extends StatelessWidget {
   }
 
   String _durationText(Technique technique) {
-    final preset = technique.presets['beginner'] ??
-        technique.presets.values.firstOrNull;
+    final preset =
+        technique.presets['beginner'] ?? technique.presets.values.firstOrNull;
     if (preset == null) return '';
     final durations = preset.recommendedDurationsMinutes;
     if (durations.isEmpty) return '';
-    final defaultDuration =
-        durations.length > 1 ? durations[1] : durations.first;
+    final defaultDuration = durations.length > 1
+        ? durations[1]
+        : durations.first;
     return '$defaultDuration min';
   }
 }

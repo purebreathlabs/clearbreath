@@ -74,22 +74,24 @@ class TechniquesScreen extends ConsumerWidget {
           }
         }
 
-        final preset = technique.presets['beginner'] ??
+        final preset =
+            technique.presets['beginner'] ??
             technique.presets.values.firstOrNull;
         if (preset == null) return;
 
         final prefs = ref.read(preferencesProvider);
-        final durationMinutes =
-            prefs.asData?.value?.sessionLengthMinutes ?? 5;
+        final durationMinutes = prefs.asData?.value?.sessionLengthMinutes ?? 5;
 
-        ref.read(activeSessionConfigProvider.notifier).setConfig(
-          ActiveSessionConfig(
-            technique: technique,
-            preset: preset,
-            presetId: preset.id,
-            durationLimitSeconds: durationMinutes * 60,
-          ),
-        );
+        ref
+            .read(activeSessionConfigProvider.notifier)
+            .setConfig(
+              ActiveSessionConfig(
+                technique: technique,
+                preset: preset,
+                presetId: preset.id,
+                durationLimitSeconds: durationMinutes * 60,
+              ),
+            );
 
         if (!context.mounted) return;
         context.go('/session');
@@ -126,9 +128,9 @@ class TechniquesScreen extends ConsumerWidget {
               child: TextField(
                 key: const Key('techniques_search_field'),
                 onChanged: (value) {
-                  ref.read(techniqueFilterProvider.notifier).update(
-                      filter.copyWith(searchQuery: value),
-                    );
+                  ref
+                      .read(techniqueFilterProvider.notifier)
+                      .update(filter.copyWith(searchQuery: value));
                 },
                 style: typography.bodyMedium.copyWith(
                   color: colors.textPrimary,
@@ -149,17 +151,16 @@ class TechniquesScreen extends ConsumerWidget {
                             color: colors.textTertiary,
                           ),
                           onPressed: () {
-                            ref.read(techniqueFilterProvider.notifier).update(
-                                filter.copyWith(searchQuery: ''),
-                              );
+                            ref
+                                .read(techniqueFilterProvider.notifier)
+                                .update(filter.copyWith(searchQuery: ''));
                           },
                         )
                       : null,
                   filled: true,
                   fillColor: colors.surfaceHigh,
                   border: OutlineInputBorder(
-                    borderRadius:
-                        BorderRadius.circular(components.inputRadius),
+                    borderRadius: BorderRadius.circular(components.inputRadius),
                     borderSide: BorderSide.none,
                   ),
                   contentPadding: EdgeInsets.symmetric(
@@ -186,9 +187,9 @@ class TechniquesScreen extends ConsumerWidget {
                       colors: colors,
                       typography: typography,
                       onTap: () {
-                        ref.read(techniqueFilterProvider.notifier).update(
-                            filter.copyWith(selectedGoals: {}),
-                          );
+                        ref
+                            .read(techniqueFilterProvider.notifier)
+                            .update(filter.copyWith(selectedGoals: {}));
                       },
                     ),
                     SizedBox(width: spacing.sm),
@@ -209,9 +210,9 @@ class TechniquesScreen extends ConsumerWidget {
                           } else {
                             goals.add(goal);
                           }
-                          ref.read(techniqueFilterProvider.notifier).update(
-                              filter.copyWith(selectedGoals: goals),
-                            );
+                          ref
+                              .read(techniqueFilterProvider.notifier)
+                              .update(filter.copyWith(selectedGoals: goals));
                         },
                       ),
                       SizedBox(width: spacing.sm),
@@ -223,8 +224,7 @@ class TechniquesScreen extends ConsumerWidget {
             SizedBox(height: spacing.sm),
             Expanded(
               child: filtered.when(
-                loading: () =>
-                    const Center(child: CircularProgressIndicator()),
+                loading: () => const Center(child: CircularProgressIndicator()),
                 error: (error, stackTrace) {
                   return Center(
                     child: Padding(
@@ -285,6 +285,7 @@ class TechniquesScreen extends ConsumerWidget {
                   return Padding(
                     padding: EdgeInsets.symmetric(horizontal: spacing.lg),
                     child: GridView.count(
+                      physics: const ClampingScrollPhysics(),
                       key: const Key('techniques_grid'),
                       crossAxisCount: 2,
                       crossAxisSpacing: spacing.md,
@@ -341,14 +342,10 @@ class _FilterChip extends StatelessWidget {
         alignment: Alignment.center,
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         decoration: BoxDecoration(
-          color: selected
-              ? color.withValues(alpha: 0.15)
-              : colors.surfaceHigh,
+          color: selected ? color.withValues(alpha: 0.15) : colors.surfaceHigh,
           borderRadius: BorderRadius.circular(20),
           border: Border.all(
-            color: selected
-                ? color.withValues(alpha: 0.5)
-                : colors.border,
+            color: selected ? color.withValues(alpha: 0.5) : colors.border,
             width: selected ? 1.2 : 0.5,
           ),
         ),

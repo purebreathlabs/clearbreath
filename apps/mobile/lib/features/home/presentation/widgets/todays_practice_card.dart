@@ -30,8 +30,9 @@ class TodaysPracticeCard extends StatelessWidget {
     final colors = Theme.of(context).extension<AppColorTokens>()!;
     final components = Theme.of(context).extension<AppComponentTokens>()!;
 
-    final imagePath =
-        techniqueId != null ? techniqueImageAsset(techniqueId!) : null;
+    final imagePath = techniqueId != null
+        ? techniqueImageAsset(techniqueId!)
+        : null;
 
     return ClipRRect(
       borderRadius: BorderRadius.circular(components.cardRadius),
