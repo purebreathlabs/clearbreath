@@ -12,6 +12,8 @@ import '../../techniques/domain/favorites_provider.dart';
 import '../../techniques/domain/safety_acknowledgement_repository.dart';
 import '../../techniques/domain/technique.dart';
 import '../../techniques/presentation/widgets/safety_warning_sheet.dart';
+import '../../auth/domain/auth_state.dart';
+import '../../auth/domain/auth_state_provider.dart';
 import '../../../shared/widgets/weekly_bar_chart.dart';
 import '../../../shared/providers/preferences_provider.dart';
 import '../domain/active_goal_provider.dart';
@@ -54,14 +56,21 @@ class HomeScreen extends ConsumerWidget {
     final favorites = ref.watch(favoriteTechniquesProvider);
     final stats = ref.watch(mergedStatsProvider);
     final weeklyMinutes = ref.watch(weeklyMinutesProvider);
+    final auth = ref.watch(authStateProvider);
 
     final prefs = ref.watch(preferencesProvider);
     final row = prefs.asData?.value;
     final durationMinutes = row?.sessionLengthMinutes ?? 5;
-    final displayName = row?.displayName ?? '';
+    final localDisplayName = row?.displayName.trim() ?? '';
+    final signedInName = auth is AuthStateSignedIn
+        ? auth.profile.displayName.trim()
+        : '';
+    final greetingName = signedInName.isNotEmpty
+        ? signedInName
+        : localDisplayName;
     final greeting = _greeting(
       dayPart: currentDayPart(DateTime.now()),
-      displayName: displayName,
+      displayName: greetingName,
     );
 
     Future<void> startRecommendation(Recommendation rec) async {
@@ -189,6 +198,8 @@ class HomeScreen extends ConsumerWidget {
                   style: typography.headlineLarge.copyWith(
                     color: colors.textPrimary,
                   ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                 ),
                 if (kDebugMode) ...[
                   SizedBox(height: spacing.md),

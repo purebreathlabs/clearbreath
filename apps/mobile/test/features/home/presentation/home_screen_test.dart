@@ -1,4 +1,8 @@
 import 'package:clearbreath/core/theme/app_theme.dart';
+import 'package:clearbreath/core/network/models/user_models.dart';
+import 'package:clearbreath/features/auth/domain/auth_controller.dart';
+import 'package:clearbreath/features/auth/domain/auth_state.dart';
+import 'package:clearbreath/features/auth/domain/auth_state_provider.dart';
 import 'package:clearbreath/features/home/domain/recommendation_engine.dart';
 import 'package:clearbreath/features/home/presentation/home_screen.dart';
 import 'package:clearbreath/features/onboarding/domain/onboarding_answers.dart';
@@ -6,6 +10,7 @@ import 'package:clearbreath/features/onboarding/domain/onboarding_answers_provid
 import 'package:clearbreath/features/stats/domain/stats_engine.dart';
 import 'package:clearbreath/features/stats/domain/stats_snapshot.dart';
 import 'package:clearbreath/features/stats/domain/weekly_minutes_provider.dart';
+import 'package:clearbreath/features/sync/domain/merged_stats_provider.dart';
 import 'package:clearbreath/features/techniques/domain/favorites_provider.dart';
 import 'package:clearbreath/features/techniques/domain/technique.dart';
 import 'package:clearbreath/features/techniques/domain/technique_preset.dart';
@@ -87,4 +92,54 @@ void main() {
     await tester.pumpWidget(const SizedBox.shrink());
     await tester.pumpAndSettle();
   });
+
+  testWidgets('shows signed-in display name in greeting', (tester) async {
+    final technique = buildTechnique('box');
+    final preset = technique.presets['beginner']!;
+    final rec = Recommendation(
+      techniqueId: technique.id,
+      presetId: 'beginner',
+      rationale: 'Test rationale',
+      technique: technique,
+      preset: preset,
+    );
+
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          authStateProvider.overrideWith(() => _SignedInAuthController()),
+          dailyRecommendationProvider.overrideWith((ref) async => rec),
+          favoriteTechniquesProvider.overrideWith((ref) async => [technique]),
+          mergedStatsProvider.overrideWith(
+            (ref) async => StatsSnapshot.empty(),
+          ),
+          weeklyMinutesProvider.overrideWith(
+            (ref) async => const [0, 0, 0, 0, 0, 0, 0],
+          ),
+        ],
+        child: MaterialApp(theme: AppTheme.dark(), home: const HomeScreen()),
+      ),
+    );
+
+    await tester.pumpAndSettle();
+
+    expect(find.textContaining('Rahul'), findsOneWidget);
+  });
+}
+
+class _SignedInAuthController extends AuthController {
+  @override
+  AuthState build() {
+    return AuthStateSignedIn(
+      profile: UserProfile(
+        id: 'user-a',
+        displayName: 'Rahul',
+        avatarSeed: 'seed-a',
+        leaderboardOptIn: true,
+        leaderboardInitialsOnly: false,
+        createdAtUtc: DateTime.utc(2026, 2, 22),
+        timezoneOffsetMinutesLatest: 0,
+      ),
+    );
+  }
 }
