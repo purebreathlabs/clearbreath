@@ -27,37 +27,37 @@ class FavoritesRow extends StatelessWidget {
       return SizedBox(
         width: double.infinity,
         child: Container(
-        padding: EdgeInsets.all(components.cardPadding),
-        decoration: BoxDecoration(
-          color: colors.surfaceHigh,
-          borderRadius: BorderRadius.circular(components.cardRadius),
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(
-              Icons.favorite_border_rounded,
-              size: 32,
-              color: colors.textTertiary,
-            ),
-            SizedBox(height: spacing.sm),
-            Text(
-              'No favorites yet',
-              style: typography.titleMedium.copyWith(
-                color: colors.textPrimary,
-              ),
-            ),
-            SizedBox(height: spacing.xs),
-            Text(
-              'Tap the heart on any technique to add it here.',
-              style: typography.bodyMedium.copyWith(
+          padding: EdgeInsets.all(components.cardPadding),
+          decoration: BoxDecoration(
+            color: colors.surfaceHigh,
+            borderRadius: BorderRadius.circular(components.cardRadius),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                Icons.favorite_border_rounded,
+                size: 32,
                 color: colors.textTertiary,
               ),
-              textAlign: TextAlign.center,
-            ),
-          ],
+              SizedBox(height: spacing.sm),
+              Text(
+                'No favorites yet',
+                style: typography.titleMedium.copyWith(
+                  color: colors.textPrimary,
+                ),
+              ),
+              SizedBox(height: spacing.xs),
+              Text(
+                'Tap the heart on any technique to add it here.',
+                style: typography.bodyMedium.copyWith(
+                  color: colors.textTertiary,
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ],
+          ),
         ),
-      ),
       );
     }
 
@@ -113,9 +113,8 @@ class _FavoriteCard extends StatelessWidget {
                 Image.asset(
                   imagePath,
                   fit: BoxFit.cover,
-                  errorBuilder: (_, _, _) => Container(
-                    color: colors.surfaceHigh,
-                  ),
+                  errorBuilder: (_, _, _) =>
+                      Container(color: colors.surfaceHigh),
                 )
               else
                 Container(color: colors.surfaceHigh),
