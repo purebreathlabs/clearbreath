@@ -13,7 +13,9 @@ import '../../session/domain/local_session.dart';
 import '../../stats/data/stats_cache_repository.dart';
 import '../../stats/domain/stats_snapshot.dart' as domain;
 import '../../techniques/data/safety_sync_service.dart';
+import '../../leaderboard/domain/leaderboard_controller.dart';
 import '../data/sync_repository.dart';
+import '../../stats/domain/weekly_minutes_provider.dart';
 import 'merged_stats_provider.dart';
 import 'sync_state.dart';
 
@@ -132,6 +134,13 @@ class SyncController extends Notifier<SyncState> {
     await _writeServerStatsCache(response.statsSnapshot);
 
     ref.invalidate(mergedStatsProvider);
+    ref.invalidate(weeklyMinutesProvider);
+
+    if (response.acceptedCount > 0) {
+      Future.delayed(const Duration(seconds: 2), () {
+        ref.read(leaderboardControllerProvider.notifier).load();
+      });
+    }
   }
 
   Future<void> _writeServerStatsCache(api.StatsSnapshot snapshot) async {

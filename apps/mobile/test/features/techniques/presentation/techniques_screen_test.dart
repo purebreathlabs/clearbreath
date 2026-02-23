@@ -57,10 +57,7 @@ void main() {
 
     await tester.pump(const Duration(seconds: 1));
 
-    expect(
-      find.byKey(const Key('techniques_search_field')),
-      findsOneWidget,
-    );
+    expect(find.byKey(const Key('techniques_search_field')), findsOneWidget);
     expect(find.byKey(const Key('filter_chip_all')), findsOneWidget);
     expect(find.byKey(const Key('filter_chip_calm')), findsOneWidget);
   });

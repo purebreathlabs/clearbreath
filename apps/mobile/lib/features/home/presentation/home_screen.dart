@@ -11,6 +11,7 @@ import '../../sync/domain/merged_stats_provider.dart';
 import '../../techniques/domain/favorites_provider.dart';
 import '../../techniques/domain/safety_acknowledgement_repository.dart';
 import '../../techniques/domain/technique.dart';
+import '../../techniques/domain/technique_preset.dart';
 import '../../techniques/presentation/widgets/safety_warning_sheet.dart';
 import '../../../shared/providers/preferences_provider.dart';
 import '../../../shared/widgets/brand_mark.dart';
@@ -91,6 +92,10 @@ class HomeScreen extends ConsumerWidget {
           }
         }
 
+        final durationLimitSeconds = rec.preset is BpmRoundsPreset
+            ? (rec.preset as BpmRoundsPreset).naturalDurationSeconds
+            : durationMinutes * 60;
+
         ref
             .read(activeSessionConfigProvider.notifier)
             .setConfig(
@@ -98,7 +103,7 @@ class HomeScreen extends ConsumerWidget {
                 technique: rec.technique,
                 preset: rec.preset,
                 presetId: rec.presetId,
-                durationLimitSeconds: durationMinutes * 60,
+                durationLimitSeconds: durationLimitSeconds,
               ),
             );
 
@@ -116,10 +121,14 @@ class HomeScreen extends ConsumerWidget {
 
     final recommendationCard = recommendation.when(
       data: (rec) {
+        final recDurationLabel = rec.preset is BpmRoundsPreset
+            ? '${(rec.preset as BpmRoundsPreset).rounds} rounds'
+            : '$durationMinutes min';
+
         return TodaysPracticeCard(
           techniqueName: rec.technique.name,
           presetLabel: rec.preset.label,
-          durationMinutes: durationMinutes,
+          durationLabel: recDurationLabel,
           rationale: rec.rationale,
           onStart: () => startRecommendation(rec),
           techniqueId: rec.technique.id,

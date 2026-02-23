@@ -121,6 +121,40 @@ void main() {
     expect(tokens!.accessToken, equals('access2'));
     expect(tokens.refreshToken, equals('refresh2'));
   });
+
+  test('sign-in passes first and last name to repository', () async {
+    final storage = _MemorySecureStorage();
+    final repo = _FakeAuthRepository()
+      ..signInResult = _authResponse(
+        accessToken: 'access1',
+        refreshToken: 'refresh1',
+        userId: 'user1',
+        displayName: 'Jane Doe',
+      );
+
+    final container = ProviderContainer(
+      overrides: [
+        secureStorageProvider.overrideWithValue(storage),
+        deviceIdProvider.overrideWith((ref) async => 'device1'),
+        onboardingAnswersProvider.overrideWith(
+          (ref) async => OnboardingAnswers.defaults(),
+        ),
+        authRepositoryProvider.overrideWithValue(repo),
+      ],
+    );
+    addTearDown(container.dispose);
+
+    final controller = container.read(authStateProvider.notifier);
+    await controller.signIn(
+      AuthProvider.google,
+      idToken: 'token',
+      firstName: 'Jane',
+      lastName: 'Doe',
+    );
+
+    expect(repo.lastFirstName, equals('Jane'));
+    expect(repo.lastLastName, equals('Doe'));
+  });
 }
 
 class _MemorySecureStorage implements SecureStorage {
@@ -178,12 +212,19 @@ class _FakeAuthRepository extends AuthRepository {
   AuthResponse? refreshResult;
   UserProfile? profileResult;
 
+  String? lastFirstName;
+  String? lastLastName;
+
   @override
   Future<AuthResponse> signInWithProvider({
     required String provider,
     required String idToken,
     required String deviceId,
+    String? firstName,
+    String? lastName,
   }) async {
+    lastFirstName = firstName;
+    lastLastName = lastName;
     final result = signInResult;
     if (result == null) {
       throw StateError('missing signInResult');
