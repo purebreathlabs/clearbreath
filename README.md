@@ -75,6 +75,46 @@ bun run mobile:get
 bun run mobile
 ```
 
+#### Local backend testing (Android emulator)
+
+Start dependencies and server first, then run mobile with dart-define flags:
+
+```bash
+make docker-up
+make server-dev
+
+make mobile-run MOBILE_RUN_ARGS="--dart-define=API_BASE_URL=http://10.0.2.2:8080 --dart-define=DEV_AUTH_ENABLED=true"
+```
+
+`10.0.2.2` is the Android emulator alias for the host machine's `localhost`.
+
+#### Local backend testing (physical Android on same WiFi)
+
+Find your machine's local IP (`ip -4 addr show | grep 192.168`) and use it:
+
+```bash
+make mobile-run MOBILE_RUN_ARGS="--dart-define=API_BASE_URL=http://192.168.x.x:8080 --dart-define=DEV_AUTH_ENABLED=true"
+```
+
+#### Release APK for local testing
+
+```bash
+flutter build apk --release --split-per-abi \
+  --dart-define=API_BASE_URL=http://192.168.x.x:8080 \
+  --dart-define=DEV_AUTH_ENABLED=true \
+  --dart-define=DEV_AUTH_SECRET=dev_secret_change_me
+```
+
+The arm64-v8a APK is at `apps/mobile/build/app/outputs/flutter-apk/app-arm64-v8a-release.apk`.
+
+#### Google Sign-In (local dev)
+
+Google Sign-In works on debug builds if the debug keystore SHA-1 is registered in the
+Google Cloud Console Android OAuth client. The `serverClientId` (Web client ID) is
+configured in `sign_in_screen.dart` and the backend reads `GOOGLE_OAUTH_CLIENT_ID` from
+`server/.env`. No additional URL or redirect configuration is needed for native Android
+sign-in.
+
 ### Web
 
 ```
