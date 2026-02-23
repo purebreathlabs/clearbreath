@@ -63,14 +63,14 @@ void main() {
       restSeconds: 30,
     );
 
-    final plan = SessionPlan.fromPreset(preset, 90);
+    final plan = SessionPlan.fromPreset(preset, preset.naturalDurationSeconds);
 
     expect(plan, isA<RoundSessionPlan>());
     final roundPlan = plan as RoundSessionPlan;
     expect(roundPlan.bpm, 60);
-    expect(roundPlan.rounds, 2);
+    expect(roundPlan.rounds, 3);
     expect(roundPlan.roundDuration, const Duration(seconds: 30));
     expect(roundPlan.restDuration, const Duration(seconds: 30));
-    expect(roundPlan.totalDuration, const Duration(seconds: 90));
+    expect(roundPlan.totalDuration, const Duration(seconds: 150));
   });
 }

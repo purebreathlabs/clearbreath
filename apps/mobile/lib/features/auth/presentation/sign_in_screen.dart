@@ -184,7 +184,11 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
             requestId: null,
           );
         }
-        return token;
+        return (
+          token: token,
+          firstName: cred.givenName,
+          lastName: cred.familyName,
+        );
       },
     );
   }
@@ -211,7 +215,19 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
               requestId: null,
             );
           }
-          return token;
+          String? firstName;
+          String? lastName;
+          final displayName = account.displayName?.trim();
+          if (displayName != null && displayName.isNotEmpty) {
+            final idx = displayName.indexOf(' ');
+            if (idx < 0) {
+              firstName = displayName;
+            } else {
+              firstName = displayName.substring(0, idx);
+              lastName = displayName.substring(idx + 1);
+            }
+          }
+          return (token: token, firstName: firstName, lastName: lastName);
         } on GoogleSignInException catch (e) {
           if (e.code == GoogleSignInExceptionCode.canceled) {
             throw const ApiError(
@@ -233,12 +249,17 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
   }
 
   Future<void> _signInDev() async {
-    await _runSignIn(provider: AuthProvider.dev, idTokenLoader: () async => '');
+    await _runSignIn(
+      provider: AuthProvider.dev,
+      idTokenLoader: () async => (token: '', firstName: null, lastName: null),
+    );
   }
 
   Future<void> _runSignIn({
     required AuthProvider provider,
-    required Future<String> Function() idTokenLoader,
+    required Future<({String token, String? firstName, String? lastName})>
+    Function()
+    idTokenLoader,
   }) async {
     if (_loading) {
       return;
@@ -246,10 +267,15 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
 
     setState(() => _loading = true);
     try {
-      final token = await idTokenLoader();
+      final result = await idTokenLoader();
       await ref
           .read(authStateProvider.notifier)
-          .signIn(provider, idToken: token);
+          .signIn(
+            provider,
+            idToken: result.token,
+            firstName: result.firstName,
+            lastName: result.lastName,
+          );
       if (!mounted) {
         return;
       }

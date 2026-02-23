@@ -13,6 +13,7 @@ import '../domain/favorites_provider.dart';
 import '../domain/favorites_repository.dart';
 import '../domain/safety_acknowledgement_repository.dart';
 import '../domain/technique.dart';
+import '../domain/technique_preset.dart';
 import '../domain/technique_filter_provider.dart';
 import 'widgets/safety_warning_sheet.dart';
 import 'widgets/technique_card.dart';
@@ -74,13 +75,18 @@ class TechniquesScreen extends ConsumerWidget {
           }
         }
 
+        final prefs = ref.read(preferencesProvider);
+        final presetId = prefs.asData?.value?.experienceLevel ?? 'beginner';
         final preset =
+            technique.presets[presetId] ??
             technique.presets['beginner'] ??
             technique.presets.values.firstOrNull;
         if (preset == null) return;
 
-        final prefs = ref.read(preferencesProvider);
         final durationMinutes = prefs.asData?.value?.sessionLengthMinutes ?? 5;
+        final durationLimitSeconds = preset is BpmRoundsPreset
+            ? preset.naturalDurationSeconds
+            : durationMinutes * 60;
 
         ref
             .read(activeSessionConfigProvider.notifier)
@@ -89,7 +95,7 @@ class TechniquesScreen extends ConsumerWidget {
                 technique: technique,
                 preset: preset,
                 presetId: preset.id,
-                durationLimitSeconds: durationMinutes * 60,
+                durationLimitSeconds: durationLimitSeconds,
               ),
             );
 

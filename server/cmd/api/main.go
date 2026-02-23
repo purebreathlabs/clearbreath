@@ -91,7 +91,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	authService, err := authsvc.NewService(store, clk, accessTokens, cfg.JWTRefreshSecret, cfg.JWTRefreshTTLMinutes, cfg.DevAuthEnabled, cfg.DevAuthSecret, cfg.GoogleOAuthClientID, cfg.AppleOAuthAudience)
+	authService, err := authsvc.NewService(store, clk, accessTokens, cfg.JWTRefreshSecret, cfg.JWTRefreshTTLMinutes, cfg.DevAuthEnabled, cfg.DevAuthSecret, cfg.GoogleOAuthClientID, cfg.AppleOAuthAudience, profanity.NewDefault())
 	if err != nil {
 		slog.Error("failed to init auth service", "error", err)
 		os.Exit(1)
@@ -132,6 +132,12 @@ func main() {
 		slog.Error("failed to init leaderboard service", "error", err)
 		os.Exit(1)
 	}
+
+	sessionService.SetOnAfterIngest(func() {
+		if err := leaderboardService.Refresh(appCtx); err != nil {
+			slog.Error("leaderboard refresh after ingest failed", "error", err)
+		}
+	})
 
 	r := chi.NewRouter()
 	r.Use(middleware.RequestID)

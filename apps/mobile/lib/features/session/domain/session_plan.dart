@@ -59,15 +59,13 @@ sealed class SessionPlan {
     if (preset is BpmRoundsPreset) {
       final roundDuration = Duration(seconds: preset.roundSeconds);
       final restDuration = Duration(seconds: preset.restSeconds);
-      final cycleDuration = roundDuration + restDuration;
-      final rounds = _ceilUnits(totalDuration, cycleDuration);
 
       return RoundSessionPlan(
         bpm: preset.bpm,
-        rounds: rounds,
+        rounds: preset.rounds,
         roundDuration: roundDuration,
         restDuration: restDuration,
-        totalDuration: totalDuration,
+        totalDuration: Duration(seconds: preset.naturalDurationSeconds),
       );
     }
 
