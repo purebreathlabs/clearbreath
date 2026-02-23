@@ -73,7 +73,7 @@ func (s *Service) UpdateProfile(ctx context.Context, userID uuid.UUID, in Update
 
 		displayName := u.DisplayName
 		if in.DisplayName != nil {
-			n, err := canonicalizeDisplayName(*in.DisplayName)
+			n, err := CanonicalizeDisplayName(*in.DisplayName)
 			if err != nil {
 				return apierr.New(http.StatusBadRequest, "validation", err.Error())
 			}
@@ -156,7 +156,7 @@ func (s *Service) DeleteAccount(ctx context.Context, userID uuid.UUID) error {
 	})
 }
 
-func canonicalizeDisplayName(s string) (string, error) {
+func CanonicalizeDisplayName(s string) (string, error) {
 	s = strings.TrimSpace(s)
 	if s == "" {
 		return "", fmt.Errorf("display_name is required")

@@ -16,9 +16,11 @@ type AuthHandler struct {
 }
 
 type providerSignInRequest struct {
-	Provider string `json:"provider"`
-	IDToken  string `json:"id_token"`
-	DeviceID string `json:"device_id"`
+	Provider  string `json:"provider"`
+	IDToken   string `json:"id_token"`
+	DeviceID  string `json:"device_id"`
+	FirstName string `json:"first_name"`
+	LastName  string `json:"last_name"`
 }
 
 type refreshRequest struct {
@@ -65,6 +67,8 @@ func (h *AuthHandler) ProviderSignIn(w http.ResponseWriter, r *http.Request) {
 		IDToken:       req.IDToken,
 		DeviceID:      req.DeviceID,
 		DevAuthHeader: r.Header.Get("X-Dev-Auth"),
+		FirstName:     req.FirstName,
+		LastName:      req.LastName,
 	})
 	if err != nil {
 		if e, ok := apierr.As(err); ok {

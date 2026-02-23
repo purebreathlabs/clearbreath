@@ -20,12 +20,13 @@ import (
 )
 
 type Service struct {
-	store     *repository.Store
-	stats     *stats.Service
-	registry  *technique.Registry
-	clock     clock.Clock
-	maxSubmit int
-	maxSync   int
+	store         *repository.Store
+	stats         *stats.Service
+	registry      *technique.Registry
+	clock         clock.Clock
+	maxSubmit     int
+	maxSync       int
+	onAfterIngest func()
 }
 
 type SessionInput struct {
@@ -74,6 +75,10 @@ func NewService(store *repository.Store, registry *technique.Registry, statsSvc 
 		maxSubmit: 200,
 		maxSync:   500,
 	}, nil
+}
+
+func (s *Service) SetOnAfterIngest(fn func()) {
+	s.onAfterIngest = fn
 }
 
 func (s *Service) Submit(ctx context.Context, userID uuid.UUID, sessions []SessionInput) (IngestResult, error) {
@@ -174,6 +179,10 @@ func (s *Service) ingest(ctx context.Context, userID uuid.UUID, sessions []Sessi
 		return nil
 	}); err != nil {
 		return IngestResult{}, err
+	}
+
+	if s.onAfterIngest != nil && out.AcceptedCount > 0 {
+		go s.onAfterIngest()
 	}
 
 	return out, nil

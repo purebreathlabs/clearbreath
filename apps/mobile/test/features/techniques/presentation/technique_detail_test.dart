@@ -252,7 +252,7 @@ void main() {
     expect(config, isNotNull);
     expect(config!.technique.id, 'kapalbhati');
     expect(config.presetId, 'beginner');
-    expect(config.durationLimitSeconds, 5 * 60);
+    expect(config.durationLimitSeconds, 150);
   });
 }
 

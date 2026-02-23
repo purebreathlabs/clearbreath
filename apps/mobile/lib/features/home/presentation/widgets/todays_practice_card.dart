@@ -10,7 +10,7 @@ class TodaysPracticeCard extends StatelessWidget {
     super.key,
     required this.techniqueName,
     required this.presetLabel,
-    required this.durationMinutes,
+    required this.durationLabel,
     required this.rationale,
     required this.onStart,
     this.techniqueId,
@@ -18,7 +18,7 @@ class TodaysPracticeCard extends StatelessWidget {
 
   final String techniqueName;
   final String presetLabel;
-  final int durationMinutes;
+  final String durationLabel;
   final String rationale;
   final VoidCallback onStart;
   final String? techniqueId;
@@ -96,7 +96,7 @@ class TodaysPracticeCard extends StatelessWidget {
                 ),
                 SizedBox(height: spacing.xs),
                 Text(
-                  '$presetLabel \u2022 $durationMinutes min',
+                  '$presetLabel \u2022 $durationLabel',
                   style: typography.bodyMedium.copyWith(
                     color: colors.textTertiary,
                   ),

@@ -57,4 +57,30 @@ class Technique {
   final TechniqueSafety safety;
   final TechniqueAbout about;
   final Map<String, TechniquePreset> presets;
+
+  bool get presetsAreEquivalent {
+    final values = presets.values.toList();
+    if (values.length <= 1) return true;
+    final first = values.first;
+    for (var i = 1; i < values.length; i++) {
+      if (!_presetsMatchTiming(first, values[i])) return false;
+    }
+    return true;
+  }
+
+  static bool _presetsMatchTiming(TechniquePreset a, TechniquePreset b) {
+    if (a is PhasePreset && b is PhasePreset) {
+      return a.inhaleMs == b.inhaleMs &&
+          a.holdMs == b.holdMs &&
+          a.exhaleMs == b.exhaleMs &&
+          a.holdAfterExhaleMs == b.holdAfterExhaleMs;
+    }
+    if (a is BpmRoundsPreset && b is BpmRoundsPreset) {
+      return a.bpm == b.bpm &&
+          a.rounds == b.rounds &&
+          a.roundSeconds == b.roundSeconds &&
+          a.restSeconds == b.restSeconds;
+    }
+    return false;
+  }
 }

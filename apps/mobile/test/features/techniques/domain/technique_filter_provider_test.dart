@@ -80,9 +80,9 @@ void main() {
   test('search filters by name', () async {
     final container = buildContainer();
     await container.read(allTechniquesProvider.future);
-    container.read(techniqueFilterProvider.notifier).update(
-      const TechniqueFilterState(searchQuery: 'box'),
-    );
+    container
+        .read(techniqueFilterProvider.notifier)
+        .update(const TechniqueFilterState(searchQuery: 'box'));
     final result = container.read(filteredTechniquesProvider);
     expect(result.value?.length, 1);
     expect(result.value?.first.id, 'box');
@@ -91,9 +91,9 @@ void main() {
   test('search filters by description', () async {
     final container = buildContainer();
     await container.read(allTechniquesProvider.future);
-    container.read(techniqueFilterProvider.notifier).update(
-      const TechniqueFilterState(searchQuery: 'humming'),
-    );
+    container
+        .read(techniqueFilterProvider.notifier)
+        .update(const TechniqueFilterState(searchQuery: 'humming'));
     final result = container.read(filteredTechniquesProvider);
     expect(result.value?.length, 1);
     expect(result.value?.first.id, 'bhramari');
@@ -102,9 +102,11 @@ void main() {
   test('goal filter returns matching techniques', () async {
     final container = buildContainer();
     await container.read(allTechniquesProvider.future);
-    container.read(techniqueFilterProvider.notifier).update(
-      const TechniqueFilterState(selectedGoals: {PrimaryGoal.energy}),
-    );
+    container
+        .read(techniqueFilterProvider.notifier)
+        .update(
+          const TechniqueFilterState(selectedGoals: {PrimaryGoal.energy}),
+        );
     final result = container.read(filteredTechniquesProvider);
     expect(result.value?.length, 1);
     expect(result.value?.first.id, 'kapalbhati');
@@ -113,9 +115,9 @@ void main() {
   test('goal filter with multiple goals', () async {
     final container = buildContainer();
     await container.read(allTechniquesProvider.future);
-    container.read(techniqueFilterProvider.notifier).update(
-      const TechniqueFilterState(selectedGoals: {PrimaryGoal.calm}),
-    );
+    container
+        .read(techniqueFilterProvider.notifier)
+        .update(const TechniqueFilterState(selectedGoals: {PrimaryGoal.calm}));
     final result = container.read(filteredTechniquesProvider);
     expect(result.value?.length, 2);
   });
@@ -123,12 +125,14 @@ void main() {
   test('combined search + goal filter', () async {
     final container = buildContainer();
     await container.read(allTechniquesProvider.future);
-    container.read(techniqueFilterProvider.notifier).update(
-      const TechniqueFilterState(
-        searchQuery: 'balanced',
-        selectedGoals: {PrimaryGoal.calm},
-      ),
-    );
+    container
+        .read(techniqueFilterProvider.notifier)
+        .update(
+          const TechniqueFilterState(
+            searchQuery: 'balanced',
+            selectedGoals: {PrimaryGoal.calm},
+          ),
+        );
     final result = container.read(filteredTechniquesProvider);
     expect(result.value?.length, 1);
     expect(result.value?.first.id, 'box');
