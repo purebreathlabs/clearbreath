@@ -248,6 +248,26 @@ class ProfileScreen extends ConsumerWidget {
                     trailing: const Icon(Icons.chevron_right_rounded),
                     onTap: () => context.push('/profile/legal/terms'),
                   ),
+                  if (!auth.isGuest) ...[
+                    divider(),
+                    ListTile(
+                      title: Text(
+                        'Sign out',
+                        style: TextStyle(color: colors.destructive),
+                      ),
+                      onTap: () async {
+                        try {
+                          await ref.read(authStateProvider.notifier).signOut();
+                        } catch (_) {
+                          if (context.mounted) {
+                            showMessage(
+                              'Could not sign out. Please try again.',
+                            );
+                          }
+                        }
+                      },
+                    ),
+                  ],
                 ]),
               ],
             ),

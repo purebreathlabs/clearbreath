@@ -55,6 +55,7 @@ class DesignSystemScreen extends StatelessWidget {
               _ColorSwatch(name: 'Text Tertiary', color: colors.textTertiary),
               _ColorSwatch(name: 'Disabled', color: colors.disabled),
               _ColorSwatch(name: 'Focus', color: colors.focus),
+              _ColorSwatch(name: 'Destructive', color: colors.destructive),
             ],
           ),
           SizedBox(height: spacing.xxl),

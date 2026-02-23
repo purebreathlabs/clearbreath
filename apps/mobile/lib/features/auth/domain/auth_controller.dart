@@ -6,7 +6,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/network/api_error.dart';
 import '../../../core/network/models/user_models.dart';
+import '../../../shared/providers/app_database_provider.dart';
+import '../../intro/domain/intro_gate.dart';
 import '../../onboarding/domain/onboarding_answers_provider.dart';
+import '../../onboarding/domain/onboarding_gate.dart';
 import '../data/auth_repository.dart';
 import '../data/device_id_store.dart';
 import '../data/token_storage.dart';
@@ -81,6 +84,9 @@ class AuthController extends Notifier<AuthState> {
   Future<void> signOut() async {
     final repo = ref.read(authRepositoryProvider);
     final storage = ref.read(tokenStorageProvider);
+    final db = ref.read(appDatabaseProvider);
+    final introGate = ref.read(introGateProvider);
+    final onboardingGate = ref.read(onboardingGateProvider);
 
     try {
       final deviceId = await ref.read(deviceIdProvider.future);
@@ -88,6 +94,9 @@ class AuthController extends Notifier<AuthState> {
     } catch (_) {}
 
     await storage.clearAll();
+    await db.deleteAllData();
+    introGate.reset();
+    onboardingGate.reset();
     state = const AuthStateGuest();
   }
 
@@ -159,6 +168,9 @@ class AuthController extends Notifier<AuthState> {
   Future<void> deleteAccount() async {
     final repo = ref.read(authRepositoryProvider);
     final storage = ref.read(tokenStorageProvider);
+    final db = ref.read(appDatabaseProvider);
+    final introGate = ref.read(introGateProvider);
+    final onboardingGate = ref.read(onboardingGateProvider);
 
     try {
       await repo.deleteAccount();
@@ -166,6 +178,9 @@ class AuthController extends Notifier<AuthState> {
       throw ApiError.fromDioException(e);
     } finally {
       await storage.clearAll();
+      await db.deleteAllData();
+      introGate.reset();
+      onboardingGate.reset();
       state = const AuthStateGuest();
     }
   }

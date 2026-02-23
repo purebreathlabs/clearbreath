@@ -16,6 +16,7 @@ class AppColorTokens extends ThemeExtension<AppColorTokens> {
     required this.focus,
     required this.inverseSurface,
     required this.inverseText,
+    required this.destructive,
   });
 
   factory AppColorTokens.dark() {
@@ -33,6 +34,7 @@ class AppColorTokens extends ThemeExtension<AppColorTokens> {
       focus: Color(0xFFE6E6E6),
       inverseSurface: Color(0xFFFFFFFF),
       inverseText: Color(0xFF000000),
+      destructive: Color(0xFFFF453A),
     );
   }
 
@@ -49,6 +51,7 @@ class AppColorTokens extends ThemeExtension<AppColorTokens> {
   final Color focus;
   final Color inverseSurface;
   final Color inverseText;
+  final Color destructive;
 
   @override
   AppColorTokens copyWith({
@@ -65,6 +68,7 @@ class AppColorTokens extends ThemeExtension<AppColorTokens> {
     Color? focus,
     Color? inverseSurface,
     Color? inverseText,
+    Color? destructive,
   }) {
     return AppColorTokens(
       background: background ?? this.background,
@@ -80,6 +84,7 @@ class AppColorTokens extends ThemeExtension<AppColorTokens> {
       focus: focus ?? this.focus,
       inverseSurface: inverseSurface ?? this.inverseSurface,
       inverseText: inverseText ?? this.inverseText,
+      destructive: destructive ?? this.destructive,
     );
   }
 
@@ -106,6 +111,7 @@ class AppColorTokens extends ThemeExtension<AppColorTokens> {
       inverseSurface:
           Color.lerp(inverseSurface, other.inverseSurface, t) ?? inverseSurface,
       inverseText: Color.lerp(inverseText, other.inverseText, t) ?? inverseText,
+      destructive: Color.lerp(destructive, other.destructive, t) ?? destructive,
     );
   }
 }

@@ -8,6 +8,10 @@ import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 import '../../../core/config/app_config.dart';
 import '../../../core/network/api_error.dart';
 import '../../../core/theme/theme_extensions.dart';
+import '../../../shared/widgets/brand_mark.dart';
+import '../../intro/domain/intro_gate.dart';
+import '../../onboarding/domain/onboarding_answers.dart';
+import '../../onboarding/domain/onboarding_gate.dart';
 import '../domain/auth_controller.dart';
 import '../domain/auth_state_provider.dart';
 
@@ -27,19 +31,6 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
     final spacing = Theme.of(context).extension<AppSpacingTokens>()!;
     final typography = Theme.of(context).extension<AppTypographyTokens>()!;
     final colors = Theme.of(context).extension<AppColorTokens>()!;
-    final components = Theme.of(context).extension<AppComponentTokens>()!;
-
-    Widget card({required Widget child}) {
-      return Container(
-        decoration: BoxDecoration(
-          color: colors.surface,
-          borderRadius: BorderRadius.circular(components.cardRadius),
-          border: Border.all(color: colors.border),
-        ),
-        padding: EdgeInsets.all(components.cardPadding),
-        child: child,
-      );
-    }
 
     Widget iconBox(Widget child) {
       return SizedBox(width: 20, height: 20, child: Center(child: child));
@@ -54,112 +45,103 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
     }
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Sign in')),
+      appBar: AppBar(
+        leading: IconButton(
+          onPressed: () {
+            if (context.canPop()) {
+              context.pop();
+              return;
+            }
+            context.go('/home');
+          },
+          icon: const Icon(Icons.arrow_back_rounded),
+          tooltip: 'Back',
+        ),
+        title: BrandMark(logoSize: 36, textStyle: typography.titleLarge),
+        centerTitle: true,
+        scrolledUnderElevation: 0,
+      ),
       body: SafeArea(
-        child: LayoutBuilder(
-          builder: (context, constraints) {
-            final maxWidth = constraints.maxWidth;
-            final contentMaxWidth = maxWidth.isFinite
-                ? (maxWidth > 520 ? 520.0 : maxWidth)
-                : 520.0;
-
-            return SingleChildScrollView(
-              physics: const ClampingScrollPhysics(),
-              child: Align(
-                alignment: Alignment.topCenter,
-                child: ConstrainedBox(
-                  constraints: BoxConstraints(maxWidth: contentMaxWidth),
-                  child: Padding(
-                    padding: EdgeInsets.all(spacing.lg),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        SizedBox(height: spacing.xl),
-                        Center(
-                          child: SvgPicture.asset(
-                            'assets/branding/clearbreath_logo.svg',
-                            width: 72,
-                            height: 72,
-                            colorFilter: ColorFilter.mode(
-                              colors.textPrimary,
-                              BlendMode.srcIn,
+        top: false,
+        child: Padding(
+          padding: EdgeInsets.symmetric(horizontal: spacing.xl),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              SizedBox(height: spacing.lg),
+              Expanded(
+                child: LayoutBuilder(
+                  builder: (context, constraints) {
+                    final maxImageHeight = (constraints.maxHeight * 0.62).clamp(
+                      180.0,
+                      360.0,
+                    );
+                    return Center(
+                      child: ConstrainedBox(
+                        constraints: const BoxConstraints(maxWidth: 420),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Flexible(
+                              child: ConstrainedBox(
+                                constraints: BoxConstraints(
+                                  maxHeight: maxImageHeight,
+                                ),
+                                child: Image.asset(
+                                  'assets/images/addition-2.png',
+                                  fit: BoxFit.contain,
+                                  alignment: Alignment.bottomCenter,
+                                  errorBuilder: (_, _, _) =>
+                                      const SizedBox.shrink(),
+                                ),
+                              ),
                             ),
-                          ),
-                        ),
-                        SizedBox(height: spacing.lg),
-                        Text(
-                          'ClearBreath',
-                          style: typography.headlineLarge.copyWith(
-                            color: colors.textPrimary,
-                          ),
-                          textAlign: TextAlign.center,
-                        ),
-                        SizedBox(height: spacing.xs),
-                        Text(
-                          'Sign in to sync sessions across devices and unlock the leaderboard.',
-                          style: typography.bodyMedium.copyWith(
-                            color: colors.textSecondary,
-                          ),
-                          textAlign: TextAlign.center,
-                        ),
-                        SizedBox(height: spacing.xl),
-                        card(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.stretch,
-                            children: [
-                              Text(
-                                'Continue with',
-                                style: typography.titleMedium.copyWith(
-                                  color: colors.textPrimary,
-                                ),
+                            SizedBox(height: spacing.sm),
+                            Text(
+                              'Sign in',
+                              style: typography.headlineLarge.copyWith(
+                                color: colors.textPrimary,
                               ),
-                              SizedBox(height: spacing.md),
-                              FilledButton.icon(
-                                onPressed: _loading
-                                    ? null
-                                    : () => _signInApple(),
-                                icon: iconBox(
-                                  const Icon(Icons.apple, size: 20),
-                                ),
-                                label: Text(
-                                  _loading
-                                      ? 'Signing in...'
-                                      : 'Sign in with Apple',
-                                ),
+                              textAlign: TextAlign.center,
+                            ),
+                            SizedBox(height: spacing.sm),
+                            Text(
+                              'Sync sessions across devices\nand unlock the leaderboard.',
+                              style: typography.bodyLarge.copyWith(
+                                color: colors.textSecondary,
+                                height: 1.5,
                               ),
-                              SizedBox(height: spacing.sm),
-                              FilledButton.icon(
-                                onPressed: _loading
-                                    ? null
-                                    : () => _signInGoogle(),
-                                icon: iconBox(googleIcon()),
-                                label: Text(
-                                  _loading
-                                      ? 'Signing in...'
-                                      : 'Sign in with Google',
-                                ),
-                              ),
-                              if (AppConfig.devAuthEnabled) ...[
-                                SizedBox(height: spacing.sm),
-                                OutlinedButton(
-                                  onPressed: _loading
-                                      ? null
-                                      : () => _signInDev(),
-                                  child: Text(
-                                    _loading ? 'Signing in...' : 'Dev Sign In',
-                                  ),
-                                ),
-                              ],
-                            ],
-                          ),
+                              textAlign: TextAlign.center,
+                            ),
+                          ],
                         ),
-                      ],
-                    ),
-                  ),
+                      ),
+                    );
+                  },
                 ),
               ),
-            );
-          },
+              SizedBox(height: spacing.lg),
+              FilledButton.icon(
+                onPressed: _loading ? null : () => _signInApple(),
+                icon: iconBox(const Icon(Icons.apple, size: 20)),
+                label: Text(_loading ? 'Signing in...' : 'Sign in with Apple'),
+              ),
+              SizedBox(height: spacing.sm),
+              FilledButton.icon(
+                onPressed: _loading ? null : () => _signInGoogle(),
+                icon: iconBox(googleIcon()),
+                label: Text(_loading ? 'Signing in...' : 'Sign in with Google'),
+              ),
+              if (AppConfig.devAuthEnabled) ...[
+                SizedBox(height: spacing.sm),
+                OutlinedButton(
+                  onPressed: _loading ? null : () => _signInDev(),
+                  child: Text(_loading ? 'Signing in...' : 'Dev Sign In'),
+                ),
+              ],
+              SizedBox(height: spacing.lg),
+            ],
+          ),
         ),
       ),
     );
@@ -279,10 +261,24 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
       if (!mounted) {
         return;
       }
-      if (context.canPop()) {
-        context.pop();
-      } else {
+
+      final introGate = ref.read(introGateProvider);
+      final onboardingGate = ref.read(onboardingGateProvider);
+      final fromIntroFlow = !introGate.isComplete || !onboardingGate.isComplete;
+
+      if (fromIntroFlow) {
+        if (!introGate.isComplete) await introGate.complete();
+        if (!onboardingGate.isComplete) {
+          await onboardingGate.complete(OnboardingAnswers.defaults());
+        }
+        if (!mounted) return;
         context.go('/home');
+      } else {
+        if (context.canPop()) {
+          context.pop();
+        } else {
+          context.go('/home');
+        }
       }
     } catch (e) {
       if (!mounted) {

@@ -245,7 +245,10 @@ class SettingsScreen extends ConsumerWidget {
                       divider(),
                     ],
                     ListTile(
-                      title: const Text('Sign out'),
+                      title: Text(
+                        'Sign out',
+                        style: TextStyle(color: colors.destructive),
+                      ),
                       onTap: () async {
                         try {
                           await ref.read(authStateProvider.notifier).signOut();
@@ -263,7 +266,10 @@ class SettingsScreen extends ConsumerWidget {
                     ),
                     divider(),
                     ListTile(
-                      title: const Text('Delete account'),
+                      title: Text(
+                        'Delete account',
+                        style: TextStyle(color: colors.destructive),
+                      ),
                       onTap: () async {
                         final confirmed = await showDialog<bool>(
                           context: context,
