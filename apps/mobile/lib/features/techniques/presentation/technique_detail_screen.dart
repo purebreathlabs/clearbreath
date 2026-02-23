@@ -231,7 +231,7 @@ class _TechniqueDetailScreenState extends ConsumerState<TechniqueDetailScreen> {
                           ],
                           SizedBox(height: spacing.lg),
                           if (isRoundBased)
-                            _RoundSessionInfo(preset: preset as BpmRoundsPreset)
+                            _RoundSessionInfo(preset: preset)
                           else ...[
                             Text('Duration', style: typography.titleMedium),
                             SizedBox(height: spacing.sm),
