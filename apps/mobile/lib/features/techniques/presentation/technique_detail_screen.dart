@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../core/theme/theme_extensions.dart';
+import '../../../shared/providers/preferences_provider.dart';
 import '../data/technique_repository.dart';
 import '../domain/favorites_provider.dart';
 import '../domain/favorites_repository.dart';
@@ -24,8 +25,8 @@ class TechniqueDetailScreen extends ConsumerStatefulWidget {
 }
 
 class _TechniqueDetailScreenState extends ConsumerState<TechniqueDetailScreen> {
-  String _presetId = 'beginner';
-  int? _durationMinutes;
+  String? _presetIdOverride;
+  int? _durationOverride;
   bool _starting = false;
 
   @override
@@ -43,6 +44,10 @@ class _TechniqueDetailScreenState extends ConsumerState<TechniqueDetailScreen> {
     );
     final favorited = favoriteIds.contains(widget.techniqueId);
     final safetyAcks = ref.watch(safetyAcksProvider);
+
+    final prefs = ref.watch(preferencesProvider);
+    final defaultPresetId = prefs.asData?.value?.experienceLevel ?? 'beginner';
+    final defaultDurationMin = prefs.asData?.value?.sessionLengthMinutes ?? 5;
 
     return Scaffold(
       appBar: AppBar(
@@ -107,12 +112,19 @@ class _TechniqueDetailScreenState extends ConsumerState<TechniqueDetailScreen> {
               );
             }
 
-            final preset = technique.presets[_presetId]!;
+            final effectivePresetId = _resolvePresetId(
+              technique,
+              _presetIdOverride ?? defaultPresetId,
+            );
+            final preset = technique.presets[effectivePresetId]!;
             final durations = preset.recommendedDurationsMinutes;
             final effectiveMinutes =
-                _durationMinutes ?? _defaultMinutes(durations);
+                _durationOverride ??
+                _closestDuration(durations, defaultDurationMin);
             final safetyAcked =
                 safetyAcks.asData?.value.contains(technique.id) ?? false;
+
+            final isRoundBased = preset is BpmRoundsPreset;
 
             return Padding(
               padding: EdgeInsets.all(spacing.lg),
@@ -177,8 +189,8 @@ class _TechniqueDetailScreenState extends ConsumerState<TechniqueDetailScreen> {
                                         SizedBox(height: spacing.xs),
                                         Text(
                                           safetyAcked
-                                              ? 'You’ve acknowledged the safety guidance for this technique.'
-                                              : 'You’ll be asked to acknowledge the safety guidance before your first session.',
+                                              ? 'You\u2019ve acknowledged the safety guidance for this technique.'
+                                              : 'You\u2019ll be asked to acknowledge the safety guidance before your first session.',
                                           style: typography.bodyMedium.copyWith(
                                             color: colors.textSecondary,
                                           ),
@@ -190,60 +202,59 @@ class _TechniqueDetailScreenState extends ConsumerState<TechniqueDetailScreen> {
                               ),
                             ),
                           ],
-                          SizedBox(height: spacing.xl),
-                          Text('Preset', style: typography.titleMedium),
-                          SizedBox(height: spacing.sm),
-                          GridView.count(
-                            crossAxisCount: 3,
-                            crossAxisSpacing: spacing.sm,
-                            mainAxisSpacing: spacing.sm,
-                            childAspectRatio: 3.0,
-                            shrinkWrap: true,
-                            physics: const NeverScrollableScrollPhysics(),
-                            children: [
-                              SelectionPill(
-                                key: const Key('preset_beginner'),
-                                label: 'Beginner',
-                                selected: _presetId == 'beginner',
-                                onTap: () => _setPreset('beginner', technique),
-                              ),
-                              SelectionPill(
-                                key: const Key('preset_intermediate'),
-                                label: 'Intermediate',
-                                selected: _presetId == 'intermediate',
-                                onTap: () =>
-                                    _setPreset('intermediate', technique),
-                              ),
-                              SelectionPill(
-                                key: const Key('preset_advanced'),
-                                label: 'Advanced',
-                                selected: _presetId == 'advanced',
-                                onTap: () => _setPreset('advanced', technique),
-                              ),
-                            ],
-                          ),
-                          SizedBox(height: spacing.lg),
-                          Text('Duration', style: typography.titleMedium),
-                          SizedBox(height: spacing.sm),
-                          GridView.count(
-                            crossAxisCount: 2,
-                            crossAxisSpacing: spacing.sm,
-                            mainAxisSpacing: spacing.sm,
-                            childAspectRatio: 3.0,
-                            shrinkWrap: true,
-                            physics: const NeverScrollableScrollPhysics(),
-                            children: [
-                              for (final minutes in durations)
-                                SelectionPill(
-                                  key: Key('duration_$minutes'),
-                                  label: '$minutes min',
-                                  selected: effectiveMinutes == minutes,
-                                  onTap: () => setState(
-                                    () => _durationMinutes = minutes,
+                          if (!technique.presetsAreEquivalent) ...[
+                            SizedBox(height: spacing.xl),
+                            Text(
+                              isRoundBased ? 'Intensity' : 'Pace',
+                              style: typography.titleMedium,
+                            ),
+                            SizedBox(height: spacing.sm),
+                            GridView.count(
+                              crossAxisCount: 3,
+                              crossAxisSpacing: spacing.sm,
+                              mainAxisSpacing: spacing.sm,
+                              childAspectRatio: 3.0,
+                              shrinkWrap: true,
+                              physics: const NeverScrollableScrollPhysics(),
+                              children: [
+                                for (final entry in technique.presets.entries)
+                                  SelectionPill(
+                                    key: Key('preset_${entry.key}'),
+                                    label: entry.value.label,
+                                    selected: effectivePresetId == entry.key,
+                                    onTap: () => setState(
+                                      () => _presetIdOverride = entry.key,
+                                    ),
                                   ),
-                                ),
-                            ],
-                          ),
+                              ],
+                            ),
+                          ],
+                          SizedBox(height: spacing.lg),
+                          if (isRoundBased)
+                            _RoundSessionInfo(preset: preset)
+                          else ...[
+                            Text('Duration', style: typography.titleMedium),
+                            SizedBox(height: spacing.sm),
+                            GridView.count(
+                              crossAxisCount: 2,
+                              crossAxisSpacing: spacing.sm,
+                              mainAxisSpacing: spacing.sm,
+                              childAspectRatio: 3.0,
+                              shrinkWrap: true,
+                              physics: const NeverScrollableScrollPhysics(),
+                              children: [
+                                for (final minutes in durations)
+                                  SelectionPill(
+                                    key: Key('duration_$minutes'),
+                                    label: '$minutes min',
+                                    selected: effectiveMinutes == minutes,
+                                    onTap: () => setState(
+                                      () => _durationOverride = minutes,
+                                    ),
+                                  ),
+                              ],
+                            ),
+                          ],
                           SizedBox(height: spacing.xl),
                           _Section(
                             title: 'What It Is',
@@ -273,12 +284,18 @@ class _TechniqueDetailScreenState extends ConsumerState<TechniqueDetailScreen> {
                   FilledButton(
                     onPressed: _starting
                         ? null
-                        : () => _startSession(
-                            technique: technique,
-                            preset: preset,
-                            presetId: _presetId,
-                            durationMinutes: effectiveMinutes,
-                          ),
+                        : () {
+                            final durationLimitSeconds =
+                                preset is BpmRoundsPreset
+                                ? preset.naturalDurationSeconds
+                                : effectiveMinutes * 60;
+                            _startSession(
+                              technique: technique,
+                              preset: preset,
+                              presetId: effectivePresetId,
+                              durationLimitSeconds: durationLimitSeconds,
+                            );
+                          },
                     child: Text(_starting ? 'Starting...' : 'Start Session'),
                   ),
                 ],
@@ -290,26 +307,24 @@ class _TechniqueDetailScreenState extends ConsumerState<TechniqueDetailScreen> {
     );
   }
 
-  int _defaultMinutes(List<int> options) {
-    if (options.contains(5)) {
-      return 5;
-    }
-    return options.isEmpty ? 5 : options.first;
+  String _resolvePresetId(Technique technique, String preferred) {
+    if (technique.presets.containsKey(preferred)) return preferred;
+    if (technique.presets.containsKey('beginner')) return 'beginner';
+    return technique.presets.keys.first;
   }
 
-  void _setPreset(String id, Technique technique) {
-    if (_presetId == id) {
-      return;
+  int _closestDuration(List<int> options, int target) {
+    if (options.isEmpty) return target;
+    int closest = options.first;
+    int closestDiff = (closest - target).abs();
+    for (final option in options) {
+      final diff = (option - target).abs();
+      if (diff < closestDiff) {
+        closest = option;
+        closestDiff = diff;
+      }
     }
-    final preset = technique.presets[id];
-    if (preset == null) {
-      return;
-    }
-
-    setState(() {
-      _presetId = id;
-      _durationMinutes = _defaultMinutes(preset.recommendedDurationsMinutes);
-    });
+    return closest;
   }
 
   Future<void> _toggleFavorite() async {
@@ -345,7 +360,7 @@ class _TechniqueDetailScreenState extends ConsumerState<TechniqueDetailScreen> {
     required Technique technique,
     required TechniquePreset preset,
     required String presetId,
-    required int durationMinutes,
+    required int durationLimitSeconds,
   }) async {
     if (_starting) {
       return;
@@ -377,7 +392,7 @@ class _TechniqueDetailScreenState extends ConsumerState<TechniqueDetailScreen> {
               technique: technique,
               preset: preset,
               presetId: presetId,
-              durationLimitSeconds: durationMinutes * 60,
+              durationLimitSeconds: durationLimitSeconds,
             ),
           );
 
@@ -412,6 +427,71 @@ class _TechniqueDetailScreenState extends ConsumerState<TechniqueDetailScreen> {
         setState(() => _starting = false);
       }
     }
+  }
+}
+
+class _RoundSessionInfo extends StatelessWidget {
+  const _RoundSessionInfo({required this.preset});
+
+  final BpmRoundsPreset preset;
+
+  @override
+  Widget build(BuildContext context) {
+    final typography = Theme.of(context).extension<AppTypographyTokens>()!;
+    final spacing = Theme.of(context).extension<AppSpacingTokens>()!;
+    final colors = Theme.of(context).extension<AppColorTokens>()!;
+    final components = Theme.of(context).extension<AppComponentTokens>()!;
+
+    final totalSeconds = preset.naturalDurationSeconds;
+    final totalMin = totalSeconds ~/ 60;
+    final totalSec = totalSeconds % 60;
+    final totalLabel = totalMin > 0
+        ? (totalSec > 0 ? '~${totalMin}m ${totalSec}s' : '~${totalMin}m')
+        : '~${totalSec}s';
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text('Session', style: typography.titleMedium),
+        SizedBox(height: spacing.sm),
+        Container(
+          width: double.infinity,
+          padding: EdgeInsets.all(components.cardPadding),
+          decoration: BoxDecoration(
+            color: colors.surface,
+            borderRadius: BorderRadius.circular(components.cardRadius),
+            border: Border.all(color: colors.border),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                '${preset.rounds} rounds \u00b7 ${preset.roundSeconds}s each',
+                style: typography.bodyMedium.copyWith(
+                  color: colors.textPrimary,
+                ),
+              ),
+              if (preset.rounds > 1) ...[
+                SizedBox(height: spacing.xs),
+                Text(
+                  '${preset.restSeconds}s rest between rounds',
+                  style: typography.bodyMedium.copyWith(
+                    color: colors.textSecondary,
+                  ),
+                ),
+              ],
+              SizedBox(height: spacing.xs),
+              Text(
+                'Total: $totalLabel',
+                style: typography.bodyMedium.copyWith(
+                  color: colors.textSecondary,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
   }
 }
 

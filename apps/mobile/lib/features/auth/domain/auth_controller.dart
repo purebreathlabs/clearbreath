@@ -26,7 +26,12 @@ class AuthController extends Notifier<AuthState> {
     return const AuthStateGuest();
   }
 
-  Future<void> signIn(AuthProvider provider, {required String idToken}) async {
+  Future<void> signIn(
+    AuthProvider provider, {
+    required String idToken,
+    String? firstName,
+    String? lastName,
+  }) async {
     final repo = ref.read(authRepositoryProvider);
     final storage = ref.read(tokenStorageProvider);
     final deviceId = await ref.read(deviceIdProvider.future);
@@ -52,6 +57,8 @@ class AuthController extends Notifier<AuthState> {
         provider: providerKey,
         idToken: safeToken,
         deviceId: deviceId,
+        firstName: firstName,
+        lastName: lastName,
       );
 
       await storage.writeTokens(

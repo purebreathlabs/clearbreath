@@ -7,6 +7,7 @@ import '../../../../shared/utils/category_colors.dart';
 import '../../../../shared/utils/technique_assets.dart';
 import '../../../onboarding/domain/onboarding_answers.dart';
 import '../../domain/technique.dart';
+import '../../domain/technique_preset.dart';
 
 class TechniqueCard extends StatelessWidget {
   const TechniqueCard({
@@ -181,6 +182,9 @@ class TechniqueCard extends StatelessWidget {
     final preset =
         technique.presets['beginner'] ?? technique.presets.values.firstOrNull;
     if (preset == null) return '';
+    if (preset is BpmRoundsPreset) {
+      return '${preset.rounds} rounds';
+    }
     final durations = preset.recommendedDurationsMinutes;
     if (durations.isEmpty) return '';
     final defaultDuration = durations.length > 1

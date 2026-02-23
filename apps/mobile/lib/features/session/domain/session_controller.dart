@@ -7,6 +7,7 @@ import '../../auth/domain/auth_state_provider.dart';
 import '../../background_audio/data/background_audio_controller.dart';
 import '../../notifications/domain/notification_controller.dart';
 import '../../stats/domain/stats_engine.dart';
+import '../../stats/domain/weekly_minutes_provider.dart';
 import '../../sync/domain/sync_controller.dart';
 import '../../techniques/domain/technique.dart';
 import '../../techniques/domain/technique_preset.dart';
@@ -188,6 +189,7 @@ class SessionController extends Notifier<SessionState> {
       try {
         await _sessions.insert(local);
         ref.invalidate(localStatsProvider);
+        ref.invalidate(weeklyMinutesProvider);
         if (ref.read(authStateProvider) is AuthStateSignedIn) {
           unawaited(
             ref.read(syncControllerProvider.notifier).submitSession(local),
@@ -295,6 +297,7 @@ class SessionController extends Notifier<SessionState> {
     } catch (_) {}
 
     ref.invalidate(localStatsProvider);
+    ref.invalidate(weeklyMinutesProvider);
     ref.read(lastCompletedSessionProvider.notifier).set(local);
     unawaited(
       ref.read(notificationControllerProvider.notifier).onSessionCompleted(),

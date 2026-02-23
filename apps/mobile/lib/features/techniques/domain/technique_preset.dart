@@ -47,4 +47,7 @@ final class BpmRoundsPreset extends TechniquePreset {
   final int rounds;
   final int roundSeconds;
   final int restSeconds;
+
+  int get naturalDurationSeconds =>
+      rounds * roundSeconds + (rounds > 1 ? (rounds - 1) * restSeconds : 0);
 }
