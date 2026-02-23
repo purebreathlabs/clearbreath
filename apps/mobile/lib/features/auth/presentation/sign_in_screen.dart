@@ -193,7 +193,12 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
     await _runSignIn(
       provider: AuthProvider.google,
       idTokenLoader: () async {
-        await (_googleInit ??= GoogleSignIn.instance.initialize());
+        await (_googleInit ??= GoogleSignIn.instance.initialize(
+          serverClientId:
+              '884656805579-ptcbmv99ha49rcfm7lelagp5e0ooeepm.apps.googleusercontent.com',
+          clientId:
+              '884656805579-kb298tik2g9e92fi5dbn5nas1ivlsvhl.apps.googleusercontent.com',
+        ));
 
         try {
           final account = await GoogleSignIn.instance.authenticate();
