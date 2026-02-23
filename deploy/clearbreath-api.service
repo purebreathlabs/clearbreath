@@ -1,0 +1,50 @@
+[Unit]
+Description=ClearBreath API Server
+Documentation=https://github.com/purebreathlabs/clearbreath
+After=network-online.target postgresql.service redis-server.service
+Wants=network-online.target
+Requires=postgresql.service redis-server.service
+
+[Service]
+Type=simple
+User=clearbreath
+Group=clearbreath
+WorkingDirectory=/opt/clearbreath
+ExecStart=/opt/clearbreath/api
+Restart=on-failure
+RestartSec=5
+StartLimitIntervalSec=60
+StartLimitBurst=3
+
+# Environment
+EnvironmentFile=/opt/clearbreath/.env
+
+# Graceful shutdown
+KillMode=mixed
+KillSignal=SIGTERM
+TimeoutStopSec=15
+
+# Security hardening
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+PrivateTmp=true
+PrivateDevices=true
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+RestrictSUIDSGID=true
+RestrictNamespaces=true
+ReadWritePaths=/opt/clearbreath
+
+# Resource limits
+LimitNOFILE=65536
+LimitNPROC=4096
+
+# Logging (stdout/stderr -> journald)
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=clearbreath-api
+
+[Install]
+WantedBy=multi-user.target
