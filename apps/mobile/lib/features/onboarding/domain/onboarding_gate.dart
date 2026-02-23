@@ -47,6 +47,10 @@ class OnboardingGate extends ChangeNotifier {
     _setStatus(OnboardingStatus.complete);
   }
 
+  void reset() {
+    _setStatus(OnboardingStatus.incomplete);
+  }
+
   Future<void> _load() async {
     try {
       final completed = await _repository.isOnboardingComplete();

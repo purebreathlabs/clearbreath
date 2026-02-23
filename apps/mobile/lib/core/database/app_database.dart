@@ -33,6 +33,18 @@ class AppDatabase extends _$AppDatabase {
     return AppDatabase(_openConnection());
   }
 
+  Future<void> deleteAllData() {
+    return transaction(() async {
+      await delete(preferences).go();
+      await delete(sessions).go();
+      await delete(favorites).go();
+      await delete(safetyAck).go();
+      await delete(statsCache).go();
+      await delete(leaderboardCache).go();
+      await delete(syncQueue).go();
+    });
+  }
+
   @override
   int get schemaVersion => 6;
 

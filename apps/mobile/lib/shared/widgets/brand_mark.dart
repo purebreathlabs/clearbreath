@@ -34,6 +34,8 @@ class BrandMark extends StatelessWidget {
           height: logoSize,
           semanticsLabel: 'ClearBreath',
           colorFilter: ColorFilter.mode(colors.textPrimary, BlendMode.srcIn),
+          allowDrawingOutsideViewBox: true,
+          clipBehavior: Clip.none,
         ),
         if (showText) ...[
           SizedBox(width: spacing.sm),
