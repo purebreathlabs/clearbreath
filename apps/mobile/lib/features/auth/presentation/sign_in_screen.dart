@@ -127,7 +127,9 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
                 FilledButton.icon(
                   onPressed: _loading ? null : () => _signInApple(),
                   icon: iconBox(const Icon(Icons.apple, size: 20)),
-                  label: Text(_loading ? 'Signing in...' : 'Sign in with Apple'),
+                  label: Text(
+                    _loading ? 'Signing in...' : 'Sign in with Apple',
+                  ),
                 ),
                 SizedBox(height: spacing.sm),
               ],

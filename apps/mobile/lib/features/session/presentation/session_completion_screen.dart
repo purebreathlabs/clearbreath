@@ -240,7 +240,8 @@ class _SessionCompletionScreenState
                                       width: 360,
                                       height: 360,
                                       child: ShareCardWidget(
-                                        streakDays: statsSnapshot.currentStreakDays,
+                                        streakDays:
+                                            statsSnapshot.currentStreakDays,
                                         minutesToday: minutes ?? 0,
                                       ),
                                     ),
