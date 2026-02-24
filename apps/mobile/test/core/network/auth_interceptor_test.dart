@@ -203,6 +203,94 @@ void main() {
     expect(await container.read(tokenStorageProvider).readTokens(), isNull);
   });
 
+  test(
+    'replay recovery preserves session when concurrent refresh succeeded',
+    () async {
+      final store = _MemorySecureStorage();
+      var refreshCalls = 0;
+
+      final refreshDio = Dio();
+      refreshDio.httpClientAdapter = _TestAdapter((options) async {
+        refreshCalls += 1;
+        await store.writeString('auth.refresh_token', 'refresh2');
+        await store.writeDateTimeUtc(
+          'auth.refresh_expires_at_utc',
+          DateTime.now().toUtc().add(const Duration(days: 30)),
+        );
+        await store.writeString('auth.access_token', 'access2');
+        await store.writeDateTimeUtc(
+          'auth.access_expires_at_utc',
+          DateTime.now().toUtc().add(const Duration(hours: 1)),
+        );
+        await store.writeString(
+          'auth.user_profile_json',
+          '{"id":"user1","display_name":"Breather123456","avatar_seed":"seed","leaderboard_opt_in":true,"leaderboard_initials_only":false,"created_at_utc":"2026-02-22T00:00:00Z","timezone_offset_minutes_latest":0}',
+        );
+        return ResponseBody.fromString(
+          '{"error":"replay","code":"refresh_replay","request_id":"r"}',
+          409,
+          headers: {
+            'content-type': ['application/json'],
+          },
+        );
+      });
+
+      final container = ProviderContainer(
+        overrides: [
+          secureStorageProvider.overrideWithValue(store),
+          deviceIdProvider.overrideWith((ref) async => 'device1'),
+          rawApiClientProvider.overrideWithValue(refreshDio),
+        ],
+      );
+      addTearDown(container.dispose);
+
+      await container
+          .read(tokenStorageProvider)
+          .writeTokens(
+            AuthTokens(
+              accessToken: 'expired_access',
+              accessTokenExpiresAtUtc: DateTime.now().toUtc().subtract(
+                const Duration(minutes: 1),
+              ),
+              refreshToken: 'refresh1',
+              refreshTokenExpiresAtUtc: DateTime.now().toUtc().add(
+                const Duration(days: 30),
+              ),
+            ),
+          );
+
+      final dio = container.read(apiClientProvider);
+      dio.httpClientAdapter = _TestAdapter((options) async {
+        final auth = options.headers['Authorization'];
+        if (auth == 'Bearer expired_access') {
+          return ResponseBody.fromString(
+            '{"error":"unauthorized","code":"unauthorized","request_id":"r"}',
+            401,
+            headers: {
+              'content-type': ['application/json'],
+            },
+          );
+        }
+        expect(auth, equals('Bearer access2'));
+        return ResponseBody.fromString(
+          '{}',
+          200,
+          headers: {
+            'content-type': ['application/json'],
+          },
+        );
+      });
+
+      final resp = await dio.get<dynamic>('/v1/me');
+      expect(resp.statusCode, equals(200));
+      expect(refreshCalls, equals(1));
+      expect(
+        await container.read(tokenStorageProvider).readTokens(),
+        isNotNull,
+      );
+    },
+  );
+
   test('single-flight refresh across concurrent 401 responses', () async {
     final store = _MemorySecureStorage();
     var refreshCalls = 0;

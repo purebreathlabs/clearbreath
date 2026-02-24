@@ -13,6 +13,7 @@ import '../../onboarding/domain/onboarding_gate.dart';
 import '../data/auth_repository.dart';
 import '../data/device_id_store.dart';
 import '../data/token_storage.dart';
+import 'auth_refresh_coordinator.dart';
 import 'auth_state.dart';
 
 enum AuthProvider { apple, google, dev }
@@ -188,6 +189,7 @@ class AuthController extends Notifier<AuthState> {
   Future<void> restoreSession() async {
     final repo = ref.read(authRepositoryProvider);
     final storage = ref.read(tokenStorageProvider);
+    final coordinator = ref.read(authRefreshCoordinatorProvider);
 
     final stored = await storage.readTokens();
     if (stored == null) {
@@ -204,7 +206,7 @@ class AuthController extends Notifier<AuthState> {
 
     final cachedProfile = await storage.readUserProfile();
     if (cachedProfile != null) {
-      state = AuthStateSignedIn(profile: cachedProfile);
+      state = AuthStateSignedIn(profile: cachedProfile, sessionReady: false);
     }
 
     final shouldRefresh = !stored.accessTokenExpiresAtUtc.isAfter(
@@ -212,59 +214,45 @@ class AuthController extends Notifier<AuthState> {
     );
 
     if (shouldRefresh) {
-      await _refreshAndSetState(
-        repo: repo,
-        storage: storage,
-        refreshToken: stored.refreshToken,
-      );
+      final outcome = await coordinator.refreshIfPossible();
+      if (outcome != null) {
+        state = AuthStateSignedIn(profile: outcome.user, sessionReady: true);
+        return;
+      }
+      if (!await storage.hasTokens()) {
+        return;
+      }
+      final fallback = await storage.readUserProfile();
+      if (fallback != null) {
+        state = AuthStateSignedIn(profile: fallback, sessionReady: true);
+      }
       return;
     }
 
     try {
       final profile = await repo.fetchProfile();
       await storage.writeUserProfile(profile);
-      state = AuthStateSignedIn(profile: profile);
+      state = AuthStateSignedIn(profile: profile, sessionReady: true);
     } on DioException catch (e) {
       final apiError = ApiError.fromDioException(e);
       if (!apiError.isUnauthorized) {
+        final fallback = await storage.readUserProfile();
+        if (fallback != null) {
+          state = AuthStateSignedIn(profile: fallback, sessionReady: true);
+        }
         return;
       }
-      await _refreshAndSetState(
-        repo: repo,
-        storage: storage,
-        refreshToken: stored.refreshToken,
-      );
-    }
-  }
-
-  Future<void> _refreshAndSetState({
-    required AuthRepository repo,
-    required TokenStorage storage,
-    required String refreshToken,
-  }) async {
-    final deviceId = await ref.read(deviceIdProvider.future);
-
-    try {
-      final resp = await repo.refreshToken(
-        refreshToken: refreshToken,
-        deviceId: deviceId,
-      );
-
-      await storage.writeTokens(
-        AuthTokens(
-          accessToken: resp.accessToken,
-          accessTokenExpiresAtUtc: resp.accessTokenExpiresAtUtc,
-          refreshToken: resp.refreshToken,
-          refreshTokenExpiresAtUtc: resp.refreshTokenExpiresAtUtc,
-        ),
-      );
-      await storage.writeUserProfile(resp.user);
-      state = AuthStateSignedIn(profile: resp.user);
-    } on DioException catch (e) {
-      final apiError = ApiError.fromDioException(e);
-      if (apiError.isUnauthorized || apiError.isRefreshReplay) {
-        await storage.clearAll();
-        state = const AuthStateGuest();
+      final outcome = await coordinator.refreshIfPossible();
+      if (outcome != null) {
+        state = AuthStateSignedIn(profile: outcome.user, sessionReady: true);
+        return;
+      }
+      if (!await storage.hasTokens()) {
+        return;
+      }
+      final fallback = await storage.readUserProfile();
+      if (fallback != null) {
+        state = AuthStateSignedIn(profile: fallback, sessionReady: true);
       }
     }
   }
