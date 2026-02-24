@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -121,12 +123,14 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
                 ),
               ),
               SizedBox(height: spacing.lg),
-              FilledButton.icon(
-                onPressed: _loading ? null : () => _signInApple(),
-                icon: iconBox(const Icon(Icons.apple, size: 20)),
-                label: Text(_loading ? 'Signing in...' : 'Sign in with Apple'),
-              ),
-              SizedBox(height: spacing.sm),
+              if (Platform.isIOS) ...[
+                FilledButton.icon(
+                  onPressed: _loading ? null : () => _signInApple(),
+                  icon: iconBox(const Icon(Icons.apple, size: 20)),
+                  label: Text(_loading ? 'Signing in...' : 'Sign in with Apple'),
+                ),
+                SizedBox(height: spacing.sm),
+              ],
               FilledButton.icon(
                 onPressed: _loading ? null : () => _signInGoogle(),
                 icon: iconBox(googleIcon()),
