@@ -29,9 +29,11 @@ class SyncController extends Notifier<SyncState> {
   @override
   SyncState build() {
     ref.listen<AuthState>(authStateProvider, (previous, next) {
-      final becameSignedIn =
-          previous is! AuthStateSignedIn && next is AuthStateSignedIn;
-      if (becameSignedIn) {
+      final becameReady =
+          (previous is! AuthStateSignedIn || !previous.sessionReady) &&
+          next is AuthStateSignedIn &&
+          next.sessionReady;
+      if (becameReady) {
         unawaited(syncUnsyncedSessions());
         unawaited(ref.read(safetySyncServiceProvider).pullAndMerge());
       }
@@ -40,7 +42,8 @@ class SyncController extends Notifier<SyncState> {
       }
     });
 
-    if (ref.read(authStateProvider) is AuthStateSignedIn) {
+    final auth = ref.read(authStateProvider);
+    if (auth is AuthStateSignedIn && auth.sessionReady) {
       unawaited(syncUnsyncedSessions());
       unawaited(ref.read(safetySyncServiceProvider).pullAndMerge());
     }
@@ -52,7 +55,8 @@ class SyncController extends Notifier<SyncState> {
     if (_inProgress) {
       return;
     }
-    if (ref.read(authStateProvider) is! AuthStateSignedIn) {
+    final auth = ref.read(authStateProvider);
+    if (auth is! AuthStateSignedIn || !auth.sessionReady) {
       return;
     }
 
@@ -89,7 +93,8 @@ class SyncController extends Notifier<SyncState> {
     if (_inProgress) {
       return;
     }
-    if (ref.read(authStateProvider) is! AuthStateSignedIn) {
+    final auth = ref.read(authStateProvider);
+    if (auth is! AuthStateSignedIn || !auth.sessionReady) {
       return;
     }
 

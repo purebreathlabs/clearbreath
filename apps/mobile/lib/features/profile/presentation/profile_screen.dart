@@ -161,7 +161,12 @@ class ProfileScreen extends ConsumerWidget {
                           ),
                           SizedBox(height: spacing.xs),
                           Text(
-                            auth.isGuest ? 'Guest' : 'Signed in',
+                            auth.isGuest
+                                ? 'Guest'
+                                : (auth is AuthStateSignedIn &&
+                                          !auth.sessionReady
+                                      ? 'Restoring\u2026'
+                                      : 'Signed in'),
                             style: typography.bodyMedium.copyWith(
                               color: colors.textSecondary,
                             ),

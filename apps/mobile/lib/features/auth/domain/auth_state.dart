@@ -12,9 +12,10 @@ final class AuthStateGuest extends AuthState {
 }
 
 final class AuthStateSignedIn extends AuthState {
-  const AuthStateSignedIn({required this.profile});
+  const AuthStateSignedIn({required this.profile, this.sessionReady = true});
 
   final UserProfile profile;
+  final bool sessionReady;
 
   String get userId => profile.id;
 }

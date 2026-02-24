@@ -10,7 +10,7 @@ import '../../stats/domain/stats_snapshot.dart';
 final mergedStatsProvider = FutureProvider<StatsSnapshot>((ref) async {
   final auth = ref.watch(authStateProvider);
 
-  if (auth is AuthStateSignedIn) {
+  if (auth is AuthStateSignedIn && auth.sessionReady) {
     StatsSnapshot? cached;
     try {
       cached = await ref.watch(statsCacheRepositoryProvider).readCached();

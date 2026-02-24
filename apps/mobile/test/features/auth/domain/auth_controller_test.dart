@@ -1,5 +1,7 @@
 import 'dart:collection';
+import 'dart:typed_data';
 
+import 'package:clearbreath/core/network/api_client.dart';
 import 'package:clearbreath/core/network/models/auth_models.dart';
 import 'package:clearbreath/core/network/models/user_models.dart';
 import 'package:clearbreath/features/auth/data/auth_repository.dart';
@@ -57,22 +59,26 @@ void main() {
 
   test('restoreSession refreshes when access token is expired', () async {
     final storage = _MemorySecureStorage();
-    final repo = _FakeAuthRepository()
-      ..refreshResult = _authResponse(
-        accessToken: 'access2',
-        refreshToken: 'refresh2',
-        userId: 'user2',
-        displayName: 'Breather999999',
-      )
-      ..profileResult = UserProfile(
-        id: 'user2',
-        displayName: 'Breather999999',
-        avatarSeed: 'seed2',
-        leaderboardOptIn: true,
-        leaderboardInitialsOnly: false,
-        createdAtUtc: DateTime.utc(2026, 2, 22, 0, 0),
-        timezoneOffsetMinutesLatest: 0,
+    var refreshCalls = 0;
+
+    final refreshDio = Dio();
+    refreshDio.httpClientAdapter = _TestAdapter((options) async {
+      refreshCalls += 1;
+      return ResponseBody.fromString(
+        _authResponseJson(
+          accessToken: 'access2',
+          refreshToken: 'refresh2',
+          userId: 'user2',
+          displayName: 'Breather999999',
+        ),
+        200,
+        headers: {
+          'content-type': ['application/json'],
+        },
       );
+    });
+
+    final repo = _FakeAuthRepository();
 
     final container = ProviderContainer(
       overrides: [
@@ -82,6 +88,7 @@ void main() {
           (ref) async => OnboardingAnswers.defaults(),
         ),
         authRepositoryProvider.overrideWithValue(repo),
+        rawApiClientProvider.overrideWithValue(refreshDio),
       ],
     );
     addTearDown(container.dispose);
@@ -114,8 +121,10 @@ void main() {
     final controller = container.read(authStateProvider.notifier);
     await controller.restoreSession();
 
-    expect(repo.refreshCalls, equals(1));
-    expect(container.read(authStateProvider), isA<AuthStateSignedIn>());
+    expect(refreshCalls, equals(1));
+    final authState = container.read(authStateProvider);
+    expect(authState, isA<AuthStateSignedIn>());
+    expect((authState as AuthStateSignedIn).sessionReady, isTrue);
     final tokens = await tokenStore.readTokens();
     expect(tokens, isNotNull);
     expect(tokens!.accessToken, equals('access2'));
@@ -155,6 +164,83 @@ void main() {
     expect(repo.lastFirstName, equals('Jane'));
     expect(repo.lastLastName, equals('Doe'));
   });
+
+  test(
+    'restoreSession sets sessionReady false then true during refresh',
+    () async {
+      final storage = _MemorySecureStorage();
+      final states = <AuthState>[];
+
+      final refreshDio = Dio();
+      refreshDio.httpClientAdapter = _TestAdapter((options) async {
+        await Future<void>.delayed(const Duration(milliseconds: 20));
+        return ResponseBody.fromString(
+          _authResponseJson(
+            accessToken: 'access2',
+            refreshToken: 'refresh2',
+            userId: 'user1',
+            displayName: 'Breather123456',
+          ),
+          200,
+          headers: {
+            'content-type': ['application/json'],
+          },
+        );
+      });
+
+      final container = ProviderContainer(
+        overrides: [
+          secureStorageProvider.overrideWithValue(storage),
+          deviceIdProvider.overrideWith((ref) async => 'device1'),
+          onboardingAnswersProvider.overrideWith(
+            (ref) async => OnboardingAnswers.defaults(),
+          ),
+          authRepositoryProvider.overrideWithValue(_FakeAuthRepository()),
+          rawApiClientProvider.overrideWithValue(refreshDio),
+        ],
+      );
+      addTearDown(container.dispose);
+
+      final tokenStore = container.read(tokenStorageProvider);
+      await tokenStore.writeTokens(
+        AuthTokens(
+          accessToken: 'expired_access',
+          accessTokenExpiresAtUtc: DateTime.now().toUtc().subtract(
+            const Duration(minutes: 1),
+          ),
+          refreshToken: 'refresh1',
+          refreshTokenExpiresAtUtc: DateTime.now().toUtc().add(
+            const Duration(days: 30),
+          ),
+        ),
+      );
+      await tokenStore.writeUserProfile(
+        UserProfile(
+          id: 'user1',
+          displayName: 'Breather123456',
+          avatarSeed: 'seed',
+          leaderboardOptIn: true,
+          leaderboardInitialsOnly: false,
+          createdAtUtc: DateTime.utc(2026, 2, 22, 0, 0),
+          timezoneOffsetMinutesLatest: 0,
+        ),
+      );
+
+      container.listen<AuthState>(authStateProvider, (_, next) {
+        states.add(next);
+      }, fireImmediately: true);
+
+      final controller = container.read(authStateProvider.notifier);
+      await controller.restoreSession();
+
+      expect(
+        states.any((s) => s is AuthStateSignedIn && !s.sessionReady),
+        isTrue,
+      );
+      expect(states.last, isA<AuthStateSignedIn>());
+      expect((states.last as AuthStateSignedIn).sessionReady, isTrue);
+    },
+  );
 }
 
 class _MemorySecureStorage implements SecureStorage {
@@ -206,10 +292,8 @@ class _FakeAuthRepository extends AuthRepository {
   _FakeAuthRepository() : super(raw: Dio(), authed: Dio());
 
   int logoutCalls = 0;
-  int refreshCalls = 0;
 
   AuthResponse? signInResult;
-  AuthResponse? refreshResult;
   UserProfile? profileResult;
 
   String? lastFirstName;
@@ -233,19 +317,6 @@ class _FakeAuthRepository extends AuthRepository {
   }
 
   @override
-  Future<AuthResponse> refreshToken({
-    required String refreshToken,
-    required String deviceId,
-  }) async {
-    refreshCalls += 1;
-    final result = refreshResult;
-    if (result == null) {
-      throw StateError('missing refreshResult');
-    }
-    return result;
-  }
-
-  @override
   Future<void> logout({required String deviceId}) async {
     logoutCalls += 1;
   }
@@ -258,6 +329,24 @@ class _FakeAuthRepository extends AuthRepository {
     }
     return result;
   }
+}
+
+class _TestAdapter implements HttpClientAdapter {
+  _TestAdapter(this._handler);
+
+  final Future<ResponseBody> Function(RequestOptions options) _handler;
+
+  @override
+  Future<ResponseBody> fetch(
+    RequestOptions options,
+    Stream<Uint8List>? requestStream,
+    Future<void>? cancelFuture,
+  ) {
+    return _handler(options);
+  }
+
+  @override
+  void close({bool force = false}) {}
 }
 
 AuthResponse _authResponse({
@@ -285,4 +374,38 @@ AuthResponse _authResponse({
       timezoneOffsetMinutesLatest: 0,
     ),
   );
+}
+
+String _authResponseJson({
+  required String accessToken,
+  required String refreshToken,
+  required String userId,
+  required String displayName,
+}) {
+  final accessExp = DateTime.now()
+      .toUtc()
+      .add(const Duration(hours: 1))
+      .toIso8601String();
+  final refreshExp = DateTime.now()
+      .toUtc()
+      .add(const Duration(days: 30))
+      .toIso8601String();
+
+  return '''
+{
+  "access_token":"$accessToken",
+  "access_token_expires_at_utc":"$accessExp",
+  "refresh_token":"$refreshToken",
+  "refresh_token_expires_at_utc":"$refreshExp",
+  "user":{
+    "id":"$userId",
+    "display_name":"$displayName",
+    "avatar_seed":"seed",
+    "leaderboard_opt_in":true,
+    "leaderboard_initials_only":false,
+    "created_at_utc":"2026-02-22T00:00:00Z",
+    "timezone_offset_minutes_latest":0
+  }
+}
+''';
 }
