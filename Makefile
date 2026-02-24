@@ -1,5 +1,5 @@
 .PHONY: server-dev server-build server-docker-build server-lint server-test server-test-ci server-test-integration server-coverage server-fmt-check server-sqlc \
-       mobile-run mobile-build apk mobile-analyze mobile-get mobile-pub-add mobile-gen mobile-fmt mobile-fmt-check mobile-test \
+       mobile-run mobile-build apk mobile-analyze mobile-get mobile-pub-add mobile-gen mobile-icons mobile-fmt mobile-fmt-check mobile-test \
        fmt-check \
        web-dev web-build \
        docker-up docker-down \
@@ -9,6 +9,8 @@
 FLUTTER ?= flutter
 DART ?= $(shell if command -v dart >/dev/null 2>&1; then echo dart; else FLUTTER_PATH="$$(command -v $(FLUTTER) 2>/dev/null || echo $(FLUTTER))"; echo "$$(dirname "$$FLUTTER_PATH")/dart"; fi)
 MOBILE_RUN_ARGS ?=
+API_BASE_URL ?= https://api.clearbreath.life
+MOBILE_DART_DEFINES ?= --dart-define=API_BASE_URL=$(API_BASE_URL)
 GOLANGCI_LINT := $(HOME)/go/bin/golangci-lint
 SQLC := $(HOME)/go/bin/sqlc
 GOOSE := $(HOME)/go/bin/goose
@@ -48,13 +50,13 @@ server-sqlc:
 	cd server && $(SQLC) generate -f sqlc/sqlc.yaml
 
 mobile-run:
-	cd apps/mobile && $(FLUTTER) run $(MOBILE_RUN_ARGS)
+	cd apps/mobile && $(FLUTTER) run $(MOBILE_RUN_ARGS) $(MOBILE_DART_DEFINES)
 
 mobile-build:
-	cd apps/mobile && $(FLUTTER) build apk --release
+	cd apps/mobile && $(FLUTTER) build apk --release $(MOBILE_DART_DEFINES)
 
 apk:
-	cd apps/mobile && $(FLUTTER) build apk --release --split-per-abi
+	cd apps/mobile && $(FLUTTER) build apk --release --split-per-abi $(MOBILE_DART_DEFINES)
 
 mobile-analyze:
 	cd apps/mobile && $(FLUTTER) analyze
@@ -68,6 +70,9 @@ mobile-pub-add:
 
 mobile-gen:
 	cd apps/mobile && $(FLUTTER) pub run build_runner build --delete-conflicting-outputs
+
+mobile-icons:
+	cd apps/mobile && $(DART) run flutter_launcher_icons
 
 mobile-fmt:
 	cd apps/mobile && $(DART) format lib/ test/

@@ -41,6 +41,7 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^6.0.0
+  flutter_launcher_icons: ^0.13.1
   drift_dev: ^2.31.0
   build_runner: ^2.11.1
   sqlite3: ^2.9.4
@@ -72,3 +73,12 @@ flutter:
           weight: 700
         - asset: assets/fonts/Manrope-ExtraBold.ttf
           weight: 800
+
+flutter_launcher_icons:
+  android: "ic_launcher"
+  ios: true
+  image_path: assets/branding/app_icon.png
+  adaptive_icon_background: "#000000"
+  adaptive_icon_foreground: assets/branding/app_icon_foreground.png
+  remove_alpha_ios: true
+  min_sdk_android: 21
