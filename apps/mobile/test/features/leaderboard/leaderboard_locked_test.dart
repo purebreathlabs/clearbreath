@@ -38,7 +38,7 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('ClearBreath'), findsOneWidget);
-    expect(find.text('Sign in with Apple'), findsOneWidget);
+    expect(find.text('Sign in with Google'), findsOneWidget);
 
     await tester.pumpWidget(const SizedBox.shrink());
     await tester.pumpAndSettle();
