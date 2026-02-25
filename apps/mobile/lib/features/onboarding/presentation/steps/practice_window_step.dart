@@ -27,24 +27,28 @@ class PracticeWindowStep extends StatelessWidget {
         children: [
           OnboardingOptionButton(
             label: 'Morning',
+            subtitle: 'Start your day centered and clear',
             selected: values.contains(PracticeWindow.morning),
             onTap: () => onToggle(PracticeWindow.morning),
           ),
           SizedBox(height: spacing.md),
           OnboardingOptionButton(
             label: 'Afternoon',
+            subtitle: 'A mid-day reset to recharge',
             selected: values.contains(PracticeWindow.afternoon),
             onTap: () => onToggle(PracticeWindow.afternoon),
           ),
           SizedBox(height: spacing.md),
           OnboardingOptionButton(
             label: 'Evening',
+            subtitle: 'Wind down and prepare for rest',
             selected: values.contains(PracticeWindow.evening),
             onTap: () => onToggle(PracticeWindow.evening),
           ),
           SizedBox(height: spacing.md),
           OnboardingOptionButton(
             label: 'Varies',
+            subtitle: 'No fixed schedule, practice when it fits',
             selected: values.contains(PracticeWindow.varies),
             onTap: () => onToggle(PracticeWindow.varies),
           ),
