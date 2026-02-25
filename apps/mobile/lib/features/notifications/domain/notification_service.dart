@@ -58,7 +58,7 @@ class _FlutterLocalNotificationService implements NotificationService {
       tz.setLocalLocation(tz.UTC);
     }
 
-    const android = AndroidInitializationSettings('@mipmap/ic_launcher');
+    const android = AndroidInitializationSettings('ic_notification');
     const ios = DarwinInitializationSettings(
       requestAlertPermission: false,
       requestBadgePermission: false,
@@ -73,6 +73,7 @@ class _FlutterLocalNotificationService implements NotificationService {
       _channelId,
       _channelName,
       channelDescription: _channelDescription,
+      icon: 'ic_notification',
       importance: Importance.defaultImportance,
       priority: Priority.defaultPriority,
     );
