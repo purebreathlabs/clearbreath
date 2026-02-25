@@ -282,6 +282,7 @@ class _AudioServiceRemoteControls implements RemoteControls {
         androidNotificationChannelName: 'Breathing session',
         androidNotificationOngoing: true,
         androidStopForegroundOnPause: true,
+        androidNotificationIcon: 'drawable/ic_notification',
       ),
     );
   }
