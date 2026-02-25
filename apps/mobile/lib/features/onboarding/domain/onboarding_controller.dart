@@ -76,31 +76,46 @@ class OnboardingController extends Notifier<OnboardingState> {
       next
         ..clear()
         ..add(PracticeWindow.varies);
-      state = state.copyWith(
-        answers: state.answers.copyWith(practiceWindows: next),
-      );
-      return;
-    }
-
-    next.remove(PracticeWindow.varies);
-    if (next.contains(value)) {
-      if (next.length == 1) {
-        next
-          ..clear()
-          ..add(PracticeWindow.varies);
-      } else {
-        next.remove(value);
-        if (next.isEmpty) {
-          next.add(PracticeWindow.varies);
-        }
-      }
     } else {
-      next.add(value);
+      next.remove(PracticeWindow.varies);
+      if (next.contains(value)) {
+        if (next.length == 1) {
+          next
+            ..clear()
+            ..add(PracticeWindow.varies);
+        } else {
+          next.remove(value);
+          if (next.isEmpty) {
+            next.add(PracticeWindow.varies);
+          }
+        }
+      } else {
+        next.add(value);
+      }
     }
 
     state = state.copyWith(
-      answers: state.answers.copyWith(practiceWindows: next),
+      answers: state.answers.copyWith(
+        practiceWindows: next,
+        reminderTimeMinutes: _defaultReminderTime(next),
+      ),
     );
+  }
+
+  static int _defaultReminderTime(Set<PracticeWindow> windows) {
+    if (windows.length == 1) {
+      switch (windows.first) {
+        case PracticeWindow.morning:
+          return 8 * 60;
+        case PracticeWindow.afternoon:
+          return 13 * 60;
+        case PracticeWindow.evening:
+          return 19 * 60;
+        case PracticeWindow.varies:
+          return 8 * 60;
+      }
+    }
+    return 8 * 60;
   }
 
   void setSessionLengthMinutes(int minutes) {
