@@ -228,6 +228,7 @@ class _FlutterLocalNotificationService implements NotificationService {
     }
     try {
       await _ensureInitialized();
+      await requestPermission();
       await _plugin.show(
         id: 9999,
         title: 'Test notification',
