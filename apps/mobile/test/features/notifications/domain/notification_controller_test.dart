@@ -171,6 +171,9 @@ class _FakeNotificationService implements NotificationService {
   }
 
   @override
+  Future<void> showTest() async {}
+
+  @override
   Future<void> cancelAll() async {}
 
   @override

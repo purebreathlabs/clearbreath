@@ -18,6 +18,7 @@ abstract class NotificationService {
   Future<void> scheduleStreakWarning(DateTime scheduledAtLocal);
   Future<void> cancelStreakWarning();
 
+  Future<void> showTest();
   Future<void> cancelAll();
   Future<void> dispose();
 }
@@ -221,6 +222,22 @@ class _FlutterLocalNotificationService implements NotificationService {
   }
 
   @override
+  Future<void> showTest() async {
+    if (kIsWeb) {
+      return;
+    }
+    try {
+      await _ensureInitialized();
+      await _plugin.show(
+        id: 9999,
+        title: 'Test notification',
+        body: 'If you see the ClearBreath icon, it works!',
+        notificationDetails: _details(),
+      );
+    } catch (_) {}
+  }
+
+  @override
   Future<void> dispose() async {}
 }
 
@@ -247,4 +264,7 @@ class _NoopNotificationService implements NotificationService {
 
   @override
   Future<void> scheduleStreakWarning(DateTime scheduledAtLocal) async {}
+
+  @override
+  Future<void> showTest() async {}
 }
