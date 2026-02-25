@@ -22,6 +22,13 @@ func (w *wrappedWriter) WriteHeader(code int) {
 	w.ResponseWriter.WriteHeader(code)
 }
 
+// Flush delegates to the underlying ResponseWriter if it supports flushing.
+func (w *wrappedWriter) Flush() {
+	if f, ok := w.ResponseWriter.(http.Flusher); ok {
+		f.Flush()
+	}
+}
+
 // Unwrap returns the underlying ResponseWriter (needed for http.ResponseController).
 func (w *wrappedWriter) Unwrap() http.ResponseWriter {
 	return w.ResponseWriter

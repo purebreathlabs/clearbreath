@@ -1,9 +1,6 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# ClearBreath API deployment script
-# Usage: ./deploy.sh
-
 PROJECT_DIR="/home/rahul/production/clearbreath"
 DEPLOY_DIR="/opt/clearbreath"
 SERVER_DIR="${PROJECT_DIR}/server"
@@ -14,8 +11,10 @@ echo "==> Building ClearBreath API v${VERSION}+${BUILD}..."
 cd "${SERVER_DIR}"
 CGO_ENABLED=0 go build -ldflags="-s -w -X main.version=${VERSION}+${BUILD}" -o /tmp/clearbreath-api ./cmd/api
 
-echo "==> Deploying binary to ${DEPLOY_DIR}..."
+echo "==> Stopping service..."
 sudo systemctl stop clearbreath-api 2>/dev/null || true
+
+echo "==> Deploying binary..."
 sudo cp /tmp/clearbreath-api "${DEPLOY_DIR}/api"
 sudo chown clearbreath:clearbreath "${DEPLOY_DIR}/api"
 sudo chmod 755 "${DEPLOY_DIR}/api"
@@ -35,6 +34,10 @@ sleep 2
 if sudo systemctl is-active --quiet clearbreath-api; then
     echo "==> ClearBreath API is running!"
     curl -sf http://localhost:8080/health && echo " (health: OK)" || echo " (health check failed)"
+    echo ""
+    echo "==> Reloading nginx..."
+    sudo nginx -t && sudo systemctl reload nginx
+    echo "==> Done! Dashboard: https://logs.clearbreath.life/dashboard/"
 else
     echo "==> FAILED to start. Check: sudo journalctl -u clearbreath-api -n 50"
     exit 1
