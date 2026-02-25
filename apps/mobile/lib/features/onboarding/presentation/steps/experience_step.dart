@@ -26,18 +26,22 @@ class ExperienceStep extends StatelessWidget {
         children: [
           OnboardingOptionButton(
             label: 'Beginner',
+            subtitle: 'New to breathwork or just getting started',
             selected: value == ExperienceLevel.beginner,
             onTap: () => onChanged(ExperienceLevel.beginner),
+            recommended: true,
           ),
           SizedBox(height: spacing.md),
           OnboardingOptionButton(
             label: 'Intermediate',
+            subtitle: 'Practiced occasionally for a few months',
             selected: value == ExperienceLevel.intermediate,
             onTap: () => onChanged(ExperienceLevel.intermediate),
           ),
           SizedBox(height: spacing.md),
           OnboardingOptionButton(
             label: 'Advanced',
+            subtitle: 'Consistent daily practice for over a year',
             selected: value == ExperienceLevel.advanced,
             onTap: () => onChanged(ExperienceLevel.advanced),
           ),
