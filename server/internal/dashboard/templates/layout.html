@@ -1,0 +1,68 @@
+{{define "layout"}}
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ClearBreath Logs</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/htmx.org@2.0.4"></script>
+    <script src="https://unpkg.com/htmx-ext-sse@2.2.2/sse.js"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    animation: {
+                        'fade-in': 'fadeIn 0.3s ease-in-out',
+                    },
+                    keyframes: {
+                        fadeIn: {
+                            '0%': { opacity: '0', backgroundColor: 'rgba(59, 130, 246, 0.1)' },
+                            '100%': { opacity: '1', backgroundColor: 'transparent' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { font-family: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace; }
+        .scrollbar-thin::-webkit-scrollbar { width: 6px; height: 6px; }
+        .scrollbar-thin::-webkit-scrollbar-track { background: #27272a; }
+        .scrollbar-thin::-webkit-scrollbar-thumb { background: #52525b; border-radius: 3px; }
+    </style>
+</head>
+<body class="bg-zinc-950 text-zinc-100 min-h-screen">
+    {{template "nav" .}}
+    <main class="max-w-[1600px] mx-auto px-4 py-6">
+        {{template "content" .}}
+    </main>
+</body>
+</html>
+{{end}}
+
+{{define "nav"}}
+<nav class="bg-zinc-900 border-b border-zinc-800 sticky top-0 z-50">
+    <div class="max-w-[1600px] mx-auto px-4">
+        <div class="flex items-center justify-between h-14">
+            <div class="flex items-center gap-6">
+                <a href="/dashboard/" class="text-sm font-bold text-zinc-100 tracking-tight">ClearBreath<span class="text-blue-400 ml-1">Logs</span></a>
+                <div class="flex items-center gap-1">
+                    <a href="/dashboard/" class="px-3 py-1.5 text-xs rounded-md transition-colors {{if eq .ActivePage "overview.html"}}bg-zinc-700 text-white{{else}}text-zinc-400 hover:text-white hover:bg-zinc-800{{end}}">Overview</a>
+                    <a href="/dashboard/logs" class="px-3 py-1.5 text-xs rounded-md transition-colors {{if eq .ActivePage "logs.html"}}bg-zinc-700 text-white{{else}}text-zinc-400 hover:text-white hover:bg-zinc-800{{end}}">Requests</a>
+                    <a href="/dashboard/errors" class="px-3 py-1.5 text-xs rounded-md transition-colors {{if eq .ActivePage "errors.html"}}bg-zinc-700 text-white{{else}}text-zinc-400 hover:text-white hover:bg-zinc-800{{end}}">Errors</a>
+                    <a href="/dashboard/auth-events" class="px-3 py-1.5 text-xs rounded-md transition-colors {{if eq .ActivePage "auth_events.html"}}bg-zinc-700 text-white{{else}}text-zinc-400 hover:text-white hover:bg-zinc-800{{end}}">Auth</a>
+                </div>
+            </div>
+            <div class="flex items-center gap-3">
+                <span class="text-xs text-zinc-500">admin</span>
+                <form method="POST" action="/dashboard/logout">
+                    <input type="hidden" name="_csrf" value="{{.CSRFToken}}">
+                    <button type="submit" class="text-xs text-zinc-500 hover:text-red-400 transition-colors">Logout</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</nav>
+{{end}}

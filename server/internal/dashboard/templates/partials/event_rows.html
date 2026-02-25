@@ -1,0 +1,43 @@
+{{define "event_rows.html"}}
+{{range .Events}}
+<tr class="border-b border-zinc-700/50 hover:bg-zinc-800/50 transition-colors">
+    <td class="px-3 py-2 text-xs text-zinc-400 whitespace-nowrap">{{formatDate .Timestamp}}</td>
+    <td class="px-3 py-2"><span class="px-1.5 py-0.5 text-xs font-bold rounded {{levelBadgeClass .Level}}">{{.Level}}</span></td>
+    <td class="px-3 py-2 text-xs text-zinc-300">{{.EventType}}</td>
+    <td class="px-3 py-2 text-sm text-zinc-200 max-w-md truncate" title="{{.Message}}">{{truncate .Message 80}}</td>
+    <td class="px-3 py-2 text-xs text-zinc-400">{{.Provider}}</td>
+    <td class="px-3 py-2 text-xs text-zinc-500 font-mono">{{.IPAddress}}</td>
+    <td class="px-3 py-2 text-xs text-zinc-500 font-mono">{{shortID .RequestID}}</td>
+</tr>
+{{else}}
+<tr>
+    <td colspan="7" class="px-3 py-8 text-center text-xs text-zinc-600">No events found</td>
+</tr>
+{{end}}
+
+{{if gt .Total 0}}
+<tr>
+    <td colspan="7" class="px-3 py-3 border-t border-zinc-800">
+        <div class="flex items-center justify-between">
+            <span class="text-xs text-zinc-500">
+                Page {{.Page}} of {{totalPages .Total .PerPage}} ({{.Total}} entries)
+            </span>
+            <div class="flex items-center gap-1">
+                {{if gt .Page 1}}
+                <button hx-get="/dashboard/api/events?page={{sub .Page 1}}"
+                    hx-target="#event-table-body"
+                    hx-include="#filter-event-type, #filter-search"
+                    class="px-2 py-1 text-xs bg-zinc-800 hover:bg-zinc-700 border border-zinc-700 rounded transition-colors">Prev</button>
+                {{end}}
+                {{if lt .Page (totalPages .Total .PerPage)}}
+                <button hx-get="/dashboard/api/events?page={{add .Page 1}}"
+                    hx-target="#event-table-body"
+                    hx-include="#filter-event-type, #filter-search"
+                    class="px-2 py-1 text-xs bg-zinc-800 hover:bg-zinc-700 border border-zinc-700 rounded transition-colors">Next</button>
+                {{end}}
+            </div>
+        </div>
+    </td>
+</tr>
+{{end}}
+{{end}}

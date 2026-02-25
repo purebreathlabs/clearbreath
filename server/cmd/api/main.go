@@ -19,7 +19,9 @@ import (
 	"github.com/clearbreath/server/internal/auth"
 	"github.com/clearbreath/server/internal/clock"
 	"github.com/clearbreath/server/internal/config"
+	"github.com/clearbreath/server/internal/dashboard"
 	"github.com/clearbreath/server/internal/handler"
+	"github.com/clearbreath/server/internal/logcollector"
 	"github.com/clearbreath/server/internal/middleware"
 	"github.com/clearbreath/server/internal/profanity"
 	"github.com/clearbreath/server/internal/repository"
@@ -82,6 +84,15 @@ func main() {
 	}
 	slog.Info("redis connected")
 
+	// Initialize log collector (if dashboard enabled)
+	var collector *logcollector.Collector
+	if cfg.DashboardEnabled {
+		collector = logcollector.New(pool)
+		go collector.Run(appCtx)
+		go collector.CleanupLoop(appCtx, 30)
+		slog.Info("log collector started")
+	}
+
 	store := repository.NewStore(pool)
 	clk := clock.RealClock{}
 
@@ -141,8 +152,8 @@ func main() {
 
 	r := chi.NewRouter()
 	r.Use(middleware.RequestID)
-	r.Use(middleware.Logger)
-	r.Use(middleware.PanicRecovery)
+	r.Use(middleware.LoggerWithCollector(collector))
+	r.Use(middleware.PanicRecoveryWithCollector(collector))
 	r.Use(middleware.CORS(cfg.CORSOrigins))
 
 	health := handler.NewHealthHandler(pool, redisPinger{rdb})
@@ -181,6 +192,33 @@ func main() {
 	r.With(leaderboardRateLimitMin).Get("/v1/leaderboard", leaderboardHandler.List)
 	r.With(middleware.Auth(accessTokens, store), leaderboardRateLimitMin).Get("/v1/leaderboard/self", leaderboardHandler.Self)
 
+	// Dashboard routes
+	if cfg.DashboardEnabled {
+		dash := dashboard.New(pool, rdb, collector.Broadcaster(), cfg)
+		r.Route("/dashboard", func(r chi.Router) {
+			r.Use(dashboard.HostCheck(cfg.DashboardHost, cfg.Env))
+			// Public routes
+			r.Get("/login", dash.LoginPage)
+			r.Post("/login", dash.LoginSubmit)
+			// Protected routes
+			r.Group(func(r chi.Router) {
+				r.Use(dash.RequireSession)
+				r.Get("/", dash.Overview)
+				r.Get("/logs", dash.LogsPage)
+				r.Get("/errors", dash.ErrorsPage)
+				r.Get("/auth-events", dash.AuthEventsPage)
+				r.Post("/logout", dash.Logout)
+				// HTMX API
+				r.Get("/api/logs", dash.LogsAPI)
+				r.Get("/api/events", dash.EventsAPI)
+				r.Get("/api/stats", dash.StatsAPI)
+				// SSE
+				r.Get("/sse/logs", dash.SSELogs)
+			})
+		})
+		slog.Info("dashboard enabled", "host", cfg.DashboardHost)
+	}
+
 	if err := leaderboardService.Refresh(appCtx); err != nil {
 		slog.Error("failed to refresh leaderboard", "error", err)
 	}
@@ -203,7 +241,7 @@ func main() {
 		Addr:         ":" + cfg.Port,
 		Handler:      r,
 		ReadTimeout:  10 * time.Second,
-		WriteTimeout: 10 * time.Second,
+		WriteTimeout: 0, // disabled for SSE; individual handlers manage deadlines
 		IdleTimeout:  120 * time.Second,
 	}
 

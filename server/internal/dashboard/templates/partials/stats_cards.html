@@ -1,0 +1,26 @@
+{{define "stats_cards.html"}}
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+    <div class="bg-zinc-900 border border-zinc-800 rounded-xl p-4">
+        <div class="text-xs text-zinc-500 mb-1">Total Requests</div>
+        <div class="text-2xl font-bold text-zinc-100">{{.Stats.TotalRequests24h}}</div>
+        <div class="text-xs text-zinc-600 mt-1">Last 24 hours</div>
+    </div>
+    <div class="bg-zinc-900 border border-zinc-800 rounded-xl p-4">
+        <div class="text-xs text-zinc-500 mb-1">Error Rate</div>
+        <div class="text-2xl font-bold {{if gt .Stats.ErrorCount24h 0}}text-red-400{{else}}text-emerald-400{{end}}">
+            {{errorRate .Stats.TotalRequests24h .Stats.ErrorCount24h}}%
+        </div>
+        <div class="text-xs text-zinc-600 mt-1">{{.Stats.ErrorCount24h}} errors</div>
+    </div>
+    <div class="bg-zinc-900 border border-zinc-800 rounded-xl p-4">
+        <div class="text-xs text-zinc-500 mb-1">Avg Response Time</div>
+        <div class="text-2xl font-bold text-zinc-100">{{printf "%.0f" .Stats.AvgDurationMs}}ms</div>
+        <div class="text-xs text-zinc-600 mt-1">Across all endpoints</div>
+    </div>
+    <div class="bg-zinc-900 border border-zinc-800 rounded-xl p-4">
+        <div class="text-xs text-zinc-500 mb-1">Unique IPs</div>
+        <div class="text-2xl font-bold text-zinc-100">{{.Stats.UniqueIPs24h}}</div>
+        <div class="text-xs text-zinc-600 mt-1">Distinct clients</div>
+    </div>
+</div>
+{{end}}

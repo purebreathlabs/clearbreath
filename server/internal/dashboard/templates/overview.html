@@ -1,0 +1,134 @@
+{{define "overview.html"}}
+{{template "layout" .}}
+{{end}}
+
+{{define "content"}}
+<div class="space-y-6">
+    <div class="flex items-center justify-between">
+        <h1 class="text-lg font-bold">Dashboard Overview</h1>
+        <span class="text-xs text-zinc-500">Last 24 hours</span>
+    </div>
+
+    <!-- Stats Cards -->
+    <div id="stats-cards" hx-get="/dashboard/api/stats" hx-trigger="every 30s" hx-swap="innerHTML">
+        {{template "stats_cards.html" .}}
+    </div>
+
+    <!-- Recent Errors -->
+    <div class="bg-zinc-900 border border-zinc-800 rounded-xl overflow-hidden">
+        <div class="px-4 py-3 border-b border-zinc-800 flex items-center justify-between">
+            <h2 class="text-sm font-medium">Recent Errors</h2>
+            <a href="/dashboard/errors" class="text-xs text-blue-400 hover:text-blue-300 transition-colors">View all</a>
+        </div>
+        <div class="overflow-x-auto scrollbar-thin">
+            <table class="w-full text-left">
+                <thead>
+                    <tr class="border-b border-zinc-800 text-xs text-zinc-500 uppercase tracking-wider">
+                        <th class="px-3 py-2 font-medium">Time</th>
+                        <th class="px-3 py-2 font-medium">Method</th>
+                        <th class="px-3 py-2 font-medium">Path</th>
+                        <th class="px-3 py-2 font-medium">Status</th>
+                        <th class="px-3 py-2 font-medium">Duration</th>
+                        <th class="px-3 py-2 font-medium">IP</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {{range .RecentErrors}}
+                    <tr class="border-b border-zinc-700/50 hover:bg-zinc-800/50 transition-colors">
+                        <td class="px-3 py-2 text-xs text-zinc-400 whitespace-nowrap">{{formatDate .Timestamp}}</td>
+                        <td class="px-3 py-2"><span class="px-1.5 py-0.5 text-xs font-medium rounded {{methodBadgeClass .Method}}">{{.Method}}</span></td>
+                        <td class="px-3 py-2 text-sm text-zinc-200 font-mono max-w-xs truncate" title="{{.Path}}">{{truncate .Path 50}}</td>
+                        <td class="px-3 py-2"><span class="px-1.5 py-0.5 text-xs font-bold rounded {{statusBadgeClass .StatusCode}}">{{.StatusCode}}</span></td>
+                        <td class="px-3 py-2 text-xs text-zinc-400">{{printf "%.1f" .DurationMs}}ms</td>
+                        <td class="px-3 py-2 text-xs text-zinc-500 font-mono">{{.IPAddress}}</td>
+                    </tr>
+                    {{else}}
+                    <tr>
+                        <td colspan="6" class="px-3 py-8 text-center text-xs text-zinc-600">No errors in the last 24 hours</td>
+                    </tr>
+                    {{end}}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Live Stream -->
+    <div class="bg-zinc-900 border border-zinc-800 rounded-xl overflow-hidden">
+        <div class="px-4 py-3 border-b border-zinc-800 flex items-center justify-between">
+            <div class="flex items-center gap-2">
+                <h2 class="text-sm font-medium">Live Stream</h2>
+                <span id="sse-status" class="flex items-center gap-1 text-xs text-zinc-500">
+                    <span class="w-1.5 h-1.5 rounded-full bg-zinc-600" id="sse-dot"></span>
+                    <span id="sse-label">Paused</span>
+                </span>
+            </div>
+            <button id="sse-toggle" onclick="toggleSSE()" class="px-2 py-1 text-xs bg-zinc-800 hover:bg-zinc-700 border border-zinc-700 rounded transition-colors">
+                Start Live
+            </button>
+        </div>
+        <div class="overflow-x-auto scrollbar-thin max-h-96">
+            <table class="w-full text-left">
+                <thead class="sticky top-0 bg-zinc-900">
+                    <tr class="border-b border-zinc-800 text-xs text-zinc-500 uppercase tracking-wider">
+                        <th class="px-3 py-2 font-medium">Time</th>
+                        <th class="px-3 py-2 font-medium">Method</th>
+                        <th class="px-3 py-2 font-medium">Path</th>
+                        <th class="px-3 py-2 font-medium">Status</th>
+                        <th class="px-3 py-2 font-medium">Duration</th>
+                        <th class="px-3 py-2 font-medium">IP</th>
+                        <th class="px-3 py-2 font-medium">Req ID</th>
+                        <th class="px-3 py-2 font-medium">User</th>
+                    </tr>
+                </thead>
+                <tbody id="live-stream-body">
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script>
+let sseSource = null;
+function toggleSSE() {
+    const btn = document.getElementById('sse-toggle');
+    const dot = document.getElementById('sse-dot');
+    const label = document.getElementById('sse-label');
+
+    if (sseSource) {
+        sseSource.close();
+        sseSource = null;
+        btn.textContent = 'Start Live';
+        dot.className = 'w-1.5 h-1.5 rounded-full bg-zinc-600';
+        label.textContent = 'Paused';
+        return;
+    }
+
+    sseSource = new EventSource('/dashboard/sse/logs');
+    btn.textContent = 'Stop Live';
+    dot.className = 'w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse';
+    label.textContent = 'Connected';
+
+    sseSource.addEventListener('request-log', function(e) {
+        const tbody = document.getElementById('live-stream-body');
+        tbody.insertAdjacentHTML('afterbegin', e.data);
+        while (tbody.children.length > 200) {
+            tbody.removeChild(tbody.lastChild);
+        }
+    });
+
+    sseSource.addEventListener('event-log', function(e) {
+        // event logs appear in the live stream too
+    });
+
+    sseSource.onerror = function() {
+        dot.className = 'w-1.5 h-1.5 rounded-full bg-red-400';
+        label.textContent = 'Reconnecting...';
+    };
+
+    sseSource.onopen = function() {
+        dot.className = 'w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse';
+        label.textContent = 'Connected';
+    };
+}
+</script>
+{{end}}
