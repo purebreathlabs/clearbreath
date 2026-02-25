@@ -7,6 +7,7 @@ import '../../../core/network/api_error.dart';
 import '../../../core/theme/theme_extensions.dart';
 import '../../auth/domain/auth_state.dart';
 import '../../auth/domain/auth_state_provider.dart';
+import '../../notifications/domain/notification_service.dart';
 import '../../../shared/widgets/selection_pill.dart';
 import '../domain/settings_controller.dart';
 
@@ -349,6 +350,16 @@ class SettingsScreen extends ConsumerWidget {
                     title: const Text('Disclaimer'),
                     trailing: const Icon(Icons.chevron_right_rounded),
                     onTap: () => context.push('/profile/legal/disclaimer'),
+                  ),
+                ]),
+                SizedBox(height: spacing.xl),
+                section('Developer', [
+                  ListTile(
+                    leading: const Icon(Icons.notifications_active_outlined),
+                    title: const Text('Test notification'),
+                    subtitle: const Text('Fire an immediate notification.'),
+                    onTap: () =>
+                        ref.read(notificationServiceProvider).showTest(),
                   ),
                 ]),
               ],
