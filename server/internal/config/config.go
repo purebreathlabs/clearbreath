@@ -30,6 +30,11 @@ type Config struct {
 	DevAuthEnabled           bool
 	DevAuthSecret            string
 	LeaderboardDailyCapMin   int
+	DashboardEnabled         bool
+	DashboardHost            string
+	DashboardUsername        string
+	DashboardPasswordHash    string
+	DashboardSessionSecret   string
 }
 
 func Load() (*Config, error) {
@@ -66,6 +71,7 @@ func Load() (*Config, error) {
 	if err != nil {
 		return nil, fmt.Errorf("parse LEADERBOARD_DAILY_CAP_MINUTES: %w", err)
 	}
+	dashboardEnabled := envBoolOrDefault("DASHBOARD_ENABLED", false)
 
 	cfg := &Config{
 		Port:                     envOrDefault("PORT", "8080"),
@@ -88,6 +94,11 @@ func Load() (*Config, error) {
 		DevAuthEnabled:           devAuthEnabled,
 		DevAuthSecret:            os.Getenv("DEV_AUTH_SECRET"),
 		LeaderboardDailyCapMin:   leaderboardDailyCapMin,
+		DashboardEnabled:         dashboardEnabled,
+		DashboardHost:            os.Getenv("DASHBOARD_HOST"),
+		DashboardUsername:        os.Getenv("DASHBOARD_USERNAME"),
+		DashboardPasswordHash:    os.Getenv("DASHBOARD_PASSWORD_HASH"),
+		DashboardSessionSecret:   os.Getenv("DASHBOARD_SESSION_SECRET"),
 	}
 
 	if err := cfg.Validate(); err != nil {
@@ -198,6 +209,20 @@ func (c *Config) Validate() error {
 	}
 	if c.DevAuthEnabled && strings.TrimSpace(c.DevAuthSecret) == "" {
 		return fmt.Errorf("DEV_AUTH_SECRET is required when DEV_AUTH_ENABLED is true")
+	}
+	if c.DashboardEnabled {
+		if strings.TrimSpace(c.DashboardUsername) == "" {
+			return fmt.Errorf("DASHBOARD_USERNAME is required when DASHBOARD_ENABLED is true")
+		}
+		if strings.TrimSpace(c.DashboardPasswordHash) == "" {
+			return fmt.Errorf("DASHBOARD_PASSWORD_HASH is required when DASHBOARD_ENABLED is true")
+		}
+		if strings.TrimSpace(c.DashboardSessionSecret) == "" {
+			return fmt.Errorf("DASHBOARD_SESSION_SECRET is required when DASHBOARD_ENABLED is true")
+		}
+		if len(c.DashboardSessionSecret) < 32 {
+			return fmt.Errorf("DASHBOARD_SESSION_SECRET must be at least 32 chars")
+		}
 	}
 	if c.Env != "development" {
 		if strings.TrimSpace(c.GoogleOAuthClientID) == "" {
