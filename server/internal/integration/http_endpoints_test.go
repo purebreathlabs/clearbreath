@@ -192,6 +192,9 @@ func TestHTTPAPIContractSmoke(t *testing.T) {
 	if envPath, _ := resolveExistingFilePath(".env", "../../.env"); envPath != "" {
 		_ = godotenv.Load(envPath)
 	}
+	setBaseIntegrationEnv(t)
+	t.Setenv("GOOGLE_OAUTH_CLIENT_ID", "")
+	t.Setenv("APPLE_OAUTH_AUDIENCE", "")
 	if p := os.Getenv("TECHNIQUE_REGISTRY_PATH"); p == "" || !fileExists(p) {
 		registryPath, err := resolveExistingFilePath("registry/techniques.json", "../../registry/techniques.json")
 		if err != nil {

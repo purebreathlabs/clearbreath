@@ -29,6 +29,7 @@ func TestLeaderboardListRanksAreContiguousAfterFiltering(t *testing.T) {
 	if envPath, _ := resolveExistingFilePath(".env", "../../.env"); envPath != "" {
 		_ = godotenv.Load(envPath)
 	}
+	setBaseIntegrationEnv(t)
 	if p := os.Getenv("TECHNIQUE_REGISTRY_PATH"); p == "" || !fileExists(p) {
 		registryPath, err := resolveExistingFilePath("registry/techniques.json", "../../registry/techniques.json")
 		if err != nil {
