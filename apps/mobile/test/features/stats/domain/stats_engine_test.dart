@@ -1,5 +1,6 @@
 import 'package:clearbreath/features/session/domain/local_session.dart';
 import 'package:clearbreath/features/stats/domain/stats_engine.dart';
+import 'package:clearbreath/features/xp/domain/xp_engine.dart' as xp;
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
@@ -66,6 +67,8 @@ void main() {
     expect(snapshot.minutesByTechnique['box'], equals(7));
     expect(snapshot.minutesByTechnique['four_seven_eight'], equals(10));
     expect(snapshot.favoriteTechniqueId, equals('four_seven_eight'));
+    expect(snapshot.totalXP, equals(170));
+    expect(snapshot.currentLevel, equals(xp.levelFromTotalXP(170)));
   });
 
   test('computes weekly minutes with Monday start', () {
@@ -109,6 +112,24 @@ void main() {
     expect(snapshot.minutesThisWeek, equals(7));
   });
 
+  test('caps practice XP per local day', () {
+    final sessions = List.generate(
+      7,
+      (i) => buildSession(
+        id: 's$i',
+        techniqueId: 'box',
+        startedAtUtc: DateTime.utc(2026, 2, 22, 10, i),
+        timezoneOffsetMinutes: 0,
+        durationSecondsActual: 600,
+        breathsCompletedEstimated: 1,
+      ),
+    );
+
+    final snapshot = computeStats(sessions, DateTime.utc(2026, 2, 25, 12), 0);
+
+    expect(snapshot.totalXP, equals(xp.dailyPracticeXPCap));
+  });
+
   test('favorite technique is deterministic on ties', () {
     final sessions = [
       buildSession(
@@ -150,5 +171,7 @@ void main() {
 
     expect(snapshot.currentStreakDays, equals(1));
     expect(snapshot.longestStreakDays, equals(1));
+    expect(snapshot.totalXP, equals(22));
+    expect(snapshot.currentLevel, equals(1));
   });
 }
