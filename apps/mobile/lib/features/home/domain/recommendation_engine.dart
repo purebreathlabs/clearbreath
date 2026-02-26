@@ -8,6 +8,7 @@ import '../../onboarding/domain/onboarding_answers_provider.dart';
 import '../../techniques/data/technique_repository.dart';
 import '../../techniques/domain/technique.dart';
 import '../../techniques/domain/technique_preset.dart';
+import '../../xp/domain/xp_provider.dart';
 
 enum DayPart { morning, afternoon, evening, night }
 
@@ -49,6 +50,7 @@ final dailyRecommendationProvider = FutureProvider<Recommendation>((ref) async {
   final engine = ref.watch(recommendationEngineProvider);
   final answers = await ref.watch(onboardingAnswersProvider.future);
   final techniques = await ref.watch(allTechniquesProvider.future);
+  final xp = await ref.watch(mergedXPProvider.future);
 
   final goal = _selectGoal(answers.primaryGoals);
 
@@ -56,7 +58,7 @@ final dailyRecommendationProvider = FutureProvider<Recommendation>((ref) async {
   return engine.recommend(
     goal: goal,
     dayPart: dayPart,
-    experienceLevel: answers.experienceLevel,
+    presetId: xp.presetId,
     techniques: techniques,
   );
 });
@@ -76,7 +78,7 @@ class RecommendationEngine {
   Future<Recommendation> recommend({
     required PrimaryGoal goal,
     required DayPart dayPart,
-    required ExperienceLevel experienceLevel,
+    required String presetId,
     required List<Technique> techniques,
   }) async {
     final map = await _load();
@@ -93,7 +95,6 @@ class RecommendationEngine {
       throw FormatException('Unknown techniqueId: ${spec.techniqueId}');
     }
 
-    final presetId = experienceLevel.name;
     final preset = technique.presets[presetId] ?? technique.presets['beginner'];
     if (preset == null) {
       throw FormatException(

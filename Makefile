@@ -1,4 +1,4 @@
-.PHONY: server-dev server-build server-docker-build server-lint server-test server-test-ci server-test-integration server-coverage server-fmt-check server-sqlc \
+.PHONY: server-dev server-build server-docker-build server-lint server-test server-test-ci server-test-integration server-coverage server-fmt-check server-sqlc db-wipe \
        mobile-run mobile-build apk apk-arm64 mobile-analyze mobile-get mobile-pub-add mobile-gen mobile-icons mobile-fmt mobile-fmt-check mobile-test \
        fmt-check \
        web-dev web-build \
@@ -114,6 +114,12 @@ db-migrate-status:
 db-migrate-new:
 	if [ -z "$$NAME" ]; then echo "NAME is required"; exit 1; fi
 	$(GOOSE) -dir server/migrations create "$$NAME" sql
+
+db-wipe:
+	@echo "Wiping all data (development only)..."
+	PGPASSWORD=clearbreath $(PSQL) -h localhost -p 5433 -U clearbreath -d clearbreath \
+		-c "TRUNCATE users, auth_identities, refresh_tokens, sessions, stats_snapshots, safety_acknowledgements, xp_events, user_progress, request_logs, event_logs CASCADE;"
+	@echo "Done."
 
 sqlc-generate: server-sqlc
 

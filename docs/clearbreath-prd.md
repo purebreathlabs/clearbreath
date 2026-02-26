@@ -358,14 +358,13 @@ ClearBreath uses four bottom tabs: Home, Techniques, Leaderboard, Profile. The L
 
 1. User downloads ClearBreath from App Store / Play Store → App opens
 2. Splash screen with subtle scale-in logo animation
-3. Seven-question onboarding (one question per screen, <2 minutes total):
-   - Experience level (Beginner/Intermediate/Advanced)
+3. Five-question onboarding (one question per screen, <2 minutes total):
    - Primary goal (Calm, Sleep, Focus, Energy, HRV, Spiritual)
    - Typical practice window (Morning/Afternoon/Evening/Varies)
-   - Typical session length (2/5/10/20 min)
    - Haptics preference (On/Off)
-   - Keep-screen-awake preference (On/Off)
    - Daily reminder preferred time
+   - Display name
+   (Experience level and session length are now auto-managed by the XP level system)
 4. Home screen loads with Today’s Practice card and one primary Start button
 5. User can start breathing immediately — zero sign-up required
 6. All session data stored locally (Drift/SQLite) until they choose to sign in
@@ -375,7 +374,7 @@ ClearBreath uses four bottom tabs: Home, Techniques, Leaderboard, Profile. The L
 
 1. Open ClearBreath → Home tab
 2. Today’s Practice recommendation based on:
-   - Experience level and goal
+   - Preset ID derived from XP level (beginner/intermediate/advanced) and goal
    - Daypart (Morning 5–11, Afternoon 11–17, Evening 17–22, Night 22–5)
 3. Start from Today’s Practice, goal shortcuts, or favorites
 4. Browse Techniques tab to explore the full library
@@ -465,9 +464,9 @@ Each technique has a short educational card accessible from the library:
 
 - **Access:** Leaderboard tab is visible for all users. Guests see a locked state with a sign-in gate.
 - **Eligibility:** Sign-in required. Under-13 users are blocked from sign-in and leaderboard participation, but guest mode remains fully usable.
-- **Views:** Current streak (default), Weekly minutes, All-time minutes.
+- **View:** Single XP ranking (total_xp with computed level). Replaced the previous streak/weekly/all-time views.
 - **Display rules:**
-  - Top 50 list
+  - Top 50 list, each row shows rank, display name, level, total XP
   - User’s own rank pinned even outside top 50
   - Display name or initials based on user preference
 - **Privacy defaults:**
@@ -608,7 +607,7 @@ Every session gets a `client_session_id` (UUID v4, generated on device at sessio
 
 - 4-tab shell: Home, Techniques, Leaderboard (locked for guests), Profile
 - Strict black/white theme, Manrope typography, splash scale-in logo
-- Onboarding: exactly 7 questions, one per screen; notification permission only after first completed session
+- Onboarding: exactly 5 questions, one per screen; notification permission only after first completed session
 - Technique library (9 techniques at launch; 2 planned additions) with detail screens and one-time safety gates
 - Session engine: countdown, phase scheduler, pause/resume, end early, slow/rapid visuals, phase-start cues, in-session volume + mute
 - Background continuation + lock-screen controls + interruption handling
@@ -620,7 +619,8 @@ Every session gets a `client_session_id` (UUID v4, generated on device at sessio
 
 - Auth: Apple/Google verification, access/refresh token lifecycle and rotation
 - Sessions: ingest, validate, dedupe, aggregate, stats snapshot
-- Leaderboard: streak/weekly/all-time views, top 50 + pinned self rank, opt-out visibility + initials-only preference
+- Leaderboard: single XP ranking, top 50 + pinned self rank, opt-out visibility + initials-only preference
+- XP system: 10 XP/min, daily 300 XP practice cap, streak multiplier (up to 3.0x), daily login bonus (5 XP), levels 0-999 with auto-managed pace/duration
 - 5-minute refresh cadence with Redis caching and anti-cheat baseline
 
 **Website (Astro):**

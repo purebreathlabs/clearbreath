@@ -85,7 +85,7 @@ void main() {
           ),
           localStatsProvider.overrideWith((ref) async => snapshot),
           weeklyMinutesProvider.overrideWith(
-            (ref) async => const [0, 1, 2, 3, 4, 5, 6],
+            (ref, weekOffset) async => const [0, 1, 2, 3, 4, 5, 6],
           ),
           allTechniquesProvider.overrideWith((ref) async => [technique]),
         ],

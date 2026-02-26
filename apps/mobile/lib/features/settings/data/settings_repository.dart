@@ -16,17 +16,6 @@ class SettingsRepository {
 
   final AppDatabase _db;
 
-  Future<void> setSessionLengthMinutes(int minutes) async {
-    await _db
-        .into(_db.preferences)
-        .insertOnConflictUpdate(
-          PreferencesCompanion(
-            id: const Value(_rowId),
-            sessionLengthMinutes: Value(minutes),
-          ),
-        );
-  }
-
   Future<void> setHapticsEnabled(bool value) async {
     await _db
         .into(_db.preferences)

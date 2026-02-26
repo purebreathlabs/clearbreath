@@ -2,19 +2,16 @@ import 'package:flutter/material.dart';
 
 import '../../../../core/theme/theme_extensions.dart';
 import '../../domain/leaderboard_entry.dart';
-import '../../domain/leaderboard_ranking.dart';
 import 'seeded_avatar.dart';
 
 class SelfRankCard extends StatelessWidget {
   const SelfRankCard({
     super.key,
     required this.entry,
-    required this.ranking,
     required this.loading,
   });
 
   final LeaderboardEntry? entry;
-  final LeaderboardRanking ranking;
   final bool loading;
 
   @override
@@ -29,8 +26,9 @@ class SelfRankCard extends StatelessWidget {
         ? 'Loading...'
         : (rankValue == null ? 'Not ranked yet' : '#$rankValue');
 
-    final metricValue = entry?.metricValue ?? 0;
-    final metricLabel = '$metricValue ${ranking.metricLabel()}';
+    final xpValue = entry?.totalXp ?? 0;
+    final metricLabel = '$xpValue XP';
+    final levelLabel = 'Level ${entry?.level ?? 0}';
 
     return Container(
       key: const Key('self_rank_card'),
@@ -56,7 +54,7 @@ class SelfRankCard extends StatelessWidget {
                 ),
                 SizedBox(height: spacing.xs),
                 Text(
-                  rankLabel,
+                  '$rankLabel · $levelLabel',
                   style: typography.bodyMedium.copyWith(
                     color: colors.textSecondary,
                   ),

@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"net/http"
 	"strings"
 	"time"
 	"unicode"
@@ -12,17 +11,17 @@ import (
 	"github.com/google/uuid"
 	"github.com/redis/go-redis/v9"
 
-	"github.com/clearbreath/server/internal/apierr"
 	"github.com/clearbreath/server/internal/clock"
 	"github.com/clearbreath/server/internal/repository"
 	"github.com/clearbreath/server/internal/repository/sqlcgen"
+	"github.com/clearbreath/server/internal/service/xp"
 )
 
 type Service struct {
-	store        *repository.Store
-	redis        redisOps
-	clock        clock.Clock
-	dailyCapMins int64
+	store *repository.Store
+	redis redisOps
+	clock clock.Clock
+	xp    *xp.Service
 }
 
 type redisOps interface {
@@ -62,19 +61,24 @@ func (r redisClientOps) ZScore(ctx context.Context, key string, member string) (
 	return r.c.ZScore(ctx, key, member).Result()
 }
 
+// Ranking type kept for API backward compatibility. All values map to XP.
 type Ranking string
 
 const (
+	RankingXP      Ranking = "xp"
 	RankingStreak  Ranking = "streak"
 	RankingWeekly  Ranking = "weekly"
 	RankingAllTime Ranking = "all_time"
 )
 
+const redisKey = "lb:xp"
+
 type Row struct {
 	Rank                  int    `json:"rank"`
 	DisplayNameOrInitials string `json:"display_name_or_initials"`
 	AvatarSeed            string `json:"avatar_seed"`
-	MetricValue           int64  `json:"metric_value"`
+	TotalXP               int64  `json:"total_xp"`
+	Level                 int32  `json:"level"`
 	UserID                string `json:"user_id"`
 }
 
@@ -90,11 +94,12 @@ type SelfResponse struct {
 }
 
 type SelfRank struct {
-	Rank        *int  `json:"rank"`
-	MetricValue int64 `json:"metric_value"`
+	Rank    *int  `json:"rank"`
+	TotalXP int64 `json:"total_xp"`
+	Level   int32 `json:"level"`
 }
 
-func NewService(store *repository.Store, rdb *redis.Client, clk clock.Clock, dailyCapMinutes int) (*Service, error) {
+func NewService(store *repository.Store, rdb *redis.Client, clk clock.Clock, xpSvc *xp.Service) (*Service, error) {
 	if store == nil {
 		return nil, fmt.Errorf("store is required")
 	}
@@ -104,85 +109,51 @@ func NewService(store *repository.Store, rdb *redis.Client, clk clock.Clock, dai
 	if clk == nil {
 		return nil, fmt.Errorf("clock is required")
 	}
-	if dailyCapMinutes <= 0 {
-		return nil, fmt.Errorf("daily cap must be positive")
+	if xpSvc == nil {
+		return nil, fmt.Errorf("xp service is required")
 	}
 
 	return &Service{
-		store:        store,
-		redis:        redisClientOps{c: rdb},
-		clock:        clk,
-		dailyCapMins: int64(dailyCapMinutes),
+		store: store,
+		redis: redisClientOps{c: rdb},
+		clock: clk,
+		xp:    xpSvc,
 	}, nil
 }
 
 func (s *Service) Refresh(ctx context.Context) error {
-	now := s.clock.Now().UTC()
-
-	streak, err := s.store.Queries().GetLeaderboardStreakMetrics(ctx)
+	rows, err := s.store.Queries().GetLeaderboardXPMetrics(ctx)
 	if err != nil {
-		return fmt.Errorf("get streak metrics: %w", err)
-	}
-	if err := s.writeZSet(ctx, "lb:streak", streak); err != nil {
-		return fmt.Errorf("write streak zset: %w", err)
+		return fmt.Errorf("get xp metrics: %w", err)
 	}
 
-	weekly, err := s.store.Queries().GetLeaderboardWeeklyMinutesMetrics(ctx, sqlcgen.GetLeaderboardWeeklyMinutesMetricsParams{
-		Column1: now,
-		Column2: s.dailyCapMins,
-	})
-	if err != nil {
-		return fmt.Errorf("get weekly metrics: %w", err)
-	}
-	if err := s.writeZSet(ctx, "lb:weekly", weekly); err != nil {
-		return fmt.Errorf("write weekly zset: %w", err)
+	if err := s.writeZSet(ctx, redisKey, rows); err != nil {
+		return fmt.Errorf("write xp zset: %w", err)
 	}
 
-	allTime, err := s.store.Queries().GetLeaderboardAllTimeMinutesMetrics(ctx, s.dailyCapMins)
-	if err != nil {
-		return fmt.Errorf("get all_time metrics: %w", err)
-	}
-	if err := s.writeZSet(ctx, "lb:all_time", allTime); err != nil {
-		return fmt.Errorf("write all_time zset: %w", err)
-	}
+	// Clean up old ranking keys
+	_ = s.redis.Del(ctx, "lb:streak", "lb:weekly", "lb:all_time")
 
 	return nil
 }
 
-func (s *Service) writeZSet(ctx context.Context, key string, rows any) error {
+func (s *Service) writeZSet(ctx context.Context, key string, rows []sqlcgen.GetLeaderboardXPMetricsRow) error {
 	tmp := key + ":tmp"
 
 	if err := s.redis.Del(ctx, tmp); err != nil {
 		return err
 	}
 
-	var zs []redis.Z
-
-	switch v := rows.(type) {
-	case []sqlcgen.GetLeaderboardStreakMetricsRow:
-		zs = make([]redis.Z, 0, len(v))
-		for _, r := range v {
-			zs = append(zs, redis.Z{Score: float64(r.MetricValue), Member: r.UserID.String()})
-		}
-	case []sqlcgen.GetLeaderboardWeeklyMinutesMetricsRow:
-		zs = make([]redis.Z, 0, len(v))
-		for _, r := range v {
-			zs = append(zs, redis.Z{Score: float64(r.MetricValue), Member: r.UserID.String()})
-		}
-	case []sqlcgen.GetLeaderboardAllTimeMinutesMetricsRow:
-		zs = make([]redis.Z, 0, len(v))
-		for _, r := range v {
-			zs = append(zs, redis.Z{Score: float64(r.MetricValue), Member: r.UserID.String()})
-		}
-	default:
-		return fmt.Errorf("unsupported rows type")
-	}
-
-	if len(zs) == 0 {
+	if len(rows) == 0 {
 		if err := s.redis.Del(ctx, key); err != nil {
 			return err
 		}
 		return nil
+	}
+
+	zs := make([]redis.Z, 0, len(rows))
+	for _, r := range rows {
+		zs = append(zs, redis.Z{Score: float64(r.TotalXp), Member: r.UserID.String()})
 	}
 
 	if err := s.redis.ZAdd(ctx, tmp, zs...); err != nil {
@@ -200,22 +171,18 @@ func (s *Service) writeZSet(ctx context.Context, key string, rows any) error {
 }
 
 func (s *Service) List(ctx context.Context, ranking Ranking, limit int) (ListResponse, error) {
-	r, err := parseRanking(ranking)
-	if err != nil {
-		return ListResponse{}, err
-	}
+	_ = normalizeRanking(ranking) // all rankings map to xp
 	if limit <= 0 || limit > 50 {
 		limit = 50
 	}
 
-	key := rankingKey(r)
-	zs, err := s.redis.ZRevRangeWithScores(ctx, key, 0, int64(limit-1))
+	zs, err := s.redis.ZRevRangeWithScores(ctx, redisKey, 0, int64(limit-1))
 	if err != nil {
 		return ListResponse{}, fmt.Errorf("redis zrevrange: %w", err)
 	}
 
 	ids := make([]uuid.UUID, 0, len(zs))
-	metrics := make([]int64, 0, len(zs))
+	totalXPs := make([]int64, 0, len(zs))
 	for _, z := range zs {
 		sid, ok := z.Member.(string)
 		if !ok {
@@ -226,7 +193,7 @@ func (s *Service) List(ctx context.Context, ranking Ranking, limit int) (ListRes
 			continue
 		}
 		ids = append(ids, id)
-		metrics = append(metrics, int64(z.Score))
+		totalXPs = append(totalXPs, int64(z.Score))
 	}
 
 	users, err := s.store.Queries().GetUsersByIDs(ctx, ids)
@@ -249,36 +216,35 @@ func (s *Service) List(ctx context.Context, ranking Ranking, limit int) (ListRes
 		if u.LeaderboardInitialsOnly {
 			name = initials(name)
 		}
+		totalXP := totalXPs[i]
+		level := s.xp.LevelFromTotalXP(totalXP)
 		top = append(top, Row{
 			Rank:                  rank,
 			DisplayNameOrInitials: name,
 			AvatarSeed:            u.AvatarSeed,
-			MetricValue:           metrics[i],
+			TotalXP:               totalXP,
+			Level:                 level,
 			UserID:                id.String(),
 		})
 		rank++
 	}
 
 	return ListResponse{
-		Ranking:        r,
+		Ranking:        RankingXP,
 		GeneratedAtUTC: s.clock.Now().UTC().Format(time.RFC3339),
 		Top:            top,
 	}, nil
 }
 
 func (s *Service) Self(ctx context.Context, userID uuid.UUID, ranking Ranking) (SelfResponse, error) {
-	r, err := parseRanking(ranking)
-	if err != nil {
-		return SelfResponse{}, err
-	}
+	_ = normalizeRanking(ranking)
 
-	key := rankingKey(r)
-	rankRes, rankErr := s.redis.ZRevRank(ctx, key, userID.String())
+	rankRes, rankErr := s.redis.ZRevRank(ctx, redisKey, userID.String())
 	if rankErr != nil && !errors.Is(rankErr, redis.Nil) {
 		return SelfResponse{}, fmt.Errorf("redis rank: %w", rankErr)
 	}
 
-	scoreRes, scoreErr := s.redis.ZScore(ctx, key, userID.String())
+	scoreRes, scoreErr := s.redis.ZScore(ctx, redisKey, userID.String())
 	if scoreErr != nil && !errors.Is(scoreErr, redis.Nil) {
 		return SelfResponse{}, fmt.Errorf("redis score: %w", scoreErr)
 	}
@@ -289,37 +255,22 @@ func (s *Service) Self(ctx context.Context, userID uuid.UUID, ranking Ranking) (
 		rank = &v
 	}
 
-	metric := int64(scoreRes)
+	totalXP := int64(scoreRes)
+	level := s.xp.LevelFromTotalXP(totalXP)
 
 	return SelfResponse{
-		Ranking: r,
+		Ranking: RankingXP,
 		User: &SelfRank{
-			Rank:        rank,
-			MetricValue: metric,
+			Rank:    rank,
+			TotalXP: totalXP,
+			Level:   level,
 		},
 	}, nil
 }
 
-func parseRanking(r Ranking) (Ranking, error) {
-	switch r {
-	case RankingStreak, RankingWeekly, RankingAllTime:
-		return r, nil
-	default:
-		return "", apierr.New(http.StatusBadRequest, "validation", "invalid ranking")
-	}
-}
-
-func rankingKey(r Ranking) string {
-	switch r {
-	case RankingStreak:
-		return "lb:streak"
-	case RankingWeekly:
-		return "lb:weekly"
-	case RankingAllTime:
-		return "lb:all_time"
-	default:
-		return "lb:streak"
-	}
+// normalizeRanking maps any ranking value to xp (for backward compat).
+func normalizeRanking(r Ranking) Ranking {
+	return RankingXP
 }
 
 func initials(name string) string {
@@ -351,7 +302,7 @@ func initials(name string) string {
 	}
 
 	first := []rune(parts[0])
-	if len(parts) == 0 || len(first) == 0 {
+	if len(first) == 0 {
 		return "U"
 	}
 

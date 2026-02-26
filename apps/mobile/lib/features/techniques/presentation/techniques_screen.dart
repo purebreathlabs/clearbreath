@@ -3,11 +3,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../core/theme/theme_extensions.dart';
-import '../../../shared/providers/preferences_provider.dart';
 import '../../../shared/utils/category_colors.dart';
 import '../../../shared/widgets/brand_mark.dart';
 import '../../onboarding/domain/onboarding_answers.dart';
 import '../../session/domain/active_session_config.dart';
+import '../../xp/domain/xp_provider.dart';
 import '../data/technique_repository.dart';
 import '../domain/favorites_provider.dart';
 import '../domain/favorites_repository.dart';
@@ -75,15 +75,15 @@ class TechniquesScreen extends ConsumerWidget {
           }
         }
 
-        final prefs = ref.read(preferencesProvider);
-        final presetId = prefs.asData?.value?.experienceLevel ?? 'beginner';
+        final xp = ref.read(mergedXPProvider).asData?.value;
+        final presetId = xp?.presetId ?? 'beginner';
         final preset =
             technique.presets[presetId] ??
             technique.presets['beginner'] ??
             technique.presets.values.firstOrNull;
         if (preset == null) return;
 
-        final durationMinutes = prefs.asData?.value?.sessionLengthMinutes ?? 5;
+        final durationMinutes = xp?.durationMinutes ?? 2;
         final durationLimitSeconds = preset is BpmRoundsPreset
             ? preset.naturalDurationSeconds
             : durationMinutes * 60;

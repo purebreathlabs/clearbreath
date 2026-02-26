@@ -30,6 +30,7 @@ import (
 	sessionsvc "github.com/clearbreath/server/internal/service/session"
 	statssvc "github.com/clearbreath/server/internal/service/stats"
 	usersvc "github.com/clearbreath/server/internal/service/user"
+	xpsvc "github.com/clearbreath/server/internal/service/xp"
 	"github.com/clearbreath/server/internal/technique"
 )
 
@@ -85,7 +86,14 @@ type ingestHTTPResponse struct {
 		SessionsAllTime    int32            `json:"sessions_all_time"`
 		MinutesByTechnique map[string]int32 `json:"minutes_by_technique"`
 		UpdatedAtUTC       string           `json:"updated_at_utc"`
+		TotalXP            int64            `json:"total_xp"`
+		CurrentLevel       int32            `json:"current_level"`
 	} `json:"stats_snapshot"`
+	TotalXP      int64 `json:"total_xp"`
+	CurrentLevel int32 `json:"current_level"`
+	XPAwards     []struct {
+		Amount int32 `json:"amount"`
+	} `json:"xp_awards"`
 }
 
 type statsHTTPResponse struct {
@@ -250,12 +258,14 @@ func TestHTTPAPIContractSmoke(t *testing.T) {
 		t.Fatalf("stats service: %v", err)
 	}
 
-	sessionService, err := sessionsvc.NewService(store, reg, statsService, clk)
+	xpService := xpsvc.NewService(store, clk)
+
+	sessionService, err := sessionsvc.NewService(store, reg, statsService, xpService, clk)
 	if err != nil {
 		t.Fatalf("session service: %v", err)
 	}
 
-	leaderboardService, err := lbsvc.NewService(store, rdb, clk, cfg.LeaderboardDailyCapMin)
+	leaderboardService, err := lbsvc.NewService(store, rdb, clk, xpService)
 	if err != nil {
 		t.Fatalf("leaderboard service: %v", err)
 	}
@@ -294,7 +304,7 @@ func TestHTTPAPIContractSmoke(t *testing.T) {
 	r.With(middleware.Auth(accessTokens, store), sessionRateLimitDay).Post("/v1/sessions/submit", sessionsHandler.Submit)
 	r.With(middleware.Auth(accessTokens, store), sessionRateLimitDay).Post("/v1/sessions/sync", sessionsHandler.Sync)
 
-	statsHandler := handler.NewStatsHandler(statsService)
+	statsHandler := handler.NewStatsHandler(statsService, store)
 	r.With(middleware.Auth(accessTokens, store)).Get("/v1/stats/snapshot", statsHandler.Snapshot)
 
 	leaderboardHandler := handler.NewLeaderboardHandler(leaderboardService)
@@ -718,6 +728,18 @@ func TestHTTPAPIContractSmoke(t *testing.T) {
 	}
 	if ingest.AcceptedCount != 1 || ingest.StatsSnapshot.SessionsAllTime != 1 {
 		t.Fatalf("unexpected ingest counts")
+	}
+	if ingest.TotalXP <= 0 {
+		t.Fatalf("expected positive total_xp, got %d", ingest.TotalXP)
+	}
+	if ingest.StatsSnapshot.TotalXP != ingest.TotalXP {
+		t.Fatalf("nested stats_snapshot.total_xp (%d) != top-level total_xp (%d)", ingest.StatsSnapshot.TotalXP, ingest.TotalXP)
+	}
+	if ingest.StatsSnapshot.CurrentLevel != ingest.CurrentLevel {
+		t.Fatalf("nested stats_snapshot.current_level (%d) != top-level current_level (%d)", ingest.StatsSnapshot.CurrentLevel, ingest.CurrentLevel)
+	}
+	if len(ingest.XPAwards) < 1 {
+		t.Fatalf("expected at least one xp award, got %d", len(ingest.XPAwards))
 	}
 
 	status, hdr, body = doJSON(t, client, http.MethodGet, srv.URL+"/v1/me", nil, map[string]string{

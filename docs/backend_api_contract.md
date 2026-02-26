@@ -1,6 +1,6 @@
 # ClearBreath Backend API Contract (v1)
 
-Last updated: 2026-02-22
+Last updated: 2026-02-26
 
 ## Conventions
 
@@ -30,6 +30,22 @@ Errors use:
 
 - `429` returns `code="rate_limited"`.
 - Policies are Redis-backed fixed-window counters and are configured via env vars.
+
+### Backward compatibility (XP migration)
+
+The leaderboard API previously supported three ranking views (`streak`, `weekly`, `all_time`). As of the XP system migration:
+
+- The `ranking` query param now accepts `xp` as the primary value.
+- Legacy values (`streak`, `weekly`, `all_time`) are silently mapped to `xp` — no `400` error, no client update required.
+- Response shape changed: `metric_value` replaced by `total_xp` (int64) + `level` (int32). Clients must handle the new fields.
+- Session ingest and stats snapshot responses now include `xp_awards`, `total_xp`, and `current_level` as additive fields (existing fields unchanged).
+
+### Session timestamp validation
+
+- `started_at_utc` must not be more than 24 hours in the future.
+- `started_at_utc` must not be more than 90 days in the past (generous window for offline sync).
+- `timezone_offset_minutes` must be between -840 and +840.
+- `local_day` is always computed server-side from `started_at_utc + timezone_offset_minutes`.
 
 ## Canonical IDs (mobile integration)
 
@@ -370,7 +386,22 @@ Response `200`:
     "sessions_all_time": 1,
     "minutes_by_technique": { "hrv_resonance": 5 },
     "updated_at_utc": "2026-02-18T12:00:00Z"
-  }
+  },
+  "xp_awards": [
+    {
+      "amount": 50,
+      "base_amount": 50,
+      "multiplier": 1.0,
+      "source": "session",
+      "daily_capped": false,
+      "new_total_xp": 50,
+      "new_level": 4,
+      "prev_level": 3,
+      "leveled_up": true
+    }
+  ],
+  "total_xp": 50,
+  "current_level": 4
 }
 ```
 
@@ -412,7 +443,7 @@ Errors:
 
 Purpose:
 
-- Fetch authoritative stats snapshot.
+- Fetch authoritative stats snapshot (includes XP fields from user_progress).
 
 Auth:
 
@@ -420,7 +451,19 @@ Auth:
 
 Response `200`:
 
-- Same shape as `stats_snapshot` in session ingest responses.
+```json
+{
+  "current_streak_days": 1,
+  "longest_streak_days": 1,
+  "minutes_this_week": 5,
+  "minutes_all_time": 5,
+  "sessions_all_time": 1,
+  "minutes_by_technique": { "hrv_resonance": 5 },
+  "updated_at_utc": "2026-02-18T12:00:00Z",
+  "total_xp": 50,
+  "current_level": 4
+}
+```
 
 Errors:
 
@@ -431,7 +474,7 @@ Errors:
 
 Purpose:
 
-- Fetch top leaderboard rows for a given ranking view.
+- Fetch top leaderboard rows ranked by total XP.
 
 Auth:
 
@@ -443,21 +486,22 @@ Rate limit:
 
 Query params:
 
-- `ranking` (required): `streak` | `weekly` | `all_time`
+- `ranking` (optional): `xp` (default). Legacy values `streak`, `weekly`, `all_time` are silently mapped to `xp` for backward compatibility.
 - `limit` (optional, max 50): integer
 
 Response `200`:
 
 ```json
 {
-  "ranking": "weekly",
+  "ranking": "xp",
   "generated_at_utc": "2026-02-18T12:00:00Z",
   "top": [
     {
       "rank": 1,
       "display_name_or_initials": "AB",
       "avatar_seed": "…",
-      "metric_value": 120,
+      "total_xp": 1250,
+      "level": 28,
       "user_id": "…"
     }
   ]
@@ -474,7 +518,7 @@ Errors:
 
 Purpose:
 
-- Fetch the authenticated user rank for a given ranking view.
+- Fetch the authenticated user XP rank.
 
 Auth:
 
@@ -486,24 +530,117 @@ Rate limit:
 
 Query params:
 
-- `ranking` (required): `streak` | `weekly` | `all_time`
+- `ranking` (optional): `xp` (default). Legacy values silently mapped to `xp`.
 
 Response `200`:
 
 ```json
 {
-  "ranking": "weekly",
-  "user": { "rank": 42, "metric_value": 12 }
+  "ranking": "xp",
+  "user": { "rank": 42, "total_xp": 1250, "level": 28 }
 }
 ```
 
 Notes:
 
-- If the user is not present in the current cached dataset, `rank` is `null` and `metric_value` may be `0`.
+- If the user is not present in the current cached dataset, `rank` is `null` and `total_xp` may be `0`.
 
 Errors:
 
 - `400 validation` (missing/invalid ranking)
 - `401 unauthorized`
 - `429 rate_limited`
+- `500 internal`
+
+### POST `/v1/me/daily-open`
+
+Purpose:
+
+- Claim daily login XP bonus (5 XP, idempotent per user per local day).
+
+Auth:
+
+- Required.
+
+Request body:
+
+```json
+{ "timezone_offset_minutes": -330 }
+```
+
+Notes:
+
+- `timezone_offset_minutes` must be between -840 and +840.
+- Used to compute the user's local day for idempotency.
+- Second call on the same local day returns `awarded: false`.
+
+Response `200`:
+
+```json
+{
+  "awarded": true,
+  "xp_award": {
+    "amount": 5,
+    "base_amount": 5,
+    "multiplier": 1.0,
+    "source": "daily_open",
+    "daily_capped": false,
+    "new_total_xp": 155,
+    "new_level": 12,
+    "prev_level": 12,
+    "leveled_up": false
+  },
+  "total_xp": 155,
+  "current_level": 12
+}
+```
+
+Errors:
+
+- `400 validation` (invalid timezone offset)
+- `401 unauthorized`
+- `500 internal`
+
+### GET `/v1/xp/history`
+
+Purpose:
+
+- Fetch daily XP breakdown for recent days.
+
+Auth:
+
+- Required.
+
+Query params:
+
+- `days` (optional, 1-30, default 7): number of days to fetch.
+- `timezone_offset_minutes` (optional, default 0): for local day computation.
+
+Response `200`:
+
+```json
+{
+  "total_xp": 1250,
+  "current_level": 28,
+  "days": [
+    {
+      "local_day": "2026-02-26",
+      "total_xp": 155,
+      "practice_xp": 150,
+      "login_xp": 5
+    },
+    {
+      "local_day": "2026-02-25",
+      "total_xp": 105,
+      "practice_xp": 100,
+      "login_xp": 5
+    }
+  ]
+}
+```
+
+Errors:
+
+- `400 validation` (invalid days or timezone)
+- `401 unauthorized`
 - `500 internal`
