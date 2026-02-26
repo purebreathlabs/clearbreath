@@ -12,8 +12,8 @@ func TestBuildLevelThresholds(t *testing.T) {
 		t.Errorf("threshold[0] = %d, want 0", th[0])
 	}
 
-	if th[1] != 2 {
-		t.Errorf("threshold[1] = %d, want 2", th[1])
+	if th[1] != 20 {
+		t.Errorf("threshold[1] = %d, want 20", th[1])
 	}
 
 	for i := 1; i < len(th); i++ {
@@ -22,8 +22,8 @@ func TestBuildLevelThresholds(t *testing.T) {
 		}
 	}
 
-	if th[1000] < 50000 || th[1000] > 80000 {
-		t.Errorf("threshold[1000] = %d, expected roughly 60K", th[1000])
+	if th[1000] < 500000 || th[1000] > 800000 {
+		t.Errorf("threshold[1000] = %d, expected roughly 600K", th[1000])
 	}
 }
 
@@ -36,9 +36,11 @@ func TestLevelFromTotalXP(t *testing.T) {
 	}{
 		{0, 0},
 		{1, 0},
-		{2, 1},
-		{3, 1},
-		{4, 2},
+		{19, 0},
+		{20, 1},
+		{22, 1},
+		{39, 1},
+		{40, 2},
 	}
 
 	for _, tt := range tests {
@@ -68,8 +70,8 @@ func TestCumulativeXPForLevel(t *testing.T) {
 	if v := s.CumulativeXPForLevel(0); v != 0 {
 		t.Errorf("CumulativeXPForLevel(0) = %d, want 0", v)
 	}
-	if v := s.CumulativeXPForLevel(1); v != 2 {
-		t.Errorf("CumulativeXPForLevel(1) = %d, want 2", v)
+	if v := s.CumulativeXPForLevel(1); v != 20 {
+		t.Errorf("CumulativeXPForLevel(1) = %d, want 20", v)
 	}
 	if v := s.CumulativeXPForLevel(-1); v != 0 {
 		t.Errorf("CumulativeXPForLevel(-1) = %d, want 0", v)
@@ -79,8 +81,8 @@ func TestCumulativeXPForLevel(t *testing.T) {
 func TestXPForNextLevel(t *testing.T) {
 	s := NewService(nil, nil)
 
-	if v := s.XPForNextLevel(0); v != 2 {
-		t.Errorf("XPForNextLevel(0) = %d, want 2", v)
+	if v := s.XPForNextLevel(0); v != 20 {
+		t.Errorf("XPForNextLevel(0) = %d, want 20", v)
 	}
 
 	for i := int32(0); i <= MaxLevel; i++ {

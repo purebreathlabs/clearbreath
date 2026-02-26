@@ -5,7 +5,8 @@ const int dailyOpenXP = 5;
 const double endedEarlyPenalty = 0.5;
 const int dailyPracticeXPCap = 300;
 const double maxStreakMultiplier = 3.0;
-const int curveVersion = 1;
+const int curveVersion = 2;
+const double levelCurveScale = 10.0;
 const int maxLevel = 999;
 
 final List<int> _thresholds = _buildThresholds();
@@ -14,7 +15,8 @@ List<int> _buildThresholds() {
   final t = List<int>.filled(maxLevel + 2, 0);
   var cumulative = 0;
   for (var k = 0; k <= maxLevel; k++) {
-    final xpForLevel = (2.0 + 0.05 * k + 0.0001 * k * k).floor();
+    final xpForLevel = ((2.0 + 0.05 * k + 0.0001 * k * k) * levelCurveScale)
+        .floor();
     cumulative += xpForLevel;
     t[k + 1] = cumulative;
   }

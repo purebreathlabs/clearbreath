@@ -23,7 +23,8 @@ const (
 	EndedEarlyPenalty   = 0.5
 	DailyPracticeXPCap  = 300
 	MaxStreakMultiplier = 3.0
-	CurveVersion        = 1
+	CurveVersion        = 2
+	LevelCurveScale     = 10.0
 	MaxLevel            = 999
 )
 
@@ -59,7 +60,7 @@ func buildLevelThresholds() []int64 {
 	t[0] = 0
 	var cumulative int64
 	for k := 0; k <= MaxLevel; k++ {
-		xpForLevel := int64(math.Floor(2.0 + 0.05*float64(k) + 0.0001*float64(k)*float64(k)))
+		xpForLevel := int64(math.Floor((2.0 + 0.05*float64(k) + 0.0001*float64(k)*float64(k)) * LevelCurveScale))
 		cumulative += xpForLevel
 		t[k+1] = cumulative
 	}
