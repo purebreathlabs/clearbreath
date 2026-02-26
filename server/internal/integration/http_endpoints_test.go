@@ -113,7 +113,8 @@ type leaderboardHTTPResponse struct {
 		Rank                  int    `json:"rank"`
 		DisplayNameOrInitials string `json:"display_name_or_initials"`
 		AvatarSeed            string `json:"avatar_seed"`
-		MetricValue           int64  `json:"metric_value"`
+		TotalXP               int64  `json:"total_xp"`
+		Level                 int32  `json:"level"`
 		UserID                string `json:"user_id"`
 	} `json:"top"`
 }
@@ -121,8 +122,9 @@ type leaderboardHTTPResponse struct {
 type leaderboardSelfHTTPResponse struct {
 	Ranking string `json:"ranking"`
 	User    struct {
-		Rank        *int  `json:"rank"`
-		MetricValue int64 `json:"metric_value"`
+		Rank    *int  `json:"rank"`
+		TotalXP int64 `json:"total_xp"`
+		Level   int32 `json:"level"`
 	} `json:"user"`
 }
 
@@ -816,21 +818,24 @@ func TestHTTPAPIContractSmoke(t *testing.T) {
 		t.Fatalf("leaderboard list: status %d body %s", status, string(body))
 	}
 
-	var lb leaderboardHTTPResponse
-	if err := json.Unmarshal(body, &lb); err != nil {
-		t.Fatalf("decode leaderboard: %v", err)
-	}
-	if lb.Ranking != string(lbsvc.RankingAllTime) {
-		t.Fatalf("ranking: got %q, want %q", lb.Ranking, lbsvc.RankingAllTime)
-	}
-	if len(lb.Top) == 0 {
-		t.Fatalf("expected non-empty leaderboard")
-	}
+		var lb leaderboardHTTPResponse
+		if err := json.Unmarshal(body, &lb); err != nil {
+			t.Fatalf("decode leaderboard: %v", err)
+		}
+		if lb.Ranking != string(lbsvc.RankingXP) {
+			t.Fatalf("ranking: got %q, want %q", lb.Ranking, lbsvc.RankingXP)
+		}
+		if len(lb.Top) == 0 {
+			t.Fatalf("expected non-empty leaderboard")
+		}
+		if lb.Top[0].TotalXP <= 0 {
+			t.Fatalf("expected positive total_xp")
+		}
 
-	status, hdr, body = doJSON(t, client, http.MethodGet, srv.URL+"/v1/leaderboard?ranking=all_time&limit=0", nil, nil)
-	requireRequestID(t, hdr, body)
-	if status != http.StatusOK {
-		t.Fatalf("leaderboard list limit clamp: status %d body %s", status, string(body))
+		status, hdr, body = doJSON(t, client, http.MethodGet, srv.URL+"/v1/leaderboard?ranking=all_time&limit=0", nil, nil)
+		requireRequestID(t, hdr, body)
+		if status != http.StatusOK {
+			t.Fatalf("leaderboard list limit clamp: status %d body %s", status, string(body))
 	}
 
 	status, hdr, body = doJSON(t, client, http.MethodGet, srv.URL+"/v1/leaderboard?ranking=all_time&limit=abc", nil, nil)
@@ -847,23 +852,37 @@ func TestHTTPAPIContractSmoke(t *testing.T) {
 		t.Fatalf("leaderboard self: status %d body %s", status, string(body))
 	}
 
-	var self leaderboardSelfHTTPResponse
-	if err := json.Unmarshal(body, &self); err != nil {
-		t.Fatalf("decode leaderboard self: %v", err)
-	}
-	if self.User.Rank == nil || *self.User.Rank != 1 {
-		t.Fatalf("expected rank 1")
-	}
+		var self leaderboardSelfHTTPResponse
+		if err := json.Unmarshal(body, &self); err != nil {
+			t.Fatalf("decode leaderboard self: %v", err)
+		}
+		if self.Ranking != string(lbsvc.RankingXP) {
+			t.Fatalf("ranking: got %q, want %q", self.Ranking, lbsvc.RankingXP)
+		}
+		if self.User.Rank == nil || *self.User.Rank != 1 {
+			t.Fatalf("expected rank 1")
+		}
+		if self.User.TotalXP <= 0 {
+			t.Fatalf("expected positive total_xp")
+		}
 
-	status, hdr, body = doJSON(t, client, http.MethodGet, srv.URL+"/v1/leaderboard", nil, nil)
-	requireRequestID(t, hdr, body)
-	if status != http.StatusBadRequest {
-		t.Fatalf("leaderboard missing ranking: status %d body %s", status, string(body))
-	}
+		status, hdr, body = doJSON(t, client, http.MethodGet, srv.URL+"/v1/leaderboard", nil, nil)
+		requireRequestID(t, hdr, body)
+		if status != http.StatusOK {
+			t.Fatalf("leaderboard missing ranking: status %d body %s", status, string(body))
+		}
 
-	status, hdr, body = doJSON(t, client, http.MethodPost, srv.URL+"/v1/auth/logout", map[string]any{
-		"device_id": "device1",
-	}, map[string]string{
+		var lbDefault leaderboardHTTPResponse
+		if err := json.Unmarshal(body, &lbDefault); err != nil {
+			t.Fatalf("decode leaderboard default: %v", err)
+		}
+		if lbDefault.Ranking != string(lbsvc.RankingXP) {
+			t.Fatalf("ranking: got %q, want %q", lbDefault.Ranking, lbsvc.RankingXP)
+		}
+
+		status, hdr, body = doJSON(t, client, http.MethodPost, srv.URL+"/v1/auth/logout", map[string]any{
+			"device_id": "device1",
+		}, map[string]string{
 		"Authorization": "Bearer " + auth2.AccessToken,
 	})
 	requireRequestID(t, hdr, body)
