@@ -83,7 +83,7 @@ StatsSnapshot computeStats(
 
   final currentStreakDays = currentStreak(minutesByLocalDay, todayKey);
   final longestStreakDays = longestStreak(minutesByLocalDay);
-  final totalXP = _computeTotalXP(sessions, currentStreakDays);
+  final totalXP = _computeTotalXP(sessions, minutesByLocalDay);
 
   var weekSeconds = 0;
   for (final entry in secondsByLocalDay.entries) {
@@ -121,9 +121,13 @@ DateTime _localDayKey({
   return DateTime.utc(localStart.year, localStart.month, localStart.day);
 }
 
-int _computeTotalXP(List<LocalSession> sessions, int streakDays) {
+int _computeTotalXP(
+  List<LocalSession> sessions,
+  Map<DateTime, int> minutesByLocalDay,
+) {
   if (sessions.isEmpty) return 0;
 
+  final streakByDay = _streakDaysForXPByLocalDay(minutesByLocalDay);
   final sorted = sessions.toList()
     ..sort((a, b) => a.startedAtUtc.compareTo(b.startedAtUtc));
 
@@ -131,6 +135,11 @@ int _computeTotalXP(List<LocalSession> sessions, int streakDays) {
   var total = 0;
 
   for (final session in sorted) {
+    final dayKey = _localDayKey(
+      startedAtUtc: session.startedAtUtc,
+      timezoneOffsetMinutes: session.timezoneOffsetMinutes,
+    );
+    final streakDays = streakByDay[dayKey] ?? 0;
     final earned = xp.computeSessionXP(
       durationSeconds: session.durationSecondsActual,
       endedEarly: session.endedEarly,
@@ -138,10 +147,6 @@ int _computeTotalXP(List<LocalSession> sessions, int streakDays) {
     );
     if (earned <= 0) continue;
 
-    final dayKey = _localDayKey(
-      startedAtUtc: session.startedAtUtc,
-      timezoneOffsetMinutes: session.timezoneOffsetMinutes,
-    );
     final soFar = xpByDay[dayKey] ?? 0;
     if (soFar >= xp.dailyPracticeXPCap) continue;
 
@@ -153,6 +158,39 @@ int _computeTotalXP(List<LocalSession> sessions, int streakDays) {
   }
 
   return total;
+}
+
+Map<DateTime, int> _streakDaysForXPByLocalDay(
+  Map<DateTime, int> minutesByLocalDay,
+) {
+  if (minutesByLocalDay.isEmpty) return const {};
+
+  final keys = minutesByLocalDay.keys.toList()..sort();
+  final result = <DateTime, int>{};
+
+  DateTime? previousDay;
+  var previousQualifies = false;
+  var previousStreakIncludingDay = 0;
+
+  for (final day in keys) {
+    final minutes = minutesByLocalDay[day] ?? 0;
+    final qualifies = minutes >= 2;
+
+    final consecutive =
+        previousDay != null && day.difference(previousDay!).inDays == 1;
+    final streakUpToYesterday = consecutive && previousQualifies
+        ? previousStreakIncludingDay
+        : 0;
+
+    final streakIncludingDay = qualifies ? streakUpToYesterday + 1 : 0;
+    result[day] = qualifies ? streakIncludingDay : streakUpToYesterday;
+
+    previousDay = day;
+    previousQualifies = qualifies;
+    previousStreakIncludingDay = streakIncludingDay;
+  }
+
+  return result;
 }
 
 DateTime _startOfWeekKey(DateTime todayKey) {
