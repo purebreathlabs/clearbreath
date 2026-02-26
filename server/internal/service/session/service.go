@@ -194,6 +194,17 @@ func (s *Service) ingest(ctx context.Context, userID uuid.UUID, sessions []Sessi
 		}
 		out.StatsSnapshot = snap
 
+		dayTotals, err := q.GetSessionDayTotals(ctx, userID)
+		if err != nil {
+			return fmt.Errorf("get day totals for xp: %w", err)
+		}
+		qualifying := make(map[time.Time]bool, len(dayTotals))
+		for _, row := range dayTotals {
+			qualifying[dateOnlyUTC(row.LocalDay)] = row.TotalSeconds >= 120
+		}
+
+		streakByDay := map[time.Time]int32{}
+
 		sortAccepted(accepted)
 		for _, a := range accepted {
 			sess, err := q.GetSessionByClientID(ctx, a.clientSessionID)
@@ -201,10 +212,17 @@ func (s *Service) ingest(ctx context.Context, userID uuid.UUID, sessions []Sessi
 				return fmt.Errorf("get session for xp: %w", err)
 			}
 
+			localDay := dateOnlyUTC(sess.LocalDay)
+			streakDays, ok := streakByDay[localDay]
+			if !ok {
+				streakDays = stats.CurrentStreakAtDay(qualifying, localDay)
+				streakByDay[localDay] = streakDays
+			}
+
 			award, err := s.xp.AwardSessionXP(
 				ctx, q, userID, sess.ID,
 				sess.DurationSecondsActual, sess.EndedEarly,
-				snap.CurrentStreakDays, sess.LocalDay,
+				streakDays, sess.LocalDay,
 			)
 			if err != nil {
 				return fmt.Errorf("award session xp: %w", err)
@@ -414,4 +432,9 @@ func clampBreathsEstimate(breaths int, durationSeconds int, preset technique.Pre
 		return maxBreaths
 	}
 	return breaths
+}
+
+func dateOnlyUTC(t time.Time) time.Time {
+	t = t.UTC()
+	return time.Date(t.Year(), t.Month(), t.Day(), 0, 0, 0, 0, time.UTC)
 }

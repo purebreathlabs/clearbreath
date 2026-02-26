@@ -49,6 +49,9 @@ func TestStreakComputation(t *testing.T) {
 			if got := computeCurrentStreak(tt.qualifying, today); got != tt.wantCurrent {
 				t.Fatalf("current: got %d, want %d", got, tt.wantCurrent)
 			}
+			if got := CurrentStreakAtDay(tt.qualifying, today); int(got) != tt.wantCurrent {
+				t.Fatalf("current exported: got %d, want %d", got, tt.wantCurrent)
+			}
 			if got := computeLongestStreak(tt.qualifying); got != tt.wantLongest {
 				t.Fatalf("longest: got %d, want %d", got, tt.wantLongest)
 			}
