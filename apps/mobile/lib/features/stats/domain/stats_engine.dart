@@ -177,7 +177,7 @@ Map<DateTime, int> _streakDaysForXPByLocalDay(
     final qualifies = minutes >= 2;
 
     final consecutive =
-        previousDay != null && day.difference(previousDay!).inDays == 1;
+        previousDay != null && day.difference(previousDay).inDays == 1;
     final streakUpToYesterday = consecutive && previousQualifies
         ? previousStreakIncludingDay
         : 0;
