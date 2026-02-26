@@ -223,39 +223,41 @@ class _SessionCompletionScreenState
                         ),
                         textAlign: TextAlign.center,
                       ),
-                      SizedBox(height: spacing.xl),
+                      if (canShare) ...[
+                        SizedBox(height: spacing.xl),
+                        LayoutBuilder(
+                          builder: (context, constraints) {
+                            final size = min(constraints.maxWidth, 260.0);
+                            return Center(
+                              child: SizedBox(
+                                width: size,
+                                height: size,
+                                child: FittedBox(
+                                  fit: BoxFit.contain,
+                                  child: RepaintBoundary(
+                                    key: _shareCardKey,
+                                    child: SizedBox(
+                                      width: 360,
+                                      height: 360,
+                                      child: ShareCardWidget(
+                                        streakDays:
+                                            statsSnapshot.currentStreakDays,
+                                        minutesToday: minutes ?? 0,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            );
+                          },
+                        ),
+                        SizedBox(height: spacing.lg),
+                      ],
                     ],
                   ),
                 ),
               ),
-              if (canShare) ...[
-                LayoutBuilder(
-                  builder: (context, constraints) {
-                    final size = min(constraints.maxWidth, 260.0);
-                    return Center(
-                      child: SizedBox(
-                        width: size,
-                        height: size,
-                        child: FittedBox(
-                          fit: BoxFit.contain,
-                          child: RepaintBoundary(
-                            key: _shareCardKey,
-                            child: SizedBox(
-                              width: 360,
-                              height: 360,
-                              child: ShareCardWidget(
-                                streakDays: statsSnapshot.currentStreakDays,
-                                minutesToday: minutes ?? 0,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                    );
-                  },
-                ),
-                SizedBox(height: spacing.lg),
-              ],
+              SizedBox(height: spacing.lg),
               FilledButton(
                 onPressed: () => context.go('/home'),
                 child: const Text('Done'),

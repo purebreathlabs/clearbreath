@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../features/design_system/presentation/design_system_screen.dart';
 import '../../features/auth/presentation/sign_in_screen.dart';
 import '../../features/home/presentation/home_screen.dart';
 import '../../features/intro/domain/intro_gate.dart';
@@ -34,6 +33,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
     final isSplash = state.matchedLocation == '/splash';
     final isIntro = state.matchedLocation == '/intro';
     final isOnboarding = state.matchedLocation == '/onboarding';
+    final isSignIn = state.matchedLocation == '/auth/sign-in';
     if (!splashGate.completed && !isSplash) {
       final from = Uri.encodeComponent(state.uri.toString());
       return '/splash?from=$from';
@@ -51,11 +51,11 @@ final appRouterProvider = Provider<GoRouter>((ref) {
             );
             return '/intro?from=$from';
           }
-          if (!isIntro && !isSplash) {
+          if (!isIntro && !isSplash && !isSignIn) {
             final from = Uri.encodeComponent(state.uri.toString());
             return '/intro?from=$from';
           }
-        } else if (!isOnboarding && !isSplash) {
+        } else if (!isOnboarding && !isSplash && !isSignIn) {
           final destination = isIntro
               ? (state.uri.queryParameters['from'] ?? '/home')
               : state.uri.toString();
@@ -86,10 +86,6 @@ final appRouterProvider = Provider<GoRouter>((ref) {
     routes: [
       GoRoute(path: '/', redirect: (context, state) => '/home'),
       GoRoute(path: '/stats', redirect: (context, state) => '/profile/stats'),
-      GoRoute(
-        path: '/design-system',
-        redirect: (context, state) => '/home/design-system',
-      ),
       GoRoute(
         path: '/onboarding',
         builder: (context, state) {
@@ -138,12 +134,6 @@ final appRouterProvider = Provider<GoRouter>((ref) {
               GoRoute(
                 path: '/home',
                 builder: (context, state) => const HomeScreen(),
-                routes: [
-                  GoRoute(
-                    path: 'design-system',
-                    builder: (context, state) => const DesignSystemScreen(),
-                  ),
-                ],
               ),
             ],
           ),

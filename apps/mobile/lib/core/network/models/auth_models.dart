@@ -6,21 +6,31 @@ class ProviderSignInRequest {
     required this.provider,
     required this.idToken,
     required this.deviceId,
-    required this.birthYear,
+    this.firstName,
+    this.lastName,
   });
 
   final String provider;
   final String idToken;
   final String deviceId;
-  final int birthYear;
+  final String? firstName;
+  final String? lastName;
 
   JsonMap toJson() {
-    return {
+    final map = <String, dynamic>{
       'provider': provider,
       'id_token': idToken,
       'device_id': deviceId,
-      'birth_year': birthYear,
     };
+    final fn = firstName?.trim();
+    if (fn != null && fn.isNotEmpty) {
+      map['first_name'] = fn;
+    }
+    final ln = lastName?.trim();
+    if (ln != null && ln.isNotEmpty) {
+      map['last_name'] = ln;
+    }
+    return map;
   }
 }
 

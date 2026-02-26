@@ -1,0 +1,113 @@
+{{define "logs.html"}}
+{{template "layout" .}}
+{{end}}
+
+{{define "content"}}
+<div class="space-y-4">
+    <div class="flex items-center justify-between">
+        <h1 class="text-lg font-bold">Request Logs</h1>
+        <span class="text-xs text-zinc-500">{{.Total}} total entries</span>
+    </div>
+
+    <!-- Filters -->
+    <div class="bg-zinc-900 border border-zinc-800 rounded-xl p-4">
+        <div class="flex flex-wrap items-center gap-3">
+            <select name="status" id="filter-status"
+                hx-get="/dashboard/api/logs"
+                hx-target="#log-table-body"
+                hx-include="#filter-method, #filter-search"
+                class="px-2 py-1.5 text-xs bg-zinc-800 border border-zinc-700 rounded-lg text-zinc-200 focus:outline-none focus:ring-1 focus:ring-blue-500/50">
+                <option value="" {{if eq .Filters.StatusGroup ""}}selected{{end}}>All Status</option>
+                <option value="2xx" {{if eq .Filters.StatusGroup "2xx"}}selected{{end}}>2xx Success</option>
+                <option value="3xx" {{if eq .Filters.StatusGroup "3xx"}}selected{{end}}>3xx Redirect</option>
+                <option value="4xx" {{if eq .Filters.StatusGroup "4xx"}}selected{{end}}>4xx Client Error</option>
+                <option value="5xx" {{if eq .Filters.StatusGroup "5xx"}}selected{{end}}>5xx Server Error</option>
+            </select>
+
+            <select name="method" id="filter-method"
+                hx-get="/dashboard/api/logs"
+                hx-target="#log-table-body"
+                hx-include="#filter-status, #filter-search"
+                class="px-2 py-1.5 text-xs bg-zinc-800 border border-zinc-700 rounded-lg text-zinc-200 focus:outline-none focus:ring-1 focus:ring-blue-500/50">
+                <option value="" {{if eq .Filters.Method ""}}selected{{end}}>All Methods</option>
+                <option value="GET" {{if eq .Filters.Method "GET"}}selected{{end}}>GET</option>
+                <option value="POST" {{if eq .Filters.Method "POST"}}selected{{end}}>POST</option>
+                <option value="PATCH" {{if eq .Filters.Method "PATCH"}}selected{{end}}>PATCH</option>
+                <option value="DELETE" {{if eq .Filters.Method "DELETE"}}selected{{end}}>DELETE</option>
+                <option value="PUT" {{if eq .Filters.Method "PUT"}}selected{{end}}>PUT</option>
+                <option value="OPTIONS" {{if eq .Filters.Method "OPTIONS"}}selected{{end}}>OPTIONS</option>
+            </select>
+
+            <div class="flex-1 min-w-[200px]">
+                <input type="search" name="search" id="filter-search" value="{{.Filters.Search}}"
+                    placeholder="Search path, request ID, error..."
+                    hx-get="/dashboard/api/logs"
+                    hx-target="#log-table-body"
+                    hx-trigger="input changed delay:300ms, search"
+                    hx-include="#filter-status, #filter-method"
+                    class="w-full px-3 py-1.5 text-xs bg-zinc-800 border border-zinc-700 rounded-lg text-zinc-200 placeholder-zinc-600 focus:outline-none focus:ring-1 focus:ring-blue-500/50">
+            </div>
+
+            <div class="flex items-center gap-2">
+                <span id="live-dot" class="w-1.5 h-1.5 rounded-full bg-zinc-600"></span>
+                <button id="live-toggle" onclick="toggleLive()"
+                    class="px-2 py-1 text-xs bg-zinc-800 hover:bg-zinc-700 border border-zinc-700 rounded transition-colors">
+                    Live
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Table -->
+    <div class="bg-zinc-900 border border-zinc-800 rounded-xl overflow-hidden">
+        <div class="overflow-x-auto scrollbar-thin">
+            <table class="w-full text-left">
+                <thead class="sticky top-0 bg-zinc-900 z-10">
+                    <tr class="border-b border-zinc-800 text-xs text-zinc-500 uppercase tracking-wider">
+                        <th class="px-3 py-2.5 font-medium">Time</th>
+                        <th class="px-3 py-2.5 font-medium">Method</th>
+                        <th class="px-3 py-2.5 font-medium">Path</th>
+                        <th class="px-3 py-2.5 font-medium">Status</th>
+                        <th class="px-3 py-2.5 font-medium">Duration</th>
+                        <th class="px-3 py-2.5 font-medium">IP</th>
+                        <th class="px-3 py-2.5 font-medium">Request ID</th>
+                        <th class="px-3 py-2.5 font-medium">User</th>
+                    </tr>
+                </thead>
+                <tbody id="log-table-body">
+                    {{template "log_rows.html" .}}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script>
+let liveSrc = null;
+function toggleLive() {
+    const dot = document.getElementById('live-dot');
+    const btn = document.getElementById('live-toggle');
+    if (liveSrc) {
+        liveSrc.close();
+        liveSrc = null;
+        dot.className = 'w-1.5 h-1.5 rounded-full bg-zinc-600';
+        btn.textContent = 'Live';
+        return;
+    }
+    liveSrc = new EventSource('/dashboard/sse/logs');
+    dot.className = 'w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse';
+    btn.textContent = 'Stop';
+    liveSrc.addEventListener('request-log', function(e) {
+        const tbody = document.getElementById('log-table-body');
+        tbody.insertAdjacentHTML('afterbegin', e.data);
+        while (tbody.children.length > 200) tbody.removeChild(tbody.lastChild);
+    });
+    liveSrc.onerror = function() {
+        dot.className = 'w-1.5 h-1.5 rounded-full bg-red-400';
+    };
+    liveSrc.onopen = function() {
+        dot.className = 'w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse';
+    };
+}
+</script>
+{{end}}

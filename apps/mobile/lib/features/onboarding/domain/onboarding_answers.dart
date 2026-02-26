@@ -19,7 +19,7 @@ class OnboardingAnswers {
   }) : primaryGoals = Set.unmodifiable(primaryGoals),
        practiceWindows = Set.unmodifiable(practiceWindows);
 
-  static const int defaultReminderTimeMinutes = 22 * 60;
+  static const int defaultReminderTimeMinutes = 8 * 60;
 
   factory OnboardingAnswers.defaults() {
     return OnboardingAnswers(

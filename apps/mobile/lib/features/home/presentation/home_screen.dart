@@ -1,26 +1,23 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../core/theme/theme_extensions.dart';
-import '../../onboarding/domain/onboarding_answers.dart';
+import '../../auth/domain/auth_state.dart';
+import '../../auth/domain/auth_state_provider.dart';
 import '../../session/domain/active_session_config.dart';
 import '../../stats/domain/weekly_minutes_provider.dart';
 import '../../sync/domain/merged_stats_provider.dart';
 import '../../techniques/domain/favorites_provider.dart';
 import '../../techniques/domain/safety_acknowledgement_repository.dart';
 import '../../techniques/domain/technique.dart';
+import '../../techniques/domain/technique_preset.dart';
 import '../../techniques/presentation/widgets/safety_warning_sheet.dart';
-import '../../auth/domain/auth_state.dart';
-import '../../auth/domain/auth_state_provider.dart';
-import '../../../shared/widgets/weekly_bar_chart.dart';
 import '../../../shared/providers/preferences_provider.dart';
-import '../domain/active_goal_provider.dart';
+import '../../../shared/widgets/brand_mark.dart';
 import '../domain/recommendation_engine.dart';
+import 'widgets/compact_progress_card.dart';
 import 'widgets/favorites_row.dart';
-import 'widgets/goal_shortcut_row.dart';
-import 'widgets/streak_display.dart';
 import 'widgets/todays_practice_card.dart';
 
 class HomeScreen extends ConsumerWidget {
@@ -52,31 +49,28 @@ class HomeScreen extends ConsumerWidget {
     }
 
     final recommendation = ref.watch(dailyRecommendationProvider);
-    final selectedGoal = _selectGoal(ref.watch(activeGoalProvider));
     final favorites = ref.watch(favoriteTechniquesProvider);
     final stats = ref.watch(mergedStatsProvider);
     final weeklyMinutes = ref.watch(weeklyMinutesProvider);
-    final auth = ref.watch(authStateProvider);
 
     final prefs = ref.watch(preferencesProvider);
     final row = prefs.asData?.value;
     final durationMinutes = row?.sessionLengthMinutes ?? 5;
     final localDisplayName = row?.displayName.trim() ?? '';
+    final auth = ref.watch(authStateProvider);
     final signedInName = auth is AuthStateSignedIn
         ? auth.profile.displayName.trim()
         : '';
-    final greetingName = signedInName.isNotEmpty
+    final displayName = signedInName.isNotEmpty
         ? signedInName
         : localDisplayName;
-    final greetingTextStyle =
-        (greetingName.isEmpty
-                ? typography.headlineLarge
-                : typography.titleLarge)
-            .copyWith(color: colors.textPrimary);
     final greeting = _greeting(
       dayPart: currentDayPart(DateTime.now()),
-      displayName: greetingName,
+      displayName: displayName,
     );
+    final greetingStyle =
+        (displayName.isEmpty ? typography.headlineLarge : typography.titleLarge)
+            .copyWith(color: colors.textPrimary);
 
     Future<void> startRecommendation(Recommendation rec) async {
       try {
@@ -98,6 +92,10 @@ class HomeScreen extends ConsumerWidget {
           }
         }
 
+        final durationLimitSeconds = rec.preset is BpmRoundsPreset
+            ? (rec.preset as BpmRoundsPreset).naturalDurationSeconds
+            : durationMinutes * 60;
+
         ref
             .read(activeSessionConfigProvider.notifier)
             .setConfig(
@@ -105,7 +103,7 @@ class HomeScreen extends ConsumerWidget {
                 technique: rec.technique,
                 preset: rec.preset,
                 presetId: rec.presetId,
-                durationLimitSeconds: durationMinutes * 60,
+                durationLimitSeconds: durationLimitSeconds,
               ),
             );
 
@@ -123,21 +121,25 @@ class HomeScreen extends ConsumerWidget {
 
     final recommendationCard = recommendation.when(
       data: (rec) {
+        final recDurationLabel = rec.preset is BpmRoundsPreset
+            ? '${(rec.preset as BpmRoundsPreset).rounds} rounds'
+            : '$durationMinutes min';
+
         return TodaysPracticeCard(
           techniqueName: rec.technique.name,
           presetLabel: rec.preset.label,
-          durationMinutes: durationMinutes,
+          durationLabel: recDurationLabel,
           rationale: rec.rationale,
           onStart: () => startRecommendation(rec),
+          techniqueId: rec.technique.id,
         );
       },
       loading: () {
         return Container(
           padding: EdgeInsets.all(components.cardPadding),
           decoration: BoxDecoration(
-            color: colors.surface,
+            color: colors.surfaceHigh,
             borderRadius: BorderRadius.circular(components.cardRadius),
-            border: Border.all(color: colors.border),
           ),
           child: Row(
             children: [
@@ -149,7 +151,7 @@ class HomeScreen extends ConsumerWidget {
               SizedBox(width: spacing.md),
               Expanded(
                 child: Text(
-                  'Loading today’s practice...',
+                  'Loading today\u2019s practice...',
                   style: typography.bodyMedium.copyWith(
                     color: colors.textSecondary,
                   ),
@@ -163,15 +165,14 @@ class HomeScreen extends ConsumerWidget {
         return Container(
           padding: EdgeInsets.all(components.cardPadding),
           decoration: BoxDecoration(
-            color: colors.surface,
+            color: colors.surfaceHigh,
             borderRadius: BorderRadius.circular(components.cardRadius),
-            border: Border.all(color: colors.border),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               Text(
-                'Could not load today’s practice.',
+                'Could not load today\u2019s practice.',
                 style: typography.bodyMedium.copyWith(
                   color: colors.textSecondary,
                 ),
@@ -190,6 +191,10 @@ class HomeScreen extends ConsumerWidget {
     final streakDays = stats.asData?.value.currentStreakDays;
 
     return Scaffold(
+      appBar: AppBar(
+        title: const BrandMark(),
+        automaticallyImplyLeading: false,
+      ),
       body: SafeArea(
         child: SingleChildScrollView(
           physics: const ClampingScrollPhysics(),
@@ -198,41 +203,21 @@ class HomeScreen extends ConsumerWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Align(
-                  alignment: Alignment.centerLeft,
+                SizedBox(
+                  width: double.infinity,
                   child: FittedBox(
                     fit: BoxFit.scaleDown,
                     alignment: Alignment.centerLeft,
                     child: Text(
                       greeting,
-                      style: greetingTextStyle,
+                      style: greetingStyle,
                       maxLines: 1,
                       softWrap: false,
                     ),
                   ),
                 ),
-                if (kDebugMode) ...[
-                  SizedBox(height: spacing.md),
-                  OutlinedButton(
-                    onPressed: () => context.push('/home/design-system'),
-                    child: const Text('Open Design System'),
-                  ),
-                ],
                 SizedBox(height: spacing.xl),
                 recommendationCard,
-                SizedBox(height: spacing.xl),
-                Text(
-                  'Goals',
-                  style: typography.titleMedium.copyWith(
-                    color: colors.textPrimary,
-                  ),
-                ),
-                SizedBox(height: spacing.sm),
-                GoalShortcutRow(
-                  selectedGoal: selectedGoal,
-                  onSelect: (goal) =>
-                      ref.read(activeGoalProvider.notifier).select(goal),
-                ),
                 SizedBox(height: spacing.xl),
                 Text(
                   'Favorites',
@@ -259,14 +244,10 @@ class HomeScreen extends ConsumerWidget {
                   ),
                 ),
                 SizedBox(height: spacing.xl),
-                StreakDisplay(streakDays: streakDays, loading: stats.isLoading),
-                SizedBox(height: spacing.lg),
-                weeklyMinutes.when(
-                  data: (minutes) => WeeklyBarChart(minutes: minutes),
-                  loading: () =>
-                      const WeeklyBarChart(minutes: <int>[], loading: true),
-                  error: (error, stackTrace) =>
-                      const WeeklyBarChart(minutes: <int>[]),
+                CompactProgressCard(
+                  streakDays: streakDays,
+                  weeklyMinutes: weeklyMinutes.asData?.value ?? const [],
+                  loading: stats.isLoading || weeklyMinutes.isLoading,
                 ),
               ],
             ),
@@ -275,15 +256,6 @@ class HomeScreen extends ConsumerWidget {
       ),
     );
   }
-}
-
-PrimaryGoal _selectGoal(Set<PrimaryGoal> goals) {
-  for (final goal in PrimaryGoal.values) {
-    if (goals.contains(goal)) {
-      return goal;
-    }
-  }
-  return PrimaryGoal.calm;
 }
 
 String _greeting({required DayPart dayPart, required String displayName}) {

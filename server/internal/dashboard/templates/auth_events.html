@@ -1,0 +1,62 @@
+{{define "auth_events.html"}}
+{{template "layout" .}}
+{{end}}
+
+{{define "content"}}
+<div class="space-y-4">
+    <div class="flex items-center justify-between">
+        <h1 class="text-lg font-bold">Auth Events</h1>
+        <span class="text-xs text-zinc-500">{{.Total}} total events</span>
+    </div>
+
+    <!-- Filters -->
+    <div class="bg-zinc-900 border border-zinc-800 rounded-xl p-4">
+        <div class="flex flex-wrap items-center gap-3">
+            <select name="event_type" id="filter-event-type"
+                hx-get="/dashboard/api/events"
+                hx-target="#event-table-body"
+                hx-include="#filter-search"
+                class="px-2 py-1.5 text-xs bg-zinc-800 border border-zinc-700 rounded-lg text-zinc-200 focus:outline-none focus:ring-1 focus:ring-blue-500/50">
+                <option value="" {{if eq .Filters.EventType ""}}selected{{end}}>All Events</option>
+                <option value="auth_login" {{if eq .Filters.EventType "auth_login"}}selected{{end}}>Login Success</option>
+                <option value="auth_failed" {{if eq .Filters.EventType "auth_failed"}}selected{{end}}>Login Failed</option>
+                <option value="auth_refresh" {{if eq .Filters.EventType "auth_refresh"}}selected{{end}}>Token Refresh</option>
+                <option value="auth_logout" {{if eq .Filters.EventType "auth_logout"}}selected{{end}}>Logout</option>
+                <option value="panic" {{if eq .Filters.EventType "panic"}}selected{{end}}>Panic</option>
+            </select>
+
+            <div class="flex-1 min-w-[200px]">
+                <input type="search" name="search" id="filter-search" value="{{.Filters.Search}}"
+                    placeholder="Search message, provider, request ID..."
+                    hx-get="/dashboard/api/events"
+                    hx-target="#event-table-body"
+                    hx-trigger="input changed delay:300ms, search"
+                    hx-include="#filter-event-type"
+                    class="w-full px-3 py-1.5 text-xs bg-zinc-800 border border-zinc-700 rounded-lg text-zinc-200 placeholder-zinc-600 focus:outline-none focus:ring-1 focus:ring-blue-500/50">
+            </div>
+        </div>
+    </div>
+
+    <!-- Table -->
+    <div class="bg-zinc-900 border border-zinc-800 rounded-xl overflow-hidden">
+        <div class="overflow-x-auto scrollbar-thin">
+            <table class="w-full text-left">
+                <thead class="sticky top-0 bg-zinc-900 z-10">
+                    <tr class="border-b border-zinc-800 text-xs text-zinc-500 uppercase tracking-wider">
+                        <th class="px-3 py-2.5 font-medium">Time</th>
+                        <th class="px-3 py-2.5 font-medium">Level</th>
+                        <th class="px-3 py-2.5 font-medium">Event</th>
+                        <th class="px-3 py-2.5 font-medium">Message</th>
+                        <th class="px-3 py-2.5 font-medium">Provider</th>
+                        <th class="px-3 py-2.5 font-medium">IP</th>
+                        <th class="px-3 py-2.5 font-medium">Request ID</th>
+                    </tr>
+                </thead>
+                <tbody id="event-table-body">
+                    {{template "event_rows.html" .}}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{{end}}

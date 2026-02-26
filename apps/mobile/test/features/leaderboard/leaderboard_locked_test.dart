@@ -37,8 +37,8 @@ void main() {
     await tester.tap(find.text('Sign in'));
     await tester.pumpAndSettle();
 
-    expect(find.text('Birth year'), findsOneWidget);
-    expect(find.text('Continue with'), findsOneWidget);
+    expect(find.text('ClearBreath'), findsOneWidget);
+    expect(find.text('Sign in with Google'), findsOneWidget);
 
     await tester.pumpWidget(const SizedBox.shrink());
     await tester.pumpAndSettle();

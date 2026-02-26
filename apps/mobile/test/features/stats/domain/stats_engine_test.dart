@@ -49,7 +49,7 @@ void main() {
       ),
       buildSession(
         id: 's3',
-        techniqueId: 'diaphragmatic',
+        techniqueId: 'four_seven_eight',
         startedAtUtc: DateTime.utc(2026, 2, 22, 11),
         timezoneOffsetMinutes: 0,
         durationSecondsActual: 600,
@@ -64,8 +64,8 @@ void main() {
     expect(snapshot.longestSessionMinutes, equals(10));
     expect(snapshot.totalBreathsEstimated, equals(35));
     expect(snapshot.minutesByTechnique['box'], equals(7));
-    expect(snapshot.minutesByTechnique['diaphragmatic'], equals(10));
-    expect(snapshot.favoriteTechniqueId, equals('diaphragmatic'));
+    expect(snapshot.minutesByTechnique['four_seven_eight'], equals(10));
+    expect(snapshot.favoriteTechniqueId, equals('four_seven_eight'));
   });
 
   test('computes weekly minutes with Monday start', () {

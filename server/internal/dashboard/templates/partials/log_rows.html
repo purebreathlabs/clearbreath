@@ -1,0 +1,44 @@
+{{define "log_rows.html"}}
+{{range .Logs}}
+<tr class="border-b border-zinc-700/50 hover:bg-zinc-800/50 transition-colors">
+    <td class="px-3 py-2 text-xs text-zinc-400 whitespace-nowrap">{{formatDate .Timestamp}}</td>
+    <td class="px-3 py-2"><span class="px-1.5 py-0.5 text-xs font-medium rounded {{methodBadgeClass .Method}}">{{.Method}}</span></td>
+    <td class="px-3 py-2 text-sm text-zinc-200 font-mono max-w-xs truncate" title="{{.Path}}">{{truncate .Path 60}}</td>
+    <td class="px-3 py-2"><span class="px-1.5 py-0.5 text-xs font-bold rounded {{statusBadgeClass .StatusCode}}">{{.StatusCode}}</span></td>
+    <td class="px-3 py-2 text-xs text-zinc-400 whitespace-nowrap">{{printf "%.1f" .DurationMs}}ms</td>
+    <td class="px-3 py-2 text-xs text-zinc-500 font-mono">{{.IPAddress}}</td>
+    <td class="px-3 py-2 text-xs text-zinc-500 font-mono">{{shortID .RequestID}}</td>
+    <td class="px-3 py-2 text-xs text-zinc-500 font-mono">{{if .UserID}}{{shortUUID .UserID}}{{end}}</td>
+</tr>
+{{else}}
+<tr>
+    <td colspan="8" class="px-3 py-8 text-center text-xs text-zinc-600">No logs found</td>
+</tr>
+{{end}}
+
+{{if gt .Total 0}}
+<tr>
+    <td colspan="8" class="px-3 py-3 border-t border-zinc-800">
+        <div class="flex items-center justify-between">
+            <span class="text-xs text-zinc-500">
+                Page {{.Page}} of {{totalPages .Total .PerPage}} ({{.Total}} entries)
+            </span>
+            <div class="flex items-center gap-1">
+                {{if gt .Page 1}}
+                <button hx-get="/dashboard/api/logs?page={{sub .Page 1}}"
+                    hx-target="#log-table-body"
+                    hx-include="#filter-status, #filter-method, #filter-search"
+                    class="px-2 py-1 text-xs bg-zinc-800 hover:bg-zinc-700 border border-zinc-700 rounded transition-colors">Prev</button>
+                {{end}}
+                {{if lt .Page (totalPages .Total .PerPage)}}
+                <button hx-get="/dashboard/api/logs?page={{add .Page 1}}"
+                    hx-target="#log-table-body"
+                    hx-include="#filter-status, #filter-method, #filter-search"
+                    class="px-2 py-1 text-xs bg-zinc-800 hover:bg-zinc-700 border border-zinc-700 rounded transition-colors">Next</button>
+                {{end}}
+            </div>
+        </div>
+    </td>
+</tr>
+{{end}}
+{{end}}

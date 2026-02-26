@@ -14,6 +14,7 @@ import 'steps/practice_window_step.dart';
 import 'steps/primary_goal_step.dart';
 import 'steps/reminder_time_step.dart';
 import 'steps/session_length_step.dart';
+import '../../../shared/widgets/brand_mark.dart';
 
 class OnboardingScreen extends ConsumerStatefulWidget {
   const OnboardingScreen({super.key, required this.from});
@@ -61,6 +62,11 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
 
     return Scaffold(
       appBar: AppBar(
+        leading: const Padding(
+          padding: EdgeInsets.only(left: 16),
+          child: BrandMark(showText: false),
+        ),
+        leadingWidth: 48,
         title: const Text('Setup'),
         actions: [
           TextButton(

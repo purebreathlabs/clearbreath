@@ -146,7 +146,7 @@ _LegalConfig? _config(String type) {
     ),
     'disclaimer' => const _LegalConfig(
       title: 'Disclaimer',
-      assetPath: null,
+      assetPath: 'assets/legal/disclaimer.md',
       latestUrl: null,
     ),
     _ => null,
@@ -161,29 +161,10 @@ class _LegalConfig {
   });
 
   final String title;
-  final String? assetPath;
+  final String assetPath;
   final String? latestUrl;
 
   Future<String> loadMarkdown() async {
-    final path = assetPath;
-    if (path == null) {
-      return _disclaimerMarkdown();
-    }
-    return rootBundle.loadString(path);
-  }
-
-  String _disclaimerMarkdown() {
-    return [
-      '# Disclaimer',
-      '',
-      'ClearBreath is for wellness and relaxation purposes only. It is not medical advice, diagnosis, or treatment.',
-      '',
-      '- Stop if you feel unwell.',
-      '- Consult a qualified professional if you have medical concerns.',
-      '- If you have a medical condition, are pregnant, or feel unwell, consult a qualified professional before practicing.',
-      '- Stop immediately if you feel dizziness, pain, shortness of breath, or discomfort.',
-      '',
-      'Use breathing practices responsibly and follow technique-specific safety guidance shown in the app.',
-    ].join('\\n');
+    return rootBundle.loadString(assetPath);
   }
 }

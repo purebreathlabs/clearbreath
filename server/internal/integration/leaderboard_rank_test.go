@@ -12,6 +12,7 @@ import (
 
 	"github.com/clearbreath/server/internal/auth"
 	"github.com/clearbreath/server/internal/config"
+	"github.com/clearbreath/server/internal/profanity"
 	"github.com/clearbreath/server/internal/repository"
 	"github.com/clearbreath/server/internal/repository/sqlcgen"
 	authsvc "github.com/clearbreath/server/internal/service/auth"
@@ -74,7 +75,7 @@ func TestLeaderboardListRanksAreContiguousAfterFiltering(t *testing.T) {
 		t.Fatalf("access token manager: %v", err)
 	}
 
-	authService, err := authsvc.NewService(store, clk, accessTokens, cfg.JWTRefreshSecret, cfg.JWTRefreshTTLMinutes, true, cfg.DevAuthSecret, cfg.GoogleOAuthClientID, cfg.AppleOAuthAudience)
+	authService, err := authsvc.NewService(store, clk, accessTokens, cfg.JWTRefreshSecret, cfg.JWTRefreshTTLMinutes, true, cfg.DevAuthSecret, cfg.GoogleOAuthClientID, cfg.AppleOAuthAudience, profanity.NewDefault())
 	if err != nil {
 		t.Fatalf("auth service: %v", err)
 	}
@@ -83,7 +84,6 @@ func TestLeaderboardListRanksAreContiguousAfterFiltering(t *testing.T) {
 		Provider:      "dev",
 		IDToken:       "user1",
 		DeviceID:      "device1",
-		BirthYear:     2000,
 		DevAuthHeader: cfg.DevAuthSecret,
 	})
 	if err != nil {
@@ -93,7 +93,6 @@ func TestLeaderboardListRanksAreContiguousAfterFiltering(t *testing.T) {
 		Provider:      "dev",
 		IDToken:       "user2",
 		DeviceID:      "device2",
-		BirthYear:     2000,
 		DevAuthHeader: cfg.DevAuthSecret,
 	})
 	if err != nil {

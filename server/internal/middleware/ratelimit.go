@@ -16,7 +16,7 @@ import (
 
 func RateLimitIP(rdb *redis.Client, keyPrefix string, limit int, window time.Duration) func(http.Handler) http.Handler {
 	return rateLimit(rdb, keyPrefix, limit, window, func(r *http.Request) string {
-		return clientIP(r)
+		return ClientIP(r)
 	})
 }
 
@@ -74,7 +74,8 @@ func allow(ctx context.Context, rdb *redis.Client, key string, limit int, window
 	return count <= int64(limit), nil
 }
 
-func clientIP(r *http.Request) string {
+// ClientIP extracts the client IP address from the request.
+func ClientIP(r *http.Request) string {
 	remote := strings.TrimSpace(r.RemoteAddr)
 	host, _, err := net.SplitHostPort(remote)
 	if err != nil {

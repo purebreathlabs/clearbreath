@@ -18,6 +18,7 @@ abstract class NotificationService {
   Future<void> scheduleStreakWarning(DateTime scheduledAtLocal);
   Future<void> cancelStreakWarning();
 
+  Future<void> showTest();
   Future<void> cancelAll();
   Future<void> dispose();
 }
@@ -58,7 +59,7 @@ class _FlutterLocalNotificationService implements NotificationService {
       tz.setLocalLocation(tz.UTC);
     }
 
-    const android = AndroidInitializationSettings('@mipmap/ic_launcher');
+    const android = AndroidInitializationSettings('ic_notification');
     const ios = DarwinInitializationSettings(
       requestAlertPermission: false,
       requestBadgePermission: false,
@@ -73,6 +74,7 @@ class _FlutterLocalNotificationService implements NotificationService {
       _channelId,
       _channelName,
       channelDescription: _channelDescription,
+      icon: 'ic_notification',
       importance: Importance.defaultImportance,
       priority: Priority.defaultPriority,
     );
@@ -220,6 +222,23 @@ class _FlutterLocalNotificationService implements NotificationService {
   }
 
   @override
+  Future<void> showTest() async {
+    if (kIsWeb) {
+      return;
+    }
+    try {
+      await _ensureInitialized();
+      await requestPermission();
+      await _plugin.show(
+        id: 9999,
+        title: 'Test notification',
+        body: 'If you see the ClearBreath icon, it works!',
+        notificationDetails: _details(),
+      );
+    } catch (_) {}
+  }
+
+  @override
   Future<void> dispose() async {}
 }
 
@@ -246,4 +265,7 @@ class _NoopNotificationService implements NotificationService {
 
   @override
   Future<void> scheduleStreakWarning(DateTime scheduledAtLocal) async {}
+
+  @override
+  Future<void> showTest() async {}
 }

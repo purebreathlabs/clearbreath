@@ -1,4 +1,5 @@
 import 'package:clearbreath/core/theme/app_theme.dart';
+import 'package:clearbreath/features/onboarding/domain/onboarding_answers.dart';
 import 'package:clearbreath/features/session/domain/active_session_config.dart';
 import 'package:clearbreath/features/techniques/data/technique_repository.dart';
 import 'package:clearbreath/features/techniques/domain/technique.dart';
@@ -66,6 +67,7 @@ void main() {
       name: 'Box',
       shortDescription: 'A balanced four-part breath.',
       animationMode: AnimationMode.circle,
+      goals: const {PrimaryGoal.focus},
       safety: const TechniqueSafety(requiresAck: false, title: '', body: ''),
       about: const TechniqueAbout(
         what: 'What',
@@ -104,6 +106,7 @@ void main() {
       name: 'Kapalbhati',
       shortDescription: 'Fast rounds with rests.',
       animationMode: AnimationMode.metronome,
+      goals: const {PrimaryGoal.energy},
       safety: const TechniqueSafety(
         requiresAck: true,
         title: 'Kapalbhati safety',
@@ -189,6 +192,7 @@ void main() {
     await tester.tap(find.byKey(const Key('preset_advanced')));
     await tester.pump();
 
+    await tester.ensureVisible(find.byKey(const Key('duration_10')));
     await tester.tap(find.byKey(const Key('duration_10')));
     await tester.pump();
 
@@ -248,7 +252,7 @@ void main() {
     expect(config, isNotNull);
     expect(config!.technique.id, 'kapalbhati');
     expect(config.presetId, 'beginner');
-    expect(config.durationLimitSeconds, 5 * 60);
+    expect(config.durationLimitSeconds, 150);
   });
 }
 
