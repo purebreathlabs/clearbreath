@@ -75,63 +75,63 @@ void main() {
     });
   });
 
-  group('presetForLevel', () {
-    test('level 0 = beginner', () {
-      expect(presetForLevel(0), 'beginner');
+  group('presetForPracticeDays', () {
+    test('0 days = beginner', () {
+      expect(presetForPracticeDays(0), 'beginner');
     });
 
-    test('level 14 = beginner', () {
-      expect(presetForLevel(14), 'beginner');
+    test('14 days = beginner', () {
+      expect(presetForPracticeDays(14), 'beginner');
     });
 
-    test('level 15 = intermediate', () {
-      expect(presetForLevel(15), 'intermediate');
+    test('15 days = intermediate', () {
+      expect(presetForPracticeDays(15), 'intermediate');
     });
 
-    test('level 49 = intermediate', () {
-      expect(presetForLevel(49), 'intermediate');
+    test('49 days = intermediate', () {
+      expect(presetForPracticeDays(49), 'intermediate');
     });
 
-    test('level 50 = advanced', () {
-      expect(presetForLevel(50), 'advanced');
+    test('50 days = advanced', () {
+      expect(presetForPracticeDays(50), 'advanced');
     });
   });
 
-  group('durationForLevel', () {
-    test('level 0 = 2 min', () {
-      expect(durationForLevel(0), 2);
+  group('durationForPracticeDays', () {
+    test('0 days = 2 min', () {
+      expect(durationForPracticeDays(0), 2);
     });
 
-    test('level 9 = 2 min', () {
-      expect(durationForLevel(9), 2);
+    test('6 days = 2 min', () {
+      expect(durationForPracticeDays(6), 2);
     });
 
-    test('level 10 = 5 min', () {
-      expect(durationForLevel(10), 5);
+    test('7 days = 5 min', () {
+      expect(durationForPracticeDays(7), 5);
     });
 
-    test('level 29 = 5 min', () {
-      expect(durationForLevel(29), 5);
+    test('29 days = 5 min', () {
+      expect(durationForPracticeDays(29), 5);
     });
 
-    test('level 30 = 10 min', () {
-      expect(durationForLevel(30), 10);
+    test('30 days = 10 min', () {
+      expect(durationForPracticeDays(30), 10);
     });
 
-    test('level 59 = 10 min', () {
-      expect(durationForLevel(59), 10);
+    test('59 days = 10 min', () {
+      expect(durationForPracticeDays(59), 10);
     });
 
-    test('level 60 = 15 min', () {
-      expect(durationForLevel(60), 15);
+    test('60 days = 15 min', () {
+      expect(durationForPracticeDays(60), 15);
     });
 
-    test('level 99 = 15 min', () {
-      expect(durationForLevel(99), 15);
+    test('99 days = 15 min', () {
+      expect(durationForPracticeDays(99), 15);
     });
 
-    test('level 100 = 20 min', () {
-      expect(durationForLevel(100), 20);
+    test('100 days = 20 min', () {
+      expect(durationForPracticeDays(100), 20);
     });
   });
 

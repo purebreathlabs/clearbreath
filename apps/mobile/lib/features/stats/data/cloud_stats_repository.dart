@@ -52,6 +52,7 @@ class CloudStatsRepository {
     return StatsSnapshot(
       currentStreakDays: cloud.currentStreakDays,
       longestStreakDays: cloud.longestStreakDays,
+      practiceDaysAllTime: cloud.practiceDaysAllTime,
       minutesThisWeek: cloud.minutesThisWeek,
       minutesAllTime: cloud.minutesAllTime,
       sessionsAllTime: cloud.sessionsAllTime,

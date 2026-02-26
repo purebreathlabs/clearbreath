@@ -46,6 +46,7 @@ class _TechniqueDetailScreenState extends ConsumerState<TechniqueDetailScreen> {
     final xpAsync = ref.watch(mergedXPProvider);
     final xpState = xpAsync.asData?.value;
     final currentLevel = xpState?.currentLevel ?? 0;
+    final practiceDaysAllTime = xpState?.practiceDaysAllTime ?? 0;
     final presetId = xpState?.presetId ?? 'beginner';
     final durationMinutes = xpState?.durationMinutes ?? 2;
 
@@ -205,6 +206,7 @@ class _TechniqueDetailScreenState extends ConsumerState<TechniqueDetailScreen> {
                           SizedBox(height: spacing.xl),
                           _SessionInfoCard(
                             currentLevel: currentLevel,
+                            practiceDaysAllTime: practiceDaysAllTime,
                             presetId: effectivePresetId,
                             durationMinutes: effectiveMinutes,
                             isRoundBased: isRoundBased,
@@ -374,6 +376,7 @@ class _TechniqueDetailScreenState extends ConsumerState<TechniqueDetailScreen> {
 class _SessionInfoCard extends StatelessWidget {
   const _SessionInfoCard({
     required this.currentLevel,
+    required this.practiceDaysAllTime,
     required this.presetId,
     required this.durationMinutes,
     required this.isRoundBased,
@@ -381,6 +384,7 @@ class _SessionInfoCard extends StatelessWidget {
   });
 
   final int currentLevel;
+  final int practiceDaysAllTime;
   final String presetId;
   final int durationMinutes;
   final bool isRoundBased;
@@ -394,7 +398,7 @@ class _SessionInfoCard extends StatelessWidget {
     final components = Theme.of(context).extension<AppComponentTokens>()!;
 
     final presetLabel = presetId[0].toUpperCase() + presetId.substring(1);
-    final nextUnlock = _nextUnlockText(currentLevel);
+    final nextUnlock = _nextUnlockText(practiceDaysAllTime);
 
     return Container(
       width: double.infinity,
@@ -441,12 +445,12 @@ class _SessionInfoCard extends StatelessWidget {
     );
   }
 
-  String? _nextUnlockText(int level) {
-    final candidates = <(int unlockLevel, String label)>[];
+  String? _nextUnlockText(int practiceDays) {
+    final candidates = <(int unlockPracticeDays, String label)>[];
 
     if (!isRoundBased) {
       if (durationMinutes < 5) {
-        candidates.add((10, '5 min sessions'));
+        candidates.add((7, '5 min sessions'));
       } else if (durationMinutes < 10) {
         candidates.add((30, '10 min sessions'));
       } else if (durationMinutes < 15) {
@@ -463,9 +467,11 @@ class _SessionInfoCard extends StatelessWidget {
     }
 
     candidates.sort((a, b) => a.$1.compareTo(b.$1));
-    for (final (unlockLevel, label) in candidates) {
-      if (level < unlockLevel) {
-        return 'Next unlock at Level $unlockLevel: $label';
+    for (final (unlockPracticeDays, label) in candidates) {
+      if (practiceDays < unlockPracticeDays) {
+        final remaining = unlockPracticeDays - practiceDays;
+        final dayLabel = remaining == 1 ? 'day' : 'days';
+        return 'Next unlock in $remaining practice $dayLabel: $label';
       }
     }
     return null;

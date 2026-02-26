@@ -46,7 +46,7 @@ class AppDatabase extends _$AppDatabase {
   }
 
   @override
-  int get schemaVersion => 7;
+  int get schemaVersion => 8;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -118,6 +118,11 @@ class AppDatabase extends _$AppDatabase {
         } catch (_) {}
         try {
           await migrator.addColumn(statsCache, statsCache.currentLevel);
+        } catch (_) {}
+      }
+      if (from < 8) {
+        try {
+          await migrator.addColumn(statsCache, statsCache.practiceDaysAllTime);
         } catch (_) {}
       }
     },

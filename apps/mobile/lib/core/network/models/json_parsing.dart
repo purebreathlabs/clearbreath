@@ -38,6 +38,20 @@ int readInt(JsonMap json, String key) {
   throw FormatException('Missing or invalid $key.');
 }
 
+int readIntOr(JsonMap json, String key, int defaultValue) {
+  final value = json[key];
+  if (value == null) {
+    return defaultValue;
+  }
+  if (value is int) {
+    return value;
+  }
+  if (value is num) {
+    return value.round();
+  }
+  throw FormatException('Missing or invalid $key.');
+}
+
 int? readNullableInt(JsonMap json, String key) {
   final value = json[key];
   if (value == null) {

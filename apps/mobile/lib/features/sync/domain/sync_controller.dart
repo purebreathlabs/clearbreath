@@ -87,6 +87,7 @@ class SyncController extends Notifier<SyncState> {
       final merged = domain.StatsSnapshot(
         currentStreakDays: existing.currentStreakDays,
         longestStreakDays: existing.longestStreakDays,
+        practiceDaysAllTime: existing.practiceDaysAllTime,
         minutesThisWeek: existing.minutesThisWeek,
         minutesAllTime: existing.minutesAllTime,
         sessionsAllTime: existing.sessionsAllTime,
@@ -221,6 +222,7 @@ class SyncController extends Notifier<SyncState> {
     final merged = domain.StatsSnapshot(
       currentStreakDays: snapshot.currentStreakDays,
       longestStreakDays: snapshot.longestStreakDays,
+      practiceDaysAllTime: snapshot.practiceDaysAllTime,
       minutesThisWeek: snapshot.minutesThisWeek,
       minutesAllTime: snapshot.minutesAllTime,
       sessionsAllTime: snapshot.sessionsAllTime,

@@ -11,6 +11,7 @@ class XPState {
     required this.xpForNextLevel,
     required this.xpProgressInLevel,
     required this.currentStreakDays,
+    required this.practiceDaysAllTime,
     required this.presetId,
     required this.durationMinutes,
   });
@@ -18,6 +19,7 @@ class XPState {
   factory XPState.fromTotalXP({
     required int totalXP,
     required int currentStreakDays,
+    required int practiceDaysAllTime,
   }) {
     final level = engine.levelFromTotalXP(totalXP);
     final cumCurrent = engine.cumulativeXPForLevel(level);
@@ -29,13 +31,17 @@ class XPState {
       xpForNextLevel: nextLevel,
       xpProgressInLevel: totalXP - cumCurrent,
       currentStreakDays: currentStreakDays,
-      presetId: engine.presetForLevel(level),
-      durationMinutes: engine.durationForLevel(level),
+      practiceDaysAllTime: practiceDaysAllTime,
+      presetId: engine.presetForPracticeDays(practiceDaysAllTime),
+      durationMinutes: engine.durationForPracticeDays(practiceDaysAllTime),
     );
   }
 
-  factory XPState.empty() =>
-      XPState.fromTotalXP(totalXP: 0, currentStreakDays: 0);
+  factory XPState.empty() => XPState.fromTotalXP(
+    totalXP: 0,
+    currentStreakDays: 0,
+    practiceDaysAllTime: 0,
+  );
 
   final int totalXP;
   final int currentLevel;
@@ -43,6 +49,7 @@ class XPState {
   final int xpForNextLevel;
   final int xpProgressInLevel;
   final int currentStreakDays;
+  final int practiceDaysAllTime;
   final String presetId;
   final int durationMinutes;
 

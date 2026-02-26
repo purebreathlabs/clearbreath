@@ -115,10 +115,10 @@ func TestStreakMultiplier(t *testing.T) {
 	}
 }
 
-func TestPresetForLevel(t *testing.T) {
+func TestPresetForPracticeDays(t *testing.T) {
 	tests := []struct {
-		level int32
-		want  string
+		days int32
+		want string
 	}{
 		{0, "beginner"},
 		{14, "beginner"},
@@ -130,21 +130,21 @@ func TestPresetForLevel(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		got := PresetForLevel(tt.level)
+		got := PresetForPracticeDays(tt.days)
 		if got != tt.want {
-			t.Errorf("PresetForLevel(%d) = %q, want %q", tt.level, got, tt.want)
+			t.Errorf("PresetForPracticeDays(%d) = %q, want %q", tt.days, got, tt.want)
 		}
 	}
 }
 
-func TestDurationMinutesForLevel(t *testing.T) {
+func TestDurationMinutesForPracticeDays(t *testing.T) {
 	tests := []struct {
-		level int32
-		want  int
+		days int32
+		want int
 	}{
 		{0, 2},
-		{9, 2},
-		{10, 5},
+		{6, 2},
+		{7, 5},
 		{29, 5},
 		{30, 10},
 		{59, 10},
@@ -155,9 +155,9 @@ func TestDurationMinutesForLevel(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		got := DurationMinutesForLevel(tt.level)
+		got := DurationMinutesForPracticeDays(tt.days)
 		if got != tt.want {
-			t.Errorf("DurationMinutesForLevel(%d) = %d, want %d", tt.level, got, tt.want)
+			t.Errorf("DurationMinutesForPracticeDays(%d) = %d, want %d", tt.days, got, tt.want)
 		}
 	}
 }

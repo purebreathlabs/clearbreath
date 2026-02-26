@@ -2256,6 +2256,17 @@ class $StatsCacheTable extends StatsCache
     requiredDuringInsert: false,
     defaultValue: const Constant(0),
   );
+  static const VerificationMeta _practiceDaysAllTimeMeta =
+      const VerificationMeta('practiceDaysAllTime');
+  @override
+  late final GeneratedColumn<int> practiceDaysAllTime = GeneratedColumn<int>(
+    'practice_days_all_time',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(0),
+  );
   static const VerificationMeta _minutesThisWeekMeta = const VerificationMeta(
     'minutesThisWeek',
   );
@@ -2377,6 +2388,7 @@ class $StatsCacheTable extends StatsCache
     id,
     currentStreakDays,
     longestStreakDays,
+    practiceDaysAllTime,
     minutesThisWeek,
     minutesAllTime,
     sessionsAllTime,
@@ -2418,6 +2430,15 @@ class $StatsCacheTable extends StatsCache
         longestStreakDays.isAcceptableOrUnknown(
           data['longest_streak_days']!,
           _longestStreakDaysMeta,
+        ),
+      );
+    }
+    if (data.containsKey('practice_days_all_time')) {
+      context.handle(
+        _practiceDaysAllTimeMeta,
+        practiceDaysAllTime.isAcceptableOrUnknown(
+          data['practice_days_all_time']!,
+          _practiceDaysAllTimeMeta,
         ),
       );
     }
@@ -2528,6 +2549,10 @@ class $StatsCacheTable extends StatsCache
         DriftSqlType.int,
         data['${effectivePrefix}longest_streak_days'],
       )!,
+      practiceDaysAllTime: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}practice_days_all_time'],
+      )!,
       minutesThisWeek: attachedDatabase.typeMapping.read(
         DriftSqlType.int,
         data['${effectivePrefix}minutes_this_week'],
@@ -2581,6 +2606,7 @@ class StatsCacheData extends DataClass implements Insertable<StatsCacheData> {
   final int id;
   final int currentStreakDays;
   final int longestStreakDays;
+  final int practiceDaysAllTime;
   final int minutesThisWeek;
   final int minutesAllTime;
   final int sessionsAllTime;
@@ -2595,6 +2621,7 @@ class StatsCacheData extends DataClass implements Insertable<StatsCacheData> {
     required this.id,
     required this.currentStreakDays,
     required this.longestStreakDays,
+    required this.practiceDaysAllTime,
     required this.minutesThisWeek,
     required this.minutesAllTime,
     required this.sessionsAllTime,
@@ -2612,6 +2639,7 @@ class StatsCacheData extends DataClass implements Insertable<StatsCacheData> {
     map['id'] = Variable<int>(id);
     map['current_streak_days'] = Variable<int>(currentStreakDays);
     map['longest_streak_days'] = Variable<int>(longestStreakDays);
+    map['practice_days_all_time'] = Variable<int>(practiceDaysAllTime);
     map['minutes_this_week'] = Variable<int>(minutesThisWeek);
     map['minutes_all_time'] = Variable<int>(minutesAllTime);
     map['sessions_all_time'] = Variable<int>(sessionsAllTime);
@@ -2632,6 +2660,7 @@ class StatsCacheData extends DataClass implements Insertable<StatsCacheData> {
       id: Value(id),
       currentStreakDays: Value(currentStreakDays),
       longestStreakDays: Value(longestStreakDays),
+      practiceDaysAllTime: Value(practiceDaysAllTime),
       minutesThisWeek: Value(minutesThisWeek),
       minutesAllTime: Value(minutesAllTime),
       sessionsAllTime: Value(sessionsAllTime),
@@ -2656,6 +2685,9 @@ class StatsCacheData extends DataClass implements Insertable<StatsCacheData> {
       id: serializer.fromJson<int>(json['id']),
       currentStreakDays: serializer.fromJson<int>(json['currentStreakDays']),
       longestStreakDays: serializer.fromJson<int>(json['longestStreakDays']),
+      practiceDaysAllTime: serializer.fromJson<int>(
+        json['practiceDaysAllTime'],
+      ),
       minutesThisWeek: serializer.fromJson<int>(json['minutesThisWeek']),
       minutesAllTime: serializer.fromJson<int>(json['minutesAllTime']),
       sessionsAllTime: serializer.fromJson<int>(json['sessionsAllTime']),
@@ -2683,6 +2715,7 @@ class StatsCacheData extends DataClass implements Insertable<StatsCacheData> {
       'id': serializer.toJson<int>(id),
       'currentStreakDays': serializer.toJson<int>(currentStreakDays),
       'longestStreakDays': serializer.toJson<int>(longestStreakDays),
+      'practiceDaysAllTime': serializer.toJson<int>(practiceDaysAllTime),
       'minutesThisWeek': serializer.toJson<int>(minutesThisWeek),
       'minutesAllTime': serializer.toJson<int>(minutesAllTime),
       'sessionsAllTime': serializer.toJson<int>(sessionsAllTime),
@@ -2702,6 +2735,7 @@ class StatsCacheData extends DataClass implements Insertable<StatsCacheData> {
     int? id,
     int? currentStreakDays,
     int? longestStreakDays,
+    int? practiceDaysAllTime,
     int? minutesThisWeek,
     int? minutesAllTime,
     int? sessionsAllTime,
@@ -2716,6 +2750,7 @@ class StatsCacheData extends DataClass implements Insertable<StatsCacheData> {
     id: id ?? this.id,
     currentStreakDays: currentStreakDays ?? this.currentStreakDays,
     longestStreakDays: longestStreakDays ?? this.longestStreakDays,
+    practiceDaysAllTime: practiceDaysAllTime ?? this.practiceDaysAllTime,
     minutesThisWeek: minutesThisWeek ?? this.minutesThisWeek,
     minutesAllTime: minutesAllTime ?? this.minutesAllTime,
     sessionsAllTime: sessionsAllTime ?? this.sessionsAllTime,
@@ -2739,6 +2774,9 @@ class StatsCacheData extends DataClass implements Insertable<StatsCacheData> {
       longestStreakDays: data.longestStreakDays.present
           ? data.longestStreakDays.value
           : this.longestStreakDays,
+      practiceDaysAllTime: data.practiceDaysAllTime.present
+          ? data.practiceDaysAllTime.value
+          : this.practiceDaysAllTime,
       minutesThisWeek: data.minutesThisWeek.present
           ? data.minutesThisWeek.value
           : this.minutesThisWeek,
@@ -2774,6 +2812,7 @@ class StatsCacheData extends DataClass implements Insertable<StatsCacheData> {
           ..write('id: $id, ')
           ..write('currentStreakDays: $currentStreakDays, ')
           ..write('longestStreakDays: $longestStreakDays, ')
+          ..write('practiceDaysAllTime: $practiceDaysAllTime, ')
           ..write('minutesThisWeek: $minutesThisWeek, ')
           ..write('minutesAllTime: $minutesAllTime, ')
           ..write('sessionsAllTime: $sessionsAllTime, ')
@@ -2793,6 +2832,7 @@ class StatsCacheData extends DataClass implements Insertable<StatsCacheData> {
     id,
     currentStreakDays,
     longestStreakDays,
+    practiceDaysAllTime,
     minutesThisWeek,
     minutesAllTime,
     sessionsAllTime,
@@ -2811,6 +2851,7 @@ class StatsCacheData extends DataClass implements Insertable<StatsCacheData> {
           other.id == this.id &&
           other.currentStreakDays == this.currentStreakDays &&
           other.longestStreakDays == this.longestStreakDays &&
+          other.practiceDaysAllTime == this.practiceDaysAllTime &&
           other.minutesThisWeek == this.minutesThisWeek &&
           other.minutesAllTime == this.minutesAllTime &&
           other.sessionsAllTime == this.sessionsAllTime &&
@@ -2827,6 +2868,7 @@ class StatsCacheCompanion extends UpdateCompanion<StatsCacheData> {
   final Value<int> id;
   final Value<int> currentStreakDays;
   final Value<int> longestStreakDays;
+  final Value<int> practiceDaysAllTime;
   final Value<int> minutesThisWeek;
   final Value<int> minutesAllTime;
   final Value<int> sessionsAllTime;
@@ -2841,6 +2883,7 @@ class StatsCacheCompanion extends UpdateCompanion<StatsCacheData> {
     this.id = const Value.absent(),
     this.currentStreakDays = const Value.absent(),
     this.longestStreakDays = const Value.absent(),
+    this.practiceDaysAllTime = const Value.absent(),
     this.minutesThisWeek = const Value.absent(),
     this.minutesAllTime = const Value.absent(),
     this.sessionsAllTime = const Value.absent(),
@@ -2856,6 +2899,7 @@ class StatsCacheCompanion extends UpdateCompanion<StatsCacheData> {
     this.id = const Value.absent(),
     this.currentStreakDays = const Value.absent(),
     this.longestStreakDays = const Value.absent(),
+    this.practiceDaysAllTime = const Value.absent(),
     this.minutesThisWeek = const Value.absent(),
     this.minutesAllTime = const Value.absent(),
     this.sessionsAllTime = const Value.absent(),
@@ -2871,6 +2915,7 @@ class StatsCacheCompanion extends UpdateCompanion<StatsCacheData> {
     Expression<int>? id,
     Expression<int>? currentStreakDays,
     Expression<int>? longestStreakDays,
+    Expression<int>? practiceDaysAllTime,
     Expression<int>? minutesThisWeek,
     Expression<int>? minutesAllTime,
     Expression<int>? sessionsAllTime,
@@ -2886,6 +2931,8 @@ class StatsCacheCompanion extends UpdateCompanion<StatsCacheData> {
       if (id != null) 'id': id,
       if (currentStreakDays != null) 'current_streak_days': currentStreakDays,
       if (longestStreakDays != null) 'longest_streak_days': longestStreakDays,
+      if (practiceDaysAllTime != null)
+        'practice_days_all_time': practiceDaysAllTime,
       if (minutesThisWeek != null) 'minutes_this_week': minutesThisWeek,
       if (minutesAllTime != null) 'minutes_all_time': minutesAllTime,
       if (sessionsAllTime != null) 'sessions_all_time': sessionsAllTime,
@@ -2907,6 +2954,7 @@ class StatsCacheCompanion extends UpdateCompanion<StatsCacheData> {
     Value<int>? id,
     Value<int>? currentStreakDays,
     Value<int>? longestStreakDays,
+    Value<int>? practiceDaysAllTime,
     Value<int>? minutesThisWeek,
     Value<int>? minutesAllTime,
     Value<int>? sessionsAllTime,
@@ -2922,6 +2970,7 @@ class StatsCacheCompanion extends UpdateCompanion<StatsCacheData> {
       id: id ?? this.id,
       currentStreakDays: currentStreakDays ?? this.currentStreakDays,
       longestStreakDays: longestStreakDays ?? this.longestStreakDays,
+      practiceDaysAllTime: practiceDaysAllTime ?? this.practiceDaysAllTime,
       minutesThisWeek: minutesThisWeek ?? this.minutesThisWeek,
       minutesAllTime: minutesAllTime ?? this.minutesAllTime,
       sessionsAllTime: sessionsAllTime ?? this.sessionsAllTime,
@@ -2949,6 +2998,9 @@ class StatsCacheCompanion extends UpdateCompanion<StatsCacheData> {
     }
     if (longestStreakDays.present) {
       map['longest_streak_days'] = Variable<int>(longestStreakDays.value);
+    }
+    if (practiceDaysAllTime.present) {
+      map['practice_days_all_time'] = Variable<int>(practiceDaysAllTime.value);
     }
     if (minutesThisWeek.present) {
       map['minutes_this_week'] = Variable<int>(minutesThisWeek.value);
@@ -2997,6 +3049,7 @@ class StatsCacheCompanion extends UpdateCompanion<StatsCacheData> {
           ..write('id: $id, ')
           ..write('currentStreakDays: $currentStreakDays, ')
           ..write('longestStreakDays: $longestStreakDays, ')
+          ..write('practiceDaysAllTime: $practiceDaysAllTime, ')
           ..write('minutesThisWeek: $minutesThisWeek, ')
           ..write('minutesAllTime: $minutesAllTime, ')
           ..write('sessionsAllTime: $sessionsAllTime, ')
@@ -4944,6 +4997,7 @@ typedef $$StatsCacheTableCreateCompanionBuilder =
       Value<int> id,
       Value<int> currentStreakDays,
       Value<int> longestStreakDays,
+      Value<int> practiceDaysAllTime,
       Value<int> minutesThisWeek,
       Value<int> minutesAllTime,
       Value<int> sessionsAllTime,
@@ -4960,6 +5014,7 @@ typedef $$StatsCacheTableUpdateCompanionBuilder =
       Value<int> id,
       Value<int> currentStreakDays,
       Value<int> longestStreakDays,
+      Value<int> practiceDaysAllTime,
       Value<int> minutesThisWeek,
       Value<int> minutesAllTime,
       Value<int> sessionsAllTime,
@@ -4993,6 +5048,11 @@ class $$StatsCacheTableFilterComposer
 
   ColumnFilters<int> get longestStreakDays => $composableBuilder(
     column: $table.longestStreakDays,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get practiceDaysAllTime => $composableBuilder(
+    column: $table.practiceDaysAllTime,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -5071,6 +5131,11 @@ class $$StatsCacheTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<int> get practiceDaysAllTime => $composableBuilder(
+    column: $table.practiceDaysAllTime,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<int> get minutesThisWeek => $composableBuilder(
     column: $table.minutesThisWeek,
     builder: (column) => ColumnOrderings(column),
@@ -5141,6 +5206,11 @@ class $$StatsCacheTableAnnotationComposer
 
   GeneratedColumn<int> get longestStreakDays => $composableBuilder(
     column: $table.longestStreakDays,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get practiceDaysAllTime => $composableBuilder(
+    column: $table.practiceDaysAllTime,
     builder: (column) => column,
   );
 
@@ -5225,6 +5295,7 @@ class $$StatsCacheTableTableManager
                 Value<int> id = const Value.absent(),
                 Value<int> currentStreakDays = const Value.absent(),
                 Value<int> longestStreakDays = const Value.absent(),
+                Value<int> practiceDaysAllTime = const Value.absent(),
                 Value<int> minutesThisWeek = const Value.absent(),
                 Value<int> minutesAllTime = const Value.absent(),
                 Value<int> sessionsAllTime = const Value.absent(),
@@ -5239,6 +5310,7 @@ class $$StatsCacheTableTableManager
                 id: id,
                 currentStreakDays: currentStreakDays,
                 longestStreakDays: longestStreakDays,
+                practiceDaysAllTime: practiceDaysAllTime,
                 minutesThisWeek: minutesThisWeek,
                 minutesAllTime: minutesAllTime,
                 sessionsAllTime: sessionsAllTime,
@@ -5255,6 +5327,7 @@ class $$StatsCacheTableTableManager
                 Value<int> id = const Value.absent(),
                 Value<int> currentStreakDays = const Value.absent(),
                 Value<int> longestStreakDays = const Value.absent(),
+                Value<int> practiceDaysAllTime = const Value.absent(),
                 Value<int> minutesThisWeek = const Value.absent(),
                 Value<int> minutesAllTime = const Value.absent(),
                 Value<int> sessionsAllTime = const Value.absent(),
@@ -5269,6 +5342,7 @@ class $$StatsCacheTableTableManager
                 id: id,
                 currentStreakDays: currentStreakDays,
                 longestStreakDays: longestStreakDays,
+                practiceDaysAllTime: practiceDaysAllTime,
                 minutesThisWeek: minutesThisWeek,
                 minutesAllTime: minutesAllTime,
                 sessionsAllTime: sessionsAllTime,

@@ -52,17 +52,17 @@ double streakMultiplier(int streakDays) {
   return min(1.0 + 0.1 * streakDays, maxStreakMultiplier);
 }
 
-String presetForLevel(int level) {
-  if (level < 15) return 'beginner';
-  if (level < 50) return 'intermediate';
+String presetForPracticeDays(int practiceDaysAllTime) {
+  if (practiceDaysAllTime < 15) return 'beginner';
+  if (practiceDaysAllTime < 50) return 'intermediate';
   return 'advanced';
 }
 
-int durationForLevel(int level) {
-  if (level < 10) return 2;
-  if (level < 30) return 5;
-  if (level < 60) return 10;
-  if (level < 100) return 15;
+int durationForPracticeDays(int practiceDaysAllTime) {
+  if (practiceDaysAllTime < 7) return 2;
+  if (practiceDaysAllTime < 30) return 5;
+  if (practiceDaysAllTime < 60) return 10;
+  if (practiceDaysAllTime < 100) return 15;
   return 20;
 }
 
