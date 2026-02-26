@@ -11,6 +11,10 @@
 - Primary stack: Flutter (Riverpod, go_router, Drift), Go (Chi, PostgreSQL, Redis)
 - Audience for this document: Junior developers, contributors, and implementation owners
 
+## 1.1 Changelog
+
+- 2026-02-26: Pace and duration unlocks now use `practice_days_all_time` (habit-based) instead of XP level thresholds to prevent same-day grinding and align 5-minute unlock with ~7–15 days of use. Updated sections: 4.4, 4.5, 8.1 note, 9.2, 17.3.
+
 ## 2. Executive Summary
 
 ClearBreath v1 is a guest-first, dark-mode breathing app focused on simplicity and consistency. The core experience is a one-tap breathing session with clear visual pacing, three phase-specific soft chime cues (inhale, hold, exhale), optional haptics, background playback support, and strong streak-based motivation.
@@ -78,7 +82,7 @@ The MVP excludes monetization and advanced social/community complexity to maximi
 
 ### 4.4 Onboarding
 
-- Exactly 5 questions (updated from 7: experience level and session length removed — now auto-managed by XP level)
+- Exactly 5 questions (updated from 7: experience level and session length removed — now auto-managed by practice days)
 - One question per screen
 - Notification permission request is deferred until after first completed session
 
@@ -87,12 +91,13 @@ The MVP excludes monetization and advanced social/community complexity to maximi
 - Daily streak requires at least 2 minutes of total practice on a day
 - Partial sessions still count toward total minutes and can qualify streak
 - Week starts Monday (user-local timezone)
+- Practice days: `practice_days_all_time` is the count of user-local days with at least 2 minutes of total practice (used for pace and duration unlocks)
 - XP system: 10 XP per full minute of practice, 50% penalty for ended-early sessions
 - Streak multiplier: min(1.0 + 0.1 * streak_days, 3.0) applied per session using streak_days at that session’s local_day (non-qualifying local_day uses the previous day’s streak)
 - Daily practice XP cap: 300 XP/day (login bonus of 5 XP excluded from cap)
 - Level curve: xp_required(L) = floor(10 * (2 + 0.05*L + 0.0001*L^2)), levels 0-999
-- Pace auto-progression: L0-14 beginner, L15-49 intermediate, L50+ advanced
-- Duration unlocks: L0=2min, L10=5min, L30=10min, L60=15min, L100=20min
+- Pace auto-progression (by practice days): D0-14 beginner, D15-49 intermediate, D50+ advanced
+- Duration unlocks (by practice days): D0-6=2min, D7-29=5min, D30-59=10min, D60-99=15min, D100+=20min
 - XP stored in dedicated tables (user_progress, xp_events) with curve_version for future recompute
 
 ### 4.6 Accounts and Leaderboard
@@ -222,7 +227,7 @@ The MVP excludes monetization and advanced social/community complexity to maximi
 4. Daily reminder preferred time
 5. Display name
 
-Note: Experience level and session length were removed — both are now auto-managed by the XP level system (see Section 4.5).
+Note: Experience level and session length were removed — both are now auto-managed by practice days (see Section 4.5).
 
 ## 8.2 UX Rules
 
@@ -245,7 +250,7 @@ Note: Experience level and session length were removed — both are now auto-man
 Inputs:
 - Selected goal
 - Time-of-day segment (Morning 5-11, Afternoon 11-17, Evening 17-22, Night 22-5)
-- Preset ID derived from XP level (beginner/intermediate/advanced via presetForLevel)
+- Preset ID derived from practice days (beginner/intermediate/advanced via practice_days_all_time)
 
 Outputs:
 - Technique id
@@ -767,6 +772,7 @@ Route naming remains implementation-defined, but behavior is normative.
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | current_streak_days | Int | Yes | >=0 | N/A | User-private unless shared | Server for signed-in, device for guest | Server authoritative after sync |
 | longest_streak_days | Int | Yes | >=0 | N/A | User-private unless shared | Server for signed-in, device for guest | Max-preserving aggregation |
+| practice_days_all_time | Int | Yes | >=0, count of user-local days with at least 2 minutes of total practice | N/A | User-private unless shared | Server for signed-in, device for guest | Recomputed authoritative |
 | minutes_this_week | Int | Yes | >=0, Monday-start local-week definition | N/A | User-private unless shared | Server for signed-in, device for guest | Recomputed authoritative |
 | minutes_all_time | Int | Yes | >=0 | N/A | User-private unless shared | Server for signed-in, device for guest | Recomputed authoritative |
 | sessions_all_time | Int | Yes | >=0 | N/A | User-private unless shared | Server for signed-in, device for guest | Recomputed authoritative |

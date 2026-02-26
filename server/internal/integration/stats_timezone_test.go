@@ -162,6 +162,9 @@ func TestTimezoneOffsetUpdateAndWeekBoundaryStats(t *testing.T) {
 	if out.StatsSnapshot.SessionsAllTime != 3 {
 		t.Fatalf("sessions_all_time: got %d, want 3", out.StatsSnapshot.SessionsAllTime)
 	}
+	if out.StatsSnapshot.PracticeDaysAllTime != 2 {
+		t.Fatalf("practice_days_all_time: got %d, want 2", out.StatsSnapshot.PracticeDaysAllTime)
+	}
 	if out.StatsSnapshot.CurrentStreakDays != 2 {
 		t.Fatalf("current_streak_days: got %d, want 2", out.StatsSnapshot.CurrentStreakDays)
 	}

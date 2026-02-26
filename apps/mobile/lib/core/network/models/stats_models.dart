@@ -4,6 +4,7 @@ class StatsSnapshot {
   const StatsSnapshot({
     required this.currentStreakDays,
     required this.longestStreakDays,
+    required this.practiceDaysAllTime,
     required this.minutesThisWeek,
     required this.minutesAllTime,
     required this.sessionsAllTime,
@@ -17,6 +18,7 @@ class StatsSnapshot {
     return StatsSnapshot(
       currentStreakDays: readInt(json, 'current_streak_days'),
       longestStreakDays: readInt(json, 'longest_streak_days'),
+      practiceDaysAllTime: readIntOr(json, 'practice_days_all_time', 0),
       minutesThisWeek: readInt(json, 'minutes_this_week'),
       minutesAllTime: readInt(json, 'minutes_all_time'),
       sessionsAllTime: readInt(json, 'sessions_all_time'),
@@ -29,6 +31,7 @@ class StatsSnapshot {
 
   final int currentStreakDays;
   final int longestStreakDays;
+  final int practiceDaysAllTime;
   final int minutesThisWeek;
   final int minutesAllTime;
   final int sessionsAllTime;

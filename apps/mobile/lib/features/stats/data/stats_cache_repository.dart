@@ -37,6 +37,7 @@ class StatsCacheRepository {
             id: const Value(_rowId),
             currentStreakDays: Value(snapshot.currentStreakDays),
             longestStreakDays: Value(snapshot.longestStreakDays),
+            practiceDaysAllTime: Value(snapshot.practiceDaysAllTime),
             minutesThisWeek: Value(snapshot.minutesThisWeek),
             minutesAllTime: Value(snapshot.minutesAllTime),
             sessionsAllTime: Value(snapshot.sessionsAllTime),
@@ -57,6 +58,7 @@ class StatsCacheRepository {
     return StatsSnapshot(
       currentStreakDays: row.currentStreakDays,
       longestStreakDays: row.longestStreakDays,
+      practiceDaysAllTime: row.practiceDaysAllTime,
       minutesThisWeek: row.minutesThisWeek,
       minutesAllTime: row.minutesAllTime,
       sessionsAllTime: row.sessionsAllTime,

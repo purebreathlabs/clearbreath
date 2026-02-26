@@ -104,27 +104,27 @@ func StreakMultiplier(streakDays int32) float64 {
 	return math.Min(1.0+0.1*float64(streakDays), MaxStreakMultiplier)
 }
 
-func PresetForLevel(level int32) string {
-	if level < 15 {
+func PresetForPracticeDays(practiceDaysAllTime int32) string {
+	if practiceDaysAllTime < 15 {
 		return "beginner"
 	}
-	if level < 50 {
+	if practiceDaysAllTime < 50 {
 		return "intermediate"
 	}
 	return "advanced"
 }
 
-func DurationMinutesForLevel(level int32) int {
-	if level < 10 {
+func DurationMinutesForPracticeDays(practiceDaysAllTime int32) int {
+	if practiceDaysAllTime < 7 {
 		return 2
 	}
-	if level < 30 {
+	if practiceDaysAllTime < 30 {
 		return 5
 	}
-	if level < 60 {
+	if practiceDaysAllTime < 60 {
 		return 10
 	}
-	if level < 100 {
+	if practiceDaysAllTime < 100 {
 		return 15
 	}
 	return 20

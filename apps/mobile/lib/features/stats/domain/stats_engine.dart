@@ -81,6 +81,13 @@ StatsSnapshot computeStats(
   final todayKey = DateTime.utc(nowLocal.year, nowLocal.month, nowLocal.day);
   final startOfWeekKey = _startOfWeekKey(todayKey);
 
+  var practiceDaysAllTime = 0;
+  for (final entry in minutesByLocalDay.entries) {
+    if (entry.value >= 2) {
+      practiceDaysAllTime++;
+    }
+  }
+
   final currentStreakDays = currentStreak(minutesByLocalDay, todayKey);
   final longestStreakDays = longestStreak(minutesByLocalDay);
   final totalXP = _computeTotalXP(sessions, minutesByLocalDay);
@@ -98,6 +105,7 @@ StatsSnapshot computeStats(
   return StatsSnapshot(
     currentStreakDays: currentStreakDays,
     longestStreakDays: longestStreakDays,
+    practiceDaysAllTime: practiceDaysAllTime,
     minutesThisWeek: minutesThisWeek,
     minutesAllTime: minutesAllTime,
     sessionsAllTime: sessionsAllTime,
