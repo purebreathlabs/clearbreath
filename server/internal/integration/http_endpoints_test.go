@@ -47,10 +47,10 @@ type authHTTPResponse struct {
 	RefreshTokenExpiresAtUTC string `json:"refresh_token_expires_at_utc"`
 	User                     struct {
 		ID                          string `json:"id"`
-		DisplayName                 string `json:"display_name"`
+		Username                    string `json:"username"`
+		Name                        string `json:"name"`
 		AvatarSeed                  string `json:"avatar_seed"`
 		LeaderboardOptIn            bool   `json:"leaderboard_opt_in"`
-		LeaderboardInitialsOnly     bool   `json:"leaderboard_initials_only"`
 		CreatedAtUTC                string `json:"created_at_utc"`
 		TimezoneOffsetMinutesLatest int32  `json:"timezone_offset_minutes_latest"`
 	} `json:"user"`
@@ -58,10 +58,10 @@ type authHTTPResponse struct {
 
 type meHTTPResponse struct {
 	ID                          string `json:"id"`
-	DisplayName                 string `json:"display_name"`
+	Username                    string `json:"username"`
+	Name                        string `json:"name"`
 	AvatarSeed                  string `json:"avatar_seed"`
 	LeaderboardOptIn            bool   `json:"leaderboard_opt_in"`
-	LeaderboardInitialsOnly     bool   `json:"leaderboard_initials_only"`
 	CreatedAtUTC                string `json:"created_at_utc"`
 	TimezoneOffsetMinutesLatest int32  `json:"timezone_offset_minutes_latest"`
 }
@@ -110,12 +110,13 @@ type leaderboardHTTPResponse struct {
 	Ranking        string `json:"ranking"`
 	GeneratedAtUTC string `json:"generated_at_utc"`
 	Top            []struct {
-		Rank                  int    `json:"rank"`
-		DisplayNameOrInitials string `json:"display_name_or_initials"`
-		AvatarSeed            string `json:"avatar_seed"`
-		TotalXP               int64  `json:"total_xp"`
-		Level                 int32  `json:"level"`
-		UserID                string `json:"user_id"`
+		Rank       int     `json:"rank"`
+		Username   string  `json:"username"`
+		Name       *string `json:"name"`
+		AvatarSeed string  `json:"avatar_seed"`
+		TotalXP    int64   `json:"total_xp"`
+		Level      int32   `json:"level"`
+		UserID     string  `json:"user_id"`
 	} `json:"top"`
 }
 
@@ -439,7 +440,7 @@ func TestHTTPAPIContractSmoke(t *testing.T) {
 	}
 
 	status, hdr, body = doJSON(t, client, http.MethodPatch, srv.URL+"/v1/me", map[string]any{
-		"display_name": "Alice",
+		"username": "alice",
 	}, map[string]string{
 		"Authorization": "Bearer " + auth1.AccessToken,
 	})
@@ -452,8 +453,8 @@ func TestHTTPAPIContractSmoke(t *testing.T) {
 	if err := json.Unmarshal(body, &me2); err != nil {
 		t.Fatalf("decode me patch: %v", err)
 	}
-	if me2.DisplayName != "Alice" {
-		t.Fatalf("display_name: got %q, want %q", me2.DisplayName, "Alice")
+	if me2.Username != "alice" {
+		t.Fatalf("username: got %q, want %q", me2.Username, "alice")
 	}
 
 	status, hdr, body = doJSON(t, client, http.MethodGet, srv.URL+"/v1/me/safety_acknowledgements", nil, map[string]string{
@@ -501,17 +502,17 @@ func TestHTTPAPIContractSmoke(t *testing.T) {
 	}
 
 	status, hdr, body = doJSON(t, client, http.MethodPatch, srv.URL+"/v1/me", map[string]any{
-		"display_name": "!!",
+		"username": "!!",
 	}, map[string]string{
 		"Authorization": "Bearer " + auth1.AccessToken,
 	})
 	requireRequestID(t, hdr, body)
 	if status != http.StatusBadRequest {
-		t.Fatalf("me patch invalid display name: status %d body %s", status, string(body))
+		t.Fatalf("me patch invalid username: status %d body %s", status, string(body))
 	}
 
 	status, hdr, body = doJSON(t, client, http.MethodPatch, srv.URL+"/v1/me", map[string]any{
-		"display_name": "F u c k",
+		"username": "fuck",
 	}, map[string]string{
 		"Authorization": "Bearer " + auth1.AccessToken,
 	})
@@ -521,8 +522,7 @@ func TestHTTPAPIContractSmoke(t *testing.T) {
 	}
 
 	status, hdr, body = doJSON(t, client, http.MethodPatch, srv.URL+"/v1/me", map[string]any{
-		"leaderboard_opt_in":        false,
-		"leaderboard_initials_only": true,
+		"leaderboard_opt_in": false,
 	}, map[string]string{
 		"Authorization": "Bearer " + auth1.AccessToken,
 	})
@@ -538,13 +538,9 @@ func TestHTTPAPIContractSmoke(t *testing.T) {
 	if me3.LeaderboardOptIn {
 		t.Fatalf("expected leaderboard_opt_in false")
 	}
-	if me3.LeaderboardInitialsOnly {
-		t.Fatalf("expected leaderboard_initials_only false when opt_in is false")
-	}
 
 	status, hdr, body = doJSON(t, client, http.MethodPatch, srv.URL+"/v1/me", map[string]any{
-		"leaderboard_opt_in":        true,
-		"leaderboard_initials_only": true,
+		"leaderboard_opt_in": true,
 	}, map[string]string{
 		"Authorization": "Bearer " + auth1.AccessToken,
 	})
@@ -559,9 +555,6 @@ func TestHTTPAPIContractSmoke(t *testing.T) {
 	}
 	if !me4.LeaderboardOptIn {
 		t.Fatalf("expected leaderboard_opt_in true")
-	}
-	if !me4.LeaderboardInitialsOnly {
-		t.Fatalf("expected leaderboard_initials_only true")
 	}
 
 	status, hdr, body = doJSON(t, client, http.MethodGet, srv.URL+"/v1/stats/snapshot", nil, map[string]string{

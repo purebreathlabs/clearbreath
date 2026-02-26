@@ -94,15 +94,15 @@ type StatsSnapshot struct {
 
 type User struct {
 	ID                          uuid.UUID          `json:"id"`
-	DisplayName                 string             `json:"display_name"`
 	AvatarSeed                  string             `json:"avatar_seed"`
 	LeaderboardOptIn            bool               `json:"leaderboard_opt_in"`
-	LeaderboardInitialsOnly     bool               `json:"leaderboard_initials_only"`
 	ShadowBanned                bool               `json:"shadow_banned"`
 	AgeBand                     string             `json:"age_band"`
 	TimezoneOffsetMinutesLatest int32              `json:"timezone_offset_minutes_latest"`
 	DeletedAt                   pgtype.Timestamptz `json:"deleted_at"`
 	CreatedAt                   time.Time          `json:"created_at"`
+	Username                    string             `json:"username"`
+	Name                        *string            `json:"name"`
 }
 
 type UserProgress struct {

@@ -10,6 +10,7 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgconn"
 
 	"github.com/clearbreath/server/internal/apierr"
 	"github.com/clearbreath/server/internal/profanity"
@@ -24,18 +25,17 @@ type Service struct {
 
 type Profile struct {
 	ID                          uuid.UUID
-	DisplayName                 string
+	Username                    string
+	Name                        string
 	AvatarSeed                  string
 	LeaderboardOptIn            bool
-	LeaderboardInitialsOnly     bool
 	CreatedAtUTC                string
 	TimezoneOffsetMinutesLatest int32
 }
 
 type UpdateInput struct {
-	DisplayName             *string
-	LeaderboardOptIn        *bool
-	LeaderboardInitialsOnly *bool
+	Username         *string
+	LeaderboardOptIn *bool
 }
 
 func NewService(store *repository.Store, filter *profanity.Filter) (*Service, error) {
@@ -71,45 +71,44 @@ func (s *Service) UpdateProfile(ctx context.Context, userID uuid.UUID, in Update
 			return fmt.Errorf("get user: %w", err)
 		}
 
-		displayName := u.DisplayName
-		if in.DisplayName != nil {
-			n, err := CanonicalizeDisplayName(*in.DisplayName)
+		if in.Username != nil {
+			n, err := CanonicalizeUsername(*in.Username)
 			if err != nil {
 				return apierr.New(http.StatusBadRequest, "validation", err.Error())
 			}
 			if s.filter.HasProfanity(n) {
-				return apierr.New(http.StatusBadRequest, "validation", "display_name contains profanity")
+				return apierr.New(http.StatusBadRequest, "validation", "username contains profanity")
 			}
-			displayName = n
+			if !strings.EqualFold(n, u.Username) {
+				exists, err := q.CheckUsernameExists(ctx, n)
+				if err != nil {
+					return fmt.Errorf("check username: %w", err)
+				}
+				if exists {
+					return apierr.New(http.StatusConflict, "username_taken", "username is taken")
+				}
+				u, err = q.UpdateUsername(ctx, sqlcgen.UpdateUsernameParams{
+					ID:       userID,
+					Username: n,
+				})
+				if err != nil {
+					if isUniqueViolation(err) {
+						return apierr.New(http.StatusConflict, "username_taken", "username is taken")
+					}
+					return fmt.Errorf("update username: %w", err)
+				}
+			}
 		}
 
 		optIn := u.LeaderboardOptIn
-		initialsOnly := u.LeaderboardInitialsOnly
 		if in.LeaderboardOptIn != nil {
 			optIn = *in.LeaderboardOptIn
 		}
-		if in.LeaderboardInitialsOnly != nil {
-			initialsOnly = *in.LeaderboardInitialsOnly
-		}
-		if !optIn {
-			initialsOnly = false
-		}
 
-		if displayName != u.DisplayName {
-			u, err = q.UpdateUserDisplayName(ctx, sqlcgen.UpdateUserDisplayNameParams{
-				ID:          userID,
-				DisplayName: displayName,
-			})
-			if err != nil {
-				return fmt.Errorf("update display name: %w", err)
-			}
-		}
-
-		if optIn != u.LeaderboardOptIn || initialsOnly != u.LeaderboardInitialsOnly {
+		if optIn != u.LeaderboardOptIn {
 			u, err = q.UpdateUserLeaderboardPrefs(ctx, sqlcgen.UpdateUserLeaderboardPrefsParams{
-				ID:                      userID,
-				LeaderboardOptIn:        optIn,
-				LeaderboardInitialsOnly: initialsOnly,
+				ID:               userID,
+				LeaderboardOptIn: optIn,
 			})
 			if err != nil {
 				return fmt.Errorf("update leaderboard prefs: %w", err)
@@ -125,12 +124,20 @@ func (s *Service) UpdateProfile(ctx context.Context, userID uuid.UUID, in Update
 	return out, nil
 }
 
+func isUniqueViolation(err error) bool {
+	var pgErr *pgconn.PgError
+	if errors.As(err, &pgErr) {
+		return pgErr.Code == "23505"
+	}
+	return false
+}
+
 func (s *Service) DeleteAccount(ctx context.Context, userID uuid.UUID) error {
 	return s.store.InTx(ctx, func(q *sqlcgen.Queries) error {
 		_, err := q.MarkUserDeleted(ctx, sqlcgen.MarkUserDeletedParams{
-			ID:          userID,
-			DisplayName: "Deleted",
-			AvatarSeed:  "",
+			ID:         userID,
+			Username:   "deleted_" + userID.String()[:8],
+			AvatarSeed: "",
 		})
 		if err != nil && !errors.Is(err, pgx.ErrNoRows) {
 			return fmt.Errorf("mark user deleted: %w", err)
@@ -162,10 +169,41 @@ func (s *Service) DeleteAccount(ctx context.Context, userID uuid.UUID) error {
 	})
 }
 
-func CanonicalizeDisplayName(s string) (string, error) {
+func CanonicalizeUsername(s string) (string, error) {
 	s = strings.TrimSpace(s)
 	if s == "" {
-		return "", fmt.Errorf("display_name is required")
+		return "", fmt.Errorf("username is required")
+	}
+
+	s = strings.ToLower(s)
+
+	var b strings.Builder
+	b.Grow(len(s))
+	for _, r := range s {
+		if (r >= 'a' && r <= 'z') || (r >= '0' && r <= '9') || r == '_' {
+			b.WriteRune(r)
+			continue
+		}
+		return "", fmt.Errorf("username has invalid characters")
+	}
+
+	out := strings.Trim(b.String(), "_")
+	n := len([]rune(out))
+	if n < 3 || n > 20 {
+		return "", fmt.Errorf("username must be 3-20 characters")
+	}
+
+	if strings.HasPrefix(out, "_") || strings.HasSuffix(out, "_") {
+		return "", fmt.Errorf("username must not start or end with underscore")
+	}
+
+	return out, nil
+}
+
+func CanonicalizeName(s string) (string, error) {
+	s = strings.TrimSpace(s)
+	if s == "" {
+		return "", fmt.Errorf("name is required")
 	}
 
 	var b strings.Builder
@@ -190,13 +228,13 @@ func CanonicalizeDisplayName(s string) (string, error) {
 			b.WriteRune(r)
 			continue
 		}
-		return "", fmt.Errorf("display_name has invalid characters")
+		return "", fmt.Errorf("name has invalid characters")
 	}
 
 	out := strings.TrimSpace(b.String())
 	n := len([]rune(out))
 	if n < 3 || n > 20 {
-		return "", fmt.Errorf("display_name must be 3-20 characters")
+		return "", fmt.Errorf("name must be 3-20 characters")
 	}
 
 	return out, nil

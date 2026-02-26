@@ -1,4 +1,4 @@
-.PHONY: server-dev server-build server-docker-build server-lint server-test server-test-ci server-test-integration server-coverage server-fmt-check server-sqlc db-wipe \
+.PHONY: server-dev server-build server-docker-build server-lint server-test server-test-ci server-test-integration server-coverage server-fmt-check server-sqlc server-smoke db-wipe \
        mobile-run mobile-build apk apk-arm64 mobile-analyze mobile-get mobile-pub-add mobile-gen mobile-icons mobile-fmt mobile-fmt-check mobile-test \
        fmt-check \
        web-dev web-build \
@@ -48,6 +48,9 @@ server-fmt-check:
 
 server-sqlc:
 	cd server && $(SQLC) generate -f sqlc/sqlc.yaml
+
+server-smoke:
+	bash scripts/backend_api_smoke.sh
 
 mobile-run:
 	cd apps/mobile && $(FLUTTER) run $(MOBILE_RUN_ARGS) $(MOBILE_DART_DEFINES)

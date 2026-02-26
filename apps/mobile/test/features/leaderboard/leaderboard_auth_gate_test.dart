@@ -68,10 +68,10 @@ class _SignedInAuthController extends AuthController {
     return AuthStateSignedIn(
       profile: UserProfile(
         id: 'test-user',
-        displayName: 'Breather123456',
+        username: 'Breather123456',
+        name: '',
         avatarSeed: 'seed',
         leaderboardOptIn: true,
-        leaderboardInitialsOnly: false,
         createdAtUtc: DateTime.utc(2026, 2, 22),
         timezoneOffsetMinutesLatest: 0,
       ),
@@ -103,7 +103,7 @@ class _FakeLeaderboardRepository extends LeaderboardRepository {
       entries: const [
         LeaderboardEntry(
           rank: 1,
-          displayNameOrInitials: 'AB',
+          username: 'AB',
           avatarSeed: 'seed',
           totalXp: 500,
           level: 3,

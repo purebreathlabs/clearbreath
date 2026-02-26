@@ -145,9 +145,8 @@ func TestLeaderboardListRanksAreContiguousAfterFiltering(t *testing.T) {
 	}
 
 	if _, err := store.Queries().UpdateUserLeaderboardPrefs(ctx, sqlcgen.UpdateUserLeaderboardPrefsParams{
-		ID:                      user1ID,
-		LeaderboardOptIn:        false,
-		LeaderboardInitialsOnly: false,
+		ID:               user1ID,
+		LeaderboardOptIn: false,
 	}); err != nil {
 		t.Fatalf("opt out user1: %v", err)
 	}

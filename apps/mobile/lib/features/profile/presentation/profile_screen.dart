@@ -8,7 +8,6 @@ import '../../../shared/providers/preferences_provider.dart';
 import '../../../shared/widgets/brand_mark.dart';
 import '../../auth/domain/auth_state.dart';
 import '../../auth/domain/auth_state_provider.dart';
-import '../../settings/data/settings_repository.dart';
 import 'widgets/level_card.dart';
 import 'widgets/stats_section.dart';
 import 'widgets/xp_history_section.dart';
@@ -43,33 +42,35 @@ class ProfileScreen extends ConsumerWidget {
 
     final auth = ref.watch(authStateProvider);
     final prefs = ref.watch(preferencesProvider);
-    final localDisplayName = prefs.asData?.value?.displayName.trim() ?? '';
-    final signedInName = auth is AuthStateSignedIn
-        ? auth.profile.displayName.trim()
-        : '';
-    final nameLabel = signedInName.isNotEmpty
-        ? signedInName
-        : (localDisplayName.isEmpty ? 'Guest' : localDisplayName);
+    final guestUsername = prefs.asData?.value?.guestUsername.trim() ?? '';
+
+    final String nameLabel;
+    final String secondaryLabel;
+    if (auth is AuthStateSignedIn) {
+      final profile = auth.profile;
+      nameLabel = profile.name.isNotEmpty ? profile.name : profile.username;
+      secondaryLabel = '@${profile.username}';
+    } else {
+      nameLabel = guestUsername.isNotEmpty ? guestUsername : 'Guest';
+      secondaryLabel = '';
+    }
     final initials = _initials(nameLabel);
 
-    Future<void> editName() async {
-      final initialValue = auth is AuthStateSignedIn
-          ? signedInName
-          : localDisplayName;
+    Future<void> editUsername() async {
+      if (auth is! AuthStateSignedIn) {
+        return;
+      }
+      final initialValue = auth.profile.username;
       final next = await showDialog<String>(
         context: context,
-        builder: (context) => _EditNameDialog(initialValue: initialValue),
+        builder: (context) => _EditUsernameDialog(initialValue: initialValue),
       );
 
       if (next == null) {
         return;
       }
       try {
-        if (auth is AuthStateSignedIn) {
-          await ref.read(authStateProvider.notifier).updateDisplayName(next);
-        } else {
-          await ref.read(settingsRepositoryProvider).setDisplayName(next);
-        }
+        await ref.read(authStateProvider.notifier).updateUsername(next);
       } on ApiError catch (e) {
         if (!context.mounted) {
           return;
@@ -79,7 +80,7 @@ class ProfileScreen extends ConsumerWidget {
         if (!context.mounted) {
           return;
         }
-        showMessage('Could not update name. Please try again.');
+        showMessage('Could not update username. Please try again.');
       }
     }
 
@@ -141,25 +142,34 @@ class ProfileScreen extends ConsumerWidget {
                             overflow: TextOverflow.ellipsis,
                           ),
                           SizedBox(height: spacing.xs),
-                          Text(
-                            auth.isGuest
-                                ? 'Guest'
-                                : (auth is AuthStateSignedIn &&
-                                          !auth.sessionReady
-                                      ? 'Restoring\u2026'
-                                      : 'Signed in'),
-                            style: typography.bodyMedium.copyWith(
-                              color: colors.textSecondary,
+                          if (secondaryLabel.isNotEmpty)
+                            Text(
+                              secondaryLabel,
+                              style: typography.bodyMedium.copyWith(
+                                color: colors.textSecondary,
+                              ),
+                            )
+                          else
+                            Text(
+                              auth.isGuest
+                                  ? 'Guest'
+                                  : (auth is AuthStateSignedIn &&
+                                            !auth.sessionReady
+                                        ? 'Restoring\u2026'
+                                        : 'Signed in'),
+                              style: typography.bodyMedium.copyWith(
+                                color: colors.textSecondary,
+                              ),
                             ),
-                          ),
                         ],
                       ),
                     ),
-                    IconButton(
-                      onPressed: editName,
-                      icon: const Icon(Icons.edit_rounded),
-                      tooltip: 'Edit name',
-                    ),
+                    if (!auth.isGuest)
+                      IconButton(
+                        onPressed: editUsername,
+                        icon: const Icon(Icons.edit_rounded),
+                        tooltip: 'Edit username',
+                      ),
                   ],
                 ),
                 if (auth.isGuest) ...[
@@ -268,16 +278,16 @@ class ProfileScreen extends ConsumerWidget {
   }
 }
 
-class _EditNameDialog extends StatefulWidget {
-  const _EditNameDialog({required this.initialValue});
+class _EditUsernameDialog extends StatefulWidget {
+  const _EditUsernameDialog({required this.initialValue});
 
   final String initialValue;
 
   @override
-  State<_EditNameDialog> createState() => _EditNameDialogState();
+  State<_EditUsernameDialog> createState() => _EditUsernameDialogState();
 }
 
-class _EditNameDialogState extends State<_EditNameDialog> {
+class _EditUsernameDialogState extends State<_EditUsernameDialog> {
   late final TextEditingController _controller;
 
   @override
@@ -323,7 +333,7 @@ class _EditNameDialogState extends State<_EditNameDialog> {
           side: BorderSide(color: colors.border),
         ),
         child: SizedBox(
-          key: const Key('edit_name_dialog'),
+          key: const Key('edit_username_dialog'),
           width: dialogWidth,
           child: Padding(
             padding: EdgeInsets.fromLTRB(
@@ -337,7 +347,7 @@ class _EditNameDialogState extends State<_EditNameDialog> {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 Text(
-                  'Edit name',
+                  'Edit username',
                   style: typography.titleLarge.copyWith(
                     color: colors.textPrimary,
                   ),
@@ -346,11 +356,10 @@ class _EditNameDialogState extends State<_EditNameDialog> {
                 TextField(
                   controller: _controller,
                   autofocus: true,
-                  keyboardType: TextInputType.name,
-                  textCapitalization: TextCapitalization.words,
+                  keyboardType: TextInputType.text,
                   textInputAction: TextInputAction.done,
                   maxLength: 20,
-                  decoration: const InputDecoration(hintText: 'Display name'),
+                  decoration: const InputDecoration(hintText: 'Username'),
                   onSubmitted: (_) => _close(_controller.text.trim()),
                 ),
                 SizedBox(height: spacing.lg),
@@ -383,7 +392,7 @@ String _initials(String name) {
     return 'C';
   }
   final parts = trimmed
-      .split(RegExp(r'\\s+'))
+      .split(RegExp(r'\s+'))
       .where((p) => p.trim().isNotEmpty)
       .toList();
   if (parts.isEmpty) {

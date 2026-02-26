@@ -53,7 +53,7 @@ class LeaderboardRowWidget extends StatelessWidget {
               mainAxisSize: MainAxisSize.min,
               children: [
                 Text(
-                  entry.displayNameOrInitials,
+                  entry.displayLabel,
                   style: typography.bodyLarge.copyWith(
                     color: colors.textPrimary,
                   ),
@@ -61,7 +61,9 @@ class LeaderboardRowWidget extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                 ),
                 Text(
-                  'Level ${entry.level}',
+                  entry.subtitle.isNotEmpty
+                      ? '${entry.subtitle} · Level ${entry.level}'
+                      : 'Level ${entry.level}',
                   style: typography.bodyMedium.copyWith(
                     color: colors.textSecondary,
                   ),

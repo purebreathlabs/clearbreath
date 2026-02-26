@@ -3,10 +3,10 @@ import 'json_parsing.dart';
 class UserProfile {
   const UserProfile({
     required this.id,
-    required this.displayName,
+    required this.username,
+    required this.name,
     required this.avatarSeed,
     required this.leaderboardOptIn,
-    required this.leaderboardInitialsOnly,
     required this.createdAtUtc,
     required this.timezoneOffsetMinutesLatest,
   });
@@ -14,10 +14,10 @@ class UserProfile {
   factory UserProfile.fromJson(JsonMap json) {
     return UserProfile(
       id: readString(json, 'id'),
-      displayName: readString(json, 'display_name'),
+      username: readString(json, 'username'),
+      name: readNullableString(json, 'name') ?? '',
       avatarSeed: readString(json, 'avatar_seed'),
       leaderboardOptIn: readBool(json, 'leaderboard_opt_in'),
-      leaderboardInitialsOnly: readBool(json, 'leaderboard_initials_only'),
       createdAtUtc: readDateTimeUtc(json, 'created_at_utc'),
       timezoneOffsetMinutesLatest: readInt(
         json,
@@ -27,20 +27,20 @@ class UserProfile {
   }
 
   final String id;
-  final String displayName;
+  final String username;
+  final String name;
   final String avatarSeed;
   final bool leaderboardOptIn;
-  final bool leaderboardInitialsOnly;
   final DateTime createdAtUtc;
   final int timezoneOffsetMinutesLatest;
 
   JsonMap toJson() {
     return {
       'id': id,
-      'display_name': displayName,
+      'username': username,
+      'name': name,
       'avatar_seed': avatarSeed,
       'leaderboard_opt_in': leaderboardOptIn,
-      'leaderboard_initials_only': leaderboardInitialsOnly,
       'created_at_utc': createdAtUtc.toUtc().toIso8601String(),
       'timezone_offset_minutes_latest': timezoneOffsetMinutesLatest,
     };
@@ -48,29 +48,20 @@ class UserProfile {
 }
 
 class MePatchRequest {
-  const MePatchRequest({
-    this.displayName,
-    this.leaderboardOptIn,
-    this.leaderboardInitialsOnly,
-  });
+  const MePatchRequest({this.username, this.leaderboardOptIn});
 
-  final String? displayName;
+  final String? username;
   final bool? leaderboardOptIn;
-  final bool? leaderboardInitialsOnly;
 
   JsonMap toJson() {
     final json = <String, dynamic>{};
-    final name = displayName?.trim();
-    if (name != null) {
-      json['display_name'] = name;
+    final u = username?.trim();
+    if (u != null) {
+      json['username'] = u;
     }
     final optIn = leaderboardOptIn;
     if (optIn != null) {
       json['leaderboard_opt_in'] = optIn;
-    }
-    final initialsOnly = leaderboardInitialsOnly;
-    if (initialsOnly != null) {
-      json['leaderboard_initials_only'] = initialsOnly;
     }
     return json;
   }

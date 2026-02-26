@@ -1,14 +1,21 @@
 import 'package:clearbreath/core/database/app_database.dart';
+import 'package:clearbreath/core/network/models/user_models.dart';
 import 'package:clearbreath/core/theme/app_theme.dart';
 import 'package:clearbreath/core/theme/theme_extensions.dart';
+import 'package:clearbreath/features/auth/domain/auth_controller.dart';
+import 'package:clearbreath/features/auth/domain/auth_state.dart';
+import 'package:clearbreath/features/auth/domain/auth_state_provider.dart';
 import 'package:clearbreath/features/onboarding/domain/onboarding_answers.dart';
 import 'package:clearbreath/features/profile/presentation/profile_screen.dart';
 import 'package:clearbreath/features/stats/domain/stats_engine.dart';
 import 'package:clearbreath/features/stats/domain/stats_snapshot.dart';
 import 'package:clearbreath/features/stats/domain/weekly_minutes_provider.dart';
+import 'package:clearbreath/features/sync/domain/merged_stats_provider.dart';
 import 'package:clearbreath/features/techniques/data/technique_repository.dart';
 import 'package:clearbreath/features/techniques/domain/technique.dart';
 import 'package:clearbreath/features/techniques/domain/technique_preset.dart';
+import 'package:clearbreath/features/xp/domain/xp_provider.dart';
+import 'package:clearbreath/features/xp/domain/xp_state.dart';
 import 'package:clearbreath/shared/providers/preferences_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -35,6 +42,7 @@ void main() {
     firstSessionCompleted: false,
     notificationPermissionAsked: false,
     displayName: 'Rahul',
+    guestUsername: 'Rahul',
   );
 
   final snapshot = StatsSnapshot(
@@ -126,10 +134,12 @@ void main() {
     await tester.pumpWidget(
       ProviderScope(
         overrides: [
+          authStateProvider.overrideWith(() => _SignedInAuthController()),
           preferencesProvider.overrideWith(
             (ref) => Stream<Preference?>.value(prefs),
           ),
-          localStatsProvider.overrideWith((ref) async => snapshot),
+          mergedStatsProvider.overrideWith((ref) async => snapshot),
+          mergedXPProvider.overrideWith((ref) async => XPState.empty()),
           weeklyMinutesProvider.overrideWith(
             (ref, weekOffset) async => const [0, 1, 2, 3, 4, 5, 6],
           ),
@@ -141,10 +151,10 @@ void main() {
 
     await tester.pumpAndSettle();
 
-    await tester.tap(find.byTooltip('Edit name'));
+    await tester.tap(find.byTooltip('Edit username'));
     await tester.pumpAndSettle();
 
-    final dialogBox = find.byKey(const Key('edit_name_dialog'));
+    final dialogBox = find.byKey(const Key('edit_username_dialog'));
     expect(dialogBox, findsOneWidget);
 
     final context = tester.element(dialogBox);
@@ -158,4 +168,21 @@ void main() {
     final size = tester.getSize(dialogBox);
     expect(size.width, closeTo(expectedDialogWidth, 0.1));
   });
+}
+
+class _SignedInAuthController extends AuthController {
+  @override
+  AuthState build() {
+    return AuthStateSignedIn(
+      profile: UserProfile(
+        id: 'user-a',
+        username: 'rahul',
+        name: 'Rahul',
+        avatarSeed: 'seed-a',
+        leaderboardOptIn: true,
+        createdAtUtc: DateTime.utc(2026, 2, 22),
+        timezoneOffsetMinutesLatest: 0,
+      ),
+    );
+  }
 }

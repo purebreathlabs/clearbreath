@@ -133,10 +133,10 @@ class _SignedInAuthController extends AuthController {
     return AuthStateSignedIn(
       profile: UserProfile(
         id: 'user-a',
-        displayName: 'Rahul',
+        username: 'rahul',
+        name: 'Rahul',
         avatarSeed: 'seed-a',
         leaderboardOptIn: true,
-        leaderboardInitialsOnly: false,
         createdAtUtc: DateTime.utc(2026, 2, 22),
         timezoneOffsetMinutesLatest: 0,
       ),

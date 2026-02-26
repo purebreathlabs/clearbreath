@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:math';
 
 import 'package:drift/drift.dart';
 
@@ -33,6 +34,7 @@ class OnboardingRepository {
             hapticsEnabled: Value(answers.hapticsEnabled),
             reminderTimeMinutes: Value(answers.reminderTimeMinutes),
             displayName: Value(_sanitizeDisplayName(answers.displayName)),
+            guestUsername: Value(_generateGuestUsername()),
           ),
         );
   }
@@ -138,5 +140,10 @@ class OnboardingRepository {
 
   String _sanitizeDisplayName(String value) {
     return value.trim();
+  }
+
+  String _generateGuestUsername() {
+    final digits = 100000 + Random().nextInt(900000);
+    return 'breather$digits';
   }
 }

@@ -164,7 +164,8 @@ class LeaderboardRepository {
         .map(
           (row) => <String, dynamic>{
             'rank': row.rank,
-            'display_name_or_initials': row.displayNameOrInitials,
+            'username': row.username,
+            'name': row.name,
             'avatar_seed': row.avatarSeed,
             'total_xp': row.totalXp,
             'level': row.level,
@@ -177,7 +178,8 @@ class LeaderboardRepository {
   LeaderboardEntry _toEntry(api.LeaderboardRow row) {
     return LeaderboardEntry(
       rank: row.rank,
-      displayNameOrInitials: row.displayNameOrInitials,
+      username: row.username,
+      name: row.name,
       avatarSeed: row.avatarSeed,
       totalXp: row.totalXp,
       level: row.level,

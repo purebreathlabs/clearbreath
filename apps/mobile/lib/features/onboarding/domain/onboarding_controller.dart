@@ -12,7 +12,7 @@ final onboardingControllerProvider =
 class OnboardingState {
   const OnboardingState({required this.stepIndex, required this.answers});
 
-  static const int totalSteps = 5;
+  static const int totalSteps = 4;
 
   final int stepIndex;
   final OnboardingAnswers answers;

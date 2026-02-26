@@ -165,26 +165,6 @@ class SettingsScreen extends ConsumerWidget {
                         },
                       ),
                       divider(),
-                      SwitchListTile(
-                        title: const Text('Initials only'),
-                        value: auth.profile.leaderboardInitialsOnly,
-                        onChanged: auth.profile.leaderboardOptIn
-                            ? (value) async {
-                                try {
-                                  await ref
-                                      .read(authStateProvider.notifier)
-                                      .setLeaderboardInitialsOnly(value);
-                                } on ApiError catch (e) {
-                                  showMessage(e.message);
-                                } catch (_) {
-                                  showMessage(
-                                    'Could not update leaderboard setting.',
-                                  );
-                                }
-                              }
-                            : null,
-                      ),
-                      divider(),
                     ],
                     ListTile(
                       title: Text(
