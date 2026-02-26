@@ -442,28 +442,30 @@ class _SessionInfoCard extends StatelessWidget {
   }
 
   String? _nextUnlockText(int level) {
-    final durationUnlocks = [
-      (10, 5, 'intermediate'),
-      (15, 5, null),
-      (30, 10, null),
-      (50, 10, 'advanced'),
-      (60, 15, null),
-      (100, 20, null),
-    ];
+    final candidates = <(int unlockLevel, String label)>[];
 
-    for (final (unlockLevel, mins, preset) in durationUnlocks) {
+    if (!isRoundBased) {
+      if (durationMinutes < 5) {
+        candidates.add((10, '5 min sessions'));
+      } else if (durationMinutes < 10) {
+        candidates.add((30, '10 min sessions'));
+      } else if (durationMinutes < 15) {
+        candidates.add((60, '15 min sessions'));
+      } else if (durationMinutes < 20) {
+        candidates.add((100, '20 min sessions'));
+      }
+    }
+
+    if (presetId == 'beginner') {
+      candidates.add((15, 'intermediate pace'));
+    } else if (presetId == 'intermediate') {
+      candidates.add((50, 'advanced pace'));
+    }
+
+    candidates.sort((a, b) => a.$1.compareTo(b.$1));
+    for (final (unlockLevel, label) in candidates) {
       if (level < unlockLevel) {
-        final parts = <String>[];
-        if (mins != durationMinutes) {
-          parts.add('$mins min sessions');
-        }
-        if (preset != null && preset != presetId) {
-          parts.add('$preset pace');
-        }
-        if (parts.isEmpty) {
-          parts.add('$mins min sessions');
-        }
-        return 'Next unlock at Level $unlockLevel: ${parts.join(' + ')}';
+        return 'Next unlock at Level $unlockLevel: $label';
       }
     }
     return null;
