@@ -179,14 +179,14 @@ void main() {
     );
 
     final machine = SessionStateMachine(
-      plan: SessionPlan.fromPreset(preset, 5),
+      plan: SessionPlan.fromPreset(preset, preset.naturalDurationSeconds),
       countdown: Duration.zero,
     );
 
     machine.start();
     expect(machine.state.phase, SessionPhase.round);
     expect(machine.state.currentRound, 1);
-    expect(machine.state.totalRounds, 2);
+    expect(machine.state.totalRounds, 3);
     expect(machine.state.breathsCompleted, 0);
 
     machine.tick(const Duration(seconds: 1));
@@ -202,14 +202,26 @@ void main() {
     machine.tick(const Duration(seconds: 1));
     expect(machine.state.phase, SessionPhase.round);
     expect(machine.state.currentRound, 2);
-    expect(machine.state.totalRounds, 2);
+    expect(machine.state.totalRounds, 3);
     expect(machine.state.totalElapsed, const Duration(seconds: 3));
 
     machine.tick(const Duration(seconds: 2));
-    expect(machine.state.isCompleted, isTrue);
+    expect(machine.state.phase, SessionPhase.rest);
     expect(machine.state.totalElapsed, const Duration(seconds: 5));
     expect(machine.state.breathsCompleted, 4);
     expect(machine.state.currentRound, 2);
+
+    machine.tick(const Duration(seconds: 1));
+    expect(machine.state.phase, SessionPhase.round);
+    expect(machine.state.currentRound, 3);
+    expect(machine.state.totalRounds, 3);
+    expect(machine.state.totalElapsed, const Duration(seconds: 6));
+
+    machine.tick(const Duration(seconds: 2));
+    expect(machine.state.isCompleted, isTrue);
+    expect(machine.state.totalElapsed, const Duration(seconds: 8));
+    expect(machine.state.breathsCompleted, 6);
+    expect(machine.state.currentRound, 3);
   });
 
   test('alternate nostril switches sides per cycle', () {

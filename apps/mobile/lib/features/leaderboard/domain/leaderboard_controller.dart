@@ -22,9 +22,11 @@ class LeaderboardController extends Notifier<LeaderboardState> {
   @override
   LeaderboardState build() {
     ref.listen<AuthState>(authStateProvider, (previous, next) {
-      final becameSignedIn =
-          previous is! AuthStateSignedIn && next is AuthStateSignedIn;
-      if (becameSignedIn) {
+      final becameReady =
+          (previous is! AuthStateSignedIn || !previous.sessionReady) &&
+          next is AuthStateSignedIn &&
+          next.sessionReady;
+      if (becameReady) {
         unawaited(Future.microtask(load));
       }
       if (next is AuthStateGuest) {
@@ -32,7 +34,8 @@ class LeaderboardController extends Notifier<LeaderboardState> {
       }
     });
 
-    if (ref.read(authStateProvider) is AuthStateSignedIn) {
+    final auth = ref.read(authStateProvider);
+    if (auth is AuthStateSignedIn && auth.sessionReady) {
       unawaited(Future.microtask(load));
     }
 
@@ -55,7 +58,7 @@ class LeaderboardController extends Notifier<LeaderboardState> {
 
   Future<void> load() async {
     final auth = ref.read(authStateProvider);
-    if (auth is! AuthStateSignedIn) {
+    if (auth is! AuthStateSignedIn || !auth.sessionReady) {
       return;
     }
 
@@ -86,7 +89,7 @@ class LeaderboardController extends Notifier<LeaderboardState> {
       }
 
       final banner = list.fromCache && list.errorMessage != null
-          ? 'Couldn’t refresh. Showing saved results.'
+          ? "Couldn't refresh. Showing saved results."
           : null;
 
       state = state.copyWith(

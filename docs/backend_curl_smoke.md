@@ -1,6 +1,6 @@
 # Backend Manual Smoke (curl)
 
-Last updated: 2026-02-19
+Last updated: 2026-02-22
 
 ## Prerequisites
 
@@ -28,7 +28,7 @@ curl -sS -i http://localhost:8080/ready
 ## Auth (dev provider)
 
 ```bash
-SIGN_IN_JSON='{"provider":"dev","id_token":"curl_user","device_id":"curl_device","birth_year":2000}'
+SIGN_IN_JSON='{"provider":"dev","id_token":"curl_user","device_id":"curl_device"}'
 RESP=$(curl -sS -X POST http://localhost:8080/v1/auth/provider_sign_in -H 'Content-Type: application/json' -H 'X-Dev-Auth: dev_secret_change_me' -d "$SIGN_IN_JSON")
 ACCESS=$(echo "$RESP" | jq -r .access_token)
 REFRESH=$(echo "$RESP" | jq -r .refresh_token)

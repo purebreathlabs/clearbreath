@@ -27,6 +27,7 @@ void main() {
       name: 'Box',
       shortDescription: 'A balanced four-part breath.',
       animationMode: AnimationMode.circle,
+      goals: const {PrimaryGoal.calm},
       safety: const TechniqueSafety(requiresAck: false, title: '', body: ''),
       about: const TechniqueAbout(
         what: '',
@@ -49,7 +50,7 @@ void main() {
     );
   }
 
-  testWidgets('renders recommendation card and goal shortcuts', (tester) async {
+  testWidgets('renders recommendation card and favorites', (tester) async {
     final technique = buildTechnique('box');
     final preset = technique.presets['beginner']!;
     final rec = Recommendation(
@@ -82,12 +83,11 @@ void main() {
 
     await tester.pumpAndSettle();
 
-    expect(find.text('Today’s practice'), findsOneWidget);
-    expect(find.text('Goals'), findsOneWidget);
-    expect(find.text('Calm'), findsOneWidget);
+    expect(find.textContaining('practice'), findsOneWidget);
     expect(find.text('Favorites'), findsOneWidget);
-    expect(find.text('Open Design System'), findsOneWidget);
-    expect(find.text('Start'), findsOneWidget);
+    expect(find.text('Start session'), findsOneWidget);
+    expect(find.text('Streak'), findsOneWidget);
+    expect(find.text('This week'), findsOneWidget);
 
     await tester.pumpWidget(const SizedBox.shrink());
     await tester.pumpAndSettle();

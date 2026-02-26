@@ -46,6 +46,10 @@ class IntroGate extends ChangeNotifier {
     _setStatus(IntroStatus.complete);
   }
 
+  void reset() {
+    _setStatus(IntroStatus.incomplete);
+  }
+
   Future<void> _load() async {
     try {
       final completed = await _repository.isIntroComplete();

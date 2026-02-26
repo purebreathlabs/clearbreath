@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../core/theme/theme_extensions.dart';
+import '../../../shared/widgets/brand_mark.dart';
 import '../domain/intro_gate.dart';
 
 class IntroScreen extends ConsumerWidget {
@@ -49,167 +49,118 @@ class IntroScreen extends ConsumerWidget {
     }
 
     return Scaffold(
-      body: ColoredBox(
-        color: colors.background,
-        child: SafeArea(
-          child: Padding(
-            padding: EdgeInsets.all(spacing.lg),
-            child: Center(
-              child: ConstrainedBox(
-                constraints: const BoxConstraints(maxWidth: 420),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    Expanded(
-                      child: SingleChildScrollView(
-                        physics: const ClampingScrollPhysics(),
+      body: SafeArea(
+        child: Padding(
+          padding: EdgeInsets.symmetric(horizontal: spacing.xl),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              SizedBox(height: spacing.xl),
+              Center(
+                child: BrandMark(
+                  logoSize: 36,
+                  textStyle: typography.titleLarge,
+                ),
+              ),
+              SizedBox(height: spacing.lg),
+              Expanded(
+                child: LayoutBuilder(
+                  builder: (context, constraints) {
+                    final maxImageHeight = (constraints.maxHeight * 0.74).clamp(
+                      200.0,
+                      450.0,
+                    );
+                    return Center(
+                      child: ConstrainedBox(
+                        constraints: const BoxConstraints(maxWidth: 420),
                         child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            SizedBox(height: spacing.xl),
-                            Center(
-                              child: SvgPicture.asset(
-                                'assets/branding/clearbreath_logo.svg',
-                                width: 84,
-                                height: 84,
-                                colorFilter: ColorFilter.mode(
-                                  colors.textPrimary,
-                                  BlendMode.srcIn,
+                            Flexible(
+                              child: ConstrainedBox(
+                                constraints: BoxConstraints(
+                                  maxHeight: maxImageHeight,
+                                ),
+                                child: Image.asset(
+                                  'assets/images/anulom-vilom.png',
+                                  fit: BoxFit.contain,
+                                  alignment: Alignment.bottomCenter,
+                                  errorBuilder: (_, _, _) =>
+                                      const SizedBox.shrink(),
                                 ),
                               ),
                             ),
-                            SizedBox(height: spacing.lg),
-                            Text(
-                              'Meet ClearBreath',
-                              style: typography.headlineLarge,
-                              textAlign: TextAlign.center,
-                            ),
                             SizedBox(height: spacing.sm),
                             Text(
-                              'Breathe with intention.',
+                              'Breathe with\nintention.',
+                              style: typography.displayLarge.copyWith(
+                                color: colors.textPrimary,
+                                height: 1.1,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                            SizedBox(height: spacing.md),
+                            Text(
+                              'Guided pranayama for calm, focus,\nand daily practice.',
                               style: typography.bodyLarge.copyWith(
                                 color: colors.textSecondary,
+                                height: 1.5,
                               ),
                               textAlign: TextAlign.center,
                             ),
-                            SizedBox(height: spacing.lg),
-                            Text(
-                              'A focused pranayama app with guided pacing and simple progress—built for daily practice.',
-                              style: typography.bodyMedium.copyWith(
-                                color: colors.textSecondary,
-                              ),
-                              textAlign: TextAlign.center,
-                            ),
-                            SizedBox(height: spacing.xl),
-                            _FeatureTile(
-                              icon: Icons.grid_view_rounded,
-                              title: 'Authentic techniques',
-                              description:
-                                  'A complete library from beginner to advanced.',
-                              radius: components.cardRadius,
-                            ),
-                            SizedBox(height: spacing.md),
-                            _FeatureTile(
-                              icon: Icons.timelapse_rounded,
-                              title: 'Guided sessions',
-                              description:
-                                  'Clean visuals with optional cues and haptics.',
-                              radius: components.cardRadius,
-                            ),
-                            SizedBox(height: spacing.md),
-                            _FeatureTile(
-                              icon: Icons.local_fire_department_rounded,
-                              title: 'Streaks that motivate',
-                              description:
-                                  'Build consistency with a simple daily streak.',
-                              radius: components.cardRadius,
-                            ),
-                            SizedBox(height: spacing.xl),
                           ],
                         ),
                       ),
-                    ),
-                    Text(
-                      'No sign-up required.',
-                      style: typography.labelMedium.copyWith(
-                        color: colors.textTertiary,
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
-                    SizedBox(height: spacing.md),
-                    FilledButton(
-                      onPressed: () => handleSubmit(),
-                      child: const Text('Get started'),
-                    ),
-                    SizedBox(height: spacing.sm),
-                  ],
+                    );
+                  },
                 ),
               ),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _FeatureTile extends StatelessWidget {
-  const _FeatureTile({
-    required this.icon,
-    required this.title,
-    required this.description,
-    required this.radius,
-  });
-
-  final IconData icon;
-  final String title;
-  final String description;
-  final double radius;
-
-  @override
-  Widget build(BuildContext context) {
-    final typography = Theme.of(context).extension<AppTypographyTokens>()!;
-    final spacing = Theme.of(context).extension<AppSpacingTokens>()!;
-    final colors = Theme.of(context).extension<AppColorTokens>()!;
-
-    return Container(
-      padding: EdgeInsets.all(spacing.lg),
-      decoration: BoxDecoration(
-        color: colors.surface,
-        borderRadius: BorderRadius.circular(radius),
-        border: Border.all(color: colors.border),
-      ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            width: 44,
-            height: 44,
-            decoration: BoxDecoration(
-              color: colors.surfaceHigh,
-              borderRadius: BorderRadius.circular(14),
-              border: Border.all(color: colors.border),
-            ),
-            alignment: Alignment.center,
-            child: Icon(icon, color: colors.textPrimary, size: 22),
-          ),
-          SizedBox(width: spacing.md),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(title, style: typography.titleMedium),
-                SizedBox(height: spacing.xs),
-                Text(
-                  description,
-                  style: typography.bodyMedium.copyWith(
-                    color: colors.textSecondary,
+              SizedBox(height: spacing.lg),
+              Text(
+                'No sign-up required.',
+                style: typography.labelMedium.copyWith(
+                  color: colors.textTertiary,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              SizedBox(height: spacing.md),
+              FilledButton(
+                onPressed: () => handleSubmit(),
+                child: const Text('Get started'),
+              ),
+              SizedBox(height: spacing.sm),
+              Align(
+                alignment: Alignment.center,
+                child: TextButton(
+                  onPressed: () => context.push('/auth/sign-in'),
+                  style: TextButton.styleFrom(
+                    foregroundColor: colors.textPrimary,
+                  ),
+                  child: Text.rich(
+                    TextSpan(
+                      style: typography.labelLarge.copyWith(
+                        color: colors.textSecondary,
+                      ),
+                      children: [
+                        const TextSpan(text: 'Already have an account? '),
+                        TextSpan(
+                          text: 'Sign in',
+                          style: typography.labelLarge.copyWith(
+                            color: colors.textPrimary,
+                            decoration: TextDecoration.underline,
+                            decorationColor: colors.textPrimary,
+                          ),
+                        ),
+                      ],
+                    ),
+                    textAlign: TextAlign.center,
                   ),
                 ),
-              ],
-            ),
+              ),
+              SizedBox(height: spacing.lg),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }

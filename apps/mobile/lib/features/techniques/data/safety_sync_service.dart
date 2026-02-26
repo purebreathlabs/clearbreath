@@ -23,7 +23,7 @@ class SafetySyncService {
 
   Future<void> pullAndMerge() async {
     final auth = ref.read(authStateProvider);
-    if (auth is! AuthStateSignedIn) {
+    if (auth is! AuthStateSignedIn || !auth.sessionReady) {
       return;
     }
 
@@ -45,7 +45,7 @@ class SafetySyncService {
 
   Future<void> pushAcknowledgements(List<String> techniqueIds) async {
     final auth = ref.read(authStateProvider);
-    if (auth is! AuthStateSignedIn) {
+    if (auth is! AuthStateSignedIn || !auth.sessionReady) {
       return;
     }
     if (techniqueIds.isEmpty) {

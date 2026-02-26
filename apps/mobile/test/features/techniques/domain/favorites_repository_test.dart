@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:clearbreath/core/database/app_database.dart';
+import 'package:clearbreath/features/onboarding/domain/onboarding_answers.dart';
 import 'package:clearbreath/features/techniques/domain/favorites_repository.dart';
 import 'package:clearbreath/features/techniques/domain/technique.dart';
 import 'package:clearbreath/features/techniques/domain/technique_preset.dart';
@@ -14,6 +15,7 @@ void main() {
       name: id,
       shortDescription: id,
       animationMode: AnimationMode.circle,
+      goals: const {PrimaryGoal.calm},
       safety: const TechniqueSafety(requiresAck: false, title: '', body: ''),
       about: const TechniqueAbout(
         what: '',

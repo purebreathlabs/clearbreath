@@ -16,7 +16,7 @@ final cloudStatsRepositoryProvider = Provider<CloudStatsRepository>((ref) {
 
 final cloudStatsProvider = FutureProvider<StatsSnapshot?>((ref) async {
   final auth = ref.watch(authStateProvider);
-  if (auth is! AuthStateSignedIn) {
+  if (auth is! AuthStateSignedIn || !auth.sessionReady) {
     return null;
   }
   return ref.watch(cloudStatsRepositoryProvider).fetchAndCache();

@@ -1,48 +1,9 @@
 [
   {
-    "id": "diaphragmatic",
-    "name": "Diaphragmatic",
-    "shortDescription": "Gentle belly breathing to calm and steady.",
-    "animationMode": "circle",
-    "safety": { "requiresAck": false, "title": "", "body": "" },
-    "about": {
-      "what": "A simple, slow breath that emphasizes belly expansion.",
-      "how": "Inhale softly through the nose, letting the belly rise. Exhale longer and relaxed.",
-      "bestTime": "Anytime you want to settle your body and mind.",
-      "benefits": "Supports relaxation, reduces tension, and builds breath awareness.",
-      "warnings": "Stop if you feel lightheaded. Keep the breath gentle and unforced."
-    },
-    "presets": {
-      "beginner": {
-        "mode": "phases",
-        "inhaleSeconds": 4,
-        "holdSeconds": 0,
-        "exhaleSeconds": 6,
-        "holdAfterExhaleSeconds": 0,
-        "recommendedDurationsMinutes": [2, 5, 10, 20]
-      },
-      "intermediate": {
-        "mode": "phases",
-        "inhaleSeconds": 5,
-        "holdSeconds": 0,
-        "exhaleSeconds": 7,
-        "holdAfterExhaleSeconds": 0,
-        "recommendedDurationsMinutes": [2, 5, 10, 20]
-      },
-      "advanced": {
-        "mode": "phases",
-        "inhaleSeconds": 6,
-        "holdSeconds": 0,
-        "exhaleSeconds": 8,
-        "holdAfterExhaleSeconds": 0,
-        "recommendedDurationsMinutes": [2, 5, 10, 20]
-      }
-    }
-  },
-  {
     "id": "box",
     "name": "Box",
-    "shortDescription": "A balanced four-part breath for focus and control.",
+    "shortDescription": "Equal inhale, hold, exhale — repeat.",
+    "goals": ["focus", "calm"],
     "animationMode": "circle",
     "safety": { "requiresAck": false, "title": "", "body": "" },
     "about": {
@@ -82,7 +43,8 @@
   {
     "id": "four_seven_eight",
     "name": "4-7-8",
-    "shortDescription": "A classic calming pattern with a long exhale.",
+    "shortDescription": "Calming pattern with a long exhale.",
+    "goals": ["sleep", "calm"],
     "animationMode": "circle",
     "safety": { "requiresAck": false, "title": "", "body": "" },
     "about": {
@@ -99,7 +61,7 @@
         "holdSeconds": 7,
         "exhaleSeconds": 8,
         "holdAfterExhaleSeconds": 0,
-        "recommendedDurationsMinutes": [2, 5, 10, 20]
+        "recommendedDurationsMinutes": [2, 5, 10, 15]
       },
       "intermediate": {
         "mode": "phases",
@@ -107,7 +69,7 @@
         "holdSeconds": 7,
         "exhaleSeconds": 8,
         "holdAfterExhaleSeconds": 0,
-        "recommendedDurationsMinutes": [2, 5, 10, 20]
+        "recommendedDurationsMinutes": [2, 5, 10, 15]
       },
       "advanced": {
         "mode": "phases",
@@ -115,54 +77,15 @@
         "holdSeconds": 7,
         "exhaleSeconds": 8,
         "holdAfterExhaleSeconds": 0,
-        "recommendedDurationsMinutes": [2, 5, 10, 20]
-      }
-    }
-  },
-  {
-    "id": "yogic_three_part",
-    "name": "Yogic Three-Part",
-    "shortDescription": "A deep, full breath that expands capacity and awareness.",
-    "animationMode": "circle",
-    "safety": { "requiresAck": false, "title": "", "body": "" },
-    "about": {
-      "what": "A fuller breath that gently engages belly, ribs, and upper chest.",
-      "how": "Inhale smoothly, expanding from belly to ribs to chest. Exhale slow and complete.",
-      "bestTime": "Morning or pre-practice when you want to feel energized and open.",
-      "benefits": "Builds awareness, supports posture, and encourages a calm steady rhythm.",
-      "warnings": "Avoid forcing a large breath. Keep it comfortable."
-    },
-    "presets": {
-      "beginner": {
-        "mode": "phases",
-        "inhaleSeconds": 4,
-        "holdSeconds": 2,
-        "exhaleSeconds": 6,
-        "holdAfterExhaleSeconds": 0,
-        "recommendedDurationsMinutes": [2, 5, 10, 20]
-      },
-      "intermediate": {
-        "mode": "phases",
-        "inhaleSeconds": 5,
-        "holdSeconds": 3,
-        "exhaleSeconds": 7,
-        "holdAfterExhaleSeconds": 0,
-        "recommendedDurationsMinutes": [2, 5, 10, 20]
-      },
-      "advanced": {
-        "mode": "phases",
-        "inhaleSeconds": 6,
-        "holdSeconds": 4,
-        "exhaleSeconds": 8,
-        "holdAfterExhaleSeconds": 0,
-        "recommendedDurationsMinutes": [2, 5, 10, 20]
+        "recommendedDurationsMinutes": [2, 5, 10, 15]
       }
     }
   },
   {
     "id": "anulom_vilom",
     "name": "Anulom Vilom",
-    "shortDescription": "Alternate nostril breathing for balance and steadiness.",
+    "shortDescription": "Alternate nostril breath for balance.",
+    "goals": ["calm", "spiritual"],
     "animationMode": "alternate_nostril",
     "safety": { "requiresAck": false, "title": "", "body": "" },
     "about": {
@@ -179,7 +102,7 @@
         "holdSeconds": 0,
         "exhaleSeconds": 4,
         "holdAfterExhaleSeconds": 0,
-        "recommendedDurationsMinutes": [2, 5, 10, 20]
+        "recommendedDurationsMinutes": [3, 5, 10, 15]
       },
       "intermediate": {
         "mode": "phases",
@@ -187,7 +110,7 @@
         "holdSeconds": 4,
         "exhaleSeconds": 8,
         "holdAfterExhaleSeconds": 0,
-        "recommendedDurationsMinutes": [2, 5, 10, 20]
+        "recommendedDurationsMinutes": [3, 5, 10, 15]
       },
       "advanced": {
         "mode": "phases",
@@ -195,14 +118,15 @@
         "holdSeconds": 16,
         "exhaleSeconds": 8,
         "holdAfterExhaleSeconds": 0,
-        "recommendedDurationsMinutes": [2, 5, 10, 20]
+        "recommendedDurationsMinutes": [3, 5, 10, 15]
       }
     }
   },
   {
     "id": "ujjayi",
     "name": "Ujjayi",
-    "shortDescription": "A slow, steady breath with gentle throat control.",
+    "shortDescription": "Steady breath with gentle throat control.",
+    "goals": ["focus", "energy"],
     "animationMode": "circle",
     "safety": { "requiresAck": false, "title": "", "body": "" },
     "about": {
@@ -219,7 +143,7 @@
         "holdSeconds": 0,
         "exhaleSeconds": 6,
         "holdAfterExhaleSeconds": 0,
-        "recommendedDurationsMinutes": [2, 5, 10, 20]
+        "recommendedDurationsMinutes": [3, 5, 10, 15]
       },
       "intermediate": {
         "mode": "phases",
@@ -227,7 +151,7 @@
         "holdSeconds": 2,
         "exhaleSeconds": 7,
         "holdAfterExhaleSeconds": 0,
-        "recommendedDurationsMinutes": [2, 5, 10, 20]
+        "recommendedDurationsMinutes": [3, 5, 10, 15]
       },
       "advanced": {
         "mode": "phases",
@@ -235,14 +159,15 @@
         "holdSeconds": 4,
         "exhaleSeconds": 8,
         "holdAfterExhaleSeconds": 0,
-        "recommendedDurationsMinutes": [2, 5, 10, 20]
+        "recommendedDurationsMinutes": [3, 5, 10, 15]
       }
     }
   },
   {
     "id": "bhramari",
     "name": "Bhramari",
-    "shortDescription": "A soothing hum on the exhale for relaxation.",
+    "shortDescription": "Soothing hum on exhale for calm.",
+    "goals": ["calm", "sleep"],
     "animationMode": "circle",
     "safety": { "requiresAck": false, "title": "", "body": "" },
     "about": {
@@ -259,7 +184,7 @@
         "holdSeconds": 0,
         "exhaleSeconds": 8,
         "holdAfterExhaleSeconds": 0,
-        "recommendedDurationsMinutes": [2, 5, 10, 20]
+        "recommendedDurationsMinutes": [2, 3, 5, 10]
       },
       "intermediate": {
         "mode": "phases",
@@ -267,7 +192,7 @@
         "holdSeconds": 0,
         "exhaleSeconds": 10,
         "holdAfterExhaleSeconds": 0,
-        "recommendedDurationsMinutes": [2, 5, 10, 20]
+        "recommendedDurationsMinutes": [2, 3, 5, 10]
       },
       "advanced": {
         "mode": "phases",
@@ -275,14 +200,15 @@
         "holdSeconds": 0,
         "exhaleSeconds": 12,
         "holdAfterExhaleSeconds": 0,
-        "recommendedDurationsMinutes": [2, 5, 10, 20]
+        "recommendedDurationsMinutes": [2, 3, 5, 10]
       }
     }
   },
   {
     "id": "hrv_resonance",
     "name": "HRV Resonance",
-    "shortDescription": "Slow, even breathing tuned for heart rate variability.",
+    "shortDescription": "Even breathing tuned for HRV.",
+    "goals": ["hrv", "focus"],
     "animationMode": "circle",
     "safety": { "requiresAck": false, "title": "", "body": "" },
     "about": {
@@ -299,7 +225,7 @@
         "holdSeconds": 0,
         "exhaleSeconds": 5,
         "holdAfterExhaleSeconds": 0,
-        "recommendedDurationsMinutes": [2, 5, 10, 20]
+        "recommendedDurationsMinutes": [5, 10, 15, 20]
       },
       "intermediate": {
         "mode": "phases",
@@ -307,7 +233,7 @@
         "holdSeconds": 0,
         "exhaleSeconds": 6,
         "holdAfterExhaleSeconds": 0,
-        "recommendedDurationsMinutes": [2, 5, 10, 20]
+        "recommendedDurationsMinutes": [5, 10, 15, 20]
       },
       "advanced": {
         "mode": "phases",
@@ -315,14 +241,15 @@
         "holdSeconds": 0,
         "exhaleSeconds": 6.7,
         "holdAfterExhaleSeconds": 0,
-        "recommendedDurationsMinutes": [2, 5, 10, 20]
+        "recommendedDurationsMinutes": [5, 10, 15, 20]
       }
     }
   },
   {
     "id": "ultra_slow",
     "name": "Ultra Slow",
-    "shortDescription": "Very slow breathing for deep calm and control.",
+    "shortDescription": "Very slow breath for deep calm.",
+    "goals": ["hrv", "spiritual"],
     "animationMode": "circle",
     "safety": {
       "requiresAck": true,
@@ -343,7 +270,7 @@
         "holdSeconds": 0,
         "exhaleSeconds": 10,
         "holdAfterExhaleSeconds": 0,
-        "recommendedDurationsMinutes": [2, 5, 10, 20]
+        "recommendedDurationsMinutes": [5, 10, 15, 20]
       },
       "intermediate": {
         "mode": "phases",
@@ -351,7 +278,7 @@
         "holdSeconds": 0,
         "exhaleSeconds": 15,
         "holdAfterExhaleSeconds": 0,
-        "recommendedDurationsMinutes": [2, 5, 10, 20]
+        "recommendedDurationsMinutes": [5, 10, 15, 20]
       },
       "advanced": {
         "mode": "phases",
@@ -359,14 +286,15 @@
         "holdSeconds": 0,
         "exhaleSeconds": 20,
         "holdAfterExhaleSeconds": 0,
-        "recommendedDurationsMinutes": [2, 5, 10, 20]
+        "recommendedDurationsMinutes": [5, 10, 15, 20]
       }
     }
   },
   {
     "id": "kapalbhati",
     "name": "Kapalbhati",
-    "shortDescription": "Fast breathing with rounds and rests for energy and heat.",
+    "shortDescription": "Fast rounds for energy and heat.",
+    "goals": ["energy"],
     "animationMode": "metronome",
     "safety": {
       "requiresAck": true,
@@ -387,7 +315,7 @@
         "rounds": 3,
         "roundSeconds": 30,
         "restSeconds": 30,
-        "recommendedDurationsMinutes": [2, 5, 10, 20]
+        "recommendedDurationsMinutes": [1, 3, 5, 10]
       },
       "intermediate": {
         "mode": "bpm_rounds",
@@ -395,7 +323,7 @@
         "rounds": 3,
         "roundSeconds": 45,
         "restSeconds": 30,
-        "recommendedDurationsMinutes": [2, 5, 10, 20]
+        "recommendedDurationsMinutes": [1, 3, 5, 10]
       },
       "advanced": {
         "mode": "bpm_rounds",
@@ -403,14 +331,15 @@
         "rounds": 3,
         "roundSeconds": 60,
         "restSeconds": 45,
-        "recommendedDurationsMinutes": [2, 5, 10, 20]
+        "recommendedDurationsMinutes": [1, 3, 5, 10]
       }
     }
   },
   {
     "id": "bhastrika",
     "name": "Bhastrika",
-    "shortDescription": "Powerful breathing in rounds for alertness and strength.",
+    "shortDescription": "Powerful rounds for alertness.",
+    "goals": ["energy"],
     "animationMode": "metronome",
     "safety": {
       "requiresAck": true,
@@ -431,7 +360,7 @@
         "rounds": 3,
         "roundSeconds": 30,
         "restSeconds": 60,
-        "recommendedDurationsMinutes": [2, 5, 10, 20]
+        "recommendedDurationsMinutes": [1, 3, 5, 10]
       },
       "intermediate": {
         "mode": "bpm_rounds",
@@ -439,7 +368,7 @@
         "rounds": 3,
         "roundSeconds": 30,
         "restSeconds": 90,
-        "recommendedDurationsMinutes": [2, 5, 10, 20]
+        "recommendedDurationsMinutes": [1, 3, 5, 10]
       },
       "advanced": {
         "mode": "bpm_rounds",
@@ -447,7 +376,7 @@
         "rounds": 3,
         "roundSeconds": 40,
         "restSeconds": 120,
-        "recommendedDurationsMinutes": [2, 5, 10, 20]
+        "recommendedDurationsMinutes": [1, 3, 5, 10]
       }
     }
   }

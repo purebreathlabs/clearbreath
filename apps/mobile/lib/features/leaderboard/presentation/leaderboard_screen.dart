@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../auth/domain/auth_state.dart';
 import '../../auth/domain/auth_state_provider.dart';
 import '../../../core/theme/theme_extensions.dart';
+import '../../../shared/widgets/brand_mark.dart';
 import '../domain/leaderboard_controller.dart';
 import 'widgets/leaderboard_row.dart';
 import 'widgets/ranking_selector.dart';
@@ -17,9 +18,43 @@ class LeaderboardScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final authState = ref.watch(authStateProvider);
     if (authState is AuthStateSignedIn) {
+      if (!authState.sessionReady) {
+        return const _LeaderboardRestoringScreen();
+      }
       return const _LeaderboardSignedInScreen();
     }
     return const LeaderboardLockedScreen();
+  }
+}
+
+class _LeaderboardRestoringScreen extends StatelessWidget {
+  const _LeaderboardRestoringScreen();
+
+  @override
+  Widget build(BuildContext context) {
+    final typography = Theme.of(context).extension<AppTypographyTokens>()!;
+    final colors = Theme.of(context).extension<AppColorTokens>()!;
+    return Scaffold(
+      appBar: AppBar(
+        title: const BrandMark(),
+        automaticallyImplyLeading: false,
+      ),
+      body: Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const CircularProgressIndicator(),
+            const SizedBox(height: 16),
+            Text(
+              'Restoring session\u2026',
+              style: typography.bodyMedium.copyWith(
+                color: colors.textSecondary,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }
 
@@ -116,7 +151,10 @@ class _LeaderboardSignedInScreen extends ConsumerWidget {
     }
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Leaderboard')),
+      appBar: AppBar(
+        title: const BrandMark(),
+        automaticallyImplyLeading: false,
+      ),
       body: SafeArea(
         child: Padding(
           padding: EdgeInsets.all(spacing.lg),

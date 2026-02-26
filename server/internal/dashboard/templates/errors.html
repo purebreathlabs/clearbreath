@@ -1,0 +1,116 @@
+{{define "errors.html"}}
+{{template "layout" .}}
+{{end}}
+
+{{define "content"}}
+<div class="space-y-4">
+    <div class="flex items-center justify-between">
+        <h1 class="text-lg font-bold">Errors</h1>
+        <span class="text-xs text-zinc-500">{{.Total}} HTTP errors, {{.EventTotal}} app events</span>
+    </div>
+
+    <!-- Filters -->
+    <div class="bg-zinc-900 border border-zinc-800 rounded-xl p-4">
+        <div class="flex flex-wrap items-center gap-3">
+            <select name="status" id="filter-status"
+                hx-get="/dashboard/errors"
+                hx-target="body"
+                hx-push-url="true"
+                hx-include="#filter-search"
+                class="px-2 py-1.5 text-xs bg-zinc-800 border border-zinc-700 rounded-lg text-zinc-200 focus:outline-none focus:ring-1 focus:ring-blue-500/50">
+                <option value="4xx" {{if or (eq .StatusQ "") (eq .StatusQ "4xx")}}selected{{end}}>4xx Client Errors</option>
+                <option value="5xx" {{if eq .StatusQ "5xx"}}selected{{end}}>5xx Server Errors</option>
+            </select>
+
+            <div class="flex-1 min-w-[200px]">
+                <input type="search" name="search" id="filter-search" value="{{.Filters.Search}}"
+                    placeholder="Search path, error message..."
+                    hx-get="/dashboard/errors"
+                    hx-target="body"
+                    hx-push-url="true"
+                    hx-trigger="input changed delay:300ms, search"
+                    hx-include="#filter-status"
+                    class="w-full px-3 py-1.5 text-xs bg-zinc-800 border border-zinc-700 rounded-lg text-zinc-200 placeholder-zinc-600 focus:outline-none focus:ring-1 focus:ring-blue-500/50">
+            </div>
+        </div>
+    </div>
+
+    <!-- HTTP Errors Table -->
+    <div class="bg-zinc-900 border border-zinc-800 rounded-xl overflow-hidden">
+        <div class="px-4 py-3 border-b border-zinc-800">
+            <h2 class="text-sm font-medium">HTTP Errors</h2>
+        </div>
+        <div class="overflow-x-auto scrollbar-thin">
+            <table class="w-full text-left">
+                <thead>
+                    <tr class="border-b border-zinc-800 text-xs text-zinc-500 uppercase tracking-wider">
+                        <th class="px-3 py-2.5 font-medium">Time</th>
+                        <th class="px-3 py-2.5 font-medium">Method</th>
+                        <th class="px-3 py-2.5 font-medium">Path</th>
+                        <th class="px-3 py-2.5 font-medium">Status</th>
+                        <th class="px-3 py-2.5 font-medium">Error</th>
+                        <th class="px-3 py-2.5 font-medium">Duration</th>
+                        <th class="px-3 py-2.5 font-medium">IP</th>
+                        <th class="px-3 py-2.5 font-medium">Request ID</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {{range .Logs}}
+                    <tr class="border-b border-zinc-700/50 hover:bg-zinc-800/50 transition-colors">
+                        <td class="px-3 py-2 text-xs text-zinc-400 whitespace-nowrap">{{formatDate .Timestamp}}</td>
+                        <td class="px-3 py-2"><span class="px-1.5 py-0.5 text-xs font-medium rounded {{methodBadgeClass .Method}}">{{.Method}}</span></td>
+                        <td class="px-3 py-2 text-sm text-zinc-200 font-mono max-w-xs truncate" title="{{.Path}}">{{truncate .Path 50}}</td>
+                        <td class="px-3 py-2"><span class="px-1.5 py-0.5 text-xs font-bold rounded {{statusBadgeClass .StatusCode}}">{{.StatusCode}}</span></td>
+                        <td class="px-3 py-2 text-xs text-red-400 max-w-xs truncate" title="{{.ErrorMsg}}">{{truncate .ErrorMsg 40}}</td>
+                        <td class="px-3 py-2 text-xs text-zinc-400">{{printf "%.1f" .DurationMs}}ms</td>
+                        <td class="px-3 py-2 text-xs text-zinc-500 font-mono">{{.IPAddress}}</td>
+                        <td class="px-3 py-2 text-xs text-zinc-500 font-mono">{{shortID .RequestID}}</td>
+                    </tr>
+                    {{else}}
+                    <tr>
+                        <td colspan="8" class="px-3 py-8 text-center text-xs text-zinc-600">No errors found</td>
+                    </tr>
+                    {{end}}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Application Events -->
+    <div class="bg-zinc-900 border border-zinc-800 rounded-xl overflow-hidden">
+        <div class="px-4 py-3 border-b border-zinc-800">
+            <h2 class="text-sm font-medium">Application Events</h2>
+        </div>
+        <div class="overflow-x-auto scrollbar-thin">
+            <table class="w-full text-left">
+                <thead>
+                    <tr class="border-b border-zinc-800 text-xs text-zinc-500 uppercase tracking-wider">
+                        <th class="px-3 py-2.5 font-medium">Time</th>
+                        <th class="px-3 py-2.5 font-medium">Level</th>
+                        <th class="px-3 py-2.5 font-medium">Type</th>
+                        <th class="px-3 py-2.5 font-medium">Message</th>
+                        <th class="px-3 py-2.5 font-medium">IP</th>
+                        <th class="px-3 py-2.5 font-medium">Request ID</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {{range .Events}}
+                    <tr class="border-b border-zinc-700/50 hover:bg-zinc-800/50 transition-colors">
+                        <td class="px-3 py-2 text-xs text-zinc-400 whitespace-nowrap">{{formatDate .Timestamp}}</td>
+                        <td class="px-3 py-2"><span class="px-1.5 py-0.5 text-xs font-bold rounded {{levelBadgeClass .Level}}">{{.Level}}</span></td>
+                        <td class="px-3 py-2 text-xs text-zinc-300">{{.EventType}}</td>
+                        <td class="px-3 py-2 text-sm text-zinc-200 max-w-md truncate" title="{{.Message}}">{{truncate .Message 60}}</td>
+                        <td class="px-3 py-2 text-xs text-zinc-500 font-mono">{{.IPAddress}}</td>
+                        <td class="px-3 py-2 text-xs text-zinc-500 font-mono">{{shortID .RequestID}}</td>
+                    </tr>
+                    {{else}}
+                    <tr>
+                        <td colspan="6" class="px-3 py-8 text-center text-xs text-zinc-600">No application events found</td>
+                    </tr>
+                    {{end}}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{{end}}

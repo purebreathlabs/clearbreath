@@ -2,8 +2,8 @@
   {
     "goal": "calm",
     "daypart": "morning",
-    "techniqueId": "diaphragmatic",
-    "rationale": "Gentle belly breathing to set a calm tone for your morning."
+    "techniqueId": "anulom_vilom",
+    "rationale": "Alternate nostril breathing to start your day calm and centered."
   },
   {
     "goal": "calm",
@@ -14,8 +14,8 @@
   {
     "goal": "calm",
     "daypart": "evening",
-    "techniqueId": "diaphragmatic",
-    "rationale": "Slow diaphragmatic breathing to unwind your evening."
+    "techniqueId": "bhramari",
+    "rationale": "Bhramari humming to unwind your evening and settle down."
   },
   {
     "goal": "calm",
@@ -92,8 +92,8 @@
   {
     "goal": "energy",
     "daypart": "night",
-    "techniqueId": "diaphragmatic",
-    "rationale": "Gentle breathing to keep you balanced at night."
+    "techniqueId": "ujjayi",
+    "rationale": "Steady Ujjayi breathing to stay balanced without overstimulation."
   },
   {
     "goal": "hrv",
@@ -122,8 +122,8 @@
   {
     "goal": "spiritual",
     "daypart": "morning",
-    "techniqueId": "yogic_three_part",
-    "rationale": "Three-part breathing to connect body and mind in the morning."
+    "techniqueId": "anulom_vilom",
+    "rationale": "Alternate nostril breathing to connect body and mind in the morning."
   },
   {
     "goal": "spiritual",
@@ -140,7 +140,7 @@
   {
     "goal": "spiritual",
     "daypart": "night",
-    "techniqueId": "yogic_three_part",
-    "rationale": "A slow three-part breath to end the day grounded."
+    "techniqueId": "anulom_vilom",
+    "rationale": "A slow alternate nostril breath to end the day grounded."
   }
 ]

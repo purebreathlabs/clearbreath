@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../core/theme/theme_extensions.dart';
+import '../../../shared/widgets/brand_mark.dart';
 
 class LeaderboardLockedScreen extends StatelessWidget {
   const LeaderboardLockedScreen({super.key});
@@ -13,6 +14,10 @@ class LeaderboardLockedScreen extends StatelessWidget {
     final colors = Theme.of(context).extension<AppColorTokens>()!;
 
     return Scaffold(
+      appBar: AppBar(
+        title: const BrandMark(),
+        automaticallyImplyLeading: false,
+      ),
       body: SafeArea(
         child: Padding(
           padding: EdgeInsets.all(spacing.lg),
@@ -48,6 +53,14 @@ class LeaderboardLockedScreen extends StatelessWidget {
                     'Sign in to join the community leaderboard.',
                     style: typography.bodyLarge.copyWith(
                       color: colors.textSecondary,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                  SizedBox(height: spacing.xs),
+                  Text(
+                    'You can opt out anytime from your profile.',
+                    style: typography.bodyMedium.copyWith(
+                      color: colors.textTertiary,
                     ),
                     textAlign: TextAlign.center,
                   ),

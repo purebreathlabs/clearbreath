@@ -29,14 +29,6 @@ export const seoPages: SeoPage[] = [
     h1: 'Ultra-slow breathing',
   },
   {
-    slug: 'diaphragmatic-breathing',
-    kind: 'technique',
-    techniqueId: 'diaphragmatic',
-    title: 'Diaphragmatic Breathing — ClearBreath',
-    description: 'Gentle belly breathing to calm and steady.',
-    h1: 'Diaphragmatic breathing',
-  },
-  {
     slug: 'box-breathing-timer',
     kind: 'technique',
     techniqueId: 'box',
@@ -51,15 +43,6 @@ export const seoPages: SeoPage[] = [
     title: '4-7-8 Breathing Timer — ClearBreath',
     description: 'A classic calming pattern with a long exhale.',
     h1: '4-7-8 breathing timer',
-  },
-  {
-    slug: 'yogic-three-part-breathing',
-    kind: 'technique',
-    techniqueId: 'yogic_three_part',
-    title: 'Yogic Three-Part Breathing — ClearBreath',
-    description:
-      'A fuller breath that gently expands belly, ribs, and upper chest.',
-    h1: 'Yogic three-part breathing',
   },
   {
     slug: 'anulom-vilom-timer',
@@ -113,4 +96,3 @@ export const seoPages: SeoPage[] = [
     h1: 'Breathing for sleep',
   },
 ];
-

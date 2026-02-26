@@ -18,7 +18,6 @@ final rawApiClientProvider = Provider<Dio>((ref) {
 });
 
 final apiClientProvider = Provider<Dio>((ref) {
-  final refreshDio = ref.watch(rawApiClientProvider);
   final tokens = ref.watch(tokenStorageProvider);
 
   final dio = Dio(
@@ -31,9 +30,7 @@ final apiClientProvider = Provider<Dio>((ref) {
     ),
   );
 
-  dio.interceptors.add(
-    AuthInterceptor(ref: ref, dio: dio, refreshDio: refreshDio, tokens: tokens),
-  );
+  dio.interceptors.add(AuthInterceptor(ref: ref, dio: dio, tokens: tokens));
 
   return dio;
 });

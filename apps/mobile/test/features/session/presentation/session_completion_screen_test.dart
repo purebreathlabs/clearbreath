@@ -1,4 +1,5 @@
 import 'package:clearbreath/core/theme/app_theme.dart';
+import 'package:clearbreath/features/onboarding/domain/onboarding_answers.dart';
 import 'package:clearbreath/features/session/domain/local_session.dart';
 import 'package:clearbreath/features/session/presentation/session_completion_screen.dart';
 import 'package:clearbreath/features/techniques/data/technique_repository.dart';
@@ -16,6 +17,7 @@ void main() {
       name: 'Box',
       shortDescription: 'Box breathing.',
       animationMode: AnimationMode.circle,
+      goals: const {PrimaryGoal.focus},
       safety: const TechniqueSafety(requiresAck: false, title: '', body: ''),
       about: const TechniqueAbout(
         what: 'What',

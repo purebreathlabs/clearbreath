@@ -5,7 +5,8 @@ Last updated: 2026-02-19
 ## What runs the refresh
 
 - On boot: refresh is attempted once.
-- During runtime: refresh runs every 5 minutes.
+- After session submission: refresh runs asynchronously after each successful session ingest (when at least one session is accepted).
+- During runtime: refresh runs every 5 minutes as a safety-net fallback.
 
 Source: `server/cmd/api/main.go` and `server/internal/service/leaderboard/service.go`.
 
@@ -65,7 +66,7 @@ Expected behavior:
 
 ### Recovery behavior
 
-- Automatic: refresh retries every 5 minutes.
+- Automatic: refresh runs after every successful session ingest, and retries every 5 minutes via the background ticker.
 - Manual: restart the API process to force an on-boot refresh attempt.
 
 ## Debug checklist (local/staging)

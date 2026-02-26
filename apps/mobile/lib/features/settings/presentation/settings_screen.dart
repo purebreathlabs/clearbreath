@@ -7,6 +7,8 @@ import '../../../core/network/api_error.dart';
 import '../../../core/theme/theme_extensions.dart';
 import '../../auth/domain/auth_state.dart';
 import '../../auth/domain/auth_state_provider.dart';
+import '../../notifications/domain/notification_service.dart';
+import '../../../shared/widgets/selection_pill.dart';
 import '../domain/settings_controller.dart';
 
 final packageInfoProvider = FutureProvider<PackageInfo>((ref) async {
@@ -81,15 +83,27 @@ class SettingsScreen extends ConsumerWidget {
                     ),
                   ),
                   SizedBox(height: spacing.md),
-                  for (final minutes in const [2, 5, 10, 20]) ...[
-                    ListTile(
-                      title: Text('$minutes minutes'),
-                      trailing: minutes == state.sessionLengthMinutes
-                          ? const Icon(Icons.check_rounded)
-                          : null,
-                      onTap: () => Navigator.of(context).pop(minutes),
-                    ),
-                  ],
+                  LayoutBuilder(
+                    builder: (context, constraints) {
+                      final tileWidth =
+                          (constraints.maxWidth - spacing.md) / 2.0;
+                      return Wrap(
+                        spacing: spacing.md,
+                        runSpacing: spacing.md,
+                        children: [
+                          for (final minutes in const [2, 5, 10, 20])
+                            SizedBox(
+                              width: tileWidth,
+                              child: SelectionPill(
+                                label: '$minutes min',
+                                selected: minutes == state.sessionLengthMinutes,
+                                onTap: () => Navigator.of(context).pop(minutes),
+                              ),
+                            ),
+                        ],
+                      );
+                    },
+                  ),
                 ],
               ),
             ),
@@ -145,12 +159,14 @@ class SettingsScreen extends ConsumerWidget {
                   divider(),
                   SwitchListTile(
                     title: const Text('Haptics'),
+                    subtitle: const Text('Vibration on phase changes.'),
                     value: state.hapticsEnabled,
                     onChanged: (value) => controller.setHapticsEnabled(value),
                   ),
                   divider(),
                   SwitchListTile(
                     title: const Text('Keep screen awake'),
+                    subtitle: const Text('Prevents screen from sleeping.'),
                     value: state.keepScreenAwake,
                     onChanged: (value) => controller.setKeepScreenAwake(value),
                   ),
@@ -159,6 +175,7 @@ class SettingsScreen extends ConsumerWidget {
                 section('Reminders', [
                   SwitchListTile(
                     title: const Text('Daily reminder'),
+                    subtitle: const Text('A gentle reminder each day.'),
                     value: state.reminderEnabled,
                     onChanged: (value) => controller.setReminderEnabled(value),
                   ),
@@ -173,6 +190,7 @@ class SettingsScreen extends ConsumerWidget {
                   divider(),
                   SwitchListTile(
                     title: const Text('Streak warning'),
+                    subtitle: const Text('A reminder before midnight.'),
                     value: state.streakWarningEnabled,
                     onChanged: (value) =>
                         controller.setStreakWarningEnabled(value),
@@ -228,7 +246,10 @@ class SettingsScreen extends ConsumerWidget {
                       divider(),
                     ],
                     ListTile(
-                      title: const Text('Sign out'),
+                      title: Text(
+                        'Sign out',
+                        style: TextStyle(color: colors.destructive),
+                      ),
                       onTap: () async {
                         try {
                           await ref.read(authStateProvider.notifier).signOut();
@@ -246,7 +267,10 @@ class SettingsScreen extends ConsumerWidget {
                     ),
                     divider(),
                     ListTile(
-                      title: const Text('Delete account'),
+                      title: Text(
+                        'Delete account',
+                        style: TextStyle(color: colors.destructive),
+                      ),
                       onTap: () async {
                         final confirmed = await showDialog<bool>(
                           context: context,
@@ -326,6 +350,16 @@ class SettingsScreen extends ConsumerWidget {
                     title: const Text('Disclaimer'),
                     trailing: const Icon(Icons.chevron_right_rounded),
                     onTap: () => context.push('/profile/legal/disclaimer'),
+                  ),
+                ]),
+                SizedBox(height: spacing.xl),
+                section('Developer', [
+                  ListTile(
+                    leading: const Icon(Icons.notifications_active_outlined),
+                    title: const Text('Test notification'),
+                    subtitle: const Text('Fire an immediate notification.'),
+                    onTap: () =>
+                        ref.read(notificationServiceProvider).showTest(),
                   ),
                 ]),
               ],

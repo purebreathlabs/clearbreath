@@ -281,7 +281,8 @@ class _AudioServiceRemoteControls implements RemoteControls {
             'life.clearbreath.clearbreath.channel.session',
         androidNotificationChannelName: 'Breathing session',
         androidNotificationOngoing: false,
-        androidStopForegroundOnPause: false,
+        androidStopForegroundOnPause: true,
+        androidNotificationIcon: 'drawable/ic_notification',
       ),
     );
   }

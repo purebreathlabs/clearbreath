@@ -7,13 +7,20 @@ This is a checklist of external setup and manual verification steps that are not
 ## OAuth / Identity (Required for production sign-in)
 
 - Google OAuth client IDs
-  - Create Android + iOS OAuth client IDs in Google Cloud Console for the app bundle/package id `life.clearbreath.clearbreath`.
-  - Set backend env `GOOGLE_OAUTH_CLIENT_ID` for staging/prod (`server/internal/config/config.go:204`).
-  - Configure iOS URL scheme(s) and any required plist entries for `google_sign_in` (no `GoogleService-Info.plist` currently present).
+  - [x] Created Android + iOS + Web OAuth client IDs in Google Cloud Console for `life.clearbreath.clearbreath`.
+  - [x] Backend env `GOOGLE_OAUTH_CLIENT_ID` set in `server/.env` (Web client ID).
+  - [x] `serverClientId` + `clientId` configured in `sign_in_screen.dart`.
+  - [x] iOS `Info.plist` configured with `GIDClientID` and `CFBundleURLSchemes`.
+  - [x] Release keystore SHA-1 registered in Google Cloud Console as separate Android client.
+  - Google OAuth Client ID reference:
+    - Web: `884656805579-ptcbmv99ha49rcfm7lelagp5e0ooeepm.apps.googleusercontent.com` (backend token verification)
+    - Android debug: `884656805579-i2irrcd5dnr8iup04jh0d096665u8ieb.apps.googleusercontent.com`
+    - Android release: `884656805579-frpshahbr2hf92c187quctgbdadl5bgb.apps.googleusercontent.com`
+    - iOS: `884656805579-kb298tik2g9e92fi5dbn5nas1ivlsvhl.apps.googleusercontent.com`
 - Apple Sign In
   - Enable “Sign In with Apple” for the iOS bundle id `life.clearbreath.clearbreath` (`apps/mobile/ios/Runner.xcodeproj/project.pbxproj:480`).
   - Add `Runner.entitlements` with the Apple Sign In capability and wire it in Xcode (no `*.entitlements` exists in `apps/mobile/ios/`).
-  - Set backend env `APPLE_OAUTH_AUDIENCE` for staging/prod (`server/internal/config/config.go:207`).
+  - [x] Backend env `APPLE_OAUTH_AUDIENCE` set in `server/.env`.
 
 ## Backend local run (manual)
 
@@ -41,20 +48,22 @@ This is a checklist of external setup and manual verification steps that are not
 
 ## Mobile local run (manual)
 
-- Run app: `make FLUTTER=/home/rahul/sdk/flutter/bin/flutter mobile-run`
-- For local backend testing (dev auth):
-  - `--dart-define=API_BASE_URL=http://localhost:8080`
-  - `--dart-define=DEV_AUTH_ENABLED=true`
-  - `--dart-define=DEV_AUTH_SECRET=<same as backend>`
+- Emulator: `make mobile-run MOBILE_RUN_ARGS="--dart-define=API_BASE_URL=http://10.0.2.2:8080 --dart-define=DEV_AUTH_ENABLED=true"`
+- Physical device (same WiFi): `make mobile-run MOBILE_RUN_ARGS="--dart-define=API_BASE_URL=http://<your-ip>:8080 --dart-define=DEV_AUTH_ENABLED=true"`
+- Release APK for local testing: `flutter build apk --release --split-per-abi --dart-define=API_BASE_URL=http://<your-ip>:8080 --dart-define=DEV_AUTH_ENABLED=true --dart-define=DEV_AUTH_SECRET=dev_secret_change_me`
+- Google Sign-In works on debug builds when debug SHA-1 is registered in Google Cloud Console.
 - Manual checks that require device testing:
   - Background audio + lock-screen controls (iOS + Android).
   - Notification delivery and time-based scheduling behavior.
-  - Apple/Google sign-in on real devices after credentials + capabilities are configured.
+  - Google sign-in on emulator/device (requires Google Play Services).
 
 ## Android release
 
-- Replace debug signing in release builds with a real keystore (`apps/mobile/android/app/build.gradle.kts:32` uses debug signing).
-- Confirm Play Store release workflow (App Bundle build, signing, upload).
+- [x] Release keystore created at `apps/mobile/android/app/clearbreath-release.keystore` (gitignored).
+- [x] `key.properties` configured at `apps/mobile/android/app/key.properties` (gitignored).
+- [x] `build.gradle.kts` loads `key.properties` for release signing, falls back to debug if absent.
+- [ ] Back up keystore + password securely (losing it means you cannot update the app on Play Store).
+- [ ] Confirm Play Store release workflow (App Bundle build, signing, upload).
 
 ## iOS release
 

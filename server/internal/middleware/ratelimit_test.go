@@ -67,7 +67,7 @@ func TestClientIP(t *testing.T) {
 			for k, v := range tt.headers {
 				r.Header.Set(k, v)
 			}
-			if got := clientIP(r); got != tt.want {
+			if got := ClientIP(r); got != tt.want {
 				t.Fatalf("got %q, want %q", got, tt.want)
 			}
 		})

@@ -1,6 +1,6 @@
 # ClearBreath Backend API Contract (v1)
 
-Last updated: 2026-02-19
+Last updated: 2026-02-22
 
 ## Conventions
 
@@ -39,15 +39,18 @@ From `server/registry/techniques.json`:
 
 - `hrv_resonance`
 - `ultra_slow`
-- `diaphragmatic`
 - `box`
 - `four_seven_eight`
-- `yogic_three_part`
 - `anulom_vilom`
 - `ujjayi`
 - `bhramari`
 - `kapalbhati`
 - `bhastrika`
+
+Planned additions (not in the registry yet):
+
+- `diaphragmatic`
+- `yogic_three_part`
 
 ### Preset IDs
 
@@ -80,15 +83,13 @@ Request body:
 {
   "provider": "dev",
   "id_token": "user1",
-  "device_id": "device1",
-  "birth_year": 2000
+  "device_id": "device1"
 }
 ```
 
 Notes:
 
 - `device_id` is required and must be <= 200 chars.
-- `birth_year` is required; under-13 is blocked with `403 age_restricted`.
 - `provider="dev"` requires header `X-Dev-Auth: <DEV_AUTH_SECRET>` when `DEV_AUTH_ENABLED=true`.
 
 Response `200`:
@@ -116,7 +117,6 @@ Errors:
 - `400 validation` (missing/invalid fields, unsupported provider)
 - `401 unauthorized` (dev auth disabled/secret invalid)
 - `401 invalid_provider_token` (google/apple token invalid)
-- `403 age_restricted` (under 13)
 - `500 provider_not_configured` (google/apple not configured)
 - `500 internal`
 

@@ -17,12 +17,12 @@ ClearBreath v1 is a guest-first, dark-mode breathing app focused on simplicity a
 
 The MVP includes:
 - Complete breathing journey from splash to onboarding to daily sessions
-- Full technique library (11 techniques) with safety gates where required
+- Full technique library (9 techniques at launch; 2 planned additions)
 - Offline-first session tracking and local stats
 - 2-minute daily streak system
 - Optional account system for cloud backup and leaderboard participation
 - Global leaderboard with privacy controls and anti-cheat baseline
-- Landing website, legal pages, and 12 SEO pages
+- Landing website, legal pages, and 10 SEO pages
 
 The MVP excludes monetization and advanced social/community complexity to maximize launch quality and speed.
 
@@ -93,7 +93,6 @@ The MVP excludes monetization and advanced social/community complexity to maximi
 - Guest mode supports full breathing and local stats
 - Account required only for leaderboard and cloud backup
 - Providers: Apple and Google
-- Age gate for accounts: ask birth year; if under 13, block sign-in but keep guest mode
 - Leaderboard visibility default ON (opt-out available)
 
 ### 4.7 Leaderboard Rules
@@ -119,7 +118,7 @@ The MVP excludes monetization and advanced social/community complexity to maximi
 - Landing page
 - Privacy page
 - Terms page
-- 12 SEO pages
+- 10 SEO pages
 - Primary CTA: Download app
 
 ### 4.10 Analytics and Monitoring
@@ -166,10 +165,9 @@ The MVP excludes monetization and advanced social/community complexity to maximi
 ### 6.3 Guest to Signed-In Journey
 
 1. User taps locked Leaderboard or sees post-session prompt (after 3 guest sessions)
-2. App asks birth year
-3. If 13+, continue with Apple or Google sign-in
-4. Merge local history into cloud account
-5. Leaderboard visibility is on by default; user can opt out from Profile settings
+2. Continue with Apple or Google sign-in
+3. Merge local history into cloud account
+4. Leaderboard visibility is on by default; user can opt out from Profile settings
 
 ### 6.4 Signed-In Leaderboard Journey
 
@@ -193,7 +191,7 @@ The MVP excludes monetization and advanced social/community complexity to maximi
 - Profile screen (Stats)
 - Settings sections (embedded in Profile)
 - Leaderboard screen
-- Sign-in gate and age gate screens
+- Sign-in gate screen
 - Legal screens (Privacy, Terms)
 
 ### 7.2 Website Pages
@@ -201,7 +199,7 @@ The MVP excludes monetization and advanced social/community complexity to maximi
 - Home landing page
 - Privacy page
 - Terms page
-- 12 SEO pages for breathing techniques and breathing-for-sleep hub
+- 10 SEO pages for breathing techniques and breathing-for-sleep hub
 
 ## 8. Onboarding Requirements
 
@@ -275,15 +273,15 @@ Must include:
 
 1. HRV Resonance Breathing
 2. Ultra-Slow Breathing (must support down to 1 BPM)
-3. Diaphragmatic (Belly) Breathing
-4. Box Breathing
-5. 4-7-8 Breathing
-6. Yogic Breathing (Three-Part)
-7. Anulom Vilom (with visual left/right guidance)
-8. Ujjayi
-9. Bhramari
-10. Kapalbhati (rapid)
-11. Bhastrika (rapid)
+3. Box Breathing
+4. 4-7-8 Breathing
+5. Anulom Vilom (with visual left/right guidance)
+6. Ujjayi
+7. Bhramari
+8. Kapalbhati (rapid)
+9. Bhastrika (rapid)
+
+Planned additions (post-v1): Diaphragmatic (Belly) Breathing, Three-Part Breath (Dirga)
 
 ## 11. Session Engine Requirements
 
@@ -388,10 +386,7 @@ Must show:
 
 ## 14.3 Age Gate
 
-- Ask birth year before sign-in
-- If age under 13, block sign-in and leaderboard participation
-- Keep guest mode fully usable
-- Backend stores only eligibility or age band, not full date of birth
+- No age gate in v1.
 
 ## 14.4 Identity Defaults
 
@@ -862,7 +857,7 @@ Tests to implement within module:
 - Landing page
 - Privacy page
 - Terms page
-- 12 SEO pages
+- 10 SEO pages
 
 ## 18.2 Content Rules
 
@@ -873,7 +868,7 @@ Tests to implement within module:
 
 ## 18.3 SEO Page Set
 
-- 11 technique-specific pages
+- 9 technique-specific pages
 - 1 breathing-for-sleep hub page
 
 ## 18.4 Web Module Plan with Task-Local Tests
@@ -905,7 +900,7 @@ Tests to implement within module:
 
 Scope:
 - Template for technique pages
-- 12 pages final content
+- 10 pages final content
 
 Tests to implement within module:
 - Build validation for all routes
@@ -1024,7 +1019,7 @@ Objectives:
 - Techniques grid/detail, local session storage, completion and stats MVP
 
 Must-complete outputs:
-- 11 techniques rendered from bundled config
+- 9 techniques rendered from bundled config
 - Detail pages with safety content and warnings
 - Local session write path and stats aggregation
 
@@ -1050,11 +1045,10 @@ Required tests in same week:
 ## Week 4 (Mar 4 to Mar 10)
 
 Objectives:
-- Auth, age gate, cloud sync foundations
+- Auth and cloud sync foundations
 
 Must-complete outputs:
 - Apple/Google sign-in backend + app flow
-- Birth-year age gate
 - Guest-to-account session merge and dedupe
 
 Required tests in same week:
@@ -1082,7 +1076,7 @@ Objectives:
 - Hardening, accessibility, SEO completion, beta testing
 
 Must-complete outputs:
-- All 12 SEO pages completed
+- All 10 SEO pages completed
 - Accessibility pass on mobile and web
 - Input validation and rate limiting hardening
 - Internal then broader beta cycle
