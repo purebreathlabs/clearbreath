@@ -8,5 +8,6 @@ final mergedXPProvider = FutureProvider<XPState>((ref) async {
   return XPState.fromTotalXP(
     totalXP: stats.totalXP,
     currentStreakDays: stats.currentStreakDays,
+    practiceDaysAllTime: stats.practiceDaysAllTime,
   );
 });

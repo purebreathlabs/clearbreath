@@ -12,7 +12,7 @@ import (
 )
 
 const getStatsSnapshot = `-- name: GetStatsSnapshot :one
-SELECT user_id, current_streak_days, longest_streak_days, minutes_this_week, minutes_all_time, sessions_all_time, minutes_by_technique, updated_at
+SELECT user_id, current_streak_days, longest_streak_days, minutes_this_week, minutes_all_time, sessions_all_time, minutes_by_technique, updated_at, practice_days_all_time
 FROM stats_snapshots
 WHERE user_id = $1
 `
@@ -29,6 +29,7 @@ func (q *Queries) GetStatsSnapshot(ctx context.Context, userID uuid.UUID) (Stats
 		&i.SessionsAllTime,
 		&i.MinutesByTechnique,
 		&i.UpdatedAt,
+		&i.PracticeDaysAllTime,
 	)
 	return i, err
 }
@@ -38,33 +39,36 @@ INSERT INTO stats_snapshots (
   user_id,
   current_streak_days,
   longest_streak_days,
+  practice_days_all_time,
   minutes_this_week,
   minutes_all_time,
   sessions_all_time,
   minutes_by_technique,
   updated_at
 )
-VALUES ($1, $2, $3, $4, $5, $6, $7, now())
+VALUES ($1, $2, $3, $4, $5, $6, $7, $8, now())
 ON CONFLICT (user_id)
 DO UPDATE SET
   current_streak_days = EXCLUDED.current_streak_days,
   longest_streak_days = EXCLUDED.longest_streak_days,
+  practice_days_all_time = EXCLUDED.practice_days_all_time,
   minutes_this_week = EXCLUDED.minutes_this_week,
   minutes_all_time = EXCLUDED.minutes_all_time,
   sessions_all_time = EXCLUDED.sessions_all_time,
   minutes_by_technique = EXCLUDED.minutes_by_technique,
   updated_at = now()
-RETURNING user_id, current_streak_days, longest_streak_days, minutes_this_week, minutes_all_time, sessions_all_time, minutes_by_technique, updated_at
+RETURNING user_id, current_streak_days, longest_streak_days, minutes_this_week, minutes_all_time, sessions_all_time, minutes_by_technique, updated_at, practice_days_all_time
 `
 
 type UpsertStatsSnapshotParams struct {
-	UserID             uuid.UUID `json:"user_id"`
-	CurrentStreakDays  int32     `json:"current_streak_days"`
-	LongestStreakDays  int32     `json:"longest_streak_days"`
-	MinutesThisWeek    int32     `json:"minutes_this_week"`
-	MinutesAllTime     int32     `json:"minutes_all_time"`
-	SessionsAllTime    int32     `json:"sessions_all_time"`
-	MinutesByTechnique []byte    `json:"minutes_by_technique"`
+	UserID              uuid.UUID `json:"user_id"`
+	CurrentStreakDays   int32     `json:"current_streak_days"`
+	LongestStreakDays   int32     `json:"longest_streak_days"`
+	PracticeDaysAllTime int32     `json:"practice_days_all_time"`
+	MinutesThisWeek     int32     `json:"minutes_this_week"`
+	MinutesAllTime      int32     `json:"minutes_all_time"`
+	SessionsAllTime     int32     `json:"sessions_all_time"`
+	MinutesByTechnique  []byte    `json:"minutes_by_technique"`
 }
 
 func (q *Queries) UpsertStatsSnapshot(ctx context.Context, arg UpsertStatsSnapshotParams) (StatsSnapshot, error) {
@@ -72,6 +76,7 @@ func (q *Queries) UpsertStatsSnapshot(ctx context.Context, arg UpsertStatsSnapsh
 		arg.UserID,
 		arg.CurrentStreakDays,
 		arg.LongestStreakDays,
+		arg.PracticeDaysAllTime,
 		arg.MinutesThisWeek,
 		arg.MinutesAllTime,
 		arg.SessionsAllTime,
@@ -87,6 +92,7 @@ func (q *Queries) UpsertStatsSnapshot(ctx context.Context, arg UpsertStatsSnapsh
 		&i.SessionsAllTime,
 		&i.MinutesByTechnique,
 		&i.UpdatedAt,
+		&i.PracticeDaysAllTime,
 	)
 	return i, err
 }

@@ -7,6 +7,9 @@ class StatsCache extends Table {
 
   IntColumn get longestStreakDays => integer().withDefault(const Constant(0))();
 
+  IntColumn get practiceDaysAllTime =>
+      integer().withDefault(const Constant(0))();
+
   IntColumn get minutesThisWeek => integer().withDefault(const Constant(0))();
 
   IntColumn get minutesAllTime => integer().withDefault(const Constant(0))();

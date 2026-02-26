@@ -159,6 +159,7 @@ void main() {
           (ref) async => StatsSnapshot(
             currentStreakDays: streakDays,
             longestStreakDays: streakDays,
+            practiceDaysAllTime: 0,
             minutesThisWeek: 0,
             minutesAllTime: 0,
             sessionsAllTime: 0,

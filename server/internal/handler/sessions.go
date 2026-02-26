@@ -51,13 +51,14 @@ type ingestStatsSnapshotResponse struct {
 }
 
 type statsSnapshotResponse struct {
-	CurrentStreakDays  int32            `json:"current_streak_days"`
-	LongestStreakDays  int32            `json:"longest_streak_days"`
-	MinutesThisWeek    int32            `json:"minutes_this_week"`
-	MinutesAllTime     int32            `json:"minutes_all_time"`
-	SessionsAllTime    int32            `json:"sessions_all_time"`
-	MinutesByTechnique map[string]int32 `json:"minutes_by_technique"`
-	UpdatedAtUTC       string           `json:"updated_at_utc"`
+	CurrentStreakDays   int32            `json:"current_streak_days"`
+	LongestStreakDays   int32            `json:"longest_streak_days"`
+	PracticeDaysAllTime int32            `json:"practice_days_all_time"`
+	MinutesThisWeek     int32            `json:"minutes_this_week"`
+	MinutesAllTime      int32            `json:"minutes_all_time"`
+	SessionsAllTime     int32            `json:"sessions_all_time"`
+	MinutesByTechnique  map[string]int32 `json:"minutes_by_technique"`
+	UpdatedAtUTC        string           `json:"updated_at_utc"`
 }
 
 func NewSessionsHandler(svc *sessionsvc.Service) *SessionsHandler {
@@ -158,12 +159,13 @@ func toStatsSnapshotResponse(s sqlcgen.StatsSnapshot) (statsSnapshotResponse, er
 	}
 
 	return statsSnapshotResponse{
-		CurrentStreakDays:  s.CurrentStreakDays,
-		LongestStreakDays:  s.LongestStreakDays,
-		MinutesThisWeek:    s.MinutesThisWeek,
-		MinutesAllTime:     s.MinutesAllTime,
-		SessionsAllTime:    s.SessionsAllTime,
-		MinutesByTechnique: m,
-		UpdatedAtUTC:       s.UpdatedAt.UTC().Format(time.RFC3339),
+		CurrentStreakDays:   s.CurrentStreakDays,
+		LongestStreakDays:   s.LongestStreakDays,
+		PracticeDaysAllTime: s.PracticeDaysAllTime,
+		MinutesThisWeek:     s.MinutesThisWeek,
+		MinutesAllTime:      s.MinutesAllTime,
+		SessionsAllTime:     s.SessionsAllTime,
+		MinutesByTechnique:  m,
+		UpdatedAtUTC:        s.UpdatedAt.UTC().Format(time.RFC3339),
 	}, nil
 }

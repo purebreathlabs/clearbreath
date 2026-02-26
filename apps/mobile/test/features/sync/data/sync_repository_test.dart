@@ -58,6 +58,7 @@ void main() {
   "stats_snapshot": {
     "current_streak_days": 1,
     "longest_streak_days": 1,
+    "practice_days_all_time": 1,
     "minutes_this_week": 5,
     "minutes_all_time": 5,
     "sessions_all_time": 1,
