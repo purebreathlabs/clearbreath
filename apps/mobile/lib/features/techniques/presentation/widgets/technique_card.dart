@@ -17,6 +17,8 @@ class TechniqueCard extends StatelessWidget {
     this.onToggleFavorite,
     this.onQuickPlay,
     this.favorited = false,
+    this.presetId = 'beginner',
+    this.durationMinutes = 2,
   });
 
   final Technique technique;
@@ -24,6 +26,8 @@ class TechniqueCard extends StatelessWidget {
   final VoidCallback? onToggleFavorite;
   final VoidCallback? onQuickPlay;
   final bool favorited;
+  final String presetId;
+  final int durationMinutes;
 
   @override
   Widget build(BuildContext context) {
@@ -180,17 +184,14 @@ class TechniqueCard extends StatelessWidget {
 
   String _durationText(Technique technique) {
     final preset =
-        technique.presets['beginner'] ?? technique.presets.values.firstOrNull;
+        technique.presets[presetId] ??
+        technique.presets['beginner'] ??
+        technique.presets.values.firstOrNull;
     if (preset == null) return '';
     if (preset is BpmRoundsPreset) {
       return '${preset.rounds} rounds';
     }
-    final durations = preset.recommendedDurationsMinutes;
-    if (durations.isEmpty) return '';
-    final defaultDuration = durations.length > 1
-        ? durations[1]
-        : durations.first;
-    return '$defaultDuration min';
+    return '$durationMinutes min';
   }
 }
 

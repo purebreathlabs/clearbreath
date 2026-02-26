@@ -36,6 +36,10 @@ class TechniquesScreen extends ConsumerWidget {
       orElse: () => const <String>{},
     );
 
+    final xpState = ref.watch(mergedXPProvider).asData?.value;
+    final userPresetId = xpState?.presetId ?? 'beginner';
+    final userDurationMinutes = xpState?.durationMinutes ?? 2;
+
     Future<void> toggleFavorite(String techniqueId) async {
       try {
         await ref.read(favoritesRepositoryProvider).toggle(techniqueId);
@@ -301,6 +305,8 @@ class TechniquesScreen extends ConsumerWidget {
                           TechniqueCard(
                             key: Key('technique_card_${technique.id}'),
                             technique: technique,
+                            presetId: userPresetId,
+                            durationMinutes: userDurationMinutes,
                             onTap: () =>
                                 context.push('/techniques/${technique.id}'),
                             favorited: favoriteIds.contains(technique.id),
