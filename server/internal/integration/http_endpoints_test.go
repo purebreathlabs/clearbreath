@@ -732,6 +732,9 @@ func TestHTTPAPIContractSmoke(t *testing.T) {
 	if ingest.TotalXP <= 0 {
 		t.Fatalf("expected positive total_xp, got %d", ingest.TotalXP)
 	}
+	if ingest.CurrentLevel > 10 {
+		t.Fatalf("expected current_level <= 10, got %d", ingest.CurrentLevel)
+	}
 	if ingest.StatsSnapshot.TotalXP != ingest.TotalXP {
 		t.Fatalf("nested stats_snapshot.total_xp (%d) != top-level total_xp (%d)", ingest.StatsSnapshot.TotalXP, ingest.TotalXP)
 	}

@@ -12,8 +12,16 @@ void main() {
       expect(levelFromTotalXP(1), 0);
     });
 
-    test('2 XP is level 1', () {
-      expect(levelFromTotalXP(2), 1);
+    test('19 XP is still level 0', () {
+      expect(levelFromTotalXP(19), 0);
+    });
+
+    test('20 XP is level 1', () {
+      expect(levelFromTotalXP(20), 1);
+    });
+
+    test('22 XP is level 1', () {
+      expect(levelFromTotalXP(22), 1);
     });
 
     test('very large XP caps at maxLevel', () {
@@ -26,8 +34,8 @@ void main() {
       expect(cumulativeXPForLevel(0), 0);
     });
 
-    test('level 1 is 2 cumulative', () {
-      expect(cumulativeXPForLevel(1), 2);
+    test('level 1 is 20 cumulative', () {
+      expect(cumulativeXPForLevel(1), 20);
     });
 
     test('negative level returns 0', () {
@@ -36,8 +44,8 @@ void main() {
   });
 
   group('xpForNextLevel', () {
-    test('level 0 needs 2 XP', () {
-      expect(xpForNextLevel(0), 2);
+    test('level 0 needs 20 XP', () {
+      expect(xpForNextLevel(0), 20);
     });
 
     test('negative level returns 0', () {

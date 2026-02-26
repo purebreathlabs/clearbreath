@@ -90,7 +90,7 @@ The MVP excludes monetization and advanced social/community complexity to maximi
 - XP system: 10 XP per full minute of practice, 50% penalty for ended-early sessions
 - Streak multiplier: min(1.0 + 0.1 * streak_days, 3.0) applied to all sessions
 - Daily practice XP cap: 300 XP/day (login bonus of 5 XP excluded from cap)
-- Level curve: xp_required(L) = floor(2 + 0.05*L + 0.0001*L^2), levels 0-999
+- Level curve: xp_required(L) = floor(10 * (2 + 0.05*L + 0.0001*L^2)), levels 0-999
 - Pace auto-progression: L0-14 beginner, L15-49 intermediate, L50+ advanced
 - Duration unlocks: L0=2min, L10=5min, L30=10min, L60=15min, L100=20min
 - XP stored in dedicated tables (user_progress, xp_events) with curve_version for future recompute
