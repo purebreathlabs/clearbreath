@@ -40,6 +40,7 @@ void main() {
   final snapshot = StatsSnapshot(
     currentStreakDays: 3,
     longestStreakDays: 5,
+    practiceDaysAllTime: 0,
     minutesThisWeek: 12,
     minutesAllTime: 34,
     sessionsAllTime: 7,

@@ -38,7 +38,7 @@ The leaderboard API previously supported three ranking views (`streak`, `weekly`
 - The `ranking` query param now accepts `xp` as the primary value.
 - Legacy values (`streak`, `weekly`, `all_time`) are silently mapped to `xp` — no `400` error, no client update required.
 - Response shape changed: `metric_value` replaced by `total_xp` (int64) + `level` (int32). Clients must handle the new fields.
-- Session ingest and stats snapshot responses now include `xp_awards`, `total_xp`, and `current_level` as additive fields (existing fields unchanged).
+- Session ingest and stats snapshot responses include additive fields: `practice_days_all_time`, `xp_awards`, `total_xp`, and `current_level` (existing fields unchanged).
 
 ### Session timestamp validation
 
@@ -382,6 +382,7 @@ Response `200`:
   "stats_snapshot": {
     "current_streak_days": 1,
     "longest_streak_days": 1,
+    "practice_days_all_time": 1,
     "minutes_this_week": 5,
     "minutes_all_time": 5,
     "sessions_all_time": 1,
@@ -458,6 +459,7 @@ Response `200`:
 {
   "current_streak_days": 1,
   "longest_streak_days": 1,
+  "practice_days_all_time": 1,
   "minutes_this_week": 5,
   "minutes_all_time": 5,
   "sessions_all_time": 1,

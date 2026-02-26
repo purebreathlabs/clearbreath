@@ -117,22 +117,28 @@ func computeAndUpsert(ctx context.Context, q *sqlcgen.Queries, userID uuid.UUID,
 	}
 
 	qualifying := make(map[time.Time]bool, len(dayTotals))
+	var practiceDaysAllTime int32
 	for _, row := range dayTotals {
 		d := dateOnly(row.LocalDay)
-		qualifying[d] = row.TotalSeconds >= 120
+		ok := row.TotalSeconds >= 120
+		qualifying[d] = ok
+		if ok {
+			practiceDaysAllTime++
+		}
 	}
 
 	currentStreak := computeCurrentStreak(qualifying, today)
 	longestStreak := computeLongestStreak(qualifying)
 
 	snap, err := q.UpsertStatsSnapshot(ctx, sqlcgen.UpsertStatsSnapshotParams{
-		UserID:             userID,
-		CurrentStreakDays:  int32(currentStreak),
-		LongestStreakDays:  int32(longestStreak),
-		MinutesThisWeek:    int32(weekSeconds / 60),
-		MinutesAllTime:     int32(totalSeconds / 60),
-		SessionsAllTime:    int32(sessionCount),
-		MinutesByTechnique: minutesJSON,
+		UserID:              userID,
+		CurrentStreakDays:   int32(currentStreak),
+		LongestStreakDays:   int32(longestStreak),
+		PracticeDaysAllTime: practiceDaysAllTime,
+		MinutesThisWeek:     int32(weekSeconds / 60),
+		MinutesAllTime:      int32(totalSeconds / 60),
+		SessionsAllTime:     int32(sessionCount),
+		MinutesByTechnique:  minutesJSON,
 	})
 	if err != nil {
 		return sqlcgen.StatsSnapshot{}, fmt.Errorf("upsert stats snapshot: %w", err)

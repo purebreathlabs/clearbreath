@@ -21,6 +21,7 @@ void main() {
           return StatsSnapshot(
             currentStreakDays: 2,
             longestStreakDays: 2,
+            practiceDaysAllTime: 0,
             minutesThisWeek: 0,
             minutesAllTime: 0,
             sessionsAllTime: 0,
@@ -82,6 +83,7 @@ void main() {
           return StatsSnapshot(
             currentStreakDays: 1,
             longestStreakDays: 1,
+            practiceDaysAllTime: 0,
             minutesThisWeek: 0,
             minutesAllTime: 0,
             sessionsAllTime: 0,

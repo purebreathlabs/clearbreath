@@ -364,7 +364,7 @@ ClearBreath uses four bottom tabs: Home, Techniques, Leaderboard, Profile. The L
    - Haptics preference (On/Off)
    - Daily reminder preferred time
    - Display name
-   (Experience level and session length are now auto-managed by the XP level system)
+   (Experience level and session length are now auto-managed by practice days)
 4. Home screen loads with Today’s Practice card and one primary Start button
 5. User can start breathing immediately — zero sign-up required
 6. All session data stored locally (Drift/SQLite) until they choose to sign in
@@ -374,7 +374,7 @@ ClearBreath uses four bottom tabs: Home, Techniques, Leaderboard, Profile. The L
 
 1. Open ClearBreath → Home tab
 2. Today’s Practice recommendation based on:
-   - Preset ID derived from XP level (beginner/intermediate/advanced) and goal
+   - Preset ID derived from practice days (beginner/intermediate/advanced) and goal
    - Daypart (Morning 5–11, Afternoon 11–17, Evening 17–22, Night 22–5)
 3. Start from Today’s Practice, goal shortcuts, or favorites
 4. Browse Techniques tab to explore the full library

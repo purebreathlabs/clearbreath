@@ -81,14 +81,15 @@ type Session struct {
 }
 
 type StatsSnapshot struct {
-	UserID             uuid.UUID `json:"user_id"`
-	CurrentStreakDays  int32     `json:"current_streak_days"`
-	LongestStreakDays  int32     `json:"longest_streak_days"`
-	MinutesThisWeek    int32     `json:"minutes_this_week"`
-	MinutesAllTime     int32     `json:"minutes_all_time"`
-	SessionsAllTime    int32     `json:"sessions_all_time"`
-	MinutesByTechnique []byte    `json:"minutes_by_technique"`
-	UpdatedAt          time.Time `json:"updated_at"`
+	UserID              uuid.UUID `json:"user_id"`
+	CurrentStreakDays   int32     `json:"current_streak_days"`
+	LongestStreakDays   int32     `json:"longest_streak_days"`
+	MinutesThisWeek     int32     `json:"minutes_this_week"`
+	MinutesAllTime      int32     `json:"minutes_all_time"`
+	SessionsAllTime     int32     `json:"sessions_all_time"`
+	MinutesByTechnique  []byte    `json:"minutes_by_technique"`
+	UpdatedAt           time.Time `json:"updated_at"`
+	PracticeDaysAllTime int32     `json:"practice_days_all_time"`
 }
 
 type User struct {

@@ -5,6 +5,7 @@ class StatsSnapshot {
   StatsSnapshot({
     required this.currentStreakDays,
     required this.longestStreakDays,
+    required this.practiceDaysAllTime,
     required this.minutesThisWeek,
     required this.minutesAllTime,
     required this.sessionsAllTime,
@@ -21,6 +22,7 @@ class StatsSnapshot {
     return StatsSnapshot(
       currentStreakDays: 0,
       longestStreakDays: 0,
+      practiceDaysAllTime: 0,
       minutesThisWeek: 0,
       minutesAllTime: 0,
       sessionsAllTime: 0,
@@ -34,6 +36,7 @@ class StatsSnapshot {
 
   final int currentStreakDays;
   final int longestStreakDays;
+  final int practiceDaysAllTime;
   final int minutesThisWeek;
   final int minutesAllTime;
   final int sessionsAllTime;
