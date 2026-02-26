@@ -1,5 +1,6 @@
 import 'package:clearbreath/core/database/app_database.dart';
 import 'package:clearbreath/core/theme/app_theme.dart';
+import 'package:clearbreath/core/theme/theme_extensions.dart';
 import 'package:clearbreath/features/onboarding/domain/onboarding_answers.dart';
 import 'package:clearbreath/features/profile/presentation/profile_screen.dart';
 import 'package:clearbreath/features/stats/domain/stats_engine.dart';
@@ -16,67 +17,67 @@ import 'package:flutter_test/flutter_test.dart';
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
-  testWidgets('renders stats and guest sign-in CTA', (tester) async {
-    const prefs = Preference(
-      id: 1,
-      introComplete: true,
-      onboardingComplete: true,
-      experienceLevel: 'beginner',
-      primaryGoal: 'calm',
-      primaryGoalsJson: '["calm"]',
-      practiceWindow: 'morning',
-      practiceWindowsJson: '["morning"]',
-      sessionLengthMinutes: 5,
-      hapticsEnabled: true,
-      keepScreenAwake: true,
-      reminderTimeMinutes: 22 * 60,
-      reminderEnabled: true,
-      streakWarningEnabled: true,
-      firstSessionCompleted: false,
-      notificationPermissionAsked: false,
-      displayName: 'Rahul',
-    );
+  const prefs = Preference(
+    id: 1,
+    introComplete: true,
+    onboardingComplete: true,
+    experienceLevel: 'beginner',
+    primaryGoal: 'calm',
+    primaryGoalsJson: '["calm"]',
+    practiceWindow: 'morning',
+    practiceWindowsJson: '["morning"]',
+    sessionLengthMinutes: 5,
+    hapticsEnabled: true,
+    keepScreenAwake: true,
+    reminderTimeMinutes: 22 * 60,
+    reminderEnabled: true,
+    streakWarningEnabled: true,
+    firstSessionCompleted: false,
+    notificationPermissionAsked: false,
+    displayName: 'Rahul',
+  );
 
-    final snapshot = StatsSnapshot(
-      currentStreakDays: 3,
-      longestStreakDays: 5,
-      minutesThisWeek: 12,
-      minutesAllTime: 34,
-      sessionsAllTime: 7,
-      minutesByTechnique: const {'box': 12},
-      longestSessionMinutes: 10,
-      favoriteTechniqueId: 'box',
-      totalBreathsEstimated: 123,
-      updatedAt: DateTime.utc(2026, 2, 21),
-    );
+  final snapshot = StatsSnapshot(
+    currentStreakDays: 3,
+    longestStreakDays: 5,
+    minutesThisWeek: 12,
+    minutesAllTime: 34,
+    sessionsAllTime: 7,
+    minutesByTechnique: const {'box': 12},
+    longestSessionMinutes: 10,
+    favoriteTechniqueId: 'box',
+    totalBreathsEstimated: 123,
+    updatedAt: DateTime.utc(2026, 2, 21),
+  );
 
-    final technique = Technique(
-      id: 'box',
-      name: 'Box',
-      shortDescription: 'Box breathing.',
-      animationMode: AnimationMode.circle,
-      goals: const {PrimaryGoal.focus},
-      safety: const TechniqueSafety(requiresAck: false, title: '', body: ''),
-      about: const TechniqueAbout(
-        what: '',
-        how: '',
-        bestTime: '',
-        benefits: '',
-        warnings: '',
+  final technique = Technique(
+    id: 'box',
+    name: 'Box',
+    shortDescription: 'Box breathing.',
+    animationMode: AnimationMode.circle,
+    goals: const {PrimaryGoal.focus},
+    safety: const TechniqueSafety(requiresAck: false, title: '', body: ''),
+    about: const TechniqueAbout(
+      what: '',
+      how: '',
+      bestTime: '',
+      benefits: '',
+      warnings: '',
+    ),
+    presets: {
+      'beginner': PhasePreset(
+        id: 'beginner',
+        label: 'Beginner',
+        recommendedDurationsMinutes: const [2, 5, 10, 20],
+        inhaleMs: 4000,
+        holdMs: 4000,
+        exhaleMs: 4000,
+        holdAfterExhaleMs: 4000,
       ),
-      presets: {
-        'beginner': PhasePreset(
-          id: 'beginner',
-          label: 'Beginner',
-          recommendedDurationsMinutes: const [2, 5, 10, 20],
-          inhaleMs: 4000,
-          holdMs: 4000,
-          exhaleMs: 4000,
-          holdAfterExhaleMs: 4000,
-        ),
-      },
-    );
+    },
+  );
 
+  testWidgets('renders stats and guest sign-in CTA', (tester) async {
     await tester.pumpWidget(
       ProviderScope(
         overrides: [
@@ -113,5 +114,47 @@ void main() {
 
     await tester.pumpWidget(const SizedBox.shrink());
     await tester.pumpAndSettle();
+  });
+
+  testWidgets('edit name dialog uses near-full width on phones', (
+    tester,
+  ) async {
+    await tester.binding.setSurfaceSize(const Size(390, 844));
+    addTearDown(() async => tester.binding.setSurfaceSize(null));
+
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          preferencesProvider.overrideWith(
+            (ref) => Stream<Preference?>.value(prefs),
+          ),
+          localStatsProvider.overrideWith((ref) async => snapshot),
+          weeklyMinutesProvider.overrideWith(
+            (ref) async => const [0, 1, 2, 3, 4, 5, 6],
+          ),
+          allTechniquesProvider.overrideWith((ref) async => [technique]),
+        ],
+        child: MaterialApp(theme: AppTheme.dark(), home: const ProfileScreen()),
+      ),
+    );
+
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byTooltip('Edit name'));
+    await tester.pumpAndSettle();
+
+    final dialogBox = find.byKey(const Key('edit_name_dialog'));
+    expect(dialogBox, findsOneWidget);
+
+    final context = tester.element(dialogBox);
+    final spacing = Theme.of(context).extension<AppSpacingTokens>()!;
+    final screenWidth = tester.binding.renderViews.single.size.width;
+    final expectedDialogWidth = (screenWidth - spacing.sm * 2).clamp(
+      0.0,
+      420.0,
+    );
+
+    final size = tester.getSize(dialogBox);
+    expect(size.width, closeTo(expectedDialogWidth, 0.1));
   });
 }
