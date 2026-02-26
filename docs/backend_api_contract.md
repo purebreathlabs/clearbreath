@@ -370,6 +370,7 @@ Notes:
 - `duration_seconds_actual` is accepted but the server computes the canonical duration from timestamps.
 - `client_session_id` is the idempotency key. Duplicate submissions are treated as no-ops.
 - `local_day` is computed as the local date of `started_at_utc + timezone_offset_minutes`.
+- Session XP awards use `multiplier = min(1.0 + 0.1*current_streak_days, 3.0)`.
 
 Response `200`:
 
@@ -385,23 +386,25 @@ Response `200`:
     "minutes_all_time": 5,
     "sessions_all_time": 1,
     "minutes_by_technique": { "hrv_resonance": 5 },
-    "updated_at_utc": "2026-02-18T12:00:00Z"
+    "updated_at_utc": "2026-02-18T12:00:00Z",
+    "total_xp": 55,
+    "current_level": 2
   },
   "xp_awards": [
     {
-      "amount": 50,
+      "amount": 55,
       "base_amount": 50,
-      "multiplier": 1.0,
+      "multiplier": 1.1,
       "source": "session",
       "daily_capped": false,
-      "new_total_xp": 50,
-      "new_level": 4,
-      "prev_level": 3,
+      "new_total_xp": 55,
+      "new_level": 2,
+      "prev_level": 0,
       "leveled_up": true
     }
   ],
-  "total_xp": 50,
-  "current_level": 4
+  "total_xp": 55,
+  "current_level": 2
 }
 ```
 
@@ -460,8 +463,8 @@ Response `200`:
   "sessions_all_time": 1,
   "minutes_by_technique": { "hrv_resonance": 5 },
   "updated_at_utc": "2026-02-18T12:00:00Z",
-  "total_xp": 50,
-  "current_level": 4
+  "total_xp": 55,
+  "current_level": 2
 }
 ```
 
@@ -501,7 +504,7 @@ Response `200`:
       "display_name_or_initials": "AB",
       "avatar_seed": "…",
       "total_xp": 1250,
-      "level": 28,
+      "level": 41,
       "user_id": "…"
     }
   ]
@@ -536,7 +539,7 @@ Response `200`:
 ```json
 {
   "ranking": "xp",
-  "user": { "rank": 42, "total_xp": 1250, "level": 28 }
+  "user": { "rank": 42, "total_xp": 1250, "level": 41 }
 }
 ```
 
@@ -571,6 +574,7 @@ Notes:
 - `timezone_offset_minutes` must be between -840 and +840.
 - Used to compute the user's local day for idempotency.
 - Second call on the same local day returns `awarded: false`.
+- When `awarded: false`, `xp_award` is omitted and `total_xp/current_level` reflect the current totals.
 
 Response `200`:
 
@@ -583,13 +587,13 @@ Response `200`:
     "multiplier": 1.0,
     "source": "daily_open",
     "daily_capped": false,
-    "new_total_xp": 155,
-    "new_level": 12,
-    "prev_level": 12,
+    "new_total_xp": 60,
+    "new_level": 2,
+    "prev_level": 2,
     "leveled_up": false
   },
-  "total_xp": 155,
-  "current_level": 12
+  "total_xp": 60,
+  "current_level": 2
 }
 ```
 
@@ -613,24 +617,25 @@ Query params:
 
 - `days` (optional, 1-30, default 7): number of days to fetch. Invalid or out-of-range values default to 7.
 - `timezone_offset_minutes` (optional, default 0): for local day computation. Invalid values default to 0.
+- `days[].total_xp` is the per-day sum (`practice_xp + login_xp`) for that local day (not the all-time total).
 
 Response `200`:
 
 ```json
 {
-  "total_xp": 1250,
-  "current_level": 28,
+  "total_xp": 92,
+  "current_level": 4,
   "days": [
     {
       "local_day": "2026-02-26",
-      "total_xp": 155,
-      "practice_xp": 150,
+      "total_xp": 65,
+      "practice_xp": 60,
       "login_xp": 5
     },
     {
       "local_day": "2026-02-25",
-      "total_xp": 105,
-      "practice_xp": 100,
+      "total_xp": 27,
+      "practice_xp": 22,
       "login_xp": 5
     }
   ]
