@@ -5,7 +5,8 @@ class LeaderboardRow {
     required this.rank,
     required this.displayNameOrInitials,
     required this.avatarSeed,
-    required this.metricValue,
+    required this.totalXp,
+    required this.level,
     required this.userId,
   });
 
@@ -14,7 +15,8 @@ class LeaderboardRow {
       rank: readInt(json, 'rank'),
       displayNameOrInitials: readString(json, 'display_name_or_initials'),
       avatarSeed: readString(json, 'avatar_seed'),
-      metricValue: readInt(json, 'metric_value'),
+      totalXp: readInt(json, 'total_xp'),
+      level: readInt(json, 'level'),
       userId: readString(json, 'user_id'),
     );
   }
@@ -22,7 +24,8 @@ class LeaderboardRow {
   final int rank;
   final String displayNameOrInitials;
   final String avatarSeed;
-  final int metricValue;
+  final int totalXp;
+  final int level;
   final String userId;
 }
 
@@ -50,17 +53,23 @@ class LeaderboardListResponse {
 }
 
 class LeaderboardSelfUser {
-  const LeaderboardSelfUser({required this.rank, required this.metricValue});
+  const LeaderboardSelfUser({
+    required this.rank,
+    required this.totalXp,
+    required this.level,
+  });
 
   factory LeaderboardSelfUser.fromJson(JsonMap json) {
     return LeaderboardSelfUser(
       rank: readNullableInt(json, 'rank'),
-      metricValue: readInt(json, 'metric_value'),
+      totalXp: readInt(json, 'total_xp'),
+      level: readInt(json, 'level'),
     );
   }
 
   final int? rank;
-  final int metricValue;
+  final int totalXp;
+  final int level;
 }
 
 class LeaderboardSelfResponse {

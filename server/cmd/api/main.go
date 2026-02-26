@@ -31,6 +31,7 @@ import (
 	sessionsvc "github.com/clearbreath/server/internal/service/session"
 	statssvc "github.com/clearbreath/server/internal/service/stats"
 	usersvc "github.com/clearbreath/server/internal/service/user"
+	xpsvc "github.com/clearbreath/server/internal/service/xp"
 	"github.com/clearbreath/server/internal/technique"
 )
 
@@ -132,13 +133,15 @@ func main() {
 		os.Exit(1)
 	}
 
-	sessionService, err := sessionsvc.NewService(store, registry, statsService, clk)
+	xpService := xpsvc.NewService(store, clk)
+
+	sessionService, err := sessionsvc.NewService(store, registry, statsService, xpService, clk)
 	if err != nil {
 		slog.Error("failed to init session service", "error", err)
 		os.Exit(1)
 	}
 
-	leaderboardService, err := lbsvc.NewService(store, rdb, clk, cfg.LeaderboardDailyCapMin)
+	leaderboardService, err := lbsvc.NewService(store, rdb, clk, xpService)
 	if err != nil {
 		slog.Error("failed to init leaderboard service", "error", err)
 		os.Exit(1)
@@ -179,13 +182,19 @@ func main() {
 	r.With(middleware.Auth(accessTokens, store)).Get("/v1/me/safety_acknowledgements", safetyHandler.Get)
 	r.With(middleware.Auth(accessTokens, store)).Post("/v1/me/safety_acknowledgements", safetyHandler.Post)
 
+	dailyLoginHandler := handler.NewDailyLoginHandler(xpService, store)
+	r.With(middleware.Auth(accessTokens, store)).Post("/v1/me/daily-open", dailyLoginHandler.DailyOpen)
+
 	sessionsHandler := handler.NewSessionsHandler(sessionService)
 	sessionRateLimitDay := middleware.RateLimitUser(rdb, "rl:sessions:day", cfg.RateLimitSessionPerDay, 24*time.Hour)
 	r.With(middleware.Auth(accessTokens, store), sessionRateLimitDay).Post("/v1/sessions/submit", sessionsHandler.Submit)
 	r.With(middleware.Auth(accessTokens, store), sessionRateLimitDay).Post("/v1/sessions/sync", sessionsHandler.Sync)
 
-	statsHandler := handler.NewStatsHandler(statsService)
+	statsHandler := handler.NewStatsHandler(statsService, store)
 	r.With(middleware.Auth(accessTokens, store)).Get("/v1/stats/snapshot", statsHandler.Snapshot)
+
+	xpHistoryHandler := handler.NewXPHistoryHandler(xpService, store)
+	r.With(middleware.Auth(accessTokens, store)).Get("/v1/xp/history", xpHistoryHandler.History)
 
 	leaderboardHandler := handler.NewLeaderboardHandler(leaderboardService)
 	leaderboardRateLimitMin := middleware.RateLimitIP(rdb, "rl:leaderboard:min", cfg.RateLimitLeaderboardPerM, time.Minute)

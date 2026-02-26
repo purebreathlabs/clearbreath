@@ -46,6 +46,8 @@ class StatsCacheRepository {
             longestSessionMinutes: Value(snapshot.longestSessionMinutes),
             favoriteTechniqueId: Value(snapshot.favoriteTechniqueId),
             totalBreathsEstimated: Value(snapshot.totalBreathsEstimated),
+            totalXp: Value(snapshot.totalXP),
+            currentLevel: Value(snapshot.currentLevel),
             updatedAt: Value(snapshot.updatedAt.toUtc()),
           ),
         );
@@ -62,6 +64,8 @@ class StatsCacheRepository {
       longestSessionMinutes: row.longestSessionMinutes,
       favoriteTechniqueId: row.favoriteTechniqueId,
       totalBreathsEstimated: row.totalBreathsEstimated,
+      totalXP: row.totalXp,
+      currentLevel: row.currentLevel,
       updatedAt: row.updatedAt,
     );
   }

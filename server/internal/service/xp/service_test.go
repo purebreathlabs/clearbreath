@@ -1,0 +1,195 @@
+package xp
+
+import (
+	"math"
+	"testing"
+)
+
+func TestBuildLevelThresholds(t *testing.T) {
+	th := buildLevelThresholds()
+
+	if th[0] != 0 {
+		t.Errorf("threshold[0] = %d, want 0", th[0])
+	}
+
+	if th[1] != 20 {
+		t.Errorf("threshold[1] = %d, want 20", th[1])
+	}
+
+	for i := 1; i < len(th); i++ {
+		if th[i] <= th[i-1] {
+			t.Errorf("threshold[%d] = %d <= threshold[%d] = %d", i, th[i], i-1, th[i-1])
+		}
+	}
+
+	if th[1000] < 500000 || th[1000] > 800000 {
+		t.Errorf("threshold[1000] = %d, expected roughly 600K", th[1000])
+	}
+}
+
+func TestLevelFromTotalXP(t *testing.T) {
+	s := NewService(nil, nil)
+
+	tests := []struct {
+		xp   int64
+		want int32
+	}{
+		{0, 0},
+		{1, 0},
+		{19, 0},
+		{20, 1},
+		{22, 1},
+		{39, 1},
+		{40, 2},
+	}
+
+	for _, tt := range tests {
+		got := s.LevelFromTotalXP(tt.xp)
+		if got != tt.want {
+			t.Errorf("LevelFromTotalXP(%d) = %d, want %d", tt.xp, got, tt.want)
+		}
+	}
+
+	if l := s.LevelFromTotalXP(0); l != 0 {
+		t.Errorf("LevelFromTotalXP(0) = %d, want 0", l)
+	}
+
+	xp999 := s.CumulativeXPForLevel(999)
+	if l := s.LevelFromTotalXP(xp999); l != 999 {
+		t.Errorf("LevelFromTotalXP(%d) = %d, want 999", xp999, l)
+	}
+
+	if l := s.LevelFromTotalXP(999999); l != 999 {
+		t.Errorf("LevelFromTotalXP(999999) = %d, want 999", l)
+	}
+}
+
+func TestCumulativeXPForLevel(t *testing.T) {
+	s := NewService(nil, nil)
+
+	if v := s.CumulativeXPForLevel(0); v != 0 {
+		t.Errorf("CumulativeXPForLevel(0) = %d, want 0", v)
+	}
+	if v := s.CumulativeXPForLevel(1); v != 20 {
+		t.Errorf("CumulativeXPForLevel(1) = %d, want 20", v)
+	}
+	if v := s.CumulativeXPForLevel(-1); v != 0 {
+		t.Errorf("CumulativeXPForLevel(-1) = %d, want 0", v)
+	}
+}
+
+func TestXPForNextLevel(t *testing.T) {
+	s := NewService(nil, nil)
+
+	if v := s.XPForNextLevel(0); v != 20 {
+		t.Errorf("XPForNextLevel(0) = %d, want 20", v)
+	}
+
+	for i := int32(0); i <= MaxLevel; i++ {
+		v := s.XPForNextLevel(i)
+		if v <= 0 {
+			t.Errorf("XPForNextLevel(%d) = %d, want > 0", i, v)
+		}
+	}
+}
+
+func TestStreakMultiplier(t *testing.T) {
+	tests := []struct {
+		streak int32
+		want   float64
+	}{
+		{0, 1.0},
+		{1, 1.1},
+		{5, 1.5},
+		{10, 2.0},
+		{20, 3.0},
+		{25, 3.0},
+		{100, 3.0},
+	}
+
+	for _, tt := range tests {
+		got := StreakMultiplier(tt.streak)
+		if math.Abs(got-tt.want) > 0.001 {
+			t.Errorf("StreakMultiplier(%d) = %f, want %f", tt.streak, got, tt.want)
+		}
+	}
+}
+
+func TestPresetForLevel(t *testing.T) {
+	tests := []struct {
+		level int32
+		want  string
+	}{
+		{0, "beginner"},
+		{14, "beginner"},
+		{15, "intermediate"},
+		{49, "intermediate"},
+		{50, "advanced"},
+		{100, "advanced"},
+		{999, "advanced"},
+	}
+
+	for _, tt := range tests {
+		got := PresetForLevel(tt.level)
+		if got != tt.want {
+			t.Errorf("PresetForLevel(%d) = %q, want %q", tt.level, got, tt.want)
+		}
+	}
+}
+
+func TestDurationMinutesForLevel(t *testing.T) {
+	tests := []struct {
+		level int32
+		want  int
+	}{
+		{0, 2},
+		{9, 2},
+		{10, 5},
+		{29, 5},
+		{30, 10},
+		{59, 10},
+		{60, 15},
+		{99, 15},
+		{100, 20},
+		{999, 20},
+	}
+
+	for _, tt := range tests {
+		got := DurationMinutesForLevel(tt.level)
+		if got != tt.want {
+			t.Errorf("DurationMinutesForLevel(%d) = %d, want %d", tt.level, got, tt.want)
+		}
+	}
+}
+
+func TestSessionXPCalculation(t *testing.T) {
+	baseMinutes := 300 / 60
+	baseXP := baseMinutes * XPPerFullMinute
+	if baseXP != 50 {
+		t.Errorf("5min session base XP = %d, want 50", baseXP)
+	}
+
+	earlyMinutes := int(math.Floor(float64(baseMinutes) * EndedEarlyPenalty))
+	earlyXP := earlyMinutes * XPPerFullMinute
+	if earlyXP != 20 {
+		t.Errorf("5min early-end XP = %d, want 20", earlyXP)
+	}
+
+	mult := StreakMultiplier(10)
+	withStreak := int(math.Floor(float64(50) * mult))
+	if withStreak != 100 {
+		t.Errorf("5min streak-10 XP = %d, want 100", withStreak)
+	}
+
+	mult = StreakMultiplier(25)
+	withStreak = int(math.Floor(float64(50) * mult))
+	if withStreak != 150 {
+		t.Errorf("5min streak-25 XP = %d, want 150", withStreak)
+	}
+
+	durationSec := 30
+	subMin := (durationSec / 60) * XPPerFullMinute
+	if subMin != 0 {
+		t.Errorf("30s session XP = %d, want 0", subMin)
+	}
+}

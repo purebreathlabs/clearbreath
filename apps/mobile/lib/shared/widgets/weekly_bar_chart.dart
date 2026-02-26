@@ -9,10 +9,18 @@ class WeeklyBarChart extends StatelessWidget {
     super.key,
     required this.minutes,
     this.loading = false,
+    this.title = 'This week',
+    this.onPrevious,
+    this.onNext,
+    this.canGoNext = false,
   });
 
   final List<int> minutes;
   final bool loading;
+  final String title;
+  final VoidCallback? onPrevious;
+  final VoidCallback? onNext;
+  final bool canGoNext;
 
   @override
   Widget build(BuildContext context) {
@@ -33,9 +41,43 @@ class WeeklyBarChart extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Text(
-            'This week',
-            style: typography.labelMedium.copyWith(color: colors.textSecondary),
+          Row(
+            children: [
+              if (onPrevious != null)
+                GestureDetector(
+                  onTap: onPrevious,
+                  behavior: HitTestBehavior.opaque,
+                  child: Padding(
+                    padding: EdgeInsets.only(right: spacing.sm),
+                    child: Icon(
+                      Icons.chevron_left_rounded,
+                      size: 20,
+                      color: colors.textSecondary,
+                    ),
+                  ),
+                ),
+              Expanded(
+                child: Text(
+                  title,
+                  style: typography.labelMedium.copyWith(
+                    color: colors.textSecondary,
+                  ),
+                ),
+              ),
+              if (onNext != null)
+                GestureDetector(
+                  onTap: canGoNext ? onNext : null,
+                  behavior: HitTestBehavior.opaque,
+                  child: Padding(
+                    padding: EdgeInsets.only(left: spacing.sm),
+                    child: Icon(
+                      Icons.chevron_right_rounded,
+                      size: 20,
+                      color: canGoNext ? colors.textSecondary : colors.disabled,
+                    ),
+                  ),
+                ),
+            ],
           ),
           SizedBox(height: spacing.md),
           SizedBox(

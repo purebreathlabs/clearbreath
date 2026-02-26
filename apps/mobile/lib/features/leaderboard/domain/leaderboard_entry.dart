@@ -6,13 +6,15 @@ class LeaderboardEntry {
     required this.rank,
     required this.displayNameOrInitials,
     required this.avatarSeed,
-    required this.metricValue,
+    required this.totalXp,
+    required this.level,
     this.userId,
   });
 
   final int? rank;
   final String displayNameOrInitials;
   final String avatarSeed;
-  final int metricValue;
+  final int totalXp;
+  final int level;
   final String? userId;
 }

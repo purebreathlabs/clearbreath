@@ -24,14 +24,14 @@ void main() {
     await tester.tap(find.text('Get started'));
     await tester.pumpAndSettle();
 
-    expect(find.text('Your experience level'), findsOneWidget);
+    expect(find.text('Your goals'), findsOneWidget);
 
     await tester.tap(find.text('Skip setup'));
     await tester.pump();
     await tester.tap(find.text('Skip'));
     await tester.pumpAndSettle();
 
-    expect(find.text('Your experience level'), findsNothing);
+    expect(find.text('Your goals'), findsNothing);
     expect(find.text('Leaderboard is locked'), findsOneWidget);
 
     await tester.pumpWidget(const SizedBox.shrink());

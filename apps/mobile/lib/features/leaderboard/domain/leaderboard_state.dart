@@ -1,12 +1,10 @@
 import 'package:flutter/foundation.dart';
 
 import 'leaderboard_entry.dart';
-import 'leaderboard_ranking.dart';
 
 @immutable
 class LeaderboardState {
   const LeaderboardState({
-    required this.ranking,
     required this.loading,
     required this.entries,
     required this.self,
@@ -18,7 +16,6 @@ class LeaderboardState {
 
   factory LeaderboardState.initial() {
     return const LeaderboardState(
-      ranking: LeaderboardRanking.streak,
       loading: false,
       entries: [],
       self: null,
@@ -29,7 +26,6 @@ class LeaderboardState {
     );
   }
 
-  final LeaderboardRanking ranking;
   final bool loading;
   final List<LeaderboardEntry> entries;
   final LeaderboardEntry? self;
@@ -39,7 +35,6 @@ class LeaderboardState {
   final String? errorMessage;
 
   LeaderboardState copyWith({
-    LeaderboardRanking? ranking,
     bool? loading,
     List<LeaderboardEntry>? entries,
     LeaderboardEntry? self,
@@ -49,7 +44,6 @@ class LeaderboardState {
     String? errorMessage,
   }) {
     return LeaderboardState(
-      ranking: ranking ?? this.ranking,
       loading: loading ?? this.loading,
       entries: entries ?? this.entries,
       self: self ?? this.self,

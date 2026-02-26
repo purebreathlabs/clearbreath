@@ -9,7 +9,9 @@ import '../../../shared/widgets/brand_mark.dart';
 import '../../auth/domain/auth_state.dart';
 import '../../auth/domain/auth_state_provider.dart';
 import '../../settings/data/settings_repository.dart';
+import 'widgets/level_card.dart';
 import 'widgets/stats_section.dart';
+import 'widgets/xp_history_section.dart';
 
 class ProfileScreen extends ConsumerWidget {
   const ProfileScreen({super.key});
@@ -189,6 +191,10 @@ class ProfileScreen extends ConsumerWidget {
                     ),
                   ),
                 ],
+                SizedBox(height: spacing.xl),
+                const LevelCard(),
+                SizedBox(height: spacing.lg),
+                const XPHistorySection(),
                 SizedBox(height: spacing.xl),
                 Text(
                   'Stats',

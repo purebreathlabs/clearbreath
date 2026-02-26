@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"sort"
 	"strings"
 	"time"
 
@@ -16,12 +17,14 @@ import (
 	"github.com/clearbreath/server/internal/repository"
 	"github.com/clearbreath/server/internal/repository/sqlcgen"
 	"github.com/clearbreath/server/internal/service/stats"
+	"github.com/clearbreath/server/internal/service/xp"
 	"github.com/clearbreath/server/internal/technique"
 )
 
 type Service struct {
 	store         *repository.Store
 	stats         *stats.Service
+	xp            *xp.Service
 	registry      *technique.Registry
 	clock         clock.Clock
 	maxSubmit     int
@@ -51,9 +54,12 @@ type IngestResult struct {
 	DuplicateCount int                   `json:"duplicate_count"`
 	Rejected       []RejectedSession     `json:"rejected"`
 	StatsSnapshot  sqlcgen.StatsSnapshot `json:"stats_snapshot"`
+	XPAwards       []xp.XPAward          `json:"xp_awards"`
+	TotalXP        int64                 `json:"total_xp"`
+	CurrentLevel   int32                 `json:"current_level"`
 }
 
-func NewService(store *repository.Store, registry *technique.Registry, statsSvc *stats.Service, clk clock.Clock) (*Service, error) {
+func NewService(store *repository.Store, registry *technique.Registry, statsSvc *stats.Service, xpSvc *xp.Service, clk clock.Clock) (*Service, error) {
 	if store == nil {
 		return nil, fmt.Errorf("store is required")
 	}
@@ -63,6 +69,9 @@ func NewService(store *repository.Store, registry *technique.Registry, statsSvc 
 	if statsSvc == nil {
 		return nil, fmt.Errorf("stats service is required")
 	}
+	if xpSvc == nil {
+		return nil, fmt.Errorf("xp service is required")
+	}
 	if clk == nil {
 		return nil, fmt.Errorf("clock is required")
 	}
@@ -71,6 +80,7 @@ func NewService(store *repository.Store, registry *technique.Registry, statsSvc 
 		store:     store,
 		registry:  registry,
 		stats:     statsSvc,
+		xp:        xpSvc,
 		clock:     clk,
 		maxSubmit: 200,
 		maxSync:   500,
@@ -100,6 +110,7 @@ func (s *Service) ingest(ctx context.Context, userID uuid.UUID, sessions []Sessi
 	now := s.clock.Now().UTC()
 	out := IngestResult{
 		Rejected: make([]RejectedSession, 0),
+		XPAwards: make([]xp.XPAward, 0),
 	}
 
 	if err := s.store.InTx(ctx, func(q *sqlcgen.Queries) error {
@@ -115,6 +126,8 @@ func (s *Service) ingest(ctx context.Context, userID uuid.UUID, sessions []Sessi
 		latestEnded := time.Time{}
 		latestOffset := tzOffset
 
+		var accepted []acceptedSession
+
 		for _, in := range sessions {
 			preset, ok := s.registry.Preset(in.TechniqueID, in.PresetID)
 			if !ok {
@@ -126,7 +139,7 @@ func (s *Service) ingest(ctx context.Context, userID uuid.UUID, sessions []Sessi
 				continue
 			}
 
-			norm, rej := normalizeSession(in, preset)
+			norm, rej := normalizeSession(in, preset, now)
 			if rej != nil {
 				out.Rejected = append(out.Rejected, *rej)
 				continue
@@ -157,6 +170,10 @@ func (s *Service) ingest(ctx context.Context, userID uuid.UUID, sessions []Sessi
 				out.DuplicateCount++
 			} else {
 				out.AcceptedCount++
+				accepted = append(accepted, acceptedSession{
+					clientSessionID: norm.ClientSessionID,
+					startedAtUTC:    norm.StartedAtUtc,
+				})
 			}
 		}
 
@@ -176,6 +193,61 @@ func (s *Service) ingest(ctx context.Context, userID uuid.UUID, sessions []Sessi
 			return err
 		}
 		out.StatsSnapshot = snap
+
+		dayTotals, err := q.GetSessionDayTotals(ctx, userID)
+		if err != nil {
+			return fmt.Errorf("get day totals for xp: %w", err)
+		}
+		qualifying := make(map[time.Time]bool, len(dayTotals))
+		for _, row := range dayTotals {
+			qualifying[dateOnlyUTC(row.LocalDay)] = row.TotalSeconds >= 120
+		}
+
+		streakByDay := map[time.Time]int32{}
+
+		sortAccepted(accepted)
+		for _, a := range accepted {
+			sess, err := q.GetSessionByClientID(ctx, a.clientSessionID)
+			if err != nil {
+				return fmt.Errorf("get session for xp: %w", err)
+			}
+
+			localDay := dateOnlyUTC(sess.LocalDay)
+			streakDays, ok := streakByDay[localDay]
+			if !ok {
+				streakDays = stats.CurrentStreakAtDay(qualifying, localDay)
+				streakByDay[localDay] = streakDays
+			}
+
+			award, err := s.xp.AwardSessionXP(
+				ctx, q, userID, sess.ID,
+				sess.DurationSecondsActual, sess.EndedEarly,
+				streakDays, sess.LocalDay,
+			)
+			if err != nil {
+				return fmt.Errorf("award session xp: %w", err)
+			}
+			if award.Amount > 0 || award.DailyCapped {
+				out.XPAwards = append(out.XPAwards, award)
+			}
+		}
+
+		if len(accepted) > 0 {
+			_, _, err := s.xp.RecomputeTotalXP(ctx, q, userID)
+			if err != nil {
+				return fmt.Errorf("recompute total xp: %w", err)
+			}
+		}
+
+		prog, err := q.GetUserProgress(ctx, userID)
+		if err != nil && !errors.Is(err, pgx.ErrNoRows) {
+			return fmt.Errorf("get user progress: %w", err)
+		}
+		if err == nil {
+			out.TotalXP = prog.TotalXp
+			out.CurrentLevel = prog.CurrentLevel
+		}
+
 		return nil
 	}); err != nil {
 		return IngestResult{}, err
@@ -201,7 +273,12 @@ type normalizedSession struct {
 	EndedEarly                bool
 }
 
-func normalizeSession(in SessionInput, preset technique.Preset) (normalizedSession, *RejectedSession) {
+const (
+	maxFutureWindow = 24 * time.Hour
+	maxPastWindow   = 90 * 24 * time.Hour
+)
+
+func normalizeSession(in SessionInput, preset technique.Preset, now time.Time) (normalizedSession, *RejectedSession) {
 	rawID := strings.TrimSpace(in.ClientSessionID)
 	if rawID == "" {
 		return normalizedSession{}, &RejectedSession{
@@ -233,6 +310,22 @@ func normalizeSession(in SessionInput, preset technique.Preset) (normalizedSessi
 			ClientSessionID: rawID,
 			Code:            "validation",
 			Message:         "timestamps are invalid",
+		}
+	}
+
+	now = now.UTC()
+	if started.After(now.Add(maxFutureWindow)) {
+		return normalizedSession{}, &RejectedSession{
+			ClientSessionID: rawID,
+			Code:            "plausibility",
+			Message:         "started_at_utc is too far in the future",
+		}
+	}
+	if started.Before(now.Add(-maxPastWindow)) {
+		return normalizedSession{}, &RejectedSession{
+			ClientSessionID: rawID,
+			Code:            "plausibility",
+			Message:         "started_at_utc is too far in the past",
 		}
 	}
 
@@ -303,6 +396,17 @@ func normalizeSession(in SessionInput, preset technique.Preset) (normalizedSessi
 	}, nil
 }
 
+type acceptedSession struct {
+	clientSessionID uuid.UUID
+	startedAtUTC    time.Time
+}
+
+func sortAccepted(a []acceptedSession) {
+	sort.Slice(a, func(i, j int) bool {
+		return a[i].startedAtUTC.Before(a[j].startedAtUTC)
+	})
+}
+
 func clampBreathsEstimate(breaths int, durationSeconds int, preset technique.Preset) int {
 	if breaths == 0 || durationSeconds <= 0 {
 		return breaths
@@ -328,4 +432,9 @@ func clampBreathsEstimate(breaths int, durationSeconds int, preset technique.Pre
 		return maxBreaths
 	}
 	return breaths
+}
+
+func dateOnlyUTC(t time.Time) time.Time {
+	t = t.UTC()
+	return time.Date(t.Year(), t.Month(), t.Day(), 0, 0, 0, 0, time.UTC)
 }

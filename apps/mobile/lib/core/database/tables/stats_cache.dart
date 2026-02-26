@@ -24,6 +24,10 @@ class StatsCache extends Table {
   IntColumn get totalBreathsEstimated =>
       integer().withDefault(const Constant(0))();
 
+  IntColumn get totalXp => integer().withDefault(const Constant(0))();
+
+  IntColumn get currentLevel => integer().withDefault(const Constant(0))();
+
   DateTimeColumn get updatedAt => dateTime()();
 
   @override

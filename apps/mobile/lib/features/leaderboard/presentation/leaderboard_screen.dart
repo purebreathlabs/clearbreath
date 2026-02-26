@@ -7,7 +7,6 @@ import '../../../core/theme/theme_extensions.dart';
 import '../../../shared/widgets/brand_mark.dart';
 import '../domain/leaderboard_controller.dart';
 import 'widgets/leaderboard_row.dart';
-import 'widgets/ranking_selector.dart';
 import 'widgets/self_rank_card.dart';
 import 'leaderboard_locked_screen.dart';
 
@@ -140,7 +139,6 @@ class _LeaderboardSignedInScreen extends ConsumerWidget {
             final entry = state.entries[index];
             return LeaderboardRowWidget(
               entry: entry,
-              ranking: state.ranking,
               isSelf: entry.userId == userId,
             );
           },
@@ -161,11 +159,6 @@ class _LeaderboardSignedInScreen extends ConsumerWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              RankingSelector(
-                selected: state.ranking,
-                onSelect: controller.selectRanking,
-              ),
-              SizedBox(height: spacing.md),
               if (state.bannerMessage != null) ...[
                 banner(state.bannerMessage!),
                 SizedBox(height: spacing.md),
@@ -181,7 +174,6 @@ class _LeaderboardSignedInScreen extends ConsumerWidget {
               SizedBox(height: spacing.md),
               SelfRankCard(
                 entry: state.self,
-                ranking: state.ranking,
                 loading: state.loading && state.self == null,
               ),
             ],

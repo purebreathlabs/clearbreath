@@ -17,6 +17,7 @@ import (
 	"github.com/clearbreath/server/internal/repository/sqlcgen"
 	authsvc "github.com/clearbreath/server/internal/service/auth"
 	lbsvc "github.com/clearbreath/server/internal/service/leaderboard"
+	xpsvc "github.com/clearbreath/server/internal/service/xp"
 	"github.com/clearbreath/server/internal/technique"
 )
 
@@ -131,7 +132,9 @@ func TestLeaderboardListRanksAreContiguousAfterFiltering(t *testing.T) {
 		t.Fatalf("upsert stats snapshot user2: %v", err)
 	}
 
-	leaderboardService, err := lbsvc.NewService(store, rdb, clk, cfg.LeaderboardDailyCapMin)
+	xpService := xpsvc.NewService(store, clk)
+
+	leaderboardService, err := lbsvc.NewService(store, rdb, clk, xpService)
 	if err != nil {
 		t.Fatalf("leaderboard service: %v", err)
 	}

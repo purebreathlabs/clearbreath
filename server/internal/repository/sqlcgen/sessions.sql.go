@@ -12,6 +12,29 @@ import (
 	"github.com/google/uuid"
 )
 
+const getSessionByClientID = `-- name: GetSessionByClientID :one
+SELECT id, duration_seconds_actual, ended_early, local_day FROM sessions WHERE client_session_id = $1
+`
+
+type GetSessionByClientIDRow struct {
+	ID                    uuid.UUID `json:"id"`
+	DurationSecondsActual int32     `json:"duration_seconds_actual"`
+	EndedEarly            bool      `json:"ended_early"`
+	LocalDay              time.Time `json:"local_day"`
+}
+
+func (q *Queries) GetSessionByClientID(ctx context.Context, clientSessionID uuid.UUID) (GetSessionByClientIDRow, error) {
+	row := q.db.QueryRow(ctx, getSessionByClientID, clientSessionID)
+	var i GetSessionByClientIDRow
+	err := row.Scan(
+		&i.ID,
+		&i.DurationSecondsActual,
+		&i.EndedEarly,
+		&i.LocalDay,
+	)
+	return i, err
+}
+
 const getSessionCount = `-- name: GetSessionCount :one
 SELECT COUNT(*)::bigint AS session_count
 FROM sessions

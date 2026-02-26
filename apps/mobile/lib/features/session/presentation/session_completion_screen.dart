@@ -8,10 +8,13 @@ import '../../../core/theme/theme_extensions.dart';
 import '../../notifications/domain/notification_controller.dart';
 import '../../share/presentation/share_button.dart';
 import '../../share/presentation/share_card_widget.dart';
+import '../../../core/network/models/session_models.dart';
+import '../../sync/domain/sync_controller.dart';
 import '../../techniques/data/technique_repository.dart';
 import '../../techniques/domain/technique.dart';
 import '../../stats/domain/stats_snapshot.dart';
 import '../../sync/domain/merged_stats_provider.dart';
+import '../../xp/domain/xp_provider.dart';
 import '../domain/local_session.dart';
 
 class SessionCompletionScreen extends ConsumerStatefulWidget {
@@ -109,6 +112,8 @@ class _SessionCompletionScreenState
     final current = widget.session;
     final techniques = ref.watch(allTechniquesProvider);
     final stats = ref.watch(mergedStatsProvider);
+    final xpAsync = ref.watch(mergedXPProvider);
+    final latestAwards = ref.watch(latestXpAwardsProvider);
     final technique = current == null
         ? null
         : _findTechnique(techniques.asData?.value, current.techniqueId);
@@ -211,6 +216,14 @@ class _SessionCompletionScreenState
                                   value: streakValue,
                                 ),
                               ),
+                              SizedBox(
+                                width: tileWidth,
+                                child: _MetricTile(
+                                  key: const Key('completion_xp_tile'),
+                                  label: 'XP Earned',
+                                  value: _xpEarnedLabel(latestAwards),
+                                ),
+                              ),
                             ],
                           );
                         },
@@ -223,6 +236,16 @@ class _SessionCompletionScreenState
                         ),
                         textAlign: TextAlign.center,
                       ),
+                      if (xpAsync.asData != null) ...[
+                        SizedBox(height: spacing.sm),
+                        Text(
+                          'Level ${xpAsync.asData!.value.currentLevel}',
+                          style: typography.titleMedium.copyWith(
+                            color: colors.textSecondary,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                      ],
                       if (canShare) ...[
                         SizedBox(height: spacing.xl),
                         LayoutBuilder(
@@ -298,6 +321,15 @@ class _SessionCompletionScreenState
         })
         .toList(growable: false);
     return words.isEmpty ? value : words.join(' ');
+  }
+
+  String _xpEarnedLabel(List<XPAward> awards) {
+    if (awards.isEmpty) return '—';
+    var total = 0;
+    for (final award in awards) {
+      total += award.amount;
+    }
+    return '+$total';
   }
 
   String _streakMessage(StatsSnapshot snapshot) {

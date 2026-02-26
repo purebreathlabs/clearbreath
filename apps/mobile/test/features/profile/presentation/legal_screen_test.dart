@@ -6,10 +6,7 @@ import 'package:flutter_test/flutter_test.dart';
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
-  Future<void> pumpLegal(
-    WidgetTester tester, {
-    required String type,
-  }) async {
+  Future<void> pumpLegal(WidgetTester tester, {required String type}) async {
     await tester.pumpWidget(
       MaterialApp(
         theme: AppTheme.dark(),

@@ -13,18 +13,27 @@ import '../../../techniques/domain/technique.dart';
 import 'stats_metric_tile.dart';
 import 'technique_breakdown_list.dart';
 
-class StatsSection extends ConsumerWidget {
+class StatsSection extends ConsumerStatefulWidget {
   const StatsSection({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<StatsSection> createState() => _StatsSectionState();
+}
+
+class _StatsSectionState extends ConsumerState<StatsSection> {
+  int _weekOffset = 0;
+
+  static const int _minWeekOffset = -52;
+
+  @override
+  Widget build(BuildContext context) {
     final spacing = Theme.of(context).extension<AppSpacingTokens>()!;
     final typography = Theme.of(context).extension<AppTypographyTokens>()!;
     final colors = Theme.of(context).extension<AppColorTokens>()!;
     final components = Theme.of(context).extension<AppComponentTokens>()!;
 
     final stats = ref.watch(mergedStatsProvider);
-    final weekly = ref.watch(weeklyMinutesProvider);
+    final weekly = ref.watch(weeklyMinutesProvider(_weekOffset));
     final techniques = ref.watch(allTechniquesProvider);
 
     Widget errorState(String message) {
@@ -112,7 +121,19 @@ class StatsSection extends ConsumerWidget {
             ),
             SizedBox(height: spacing.lg),
             weekly.when(
-              data: (minutes) => WeeklyBarChart(minutes: minutes),
+              data: (minutes) => WeeklyBarChart(
+                minutes: minutes,
+                title: weekTitle(_weekOffset),
+                onPrevious: _weekOffset > _minWeekOffset
+                    ? () => setState(() => _weekOffset--)
+                    : null,
+                onNext: () {
+                  if (_weekOffset < 0) {
+                    setState(() => _weekOffset++);
+                  }
+                },
+                canGoNext: _weekOffset < 0,
+              ),
               loading: () =>
                   const WeeklyBarChart(minutes: <int>[], loading: true),
               error: (error, stackTrace) =>

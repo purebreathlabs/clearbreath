@@ -9,7 +9,6 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/redis/go-redis/v9"
 	"golang.org/x/crypto/bcrypt"
 
 	"github.com/clearbreath/server/internal/middleware"
@@ -95,12 +94,13 @@ func (d *Dashboard) validateSession(r *http.Request) (*sessionPayload, bool) {
 }
 
 func (d *Dashboard) clearSession(w http.ResponseWriter) {
+	secure := d.env != "development"
 	http.SetCookie(w, &http.Cookie{
 		Name:     sessionCookieName,
 		Value:    "",
 		Path:     "/dashboard",
 		HttpOnly: true,
-		Secure:   true,
+		Secure:   secure,
 		SameSite: http.SameSiteStrictMode,
 		MaxAge:   -1,
 	})
@@ -124,15 +124,6 @@ func (d *Dashboard) csrfTokenFromRequest(r *http.Request) string {
 		return ""
 	}
 	return d.csrfToken(c.Value)
-}
-
-func (d *Dashboard) validateCSRF(r *http.Request) bool {
-	token := r.FormValue("_csrf")
-	if token == "" {
-		return false
-	}
-	expected := d.csrfTokenFromRequest(r)
-	return hmac.Equal([]byte(token), []byte(expected))
 }
 
 // checkLoginRateLimit returns true if the IP is allowed to attempt login.
@@ -159,9 +150,4 @@ func (d *Dashboard) clearLoginRateLimit(r *http.Request) {
 func (d *Dashboard) verifyPassword(password string) bool {
 	err := bcrypt.CompareHashAndPassword([]byte(d.passwordHash), []byte(password))
 	return err == nil
-}
-
-// newRedisNilSafe wraps redis client for dashboard use.
-func newRedisNilSafe(rdb *redis.Client) *redis.Client {
-	return rdb
 }
