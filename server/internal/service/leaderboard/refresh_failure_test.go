@@ -141,7 +141,7 @@ func TestWriteZSetDeletesFinalOnEmptyDataset(t *testing.T) {
 
 	_ = r.ZAdd(ctx, "lb:streak", redis.Z{Member: uuid.New().String(), Score: 1})
 
-	if err := s.writeZSet(ctx, "lb:streak", []sqlcgen.GetLeaderboardStreakMetricsRow{}); err != nil {
+	if err := s.writeZSet(ctx, "lb:streak", []sqlcgen.GetLeaderboardXPMetricsRow{}); err != nil {
 		t.Fatalf("writeZSet: %v", err)
 	}
 
@@ -161,8 +161,8 @@ func TestWriteZSetRenameFailureLeavesFinalUntouchedAndRecovers(t *testing.T) {
 	_ = r.ZAdd(ctx, "lb:streak", redis.Z{Member: oldID, Score: 1})
 	r.renameErr = errors.New("rename failed")
 
-	rows := []sqlcgen.GetLeaderboardStreakMetricsRow{
-		{UserID: uuid.MustParse(newID), MetricValue: 10},
+	rows := []sqlcgen.GetLeaderboardXPMetricsRow{
+		{UserID: uuid.MustParse(newID), TotalXp: 10},
 	}
 
 	if err := s.writeZSet(ctx, "lb:streak", rows); err == nil {
@@ -209,8 +209,8 @@ func TestWriteZSetDelFailureReturnsError(t *testing.T) {
 	r.delErr = errors.New("redis down")
 	s := &Service{redis: r}
 
-	rows := []sqlcgen.GetLeaderboardStreakMetricsRow{
-		{UserID: uuid.New(), MetricValue: 1},
+	rows := []sqlcgen.GetLeaderboardXPMetricsRow{
+		{UserID: uuid.New(), TotalXp: 1},
 	}
 
 	if err := s.writeZSet(ctx, "lb:streak", rows); err == nil {

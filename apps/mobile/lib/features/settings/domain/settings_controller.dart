@@ -8,7 +8,6 @@ import '../data/settings_repository.dart';
 @immutable
 class SettingsState {
   const SettingsState({
-    required this.sessionLengthMinutes,
     required this.hapticsEnabled,
     required this.keepScreenAwake,
     required this.reminderEnabled,
@@ -20,7 +19,6 @@ class SettingsState {
   factory SettingsState.fromPreferences(Preference? prefs) {
     if (prefs == null) {
       return const SettingsState(
-        sessionLengthMinutes: 5,
         hapticsEnabled: true,
         keepScreenAwake: true,
         reminderEnabled: true,
@@ -31,7 +29,6 @@ class SettingsState {
     }
 
     return SettingsState(
-      sessionLengthMinutes: prefs.sessionLengthMinutes,
       hapticsEnabled: prefs.hapticsEnabled,
       keepScreenAwake: prefs.keepScreenAwake,
       reminderEnabled: prefs.reminderEnabled,
@@ -41,7 +38,6 @@ class SettingsState {
     );
   }
 
-  final int sessionLengthMinutes;
   final bool hapticsEnabled;
   final bool keepScreenAwake;
   final bool reminderEnabled;
@@ -59,13 +55,6 @@ class SettingsController extends Notifier<SettingsState> {
     final prefs = ref.watch(preferencesProvider);
     final row = prefs.asData?.value;
     return SettingsState.fromPreferences(row);
-  }
-
-  Future<void> setSessionLength(int minutes) async {
-    final sanitized = _sanitizeSessionLength(minutes);
-    await ref
-        .read(settingsRepositoryProvider)
-        .setSessionLengthMinutes(sanitized);
   }
 
   Future<void> setHapticsEnabled(bool value) async {
@@ -91,13 +80,5 @@ class SettingsController extends Notifier<SettingsState> {
 
   Future<void> setDisplayName(String value) async {
     await ref.read(settingsRepositoryProvider).setDisplayName(value);
-  }
-
-  int _sanitizeSessionLength(int value) {
-    const allowed = [2, 5, 10, 20];
-    if (allowed.contains(value)) {
-      return value;
-    }
-    return 5;
   }
 }

@@ -42,18 +42,6 @@ class LeaderboardController extends Notifier<LeaderboardState> {
     return LeaderboardState.initial();
   }
 
-  void selectRanking(LeaderboardRanking ranking) {
-    if (state.ranking == ranking) {
-      return;
-    }
-    state = state.copyWith(
-      ranking: ranking,
-      bannerMessage: null,
-      errorMessage: null,
-    );
-    unawaited(load());
-  }
-
   Future<void> refresh() => load();
 
   Future<void> load() async {
@@ -63,7 +51,7 @@ class LeaderboardController extends Notifier<LeaderboardState> {
     }
 
     final requestId = ++_requestId;
-    final ranking = state.ranking;
+    const ranking = LeaderboardRanking.xp;
 
     state = state.copyWith(
       loading: true,
@@ -136,7 +124,8 @@ class LeaderboardController extends Notifier<LeaderboardState> {
             ? _initials(auth.profile.displayName)
             : auth.profile.displayName,
         avatarSeed: auth.profile.avatarSeed,
-        metricValue: self.metricValue,
+        totalXp: self.totalXp,
+        level: self.level,
         userId: auth.profile.id,
       );
     } catch (_) {
@@ -146,7 +135,8 @@ class LeaderboardController extends Notifier<LeaderboardState> {
             ? _initials(auth.profile.displayName)
             : auth.profile.displayName,
         avatarSeed: auth.profile.avatarSeed,
-        metricValue: 0,
+        totalXp: 0,
+        level: 0,
         userId: auth.profile.id,
       );
     }

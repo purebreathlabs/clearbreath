@@ -19,6 +19,19 @@ type AuthIdentity struct {
 	CreatedAt       time.Time `json:"created_at"`
 }
 
+type EventLog struct {
+	ID        int64       `json:"id"`
+	Timestamp time.Time   `json:"timestamp"`
+	Level     string      `json:"level"`
+	EventType string      `json:"event_type"`
+	Message   string      `json:"message"`
+	RequestID string      `json:"request_id"`
+	UserID    pgtype.UUID `json:"user_id"`
+	IpAddress string      `json:"ip_address"`
+	Provider  string      `json:"provider"`
+	Metadata  []byte      `json:"metadata"`
+}
+
 type RefreshToken struct {
 	ID         uuid.UUID          `json:"id"`
 	UserID     uuid.UUID          `json:"user_id"`
@@ -28,6 +41,21 @@ type RefreshToken struct {
 	RevokedAt  pgtype.Timestamptz `json:"revoked_at"`
 	ReplacedBy pgtype.UUID        `json:"replaced_by"`
 	CreatedAt  time.Time          `json:"created_at"`
+}
+
+type RequestLog struct {
+	ID         int64       `json:"id"`
+	Timestamp  time.Time   `json:"timestamp"`
+	Method     string      `json:"method"`
+	Path       string      `json:"path"`
+	StatusCode int32       `json:"status_code"`
+	DurationMs float64     `json:"duration_ms"`
+	IpAddress  string      `json:"ip_address"`
+	UserAgent  string      `json:"user_agent"`
+	RequestID  string      `json:"request_id"`
+	UserID     pgtype.UUID `json:"user_id"`
+	ErrorCode  string      `json:"error_code"`
+	ErrorMsg   string      `json:"error_msg"`
 }
 
 type SafetyAcknowledgement struct {
@@ -74,4 +102,25 @@ type User struct {
 	TimezoneOffsetMinutesLatest int32              `json:"timezone_offset_minutes_latest"`
 	DeletedAt                   pgtype.Timestamptz `json:"deleted_at"`
 	CreatedAt                   time.Time          `json:"created_at"`
+}
+
+type UserProgress struct {
+	UserID       uuid.UUID `json:"user_id"`
+	TotalXp      int64     `json:"total_xp"`
+	CurrentLevel int32     `json:"current_level"`
+	CurveVersion int32     `json:"curve_version"`
+	UpdatedAt    time.Time `json:"updated_at"`
+}
+
+type XpEvent struct {
+	ID           uuid.UUID      `json:"id"`
+	UserID       uuid.UUID      `json:"user_id"`
+	Source       string         `json:"source"`
+	Amount       int32          `json:"amount"`
+	Multiplier   pgtype.Numeric `json:"multiplier"`
+	BaseAmount   int32          `json:"base_amount"`
+	SessionID    pgtype.UUID    `json:"session_id"`
+	LocalDay     time.Time      `json:"local_day"`
+	CurveVersion int32          `json:"curve_version"`
+	CreatedAt    time.Time      `json:"created_at"`
 }

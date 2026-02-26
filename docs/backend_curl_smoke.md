@@ -1,6 +1,6 @@
 # Backend Manual Smoke (curl)
 
-Last updated: 2026-02-22
+Last updated: 2026-02-26
 
 ## Prerequisites
 
@@ -79,17 +79,27 @@ Sync:
 curl -sS -i -X POST http://localhost:8080/v1/sessions/sync -H "Authorization: Bearer $ACCESS2" -H 'Content-Type: application/json' -d "{\"sessions\":[{\"client_session_id\":\"22222222-2222-2222-2222-222222222222\",\"technique_id\":\"hrv_resonance\",\"preset_id\":\"beginner\",\"started_at_utc\":\"$START\",\"ended_at_utc\":\"$END\",\"timezone_offset_minutes\":0,\"breaths_completed_estimated\":30,\"ended_early\":false}]}"
 ```
 
-Stats:
+Stats (includes total_xp and current_level):
 
 ```bash
 curl -sS -i http://localhost:8080/v1/stats/snapshot -H "Authorization: Bearer $ACCESS2"
 ```
 
+## Daily Open (XP login bonus)
+
+```bash
+curl -sS -i -X POST http://localhost:8080/v1/me/daily-open -H "Authorization: Bearer $ACCESS2" -H 'Content-Type: application/json' -d '{"timezone_offset_minutes":0}'
+```
+
+## XP History
+
+```bash
+curl -sS -i 'http://localhost:8080/v1/xp/history?days=7&timezone_offset_minutes=0' -H "Authorization: Bearer $ACCESS2"
+```
+
 ## Leaderboard
 
 ```bash
-curl -sS -i 'http://localhost:8080/v1/leaderboard?ranking=streak&limit=10'
-curl -sS -i 'http://localhost:8080/v1/leaderboard?ranking=weekly&limit=10'
-curl -sS -i 'http://localhost:8080/v1/leaderboard?ranking=all_time&limit=10'
-curl -sS -i 'http://localhost:8080/v1/leaderboard/self?ranking=streak' -H "Authorization: Bearer $ACCESS2"
+curl -sS -i 'http://localhost:8080/v1/leaderboard?ranking=xp&limit=10'
+curl -sS -i 'http://localhost:8080/v1/leaderboard/self?ranking=xp' -H "Authorization: Bearer $ACCESS2"
 ```

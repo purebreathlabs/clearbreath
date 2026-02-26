@@ -18,6 +18,7 @@
     "docker:up": "make docker-up",
     "docker:down": "make docker-down",
     "setup": "make setup",
+    "db:wipe": "make db-wipe",
     "clean": "make clean",
     "version:sync": "bash scripts/version-sync.sh",
     "version:check": "make version",

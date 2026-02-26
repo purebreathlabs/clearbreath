@@ -145,6 +145,12 @@ func (s *Service) DeleteAccount(ctx context.Context, userID uuid.UUID) error {
 		if err := q.DeleteSafetyAcknowledgementsByUserID(ctx, userID); err != nil {
 			return fmt.Errorf("delete safety acknowledgements: %w", err)
 		}
+		if err := q.DeleteXPEventsByUser(ctx, userID); err != nil {
+			return fmt.Errorf("delete xp events: %w", err)
+		}
+		if err := q.DeleteUserProgress(ctx, userID); err != nil {
+			return fmt.Errorf("delete user progress: %w", err)
+		}
 		if err := q.DeleteSessionsByUserID(ctx, userID); err != nil {
 			return fmt.Errorf("delete sessions: %w", err)
 		}

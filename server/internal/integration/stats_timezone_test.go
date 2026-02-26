@@ -17,6 +17,7 @@ import (
 	authsvc "github.com/clearbreath/server/internal/service/auth"
 	sessionsvc "github.com/clearbreath/server/internal/service/session"
 	statssvc "github.com/clearbreath/server/internal/service/stats"
+	xpsvc "github.com/clearbreath/server/internal/service/xp"
 	"github.com/clearbreath/server/internal/technique"
 )
 
@@ -86,7 +87,9 @@ func TestTimezoneOffsetUpdateAndWeekBoundaryStats(t *testing.T) {
 		t.Fatalf("stats service: %v", err)
 	}
 
-	sessionService, err := sessionsvc.NewService(store, reg, statsService, clk)
+	xpService := xpsvc.NewService(store, clk)
+
+	sessionService, err := sessionsvc.NewService(store, reg, statsService, xpService, clk)
 	if err != nil {
 		t.Fatalf("session service: %v", err)
 	}

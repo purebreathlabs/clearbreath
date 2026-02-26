@@ -3,7 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../core/theme/theme_extensions.dart';
-import '../../../shared/providers/preferences_provider.dart';
+import '../../../shared/utils/technique_assets.dart';
+import '../../xp/domain/xp_provider.dart';
 import '../data/technique_repository.dart';
 import '../domain/favorites_provider.dart';
 import '../domain/favorites_repository.dart';
@@ -12,7 +13,6 @@ import '../domain/technique.dart';
 import '../domain/technique_preset.dart';
 import '../../session/domain/active_session_config.dart';
 import 'widgets/safety_warning_sheet.dart';
-import '../../../shared/widgets/selection_pill.dart';
 
 class TechniqueDetailScreen extends ConsumerStatefulWidget {
   const TechniqueDetailScreen({super.key, required this.techniqueId});
@@ -25,8 +25,6 @@ class TechniqueDetailScreen extends ConsumerStatefulWidget {
 }
 
 class _TechniqueDetailScreenState extends ConsumerState<TechniqueDetailScreen> {
-  String? _presetIdOverride;
-  int? _durationOverride;
   bool _starting = false;
 
   @override
@@ -45,9 +43,11 @@ class _TechniqueDetailScreenState extends ConsumerState<TechniqueDetailScreen> {
     final favorited = favoriteIds.contains(widget.techniqueId);
     final safetyAcks = ref.watch(safetyAcksProvider);
 
-    final prefs = ref.watch(preferencesProvider);
-    final defaultPresetId = prefs.asData?.value?.experienceLevel ?? 'beginner';
-    final defaultDurationMin = prefs.asData?.value?.sessionLengthMinutes ?? 5;
+    final xpAsync = ref.watch(mergedXPProvider);
+    final xpState = xpAsync.asData?.value;
+    final currentLevel = xpState?.currentLevel ?? 0;
+    final presetId = xpState?.presetId ?? 'beginner';
+    final durationMinutes = xpState?.durationMinutes ?? 2;
 
     return Scaffold(
       appBar: AppBar(
@@ -112,19 +112,14 @@ class _TechniqueDetailScreenState extends ConsumerState<TechniqueDetailScreen> {
               );
             }
 
-            final effectivePresetId = _resolvePresetId(
-              technique,
-              _presetIdOverride ?? defaultPresetId,
-            );
+            final effectivePresetId = _resolvePresetId(technique, presetId);
             final preset = technique.presets[effectivePresetId]!;
-            final durations = preset.recommendedDurationsMinutes;
-            final effectiveMinutes =
-                _durationOverride ??
-                _closestDuration(durations, defaultDurationMin);
+            final isRoundBased = preset is BpmRoundsPreset;
+            final effectiveMinutes = isRoundBased ? 0 : durationMinutes;
             final safetyAcked =
                 safetyAcks.asData?.value.contains(technique.id) ?? false;
 
-            final isRoundBased = preset is BpmRoundsPreset;
+            final imagePath = techniqueImageAsset(technique.id);
 
             return Padding(
               padding: EdgeInsets.all(spacing.lg),
@@ -137,6 +132,11 @@ class _TechniqueDetailScreenState extends ConsumerState<TechniqueDetailScreen> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
+                          _HeroImage(
+                            imagePath: imagePath,
+                            techniqueName: technique.name,
+                          ),
+                          SizedBox(height: spacing.lg),
                           Text(
                             technique.name,
                             style: typography.headlineLarge.copyWith(
@@ -202,59 +202,14 @@ class _TechniqueDetailScreenState extends ConsumerState<TechniqueDetailScreen> {
                               ),
                             ),
                           ],
-                          if (!technique.presetsAreEquivalent) ...[
-                            SizedBox(height: spacing.xl),
-                            Text(
-                              isRoundBased ? 'Intensity' : 'Pace',
-                              style: typography.titleMedium,
-                            ),
-                            SizedBox(height: spacing.sm),
-                            GridView.count(
-                              crossAxisCount: 3,
-                              crossAxisSpacing: spacing.sm,
-                              mainAxisSpacing: spacing.sm,
-                              childAspectRatio: 3.0,
-                              shrinkWrap: true,
-                              physics: const NeverScrollableScrollPhysics(),
-                              children: [
-                                for (final entry in technique.presets.entries)
-                                  SelectionPill(
-                                    key: Key('preset_${entry.key}'),
-                                    label: entry.value.label,
-                                    selected: effectivePresetId == entry.key,
-                                    onTap: () => setState(
-                                      () => _presetIdOverride = entry.key,
-                                    ),
-                                  ),
-                              ],
-                            ),
-                          ],
-                          SizedBox(height: spacing.lg),
-                          if (isRoundBased)
-                            _RoundSessionInfo(preset: preset)
-                          else ...[
-                            Text('Duration', style: typography.titleMedium),
-                            SizedBox(height: spacing.sm),
-                            GridView.count(
-                              crossAxisCount: 2,
-                              crossAxisSpacing: spacing.sm,
-                              mainAxisSpacing: spacing.sm,
-                              childAspectRatio: 3.0,
-                              shrinkWrap: true,
-                              physics: const NeverScrollableScrollPhysics(),
-                              children: [
-                                for (final minutes in durations)
-                                  SelectionPill(
-                                    key: Key('duration_$minutes'),
-                                    label: '$minutes min',
-                                    selected: effectiveMinutes == minutes,
-                                    onTap: () => setState(
-                                      () => _durationOverride = minutes,
-                                    ),
-                                  ),
-                              ],
-                            ),
-                          ],
+                          SizedBox(height: spacing.xl),
+                          _SessionInfoCard(
+                            currentLevel: currentLevel,
+                            presetId: effectivePresetId,
+                            durationMinutes: effectiveMinutes,
+                            isRoundBased: isRoundBased,
+                            preset: preset,
+                          ),
                           SizedBox(height: spacing.xl),
                           _Section(
                             title: 'What It Is',
@@ -311,20 +266,6 @@ class _TechniqueDetailScreenState extends ConsumerState<TechniqueDetailScreen> {
     if (technique.presets.containsKey(preferred)) return preferred;
     if (technique.presets.containsKey('beginner')) return 'beginner';
     return technique.presets.keys.first;
-  }
-
-  int _closestDuration(List<int> options, int target) {
-    if (options.isEmpty) return target;
-    int closest = options.first;
-    int closestDiff = (closest - target).abs();
-    for (final option in options) {
-      final diff = (option - target).abs();
-      if (diff < closestDiff) {
-        closest = option;
-        closestDiff = diff;
-      }
-    }
-    return closest;
   }
 
   Future<void> _toggleFavorite() async {
@@ -430,8 +371,138 @@ class _TechniqueDetailScreenState extends ConsumerState<TechniqueDetailScreen> {
   }
 }
 
-class _RoundSessionInfo extends StatelessWidget {
-  const _RoundSessionInfo({required this.preset});
+class _SessionInfoCard extends StatelessWidget {
+  const _SessionInfoCard({
+    required this.currentLevel,
+    required this.presetId,
+    required this.durationMinutes,
+    required this.isRoundBased,
+    required this.preset,
+  });
+
+  final int currentLevel;
+  final String presetId;
+  final int durationMinutes;
+  final bool isRoundBased;
+  final TechniquePreset preset;
+
+  @override
+  Widget build(BuildContext context) {
+    final spacing = Theme.of(context).extension<AppSpacingTokens>()!;
+    final typography = Theme.of(context).extension<AppTypographyTokens>()!;
+    final colors = Theme.of(context).extension<AppColorTokens>()!;
+    final components = Theme.of(context).extension<AppComponentTokens>()!;
+
+    final presetLabel = presetId[0].toUpperCase() + presetId.substring(1);
+    final nextUnlock = _nextUnlockText(currentLevel);
+
+    return Container(
+      width: double.infinity,
+      padding: EdgeInsets.all(components.cardPadding),
+      decoration: BoxDecoration(
+        color: colors.surface,
+        borderRadius: BorderRadius.circular(components.cardRadius),
+        border: Border.all(color: colors.border),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Your Session',
+            style: typography.titleMedium.copyWith(color: colors.textPrimary),
+          ),
+          SizedBox(height: spacing.md),
+          Row(
+            children: [
+              _InfoChip(label: 'Level $currentLevel'),
+              SizedBox(width: spacing.sm),
+              _InfoChip(label: presetLabel),
+              if (!isRoundBased) ...[
+                SizedBox(width: spacing.sm),
+                _InfoChip(label: '$durationMinutes min'),
+              ],
+            ],
+          ),
+          if (isRoundBased && preset is BpmRoundsPreset) ...[
+            SizedBox(height: spacing.md),
+            _RoundInfo(preset: preset as BpmRoundsPreset),
+          ],
+          if (nextUnlock != null) ...[
+            SizedBox(height: spacing.md),
+            Text(
+              nextUnlock,
+              style: typography.bodyMedium.copyWith(
+                color: colors.textSecondary,
+              ),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+
+  String? _nextUnlockText(int level) {
+    final candidates = <(int unlockLevel, String label)>[];
+
+    if (!isRoundBased) {
+      if (durationMinutes < 5) {
+        candidates.add((10, '5 min sessions'));
+      } else if (durationMinutes < 10) {
+        candidates.add((30, '10 min sessions'));
+      } else if (durationMinutes < 15) {
+        candidates.add((60, '15 min sessions'));
+      } else if (durationMinutes < 20) {
+        candidates.add((100, '20 min sessions'));
+      }
+    }
+
+    if (presetId == 'beginner') {
+      candidates.add((15, 'intermediate pace'));
+    } else if (presetId == 'intermediate') {
+      candidates.add((50, 'advanced pace'));
+    }
+
+    candidates.sort((a, b) => a.$1.compareTo(b.$1));
+    for (final (unlockLevel, label) in candidates) {
+      if (level < unlockLevel) {
+        return 'Next unlock at Level $unlockLevel: $label';
+      }
+    }
+    return null;
+  }
+}
+
+class _InfoChip extends StatelessWidget {
+  const _InfoChip({required this.label});
+
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    final spacing = Theme.of(context).extension<AppSpacingTokens>()!;
+    final typography = Theme.of(context).extension<AppTypographyTokens>()!;
+    final colors = Theme.of(context).extension<AppColorTokens>()!;
+
+    return Container(
+      padding: EdgeInsets.symmetric(
+        horizontal: spacing.md,
+        vertical: spacing.xs,
+      ),
+      decoration: BoxDecoration(
+        color: colors.surfaceHigh,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: colors.border),
+      ),
+      child: Text(
+        label,
+        style: typography.labelMedium.copyWith(color: colors.textPrimary),
+      ),
+    );
+  }
+}
+
+class _RoundInfo extends StatelessWidget {
+  const _RoundInfo({required this.preset});
 
   final BpmRoundsPreset preset;
 
@@ -440,7 +511,6 @@ class _RoundSessionInfo extends StatelessWidget {
     final typography = Theme.of(context).extension<AppTypographyTokens>()!;
     final spacing = Theme.of(context).extension<AppSpacingTokens>()!;
     final colors = Theme.of(context).extension<AppColorTokens>()!;
-    final components = Theme.of(context).extension<AppComponentTokens>()!;
 
     final totalSeconds = preset.naturalDurationSeconds;
     final totalMin = totalSeconds ~/ 60;
@@ -452,45 +522,69 @@ class _RoundSessionInfo extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('Session', style: typography.titleMedium),
-        SizedBox(height: spacing.sm),
-        Container(
-          width: double.infinity,
-          padding: EdgeInsets.all(components.cardPadding),
-          decoration: BoxDecoration(
-            color: colors.surface,
-            borderRadius: BorderRadius.circular(components.cardRadius),
-            border: Border.all(color: colors.border),
+        Text(
+          '${preset.rounds} rounds \u00b7 ${preset.roundSeconds}s each',
+          style: typography.bodyMedium.copyWith(color: colors.textPrimary),
+        ),
+        if (preset.rounds > 1) ...[
+          SizedBox(height: spacing.xs),
+          Text(
+            '${preset.restSeconds}s rest between rounds',
+            style: typography.bodyMedium.copyWith(color: colors.textSecondary),
           ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                '${preset.rounds} rounds \u00b7 ${preset.roundSeconds}s each',
-                style: typography.bodyMedium.copyWith(
-                  color: colors.textPrimary,
-                ),
-              ),
-              if (preset.rounds > 1) ...[
-                SizedBox(height: spacing.xs),
-                Text(
-                  '${preset.restSeconds}s rest between rounds',
-                  style: typography.bodyMedium.copyWith(
-                    color: colors.textSecondary,
-                  ),
-                ),
-              ],
-              SizedBox(height: spacing.xs),
-              Text(
-                'Total: $totalLabel',
-                style: typography.bodyMedium.copyWith(
-                  color: colors.textSecondary,
-                ),
-              ),
-            ],
-          ),
+        ],
+        SizedBox(height: spacing.xs),
+        Text(
+          'Total: $totalLabel',
+          style: typography.bodyMedium.copyWith(color: colors.textSecondary),
         ),
       ],
+    );
+  }
+}
+
+class _HeroImage extends StatelessWidget {
+  const _HeroImage({required this.imagePath, required this.techniqueName});
+
+  final String? imagePath;
+  final String techniqueName;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = Theme.of(context).extension<AppColorTokens>()!;
+    final components = Theme.of(context).extension<AppComponentTokens>()!;
+
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(components.cardRadius),
+      child: AspectRatio(
+        aspectRatio: 16 / 10,
+        child: Stack(
+          fit: StackFit.expand,
+          children: [
+            if (imagePath != null)
+              Image.asset(
+                imagePath!,
+                fit: BoxFit.cover,
+                errorBuilder: (_, _, _) => Container(color: colors.surfaceHigh),
+              )
+            else
+              Container(color: colors.surfaceHigh),
+            DecoratedBox(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    Colors.transparent,
+                    Colors.black.withValues(alpha: 0.6),
+                  ],
+                  stops: const [0.4, 1.0],
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

@@ -18,6 +18,21 @@ import '../data/sync_repository.dart';
 import '../../stats/domain/weekly_minutes_provider.dart';
 import 'merged_stats_provider.dart';
 import 'sync_state.dart';
+import '../../xp/data/daily_login_repository.dart';
+
+final latestXpAwardsProvider =
+    NotifierProvider<LatestXpAwardsController, List<XPAward>>(
+      LatestXpAwardsController.new,
+    );
+
+class LatestXpAwardsController extends Notifier<List<XPAward>> {
+  @override
+  List<XPAward> build() => const [];
+
+  void set(List<XPAward> awards) => state = awards;
+
+  void clear() => state = const [];
+}
 
 final syncControllerProvider = NotifierProvider<SyncController, SyncState>(
   SyncController.new,
@@ -25,6 +40,7 @@ final syncControllerProvider = NotifierProvider<SyncController, SyncState>(
 
 class SyncController extends Notifier<SyncState> {
   var _inProgress = false;
+  var _pendingSync = false;
 
   @override
   SyncState build() {
@@ -36,6 +52,7 @@ class SyncController extends Notifier<SyncState> {
       if (becameReady) {
         unawaited(syncUnsyncedSessions());
         unawaited(ref.read(safetySyncServiceProvider).pullAndMerge());
+        unawaited(_claimDailyOpen(next.profile.id));
       }
       if (next is AuthStateGuest) {
         state = const SyncIdle();
@@ -46,13 +63,52 @@ class SyncController extends Notifier<SyncState> {
     if (auth is AuthStateSignedIn && auth.sessionReady) {
       unawaited(syncUnsyncedSessions());
       unawaited(ref.read(safetySyncServiceProvider).pullAndMerge());
+      unawaited(_claimDailyOpen(auth.profile.id));
     }
 
     return const SyncIdle();
   }
 
+  Future<void> _claimDailyOpen(String userId) async {
+    final result = await ref
+        .read(dailyLoginRepositoryProvider)
+        .claimIfNeeded(userId: userId);
+    if (result == null) {
+      return;
+    }
+
+    final cache = ref.read(statsCacheRepositoryProvider);
+    domain.StatsSnapshot? existing;
+    try {
+      existing = await cache.readCached();
+    } catch (_) {}
+
+    if (existing != null) {
+      final merged = domain.StatsSnapshot(
+        currentStreakDays: existing.currentStreakDays,
+        longestStreakDays: existing.longestStreakDays,
+        minutesThisWeek: existing.minutesThisWeek,
+        minutesAllTime: existing.minutesAllTime,
+        sessionsAllTime: existing.sessionsAllTime,
+        minutesByTechnique: existing.minutesByTechnique,
+        longestSessionMinutes: existing.longestSessionMinutes,
+        favoriteTechniqueId: existing.favoriteTechniqueId,
+        totalBreathsEstimated: existing.totalBreathsEstimated,
+        totalXP: result.totalXp,
+        currentLevel: result.currentLevel,
+        updatedAt: existing.updatedAt,
+      );
+      try {
+        await cache.writeCache(merged);
+      } catch (_) {}
+    }
+
+    ref.invalidate(mergedStatsProvider);
+  }
+
   Future<void> syncUnsyncedSessions() async {
     if (_inProgress) {
+      _pendingSync = true;
       return;
     }
     final auth = ref.read(authStateProvider);
@@ -86,11 +142,16 @@ class SyncController extends Notifier<SyncState> {
       state = const SyncFailed('Sync failed.');
     } finally {
       _inProgress = false;
+      if (_pendingSync) {
+        _pendingSync = false;
+        unawaited(syncUnsyncedSessions());
+      }
     }
   }
 
   Future<void> submitSession(LocalSession session) async {
     if (_inProgress) {
+      _pendingSync = true;
       return;
     }
     final auth = ref.read(authStateProvider);
@@ -116,6 +177,10 @@ class SyncController extends Notifier<SyncState> {
       state = const SyncFailed('Sync failed.');
     } finally {
       _inProgress = false;
+      if (_pendingSync) {
+        _pendingSync = false;
+        unawaited(syncUnsyncedSessions());
+      }
     }
   }
 
@@ -137,6 +202,8 @@ class SyncController extends Notifier<SyncState> {
     await ref.read(sessionRepositoryProvider).markSynced(synced);
 
     await _writeServerStatsCache(response.statsSnapshot);
+
+    ref.read(latestXpAwardsProvider.notifier).set(response.xpAwards);
 
     ref.invalidate(mergedStatsProvider);
     ref.invalidate(weeklyMinutesProvider);
@@ -161,6 +228,8 @@ class SyncController extends Notifier<SyncState> {
       longestSessionMinutes: existing?.longestSessionMinutes ?? 0,
       favoriteTechniqueId: existing?.favoriteTechniqueId,
       totalBreathsEstimated: existing?.totalBreathsEstimated ?? 0,
+      totalXP: snapshot.totalXp,
+      currentLevel: snapshot.currentLevel,
       updatedAt: snapshot.updatedAtUtc,
     );
 

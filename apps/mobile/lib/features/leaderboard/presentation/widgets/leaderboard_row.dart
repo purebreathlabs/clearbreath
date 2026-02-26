@@ -2,19 +2,16 @@ import 'package:flutter/material.dart';
 
 import '../../../../core/theme/theme_extensions.dart';
 import '../../domain/leaderboard_entry.dart';
-import '../../domain/leaderboard_ranking.dart';
 import 'seeded_avatar.dart';
 
 class LeaderboardRowWidget extends StatelessWidget {
   const LeaderboardRowWidget({
     super.key,
     required this.entry,
-    required this.ranking,
     required this.isSelf,
   });
 
   final LeaderboardEntry entry;
-  final LeaderboardRanking ranking;
   final bool isSelf;
 
   @override
@@ -24,7 +21,7 @@ class LeaderboardRowWidget extends StatelessWidget {
     final spacing = Theme.of(context).extension<AppSpacingTokens>()!;
     final components = Theme.of(context).extension<AppComponentTokens>()!;
 
-    final metric = '${entry.metricValue} ${ranking.metricLabel()}';
+    final metric = '${entry.totalXp} XP';
     final rankText = entry.rank?.toString() ?? '—';
 
     return Container(
@@ -51,11 +48,25 @@ class LeaderboardRowWidget extends StatelessWidget {
           SeededAvatar(seed: entry.avatarSeed, size: 36),
           SizedBox(width: spacing.md),
           Expanded(
-            child: Text(
-              entry.displayNameOrInitials,
-              style: typography.bodyLarge.copyWith(color: colors.textPrimary),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  entry.displayNameOrInitials,
+                  style: typography.bodyLarge.copyWith(
+                    color: colors.textPrimary,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                Text(
+                  'Level ${entry.level}',
+                  style: typography.bodyMedium.copyWith(
+                    color: colors.textSecondary,
+                  ),
+                ),
+              ],
             ),
           ),
           SizedBox(width: spacing.md),

@@ -298,6 +298,7 @@ class SessionController extends Notifier<SessionState> {
 
     ref.invalidate(localStatsProvider);
     ref.invalidate(weeklyMinutesProvider);
+    ref.read(latestXpAwardsProvider.notifier).clear();
     ref.read(lastCompletedSessionProvider.notifier).set(local);
     unawaited(
       ref.read(notificationControllerProvider.notifier).onSessionCompleted(),

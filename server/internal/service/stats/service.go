@@ -159,6 +159,26 @@ func computeCurrentStreak(qualifying map[time.Time]bool, today time.Time) int {
 	return streak
 }
 
+func CurrentStreakAtDay(qualifying map[time.Time]bool, day time.Time) int32 {
+	day = dateOnly(day)
+
+	end := day
+	if !qualifying[end] {
+		yesterday := end.AddDate(0, 0, -1)
+		if qualifying[yesterday] {
+			end = yesterday
+		} else {
+			return 0
+		}
+	}
+
+	var streak int32
+	for d := end; qualifying[d]; d = d.AddDate(0, 0, -1) {
+		streak++
+	}
+	return streak
+}
+
 func computeLongestStreak(qualifying map[time.Time]bool) int {
 	dates := make([]time.Time, 0, len(qualifying))
 	for d, ok := range qualifying {

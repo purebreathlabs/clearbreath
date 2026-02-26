@@ -45,7 +45,12 @@ void main() {
         sessionsAllTime: 7,
         minutesByTechnique: const {'box': 34},
         updatedAtUtc: DateTime.utc(2026, 2, 22, 12, 0),
+        totalXp: 150,
+        currentLevel: 2,
       ),
+      xpAwards: const [],
+      totalXp: 150,
+      currentLevel: 2,
     );
 
     late _SpySafetySyncService safetySpy;

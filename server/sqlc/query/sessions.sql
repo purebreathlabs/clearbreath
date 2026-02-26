@@ -45,3 +45,6 @@ WHERE user_id = $1
   AND local_day >= $2
   AND local_day < $3;
 
+-- name: GetSessionByClientID :one
+SELECT id, duration_seconds_actual, ended_early, local_day FROM sessions WHERE client_session_id = $1;
+

@@ -7,140 +7,31 @@ package sqlcgen
 
 import (
 	"context"
-	"time"
 
 	"github.com/google/uuid"
 )
 
-const getLeaderboardAllTimeMinutesMetrics = `-- name: GetLeaderboardAllTimeMinutesMetrics :many
-WITH per_day AS (
-  SELECT user_id,
-         local_day,
-         LEAST((SUM(duration_seconds_actual)::int) / 60, $1)::bigint AS capped_minutes
-  FROM sessions
-  GROUP BY user_id, local_day
-)
-SELECT u.id AS user_id,
-       COALESCE(SUM(per_day.capped_minutes), 0)::bigint AS metric_value
-FROM users u
-LEFT JOIN per_day ON per_day.user_id = u.id
-WHERE u.deleted_at IS NULL
-  AND u.leaderboard_opt_in = true
-  AND u.shadow_banned = false
-GROUP BY u.id
+const getLeaderboardXPMetrics = `-- name: GetLeaderboardXPMetrics :many
+SELECT u.id AS user_id, COALESCE(up.total_xp, 0)::bigint AS total_xp
+FROM users u LEFT JOIN user_progress up ON up.user_id = u.id
+WHERE u.deleted_at IS NULL AND u.leaderboard_opt_in = true AND u.shadow_banned = false
 `
 
-type GetLeaderboardAllTimeMinutesMetricsRow struct {
-	UserID      uuid.UUID `json:"user_id"`
-	MetricValue int64     `json:"metric_value"`
+type GetLeaderboardXPMetricsRow struct {
+	UserID  uuid.UUID `json:"user_id"`
+	TotalXp int64     `json:"total_xp"`
 }
 
-func (q *Queries) GetLeaderboardAllTimeMinutesMetrics(ctx context.Context, dollar_1 int64) ([]GetLeaderboardAllTimeMinutesMetricsRow, error) {
-	rows, err := q.db.Query(ctx, getLeaderboardAllTimeMinutesMetrics, dollar_1)
+func (q *Queries) GetLeaderboardXPMetrics(ctx context.Context) ([]GetLeaderboardXPMetricsRow, error) {
+	rows, err := q.db.Query(ctx, getLeaderboardXPMetrics)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	items := []GetLeaderboardAllTimeMinutesMetricsRow{}
+	items := []GetLeaderboardXPMetricsRow{}
 	for rows.Next() {
-		var i GetLeaderboardAllTimeMinutesMetricsRow
-		if err := rows.Scan(&i.UserID, &i.MetricValue); err != nil {
-			return nil, err
-		}
-		items = append(items, i)
-	}
-	if err := rows.Err(); err != nil {
-		return nil, err
-	}
-	return items, nil
-}
-
-const getLeaderboardStreakMetrics = `-- name: GetLeaderboardStreakMetrics :many
-SELECT u.id AS user_id,
-       COALESCE(ss.current_streak_days, 0)::bigint AS metric_value
-FROM users u
-LEFT JOIN stats_snapshots ss ON ss.user_id = u.id
-WHERE u.deleted_at IS NULL
-  AND u.leaderboard_opt_in = true
-  AND u.shadow_banned = false
-`
-
-type GetLeaderboardStreakMetricsRow struct {
-	UserID      uuid.UUID `json:"user_id"`
-	MetricValue int64     `json:"metric_value"`
-}
-
-func (q *Queries) GetLeaderboardStreakMetrics(ctx context.Context) ([]GetLeaderboardStreakMetricsRow, error) {
-	rows, err := q.db.Query(ctx, getLeaderboardStreakMetrics)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-	items := []GetLeaderboardStreakMetricsRow{}
-	for rows.Next() {
-		var i GetLeaderboardStreakMetricsRow
-		if err := rows.Scan(&i.UserID, &i.MetricValue); err != nil {
-			return nil, err
-		}
-		items = append(items, i)
-	}
-	if err := rows.Err(); err != nil {
-		return nil, err
-	}
-	return items, nil
-}
-
-const getLeaderboardWeeklyMinutesMetrics = `-- name: GetLeaderboardWeeklyMinutesMetrics :many
-WITH eligible AS (
-  SELECT id AS user_id,
-         (($1::timestamptz + (timezone_offset_minutes_latest * interval '1 minute'))::date) AS local_today
-  FROM users
-  WHERE deleted_at IS NULL
-    AND leaderboard_opt_in = true
-    AND shadow_banned = false
-),
-week_bounds AS (
-  SELECT user_id,
-         (local_today - (extract(isodow from local_today)::int - 1))::date AS week_start
-  FROM eligible
-),
-per_day AS (
-  SELECT user_id,
-         local_day,
-         LEAST((SUM(duration_seconds_actual)::int) / 60, $2)::bigint AS capped_minutes
-  FROM sessions
-  GROUP BY user_id, local_day
-)
-SELECT wb.user_id AS user_id,
-       COALESCE(SUM(pd.capped_minutes), 0)::bigint AS metric_value
-FROM week_bounds wb
-LEFT JOIN per_day pd
-  ON pd.user_id = wb.user_id
- AND pd.local_day >= wb.week_start
- AND pd.local_day < wb.week_start + 7
-GROUP BY wb.user_id
-`
-
-type GetLeaderboardWeeklyMinutesMetricsParams struct {
-	Column1 time.Time `json:"column_1"`
-	Column2 int64     `json:"column_2"`
-}
-
-type GetLeaderboardWeeklyMinutesMetricsRow struct {
-	UserID      uuid.UUID `json:"user_id"`
-	MetricValue int64     `json:"metric_value"`
-}
-
-func (q *Queries) GetLeaderboardWeeklyMinutesMetrics(ctx context.Context, arg GetLeaderboardWeeklyMinutesMetricsParams) ([]GetLeaderboardWeeklyMinutesMetricsRow, error) {
-	rows, err := q.db.Query(ctx, getLeaderboardWeeklyMinutesMetrics, arg.Column1, arg.Column2)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-	items := []GetLeaderboardWeeklyMinutesMetricsRow{}
-	for rows.Next() {
-		var i GetLeaderboardWeeklyMinutesMetricsRow
-		if err := rows.Scan(&i.UserID, &i.MetricValue); err != nil {
+		var i GetLeaderboardXPMetricsRow
+		if err := rows.Scan(&i.UserID, &i.TotalXp); err != nil {
 			return nil, err
 		}
 		items = append(items, i)

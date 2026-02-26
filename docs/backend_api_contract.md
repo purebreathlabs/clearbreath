@@ -1,6 +1,6 @@
 # ClearBreath Backend API Contract (v1)
 
-Last updated: 2026-02-22
+Last updated: 2026-02-26
 
 ## Conventions
 
@@ -30,6 +30,22 @@ Errors use:
 
 - `429` returns `code="rate_limited"`.
 - Policies are Redis-backed fixed-window counters and are configured via env vars.
+
+### Backward compatibility (XP migration)
+
+The leaderboard API previously supported three ranking views (`streak`, `weekly`, `all_time`). As of the XP system migration:
+
+- The `ranking` query param now accepts `xp` as the primary value.
+- Legacy values (`streak`, `weekly`, `all_time`) are silently mapped to `xp` — no `400` error, no client update required.
+- Response shape changed: `metric_value` replaced by `total_xp` (int64) + `level` (int32). Clients must handle the new fields.
+- Session ingest and stats snapshot responses now include `xp_awards`, `total_xp`, and `current_level` as additive fields (existing fields unchanged).
+
+### Session timestamp validation
+
+- `started_at_utc` must not be more than 24 hours in the future.
+- `started_at_utc` must not be more than 90 days in the past (generous window for offline sync).
+- `timezone_offset_minutes` must be between -840 and +840.
+- `local_day` is always computed server-side from `started_at_utc + timezone_offset_minutes`.
 
 ## Canonical IDs (mobile integration)
 
@@ -354,6 +370,7 @@ Notes:
 - `duration_seconds_actual` is accepted but the server computes the canonical duration from timestamps.
 - `client_session_id` is the idempotency key. Duplicate submissions are treated as no-ops.
 - `local_day` is computed as the local date of `started_at_utc + timezone_offset_minutes`.
+- Session XP awards use `multiplier = min(1.0 + 0.1*streak_days_for_session, 3.0)`, where `streak_days_for_session` is the current streak as of the session’s `local_day` (non-qualifying `local_day` uses the previous day’s streak).
 
 Response `200`:
 
@@ -369,8 +386,25 @@ Response `200`:
     "minutes_all_time": 5,
     "sessions_all_time": 1,
     "minutes_by_technique": { "hrv_resonance": 5 },
-    "updated_at_utc": "2026-02-18T12:00:00Z"
-  }
+    "updated_at_utc": "2026-02-18T12:00:00Z",
+    "total_xp": 55,
+    "current_level": 2
+  },
+  "xp_awards": [
+    {
+      "amount": 55,
+      "base_amount": 50,
+      "multiplier": 1.1,
+      "source": "session",
+      "daily_capped": false,
+      "new_total_xp": 55,
+      "new_level": 2,
+      "prev_level": 0,
+      "leveled_up": true
+    }
+  ],
+  "total_xp": 55,
+  "current_level": 2
 }
 ```
 
@@ -412,7 +446,7 @@ Errors:
 
 Purpose:
 
-- Fetch authoritative stats snapshot.
+- Fetch authoritative stats snapshot (includes XP fields from user_progress).
 
 Auth:
 
@@ -420,7 +454,19 @@ Auth:
 
 Response `200`:
 
-- Same shape as `stats_snapshot` in session ingest responses.
+```json
+{
+  "current_streak_days": 1,
+  "longest_streak_days": 1,
+  "minutes_this_week": 5,
+  "minutes_all_time": 5,
+  "sessions_all_time": 1,
+  "minutes_by_technique": { "hrv_resonance": 5 },
+  "updated_at_utc": "2026-02-18T12:00:00Z",
+  "total_xp": 55,
+  "current_level": 2
+}
+```
 
 Errors:
 
@@ -431,7 +477,7 @@ Errors:
 
 Purpose:
 
-- Fetch top leaderboard rows for a given ranking view.
+- Fetch top leaderboard rows ranked by total XP.
 
 Auth:
 
@@ -443,21 +489,22 @@ Rate limit:
 
 Query params:
 
-- `ranking` (required): `streak` | `weekly` | `all_time`
+- `ranking` (optional): `xp` (default). Legacy values `streak`, `weekly`, `all_time` are silently mapped to `xp` for backward compatibility. Unknown values are treated as `xp`.
 - `limit` (optional, max 50): integer
 
 Response `200`:
 
 ```json
 {
-  "ranking": "weekly",
+  "ranking": "xp",
   "generated_at_utc": "2026-02-18T12:00:00Z",
   "top": [
     {
       "rank": 1,
       "display_name_or_initials": "AB",
       "avatar_seed": "…",
-      "metric_value": 120,
+      "total_xp": 1250,
+      "level": 41,
       "user_id": "…"
     }
   ]
@@ -466,7 +513,6 @@ Response `200`:
 
 Errors:
 
-- `400 validation` (missing/invalid ranking)
 - `429 rate_limited`
 - `500 internal`
 
@@ -474,7 +520,7 @@ Errors:
 
 Purpose:
 
-- Fetch the authenticated user rank for a given ranking view.
+- Fetch the authenticated user XP rank.
 
 Auth:
 
@@ -486,24 +532,117 @@ Rate limit:
 
 Query params:
 
-- `ranking` (required): `streak` | `weekly` | `all_time`
+- `ranking` (optional): `xp` (default). Legacy values silently mapped to `xp`. Unknown values are treated as `xp`.
 
 Response `200`:
 
 ```json
 {
-  "ranking": "weekly",
-  "user": { "rank": 42, "metric_value": 12 }
+  "ranking": "xp",
+  "user": { "rank": 42, "total_xp": 1250, "level": 41 }
 }
 ```
 
 Notes:
 
-- If the user is not present in the current cached dataset, `rank` is `null` and `metric_value` may be `0`.
+- If the user is not present in the current cached dataset, `rank` is `null` and `total_xp` may be `0`.
 
 Errors:
 
-- `400 validation` (missing/invalid ranking)
 - `401 unauthorized`
 - `429 rate_limited`
+- `500 internal`
+
+### POST `/v1/me/daily-open`
+
+Purpose:
+
+- Claim daily login XP bonus (5 XP, idempotent per user per local day).
+
+Auth:
+
+- Required.
+
+Request body:
+
+```json
+{ "timezone_offset_minutes": -330 }
+```
+
+Notes:
+
+- `timezone_offset_minutes` must be between -840 and +840.
+- Used to compute the user's local day for idempotency.
+- Second call on the same local day returns `awarded: false`.
+- When `awarded: false`, `xp_award` is omitted and `total_xp/current_level` reflect the current totals.
+
+Response `200`:
+
+```json
+{
+  "awarded": true,
+  "xp_award": {
+    "amount": 5,
+    "base_amount": 5,
+    "multiplier": 1.0,
+    "source": "daily_open",
+    "daily_capped": false,
+    "new_total_xp": 60,
+    "new_level": 2,
+    "prev_level": 2,
+    "leveled_up": false
+  },
+  "total_xp": 60,
+  "current_level": 2
+}
+```
+
+Errors:
+
+- `400 validation` (invalid timezone offset)
+- `401 unauthorized`
+- `500 internal`
+
+### GET `/v1/xp/history`
+
+Purpose:
+
+- Fetch daily XP breakdown for recent days.
+
+Auth:
+
+- Required.
+
+Query params:
+
+- `days` (optional, 1-30, default 7): number of days to fetch. Invalid or out-of-range values default to 7.
+- `timezone_offset_minutes` (optional, default 0): for local day computation. Invalid values default to 0.
+- `days[].total_xp` is the per-day sum (`practice_xp + login_xp`) for that local day (not the all-time total).
+
+Response `200`:
+
+```json
+{
+  "total_xp": 92,
+  "current_level": 4,
+  "days": [
+    {
+      "local_day": "2026-02-26",
+      "total_xp": 65,
+      "practice_xp": 60,
+      "login_xp": 5
+    },
+    {
+      "local_day": "2026-02-25",
+      "total_xp": 27,
+      "practice_xp": 22,
+      "login_xp": 5
+    }
+  ]
+}
+```
+
+Errors:
+
+- `401 unauthorized`
 - `500 internal`

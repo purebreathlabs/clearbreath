@@ -78,15 +78,22 @@ The MVP excludes monetization and advanced social/community complexity to maximi
 
 ### 4.4 Onboarding
 
-- Exactly 7 questions
+- Exactly 5 questions (updated from 7: experience level and session length removed — now auto-managed by XP level)
 - One question per screen
 - Notification permission request is deferred until after first completed session
 
-### 4.5 Streak and Stats
+### 4.5 Streak, Stats, and XP Gamification
 
 - Daily streak requires at least 2 minutes of total practice on a day
 - Partial sessions still count toward total minutes and can qualify streak
 - Week starts Monday (user-local timezone)
+- XP system: 10 XP per full minute of practice, 50% penalty for ended-early sessions
+- Streak multiplier: min(1.0 + 0.1 * streak_days, 3.0) applied per session using streak_days at that session’s local_day (non-qualifying local_day uses the previous day’s streak)
+- Daily practice XP cap: 300 XP/day (login bonus of 5 XP excluded from cap)
+- Level curve: xp_required(L) = floor(10 * (2 + 0.05*L + 0.0001*L^2)), levels 0-999
+- Pace auto-progression: L0-14 beginner, L15-49 intermediate, L50+ advanced
+- Duration unlocks: L0=2min, L10=5min, L30=10min, L60=15min, L100=20min
+- XP stored in dedicated tables (user_progress, xp_events) with curve_version for future recompute
 
 ### 4.6 Accounts and Leaderboard
 
@@ -97,13 +104,17 @@ The MVP excludes monetization and advanced social/community complexity to maximi
 
 ### 4.7 Leaderboard Rules
 
-- Views: Current streak, Weekly minutes, All-time minutes
+- Single view: Total XP (replaced streak/weekly/all-time views — XP is the unified progression metric)
 - Top 50 visible
 - User rank pinned even outside top 50
 - Refresh every 5 minutes
 - Profanity filter required on display names
 - Silent shadow-ban available for suspicious behavior
-- Daily cap applies to leaderboard minutes contribution
+- Daily practice XP cap of 300 XP/day (login bonus excluded)
+- API backward compatibility: old ranking params (streak/weekly/all_time) silently map to xp; response shape changed (total_xp + level instead of metric_value)
+- DB idempotency: unique partial indexes prevent double-awarding (daily_open per user/day, session XP per session_id)
+- Timestamp validation: sessions rejected if started_at_utc > 24h in the future or > 90 days in the past
+- local_day computed server-side from started_at_utc + timezone_offset_minutes (offset validated -840 to +840)
 
 ### 4.8 Backend and Infra
 
@@ -148,7 +159,7 @@ The MVP excludes monetization and advanced social/community complexity to maximi
 ### 6.1 First-Time Guest Journey
 
 1. Splash with scale-in logo
-2. Seven-question onboarding
+2. Five-question onboarding (goals, practice window, haptics, reminder, display name)
 3. Home opens with Today’s Practice card
 4. User taps Start and begins session in one tap
 5. Session completes and updates local stats/streak
@@ -172,7 +183,7 @@ The MVP excludes monetization and advanced social/community complexity to maximi
 ### 6.4 Signed-In Leaderboard Journey
 
 1. Open Leaderboard tab
-2. Select ranking view: streak/weekly/all-time
+2. View XP-ranked leaderboard with level display
 3. View top list and pinned self rank
 4. Manage visibility and initials-only mode from Profile settings
 
@@ -181,7 +192,7 @@ The MVP excludes monetization and advanced social/community complexity to maximi
 ### 7.1 Mobile Screens
 
 - Splash screen
-- Onboarding step screens (7)
+- Onboarding step screens (5)
 - Home screen
 - Techniques grid
 - Technique detail with presets and safety notes
@@ -205,13 +216,13 @@ The MVP excludes monetization and advanced social/community complexity to maximi
 
 ## 8.1 Questions (Fixed Order)
 
-1. Experience level (Beginner/Intermediate/Advanced)
-2. Primary goal (Calm, Sleep, Focus, Energy, HRV, Spiritual)
-3. Typical practice window (Morning/Afternoon/Evening/Varies)
-4. Typical session length (2/5/10/20 min)
-5. Haptics preference (On/Off)
-6. Daily reminder preferred time
-7. Display name
+1. Primary goal (Calm, Sleep, Focus, Energy, HRV, Spiritual)
+2. Typical practice window (Morning/Afternoon/Evening/Varies)
+3. Haptics preference (On/Off)
+4. Daily reminder preferred time
+5. Display name
+
+Note: Experience level and session length were removed — both are now auto-managed by the XP level system (see Section 4.5).
 
 ## 8.2 UX Rules
 
@@ -234,7 +245,7 @@ The MVP excludes monetization and advanced social/community complexity to maximi
 Inputs:
 - Selected goal
 - Time-of-day segment (Morning 5-11, Afternoon 11-17, Evening 17-22, Night 22-5)
-- Experience level
+- Preset ID derived from XP level (beginner/intermediate/advanced via presetForLevel)
 
 Outputs:
 - Technique id
@@ -413,11 +424,10 @@ Must show:
 - Tab visible for all users
 - Guests see locked entry with sign-in gate
 
-## 15.2 Leaderboard Views
+## 15.2 Leaderboard View
 
-- Current streak (default)
-- Weekly minutes
-- All-time minutes
+- Single view: Total XP (ranked by total_xp; level computed from XP via levelFromTotalXP)
+- Each row displays: rank, display name, avatar, level, total XP
 
 ## 15.3 Display Rules
 
@@ -432,8 +442,8 @@ Must show:
 ## 15.5 Integrity Rules
 
 - Validate session plausibility against preset bounds
-- Apply daily cap for leaderboard minute contribution
-- Streak calculation independent from leaderboard cap
+- Apply daily practice XP cap (300 XP/day)
+- Streak calculation independent from XP cap
 - Silent shadow-ban support for suspicious patterns
 
 ## 15.6 Moderation Baseline
@@ -503,7 +513,7 @@ Tests to implement within module:
 ### Module M2: Onboarding and Initial Preferences
 
 Scope:
-- Seven-question flow
+- Five-question flow (goals, practice window, haptics, reminder, display name)
 - Local persistence of answers
 - Apply default preferences immediately
 
@@ -599,7 +609,7 @@ Tests to implement within module:
 
 Scope:
 - Locked tab behavior for guest
-- Three leaderboard views
+- Single XP leaderboard view
 - Pinned self rank
 - Visibility and initials-only preferences
 
@@ -650,8 +660,8 @@ Route naming remains implementation-defined, but behavior is normative.
 
 | Capability | Auth requirement | Request field constraints | Response semantics | Idempotency | Rate-limit policy | Error classes |
 | --- | --- | --- | --- | --- | --- | --- |
-| Fetch leaderboard list | JWT optional; guest sees locked gate behavior in app | ranking must be one of streak/weekly/all_time; limit max 50 | Returns ordered list excluding users who have opted out of visibility | Idempotent | Tight read limits per IP/user to prevent scraping | 400 validation, 429 rate-limited |
-| Fetch self-rank snapshot | JWT required | ranking enum required | Returns requester rank even when outside top list | Idempotent | Standard authenticated read limits | 400 validation, 401 unauthorized |
+| Fetch leaderboard list | JWT optional; guest sees locked gate behavior in app | ranking=xp (legacy values silently map to xp); limit max 50 | Returns ordered list by total_xp with computed level, excluding opted-out users | Idempotent | Tight read limits per IP/user to prevent scraping | 400 validation, 429 rate-limited |
+| Fetch self-rank snapshot | JWT required | ranking=xp | Returns requester rank, total_xp, and level even when outside top list | Idempotent | Standard authenticated read limits | 400 validation, 401 unauthorized |
 
 ### Cross-cutting middleware contract
 
@@ -693,12 +703,32 @@ Route naming remains implementation-defined, but behavior is normative.
 - minutes_all_time
 - sessions_all_time
 - minutes_by_technique
+- total_xp (from user_progress table)
+- current_level (from user_progress table)
+
+### User Progress (XP)
+- user_id
+- total_xp
+- current_level
+- curve_version
+
+### XP Event
+- id
+- user_id
+- source (session | daily_open)
+- amount (final XP after multiplier and cap)
+- multiplier
+- base_amount
+- session_id (nullable)
+- local_day
+- curve_version
 
 ### Leaderboard Entry
 - rank
 - display_name_or_initials
 - avatar_seed
-- metric_value
+- total_xp
+- level
 - user_id
 
 ## 17.3.5 Data Constraints Matrix
@@ -749,7 +779,8 @@ Route naming remains implementation-defined, but behavior is normative.
 | rank | Int | Yes | >=1, contiguous within generated view | Unique per ranking view | Public leaderboard data | Server/Redis cache | Recomputed every refresh |
 | display_name_or_initials | String | Yes | Must respect user visibility and initials-only setting | Not unique | Public leaderboard data | Server | Derived at read time |
 | avatar_seed | String | Yes | Derived from user profile seed | Not unique | Public leaderboard data | Server | Derived at read time |
-| metric_value | Int | Yes | >=0 and ranking-specific | Not unique | Public leaderboard data | Server/Redis cache | Recomputed every refresh |
+| total_xp | BigInt | Yes | >=0 | Not unique | Public leaderboard data | Server/Redis cache (lb:xp) | Recomputed every refresh |
+| level | Int | Yes | 0-999, derived from total_xp | Not unique | Public leaderboard data | Server (computed at read time) | Derived from total_xp |
 | user_id | UUID | Yes | Must map to opted-in active user | Unique per entry | Internal/public mixed | Server | Recomputed every refresh |
 
 ## 17.4 Backend Security Baseline
@@ -762,8 +793,8 @@ Route naming remains implementation-defined, but behavior is normative.
 
 ## 17.5 Backend Caching and Jobs
 
-- Redis sorted sets for streak, weekly minutes, all-time minutes
-- Refresh rankings every 5 minutes
+- Redis sorted set for XP leaderboard (lb:xp key; old lb:streak/lb:weekly/lb:all_time keys cleaned up on refresh)
+- Refresh ranking every 5 minutes
 - Exclude non-opt-in users from ranking sets
 
 ## 17.6 Backend Module Plan with Task-Local Tests
@@ -1005,7 +1036,7 @@ Objectives:
 
 Must-complete outputs:
 - Working 4-tab shell with locked leaderboard tab
-- Working 7-step onboarding flow and local preference persistence
+- Working 5-step onboarding flow and local preference persistence
 - Session phase scheduler MVP with pause/resume
 - Backend service boots with config and health endpoint
 

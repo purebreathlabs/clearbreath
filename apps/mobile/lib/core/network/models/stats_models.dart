@@ -9,6 +9,8 @@ class StatsSnapshot {
     required this.sessionsAllTime,
     required this.minutesByTechnique,
     required this.updatedAtUtc,
+    required this.totalXp,
+    required this.currentLevel,
   });
 
   factory StatsSnapshot.fromJson(JsonMap json) {
@@ -20,6 +22,8 @@ class StatsSnapshot {
       sessionsAllTime: readInt(json, 'sessions_all_time'),
       minutesByTechnique: readStringIntMap(json, 'minutes_by_technique'),
       updatedAtUtc: readDateTimeUtc(json, 'updated_at_utc'),
+      totalXp: readInt(json, 'total_xp'),
+      currentLevel: readInt(json, 'current_level'),
     );
   }
 
@@ -30,4 +34,6 @@ class StatsSnapshot {
   final int sessionsAllTime;
   final Map<String, int> minutesByTechnique;
   final DateTime updatedAtUtc;
+  final int totalXp;
+  final int currentLevel;
 }

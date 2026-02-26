@@ -7,6 +7,10 @@ import 'package:clearbreath/features/leaderboard/data/leaderboard_repository.dar
 import 'package:clearbreath/features/leaderboard/domain/leaderboard_entry.dart';
 import 'package:clearbreath/features/leaderboard/domain/leaderboard_ranking.dart';
 import 'package:clearbreath/features/onboarding/domain/onboarding_gate.dart';
+import 'package:clearbreath/features/stats/domain/stats_snapshot.dart';
+import 'package:clearbreath/features/sync/domain/merged_stats_provider.dart';
+import 'package:clearbreath/features/xp/domain/xp_provider.dart';
+import 'package:clearbreath/features/xp/domain/xp_state.dart';
 import 'package:dio/dio.dart';
 import 'package:drift/native.dart';
 import 'package:flutter/material.dart';
@@ -34,6 +38,10 @@ void main() {
             ref.onDispose(gate.dispose);
             return gate;
           }),
+          mergedStatsProvider.overrideWith(
+            (ref) async => StatsSnapshot.empty(),
+          ),
+          mergedXPProvider.overrideWith((ref) async => XPState.empty()),
         ],
         child: const ClearBreathApp(),
       ),
@@ -97,7 +105,8 @@ class _FakeLeaderboardRepository extends LeaderboardRepository {
           rank: 1,
           displayNameOrInitials: 'AB',
           avatarSeed: 'seed',
-          metricValue: 7,
+          totalXp: 500,
+          level: 3,
           userId: 'test-user',
         ),
       ],
@@ -110,6 +119,6 @@ class _FakeLeaderboardRepository extends LeaderboardRepository {
 
   @override
   Future<LeaderboardSelfResult> fetchSelf(LeaderboardRanking ranking) async {
-    return const LeaderboardSelfResult(rank: 1, metricValue: 7);
+    return const LeaderboardSelfResult(rank: 1, totalXp: 500, level: 3);
   }
 }

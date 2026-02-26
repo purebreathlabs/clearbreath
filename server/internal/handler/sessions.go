@@ -11,6 +11,7 @@ import (
 	"github.com/clearbreath/server/internal/middleware"
 	"github.com/clearbreath/server/internal/repository/sqlcgen"
 	sessionsvc "github.com/clearbreath/server/internal/service/session"
+	"github.com/clearbreath/server/internal/service/xp"
 )
 
 type SessionsHandler struct {
@@ -37,7 +38,16 @@ type ingestSessionsResponse struct {
 	AcceptedCount  int                          `json:"accepted_count"`
 	DuplicateCount int                          `json:"duplicate_count"`
 	Rejected       []sessionsvc.RejectedSession `json:"rejected"`
-	StatsSnapshot  statsSnapshotResponse        `json:"stats_snapshot"`
+	StatsSnapshot  ingestStatsSnapshotResponse  `json:"stats_snapshot"`
+	XPAwards       []xp.XPAward                 `json:"xp_awards"`
+	TotalXP        int64                        `json:"total_xp"`
+	CurrentLevel   int32                        `json:"current_level"`
+}
+
+type ingestStatsSnapshotResponse struct {
+	statsSnapshotResponse
+	TotalXP      int64 `json:"total_xp"`
+	CurrentLevel int32 `json:"current_level"`
 }
 
 type statsSnapshotResponse struct {
@@ -127,7 +137,14 @@ func toIngestSessionsResponse(out sessionsvc.IngestResult) (ingestSessionsRespon
 		AcceptedCount:  out.AcceptedCount,
 		DuplicateCount: out.DuplicateCount,
 		Rejected:       out.Rejected,
-		StatsSnapshot:  snap,
+		StatsSnapshot: ingestStatsSnapshotResponse{
+			statsSnapshotResponse: snap,
+			TotalXP:               out.TotalXP,
+			CurrentLevel:          out.CurrentLevel,
+		},
+		XPAwards:     out.XPAwards,
+		TotalXP:      out.TotalXP,
+		CurrentLevel: out.CurrentLevel,
 	}, nil
 }
 

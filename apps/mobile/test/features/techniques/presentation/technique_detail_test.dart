@@ -1,6 +1,8 @@
 import 'package:clearbreath/core/theme/app_theme.dart';
 import 'package:clearbreath/features/onboarding/domain/onboarding_answers.dart';
 import 'package:clearbreath/features/session/domain/active_session_config.dart';
+import 'package:clearbreath/features/stats/domain/stats_snapshot.dart';
+import 'package:clearbreath/features/sync/domain/merged_stats_provider.dart';
 import 'package:clearbreath/features/techniques/data/technique_repository.dart';
 import 'package:clearbreath/features/techniques/domain/technique.dart';
 import 'package:clearbreath/features/techniques/domain/technique_preset.dart';
@@ -147,17 +149,103 @@ void main() {
     return [box, kapalbhati];
   }
 
-  ProviderContainer createContainer() {
+  ProviderContainer createContainer({int totalXP = 0, int streakDays = 0}) {
     return ProviderContainer(
       overrides: [
         techniqueRepositoryProvider.overrideWithValue(
           TestTechniqueRepository(buildTechniques()),
         ),
+        mergedStatsProvider.overrideWith(
+          (ref) async => StatsSnapshot(
+            currentStreakDays: streakDays,
+            longestStreakDays: streakDays,
+            minutesThisWeek: 0,
+            minutesAllTime: 0,
+            sessionsAllTime: 0,
+            minutesByTechnique: const {},
+            longestSessionMinutes: 0,
+            favoriteTechniqueId: null,
+            totalBreathsEstimated: 0,
+            updatedAt: DateTime.utc(2026),
+            totalXP: totalXP,
+            currentLevel: 0,
+          ),
+        ),
       ],
     );
   }
 
-  testWidgets('preset selector updates session config', (tester) async {
+  testWidgets('no pace or duration selectors are shown', (tester) async {
+    final container = createContainer();
+    addTearDown(container.dispose);
+
+    final router = GoRouter(
+      initialLocation: '/techniques/box',
+      routes: [
+        GoRoute(
+          path: '/techniques/:id',
+          builder: (context, state) {
+            final id = state.pathParameters['id'] ?? '';
+            return TechniqueDetailScreen(techniqueId: id);
+          },
+        ),
+      ],
+    );
+
+    await tester.pumpWidget(
+      UncontrolledProviderScope(
+        container: container,
+        child: MaterialApp.router(theme: AppTheme.dark(), routerConfig: router),
+      ),
+    );
+
+    await pumpUntilFound(tester, find.text('Start Session'));
+
+    expect(find.text('Pace'), findsNothing);
+    expect(find.text('Duration'), findsNothing);
+    expect(find.byKey(const Key('preset_beginner')), findsNothing);
+    expect(find.byKey(const Key('preset_advanced')), findsNothing);
+    expect(find.byKey(const Key('duration_2')), findsNothing);
+    expect(find.byKey(const Key('duration_5')), findsNothing);
+    expect(find.byKey(const Key('duration_10')), findsNothing);
+    expect(find.byKey(const Key('duration_20')), findsNothing);
+  });
+
+  testWidgets('shows Your Session card with level info', (tester) async {
+    final container = createContainer();
+    addTearDown(container.dispose);
+
+    final router = GoRouter(
+      initialLocation: '/techniques/box',
+      routes: [
+        GoRoute(
+          path: '/techniques/:id',
+          builder: (context, state) {
+            final id = state.pathParameters['id'] ?? '';
+            return TechniqueDetailScreen(techniqueId: id);
+          },
+        ),
+      ],
+    );
+
+    await tester.pumpWidget(
+      UncontrolledProviderScope(
+        container: container,
+        child: MaterialApp.router(theme: AppTheme.dark(), routerConfig: router),
+      ),
+    );
+
+    await pumpUntilFound(tester, find.text('Your Session'));
+
+    expect(find.text('Your Session'), findsOneWidget);
+    expect(find.text('Level 0'), findsOneWidget);
+    expect(find.text('Beginner'), findsOneWidget);
+    expect(find.text('2 min'), findsOneWidget);
+  });
+
+  testWidgets('start session uses XP-derived preset and duration', (
+    tester,
+  ) async {
     final container = createContainer();
     addTearDown(container.dispose);
 
@@ -189,13 +277,6 @@ void main() {
 
     await pumpUntilFound(tester, find.text('Start Session'));
 
-    await tester.tap(find.byKey(const Key('preset_advanced')));
-    await tester.pump();
-
-    await tester.ensureVisible(find.byKey(const Key('duration_10')));
-    await tester.tap(find.byKey(const Key('duration_10')));
-    await tester.pump();
-
     await tester.tap(find.text('Start Session'));
     await pumpUntilFound(tester, find.text('Session'));
 
@@ -203,8 +284,8 @@ void main() {
     final config = container.read(activeSessionConfigProvider);
     expect(config, isNotNull);
     expect(config!.technique.id, 'box');
-    expect(config.presetId, 'advanced');
-    expect(config.durationLimitSeconds, 10 * 60);
+    expect(config.presetId, 'beginner');
+    expect(config.durationLimitSeconds, 2 * 60);
   });
 
   testWidgets('safety gate shows sheet for gated techniques', (tester) async {

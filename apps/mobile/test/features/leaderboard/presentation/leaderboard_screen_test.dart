@@ -30,9 +30,7 @@ void main() {
     expect(find.text('Leaderboard is locked'), findsOneWidget);
   });
 
-  testWidgets('ranking toggle updates list and self rank is visible', (
-    tester,
-  ) async {
+  testWidgets('signed-in user sees self rank card', (tester) async {
     final repo = _FakeLeaderboardRepository();
     addTearDown(repo.dispose);
 
@@ -53,11 +51,6 @@ void main() {
 
     expect(find.byKey(const Key('self_rank_card')), findsOneWidget);
     expect(find.text('AB'), findsOneWidget);
-
-    await tester.tap(find.byKey(const Key('ranking_weekly')));
-    await tester.pumpAndSettle();
-
-    expect(find.text('CD'), findsOneWidget);
   });
 }
 
@@ -98,30 +91,17 @@ class _FakeLeaderboardRepository extends LeaderboardRepository {
     int limit = 50,
   }) async {
     final now = DateTime.now().toUtc();
-    final entries = switch (ranking) {
-      LeaderboardRanking.streak => [
-        const LeaderboardEntry(
+    return LeaderboardListResult(
+      entries: const [
+        LeaderboardEntry(
           rank: 1,
           displayNameOrInitials: 'AB',
           avatarSeed: 'seed-a',
-          metricValue: 7,
+          totalXp: 500,
+          level: 3,
           userId: 'user-a',
         ),
       ],
-      LeaderboardRanking.weekly => [
-        const LeaderboardEntry(
-          rank: 1,
-          displayNameOrInitials: 'CD',
-          avatarSeed: 'seed-b',
-          metricValue: 120,
-          userId: 'user-b',
-        ),
-      ],
-      LeaderboardRanking.allTime => const <LeaderboardEntry>[],
-    };
-
-    return LeaderboardListResult(
-      entries: entries,
       generatedAtUtc: now,
       fetchedAtUtc: now,
       fromCache: false,
@@ -131,6 +111,6 @@ class _FakeLeaderboardRepository extends LeaderboardRepository {
 
   @override
   Future<LeaderboardSelfResult> fetchSelf(LeaderboardRanking ranking) async {
-    return const LeaderboardSelfResult(rank: 1, metricValue: 7);
+    return const LeaderboardSelfResult(rank: 1, totalXp: 500, level: 3);
   }
 }
