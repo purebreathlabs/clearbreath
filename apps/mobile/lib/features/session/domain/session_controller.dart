@@ -8,6 +8,7 @@ import '../../background_audio/data/background_audio_controller.dart';
 import '../../notifications/domain/notification_controller.dart';
 import '../../stats/domain/stats_engine.dart';
 import '../../stats/domain/weekly_minutes_provider.dart';
+import '../../sync/domain/merged_stats_provider.dart';
 import '../../sync/domain/sync_controller.dart';
 import '../../techniques/domain/technique.dart';
 import '../../techniques/domain/technique_preset.dart';
@@ -189,6 +190,8 @@ class SessionController extends Notifier<SessionState> {
       try {
         await _sessions.insert(local);
         ref.invalidate(localStatsProvider);
+        await ref.read(localStatsProvider.future);
+        ref.invalidate(mergedStatsProvider);
         ref.invalidate(weeklyMinutesProvider);
         if (ref.read(authStateProvider) is AuthStateSignedIn) {
           unawaited(
@@ -297,6 +300,8 @@ class SessionController extends Notifier<SessionState> {
     } catch (_) {}
 
     ref.invalidate(localStatsProvider);
+    await ref.read(localStatsProvider.future);
+    ref.invalidate(mergedStatsProvider);
     ref.invalidate(weeklyMinutesProvider);
     ref.read(latestXpAwardsProvider.notifier).clear();
     ref.read(lastCompletedSessionProvider.notifier).set(local);
