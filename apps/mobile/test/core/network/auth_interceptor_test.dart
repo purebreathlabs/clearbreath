@@ -224,7 +224,7 @@ void main() {
         );
         await store.writeString(
           'auth.user_profile_json',
-          '{"id":"user1","display_name":"Breather123456","avatar_seed":"seed","leaderboard_opt_in":true,"leaderboard_initials_only":false,"created_at_utc":"2026-02-22T00:00:00Z","timezone_offset_minutes_latest":0}',
+          '{"id":"user1","username":"Breather123456","name":"","avatar_seed":"seed","leaderboard_opt_in":true,"created_at_utc":"2026-02-22T00:00:00Z","timezone_offset_minutes_latest":0}',
         );
         return ResponseBody.fromString(
           '{"error":"replay","code":"refresh_replay","request_id":"r"}',
@@ -454,10 +454,10 @@ String _authResponseJson({
   "refresh_token_expires_at_utc":"$refreshExp",
   "user":{
     "id":"$userId",
-    "display_name":"Breather123456",
+    "username":"Breather123456",
+    "name":"",
     "avatar_seed":"seed",
     "leaderboard_opt_in":true,
-    "leaderboard_initials_only":false,
     "created_at_utc":"2026-02-22T00:00:00Z",
     "timezone_offset_minutes_latest":0
   }

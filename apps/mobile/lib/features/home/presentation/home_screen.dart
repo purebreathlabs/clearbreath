@@ -60,10 +60,12 @@ class HomeScreen extends ConsumerWidget {
 
     final prefs = ref.watch(preferencesProvider);
     final row = prefs.asData?.value;
-    final localDisplayName = row?.displayName.trim() ?? '';
+    final localDisplayName = row?.guestUsername.trim() ?? '';
     final auth = ref.watch(authStateProvider);
     final signedInName = auth is AuthStateSignedIn
-        ? auth.profile.displayName.trim()
+        ? (auth.profile.name.trim().isNotEmpty
+              ? auth.profile.name.trim()
+              : auth.profile.username.trim())
         : '';
     final displayName = signedInName.isNotEmpty
         ? signedInName

@@ -4,9 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"strings"
 	"time"
-	"unicode"
 
 	"github.com/google/uuid"
 	"github.com/redis/go-redis/v9"
@@ -73,12 +71,13 @@ const (
 const redisKey = "lb:xp"
 
 type Row struct {
-	Rank                  int    `json:"rank"`
-	DisplayNameOrInitials string `json:"display_name_or_initials"`
-	AvatarSeed            string `json:"avatar_seed"`
-	TotalXP               int64  `json:"total_xp"`
-	Level                 int32  `json:"level"`
-	UserID                string `json:"user_id"`
+	Rank       int     `json:"rank"`
+	Username   string  `json:"username"`
+	Name       *string `json:"name"`
+	AvatarSeed string  `json:"avatar_seed"`
+	TotalXP    int64   `json:"total_xp"`
+	Level      int32   `json:"level"`
+	UserID     string  `json:"user_id"`
 }
 
 type ListResponse struct {
@@ -210,19 +209,16 @@ func (s *Service) List(ctx context.Context, ranking Ranking, limit int) (ListRes
 		if !ok {
 			continue
 		}
-		name := u.DisplayName
-		if u.LeaderboardInitialsOnly {
-			name = initials(name)
-		}
 		totalXP := totalXPs[i]
 		level := s.xp.LevelFromTotalXP(totalXP)
 		top = append(top, Row{
-			Rank:                  rank,
-			DisplayNameOrInitials: name,
-			AvatarSeed:            u.AvatarSeed,
-			TotalXP:               totalXP,
-			Level:                 level,
-			UserID:                id.String(),
+			Rank:       rank,
+			Username:   u.Username,
+			Name:       u.Name,
+			AvatarSeed: u.AvatarSeed,
+			TotalXP:    totalXP,
+			Level:      level,
+			UserID:     id.String(),
 		})
 		rank++
 	}
@@ -268,48 +264,4 @@ func (s *Service) Self(ctx context.Context, userID uuid.UUID, ranking Ranking) (
 
 func normalizeRanking(r Ranking) Ranking {
 	return RankingXP
-}
-
-func initials(name string) string {
-	name = strings.TrimSpace(name)
-	if name == "" {
-		return "U"
-	}
-
-	var parts []string
-	var b strings.Builder
-	for _, r := range name {
-		if unicode.IsSpace(r) {
-			if b.Len() > 0 {
-				parts = append(parts, b.String())
-				b.Reset()
-			}
-			continue
-		}
-		if unicode.IsLetter(r) || unicode.IsNumber(r) {
-			b.WriteRune(r)
-		}
-	}
-	if b.Len() > 0 {
-		parts = append(parts, b.String())
-	}
-
-	if len(parts) == 0 {
-		return "U"
-	}
-
-	first := []rune(parts[0])
-	if len(first) == 0 {
-		return "U"
-	}
-
-	out := strings.ToUpper(string(first[0]))
-	if len(parts) > 1 {
-		second := []rune(parts[1])
-		if len(second) > 0 {
-			out += strings.ToUpper(string(second[0]))
-		}
-	}
-
-	return out
 }

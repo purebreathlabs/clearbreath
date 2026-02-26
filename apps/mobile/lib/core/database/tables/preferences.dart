@@ -49,6 +49,8 @@ class Preferences extends Table {
 
   TextColumn get displayName => text().withDefault(const Constant(''))();
 
+  TextColumn get guestUsername => text().withDefault(const Constant(''))();
+
   @override
   Set<Column> get primaryKey => {id};
 }

@@ -231,6 +231,18 @@ class $PreferencesTable extends Preferences
     requiredDuringInsert: false,
     defaultValue: const Constant(''),
   );
+  static const VerificationMeta _guestUsernameMeta = const VerificationMeta(
+    'guestUsername',
+  );
+  @override
+  late final GeneratedColumn<String> guestUsername = GeneratedColumn<String>(
+    'guest_username',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(''),
+  );
   @override
   List<GeneratedColumn> get $columns => [
     id,
@@ -250,6 +262,7 @@ class $PreferencesTable extends Preferences
     firstSessionCompleted,
     notificationPermissionAsked,
     displayName,
+    guestUsername,
   ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -410,6 +423,15 @@ class $PreferencesTable extends Preferences
         ),
       );
     }
+    if (data.containsKey('guest_username')) {
+      context.handle(
+        _guestUsernameMeta,
+        guestUsername.isAcceptableOrUnknown(
+          data['guest_username']!,
+          _guestUsernameMeta,
+        ),
+      );
+    }
     return context;
   }
 
@@ -487,6 +509,10 @@ class $PreferencesTable extends Preferences
         DriftSqlType.string,
         data['${effectivePrefix}display_name'],
       )!,
+      guestUsername: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}guest_username'],
+      )!,
     );
   }
 
@@ -514,6 +540,7 @@ class Preference extends DataClass implements Insertable<Preference> {
   final bool firstSessionCompleted;
   final bool notificationPermissionAsked;
   final String displayName;
+  final String guestUsername;
   const Preference({
     required this.id,
     required this.introComplete,
@@ -532,6 +559,7 @@ class Preference extends DataClass implements Insertable<Preference> {
     required this.firstSessionCompleted,
     required this.notificationPermissionAsked,
     required this.displayName,
+    required this.guestUsername,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -555,6 +583,7 @@ class Preference extends DataClass implements Insertable<Preference> {
       notificationPermissionAsked,
     );
     map['display_name'] = Variable<String>(displayName);
+    map['guest_username'] = Variable<String>(guestUsername);
     return map;
   }
 
@@ -577,6 +606,7 @@ class Preference extends DataClass implements Insertable<Preference> {
       firstSessionCompleted: Value(firstSessionCompleted),
       notificationPermissionAsked: Value(notificationPermissionAsked),
       displayName: Value(displayName),
+      guestUsername: Value(guestUsername),
     );
   }
 
@@ -615,6 +645,7 @@ class Preference extends DataClass implements Insertable<Preference> {
         json['notificationPermissionAsked'],
       ),
       displayName: serializer.fromJson<String>(json['displayName']),
+      guestUsername: serializer.fromJson<String>(json['guestUsername']),
     );
   }
   @override
@@ -640,6 +671,7 @@ class Preference extends DataClass implements Insertable<Preference> {
         notificationPermissionAsked,
       ),
       'displayName': serializer.toJson<String>(displayName),
+      'guestUsername': serializer.toJson<String>(guestUsername),
     };
   }
 
@@ -661,6 +693,7 @@ class Preference extends DataClass implements Insertable<Preference> {
     bool? firstSessionCompleted,
     bool? notificationPermissionAsked,
     String? displayName,
+    String? guestUsername,
   }) => Preference(
     id: id ?? this.id,
     introComplete: introComplete ?? this.introComplete,
@@ -680,6 +713,7 @@ class Preference extends DataClass implements Insertable<Preference> {
     notificationPermissionAsked:
         notificationPermissionAsked ?? this.notificationPermissionAsked,
     displayName: displayName ?? this.displayName,
+    guestUsername: guestUsername ?? this.guestUsername,
   );
   Preference copyWithCompanion(PreferencesCompanion data) {
     return Preference(
@@ -732,6 +766,9 @@ class Preference extends DataClass implements Insertable<Preference> {
       displayName: data.displayName.present
           ? data.displayName.value
           : this.displayName,
+      guestUsername: data.guestUsername.present
+          ? data.guestUsername.value
+          : this.guestUsername,
     );
   }
 
@@ -754,7 +791,8 @@ class Preference extends DataClass implements Insertable<Preference> {
           ..write('streakWarningEnabled: $streakWarningEnabled, ')
           ..write('firstSessionCompleted: $firstSessionCompleted, ')
           ..write('notificationPermissionAsked: $notificationPermissionAsked, ')
-          ..write('displayName: $displayName')
+          ..write('displayName: $displayName, ')
+          ..write('guestUsername: $guestUsername')
           ..write(')'))
         .toString();
   }
@@ -778,6 +816,7 @@ class Preference extends DataClass implements Insertable<Preference> {
     firstSessionCompleted,
     notificationPermissionAsked,
     displayName,
+    guestUsername,
   );
   @override
   bool operator ==(Object other) =>
@@ -800,7 +839,8 @@ class Preference extends DataClass implements Insertable<Preference> {
           other.firstSessionCompleted == this.firstSessionCompleted &&
           other.notificationPermissionAsked ==
               this.notificationPermissionAsked &&
-          other.displayName == this.displayName);
+          other.displayName == this.displayName &&
+          other.guestUsername == this.guestUsername);
 }
 
 class PreferencesCompanion extends UpdateCompanion<Preference> {
@@ -821,6 +861,7 @@ class PreferencesCompanion extends UpdateCompanion<Preference> {
   final Value<bool> firstSessionCompleted;
   final Value<bool> notificationPermissionAsked;
   final Value<String> displayName;
+  final Value<String> guestUsername;
   const PreferencesCompanion({
     this.id = const Value.absent(),
     this.introComplete = const Value.absent(),
@@ -839,6 +880,7 @@ class PreferencesCompanion extends UpdateCompanion<Preference> {
     this.firstSessionCompleted = const Value.absent(),
     this.notificationPermissionAsked = const Value.absent(),
     this.displayName = const Value.absent(),
+    this.guestUsername = const Value.absent(),
   });
   PreferencesCompanion.insert({
     this.id = const Value.absent(),
@@ -858,6 +900,7 @@ class PreferencesCompanion extends UpdateCompanion<Preference> {
     this.firstSessionCompleted = const Value.absent(),
     this.notificationPermissionAsked = const Value.absent(),
     this.displayName = const Value.absent(),
+    this.guestUsername = const Value.absent(),
   });
   static Insertable<Preference> custom({
     Expression<int>? id,
@@ -877,6 +920,7 @@ class PreferencesCompanion extends UpdateCompanion<Preference> {
     Expression<bool>? firstSessionCompleted,
     Expression<bool>? notificationPermissionAsked,
     Expression<String>? displayName,
+    Expression<String>? guestUsername,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
@@ -902,6 +946,7 @@ class PreferencesCompanion extends UpdateCompanion<Preference> {
       if (notificationPermissionAsked != null)
         'notification_permission_asked': notificationPermissionAsked,
       if (displayName != null) 'display_name': displayName,
+      if (guestUsername != null) 'guest_username': guestUsername,
     });
   }
 
@@ -923,6 +968,7 @@ class PreferencesCompanion extends UpdateCompanion<Preference> {
     Value<bool>? firstSessionCompleted,
     Value<bool>? notificationPermissionAsked,
     Value<String>? displayName,
+    Value<String>? guestUsername,
   }) {
     return PreferencesCompanion(
       id: id ?? this.id,
@@ -944,6 +990,7 @@ class PreferencesCompanion extends UpdateCompanion<Preference> {
       notificationPermissionAsked:
           notificationPermissionAsked ?? this.notificationPermissionAsked,
       displayName: displayName ?? this.displayName,
+      guestUsername: guestUsername ?? this.guestUsername,
     );
   }
 
@@ -1009,6 +1056,9 @@ class PreferencesCompanion extends UpdateCompanion<Preference> {
     if (displayName.present) {
       map['display_name'] = Variable<String>(displayName.value);
     }
+    if (guestUsername.present) {
+      map['guest_username'] = Variable<String>(guestUsername.value);
+    }
     return map;
   }
 
@@ -1031,7 +1081,8 @@ class PreferencesCompanion extends UpdateCompanion<Preference> {
           ..write('streakWarningEnabled: $streakWarningEnabled, ')
           ..write('firstSessionCompleted: $firstSessionCompleted, ')
           ..write('notificationPermissionAsked: $notificationPermissionAsked, ')
-          ..write('displayName: $displayName')
+          ..write('displayName: $displayName, ')
+          ..write('guestUsername: $guestUsername')
           ..write(')'))
         .toString();
   }
@@ -3945,6 +3996,7 @@ typedef $$PreferencesTableCreateCompanionBuilder =
       Value<bool> firstSessionCompleted,
       Value<bool> notificationPermissionAsked,
       Value<String> displayName,
+      Value<String> guestUsername,
     });
 typedef $$PreferencesTableUpdateCompanionBuilder =
     PreferencesCompanion Function({
@@ -3965,6 +4017,7 @@ typedef $$PreferencesTableUpdateCompanionBuilder =
       Value<bool> firstSessionCompleted,
       Value<bool> notificationPermissionAsked,
       Value<String> displayName,
+      Value<String> guestUsername,
     });
 
 class $$PreferencesTableFilterComposer
@@ -4058,6 +4111,11 @@ class $$PreferencesTableFilterComposer
 
   ColumnFilters<String> get displayName => $composableBuilder(
     column: $table.displayName,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get guestUsername => $composableBuilder(
+    column: $table.guestUsername,
     builder: (column) => ColumnFilters(column),
   );
 }
@@ -4155,6 +4213,11 @@ class $$PreferencesTableOrderingComposer
     column: $table.displayName,
     builder: (column) => ColumnOrderings(column),
   );
+
+  ColumnOrderings<String> get guestUsername => $composableBuilder(
+    column: $table.guestUsername,
+    builder: (column) => ColumnOrderings(column),
+  );
 }
 
 class $$PreferencesTableAnnotationComposer
@@ -4248,6 +4311,11 @@ class $$PreferencesTableAnnotationComposer
     column: $table.displayName,
     builder: (column) => column,
   );
+
+  GeneratedColumn<String> get guestUsername => $composableBuilder(
+    column: $table.guestUsername,
+    builder: (column) => column,
+  );
 }
 
 class $$PreferencesTableTableManager
@@ -4298,6 +4366,7 @@ class $$PreferencesTableTableManager
                 Value<bool> firstSessionCompleted = const Value.absent(),
                 Value<bool> notificationPermissionAsked = const Value.absent(),
                 Value<String> displayName = const Value.absent(),
+                Value<String> guestUsername = const Value.absent(),
               }) => PreferencesCompanion(
                 id: id,
                 introComplete: introComplete,
@@ -4316,6 +4385,7 @@ class $$PreferencesTableTableManager
                 firstSessionCompleted: firstSessionCompleted,
                 notificationPermissionAsked: notificationPermissionAsked,
                 displayName: displayName,
+                guestUsername: guestUsername,
               ),
           createCompanionCallback:
               ({
@@ -4336,6 +4406,7 @@ class $$PreferencesTableTableManager
                 Value<bool> firstSessionCompleted = const Value.absent(),
                 Value<bool> notificationPermissionAsked = const Value.absent(),
                 Value<String> displayName = const Value.absent(),
+                Value<String> guestUsername = const Value.absent(),
               }) => PreferencesCompanion.insert(
                 id: id,
                 introComplete: introComplete,
@@ -4354,6 +4425,7 @@ class $$PreferencesTableTableManager
                 firstSessionCompleted: firstSessionCompleted,
                 notificationPermissionAsked: notificationPermissionAsked,
                 displayName: displayName,
+                guestUsername: guestUsername,
               ),
           withReferenceMapper: (p0) => p0
               .map((e) => (e.readTable(table), BaseReferences(db, table, e)))

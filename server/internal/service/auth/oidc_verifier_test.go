@@ -58,7 +58,7 @@ func TestOIDCVerifierVerifySuccessAndCaching(t *testing.T) {
 
 	v := newOIDCVerifier(issuer, clientID)
 
-	sub, err := v.Verify(context.Background(), raw)
+	sub, _, err := v.Verify(context.Background(), raw)
 	if err != nil {
 		t.Fatalf("verify: %v", err)
 	}
@@ -66,7 +66,7 @@ func TestOIDCVerifierVerifySuccessAndCaching(t *testing.T) {
 		t.Fatalf("sub: got %q, want %q", sub, "user1")
 	}
 
-	sub, err = v.Verify(context.Background(), raw)
+	sub, _, err = v.Verify(context.Background(), raw)
 	if err != nil {
 		t.Fatalf("verify cached: %v", err)
 	}
@@ -119,7 +119,7 @@ func TestOIDCVerifierVerifyRejectsInvalidToken(t *testing.T) {
 
 	v := newOIDCVerifier(issuer, clientID)
 
-	if _, err := v.Verify(context.Background(), raw); err == nil {
+	if _, _, err := v.Verify(context.Background(), raw); err == nil {
 		t.Fatalf("expected error")
 	}
 }
@@ -168,7 +168,7 @@ func TestOIDCVerifierVerifyRejectsEmptySubject(t *testing.T) {
 
 	v := newOIDCVerifier(issuer, clientID)
 
-	if _, err := v.Verify(context.Background(), raw); err == nil {
+	if _, _, err := v.Verify(context.Background(), raw); err == nil {
 		t.Fatalf("expected error")
 	}
 }
@@ -224,7 +224,7 @@ func TestVerifyProviderGoogleAndAppleSuccessWithLocalOIDC(t *testing.T) {
 		s.appleVerifier = newOIDCVerifier(issuer, clientID)
 	})
 
-	sub, err := s.verifyProvider(context.Background(), "google", raw, "device1", "")
+	sub, _, err := s.verifyProvider(context.Background(), "google", raw, "device1", "")
 	if err != nil {
 		t.Fatalf("verify google: %v", err)
 	}
@@ -232,7 +232,7 @@ func TestVerifyProviderGoogleAndAppleSuccessWithLocalOIDC(t *testing.T) {
 		t.Fatalf("sub: got %q, want %q", sub, "user1")
 	}
 
-	sub, err = s.verifyProvider(context.Background(), "apple", raw, "device1", "")
+	sub, _, err = s.verifyProvider(context.Background(), "apple", raw, "device1", "")
 	if err != nil {
 		t.Fatalf("verify apple: %v", err)
 	}
@@ -290,7 +290,7 @@ func TestVerifyProviderReturnsProviderTokenError(t *testing.T) {
 		s.appleVerifier = newOIDCVerifier(issuer, clientID)
 	})
 
-	if _, err := s.verifyProvider(context.Background(), "google", "not-a-jwt", "device1", ""); err == nil {
+	if _, _, err := s.verifyProvider(context.Background(), "google", "not-a-jwt", "device1", ""); err == nil {
 		t.Fatalf("expected error")
 	}
 }

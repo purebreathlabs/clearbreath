@@ -4,7 +4,7 @@ FROM users u LEFT JOIN user_progress up ON up.user_id = u.id
 WHERE u.deleted_at IS NULL AND u.leaderboard_opt_in = true AND u.shadow_banned = false;
 
 -- name: GetUsersByIDs :many
-SELECT id, display_name, avatar_seed, leaderboard_initials_only
+SELECT id, username, name, avatar_seed
 FROM users
 WHERE id = ANY($1::uuid[])
   AND deleted_at IS NULL

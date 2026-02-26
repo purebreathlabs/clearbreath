@@ -11,22 +11,35 @@ import (
 	"github.com/google/uuid"
 )
 
+const checkUsernameExists = `-- name: CheckUsernameExists :one
+SELECT EXISTS(SELECT 1 FROM users WHERE lower(username) = lower($1) AND deleted_at IS NULL)
+`
+
+func (q *Queries) CheckUsernameExists(ctx context.Context, lower string) (bool, error) {
+	row := q.db.QueryRow(ctx, checkUsernameExists, lower)
+	var exists bool
+	err := row.Scan(&exists)
+	return exists, err
+}
+
 const createUser = `-- name: CreateUser :one
-INSERT INTO users (display_name, avatar_seed, age_band, timezone_offset_minutes_latest)
-VALUES ($1, $2, $3, $4)
-RETURNING id, display_name, avatar_seed, leaderboard_opt_in, leaderboard_initials_only, shadow_banned, age_band, timezone_offset_minutes_latest, deleted_at, created_at
+INSERT INTO users (username, name, avatar_seed, age_band, timezone_offset_minutes_latest)
+VALUES ($1, $2, $3, $4, $5)
+RETURNING id, avatar_seed, leaderboard_opt_in, shadow_banned, age_band, timezone_offset_minutes_latest, deleted_at, created_at, username, name
 `
 
 type CreateUserParams struct {
-	DisplayName                 string `json:"display_name"`
-	AvatarSeed                  string `json:"avatar_seed"`
-	AgeBand                     string `json:"age_band"`
-	TimezoneOffsetMinutesLatest int32  `json:"timezone_offset_minutes_latest"`
+	Username                    string  `json:"username"`
+	Name                        *string `json:"name"`
+	AvatarSeed                  string  `json:"avatar_seed"`
+	AgeBand                     string  `json:"age_band"`
+	TimezoneOffsetMinutesLatest int32   `json:"timezone_offset_minutes_latest"`
 }
 
 func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, error) {
 	row := q.db.QueryRow(ctx, createUser,
-		arg.DisplayName,
+		arg.Username,
+		arg.Name,
 		arg.AvatarSeed,
 		arg.AgeBand,
 		arg.TimezoneOffsetMinutesLatest,
@@ -34,15 +47,15 @@ func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, e
 	var i User
 	err := row.Scan(
 		&i.ID,
-		&i.DisplayName,
 		&i.AvatarSeed,
 		&i.LeaderboardOptIn,
-		&i.LeaderboardInitialsOnly,
 		&i.ShadowBanned,
 		&i.AgeBand,
 		&i.TimezoneOffsetMinutesLatest,
 		&i.DeletedAt,
 		&i.CreatedAt,
+		&i.Username,
+		&i.Name,
 	)
 	return i, err
 }
@@ -88,7 +101,7 @@ func (q *Queries) DeleteStatsSnapshotByUserID(ctx context.Context, userID uuid.U
 }
 
 const getUserByID = `-- name: GetUserByID :one
-SELECT id, display_name, avatar_seed, leaderboard_opt_in, leaderboard_initials_only, shadow_banned, age_band, timezone_offset_minutes_latest, deleted_at, created_at
+SELECT id, avatar_seed, leaderboard_opt_in, shadow_banned, age_band, timezone_offset_minutes_latest, deleted_at, created_at, username, name
 FROM users
 WHERE id = $1
   AND deleted_at IS NULL
@@ -100,21 +113,21 @@ func (q *Queries) GetUserByID(ctx context.Context, id uuid.UUID) (User, error) {
 	var i User
 	err := row.Scan(
 		&i.ID,
-		&i.DisplayName,
 		&i.AvatarSeed,
 		&i.LeaderboardOptIn,
-		&i.LeaderboardInitialsOnly,
 		&i.ShadowBanned,
 		&i.AgeBand,
 		&i.TimezoneOffsetMinutesLatest,
 		&i.DeletedAt,
 		&i.CreatedAt,
+		&i.Username,
+		&i.Name,
 	)
 	return i, err
 }
 
 const getUserByIDAllowDeleted = `-- name: GetUserByIDAllowDeleted :one
-SELECT id, display_name, avatar_seed, leaderboard_opt_in, leaderboard_initials_only, shadow_banned, age_band, timezone_offset_minutes_latest, deleted_at, created_at
+SELECT id, avatar_seed, leaderboard_opt_in, shadow_banned, age_band, timezone_offset_minutes_latest, deleted_at, created_at, username, name
 FROM users
 WHERE id = $1
 LIMIT 1
@@ -125,15 +138,15 @@ func (q *Queries) GetUserByIDAllowDeleted(ctx context.Context, id uuid.UUID) (Us
 	var i User
 	err := row.Scan(
 		&i.ID,
-		&i.DisplayName,
 		&i.AvatarSeed,
 		&i.LeaderboardOptIn,
-		&i.LeaderboardInitialsOnly,
 		&i.ShadowBanned,
 		&i.AgeBand,
 		&i.TimezoneOffsetMinutesLatest,
 		&i.DeletedAt,
 		&i.CreatedAt,
+		&i.Username,
+		&i.Name,
 	)
 	return i, err
 }
@@ -142,98 +155,95 @@ const markUserDeleted = `-- name: MarkUserDeleted :one
 UPDATE users
 SET deleted_at = now(),
     leaderboard_opt_in = false,
-    leaderboard_initials_only = false,
-    display_name = $2,
+    username = $2,
     avatar_seed = $3
 WHERE id = $1
   AND deleted_at IS NULL
-RETURNING id, display_name, avatar_seed, leaderboard_opt_in, leaderboard_initials_only, shadow_banned, age_band, timezone_offset_minutes_latest, deleted_at, created_at
+RETURNING id, avatar_seed, leaderboard_opt_in, shadow_banned, age_band, timezone_offset_minutes_latest, deleted_at, created_at, username, name
 `
 
 type MarkUserDeletedParams struct {
-	ID          uuid.UUID `json:"id"`
-	DisplayName string    `json:"display_name"`
-	AvatarSeed  string    `json:"avatar_seed"`
+	ID         uuid.UUID `json:"id"`
+	Username   string    `json:"username"`
+	AvatarSeed string    `json:"avatar_seed"`
 }
 
 func (q *Queries) MarkUserDeleted(ctx context.Context, arg MarkUserDeletedParams) (User, error) {
-	row := q.db.QueryRow(ctx, markUserDeleted, arg.ID, arg.DisplayName, arg.AvatarSeed)
+	row := q.db.QueryRow(ctx, markUserDeleted, arg.ID, arg.Username, arg.AvatarSeed)
 	var i User
 	err := row.Scan(
 		&i.ID,
-		&i.DisplayName,
 		&i.AvatarSeed,
 		&i.LeaderboardOptIn,
-		&i.LeaderboardInitialsOnly,
 		&i.ShadowBanned,
 		&i.AgeBand,
 		&i.TimezoneOffsetMinutesLatest,
 		&i.DeletedAt,
 		&i.CreatedAt,
-	)
-	return i, err
-}
-
-const updateUserDisplayName = `-- name: UpdateUserDisplayName :one
-UPDATE users
-SET display_name = $2
-WHERE id = $1
-  AND deleted_at IS NULL
-RETURNING id, display_name, avatar_seed, leaderboard_opt_in, leaderboard_initials_only, shadow_banned, age_band, timezone_offset_minutes_latest, deleted_at, created_at
-`
-
-type UpdateUserDisplayNameParams struct {
-	ID          uuid.UUID `json:"id"`
-	DisplayName string    `json:"display_name"`
-}
-
-func (q *Queries) UpdateUserDisplayName(ctx context.Context, arg UpdateUserDisplayNameParams) (User, error) {
-	row := q.db.QueryRow(ctx, updateUserDisplayName, arg.ID, arg.DisplayName)
-	var i User
-	err := row.Scan(
-		&i.ID,
-		&i.DisplayName,
-		&i.AvatarSeed,
-		&i.LeaderboardOptIn,
-		&i.LeaderboardInitialsOnly,
-		&i.ShadowBanned,
-		&i.AgeBand,
-		&i.TimezoneOffsetMinutesLatest,
-		&i.DeletedAt,
-		&i.CreatedAt,
+		&i.Username,
+		&i.Name,
 	)
 	return i, err
 }
 
 const updateUserLeaderboardPrefs = `-- name: UpdateUserLeaderboardPrefs :one
 UPDATE users
-SET leaderboard_opt_in = $2,
-    leaderboard_initials_only = $3
+SET leaderboard_opt_in = $2
 WHERE id = $1
   AND deleted_at IS NULL
-RETURNING id, display_name, avatar_seed, leaderboard_opt_in, leaderboard_initials_only, shadow_banned, age_band, timezone_offset_minutes_latest, deleted_at, created_at
+RETURNING id, avatar_seed, leaderboard_opt_in, shadow_banned, age_band, timezone_offset_minutes_latest, deleted_at, created_at, username, name
 `
 
 type UpdateUserLeaderboardPrefsParams struct {
-	ID                      uuid.UUID `json:"id"`
-	LeaderboardOptIn        bool      `json:"leaderboard_opt_in"`
-	LeaderboardInitialsOnly bool      `json:"leaderboard_initials_only"`
+	ID               uuid.UUID `json:"id"`
+	LeaderboardOptIn bool      `json:"leaderboard_opt_in"`
 }
 
 func (q *Queries) UpdateUserLeaderboardPrefs(ctx context.Context, arg UpdateUserLeaderboardPrefsParams) (User, error) {
-	row := q.db.QueryRow(ctx, updateUserLeaderboardPrefs, arg.ID, arg.LeaderboardOptIn, arg.LeaderboardInitialsOnly)
+	row := q.db.QueryRow(ctx, updateUserLeaderboardPrefs, arg.ID, arg.LeaderboardOptIn)
 	var i User
 	err := row.Scan(
 		&i.ID,
-		&i.DisplayName,
 		&i.AvatarSeed,
 		&i.LeaderboardOptIn,
-		&i.LeaderboardInitialsOnly,
 		&i.ShadowBanned,
 		&i.AgeBand,
 		&i.TimezoneOffsetMinutesLatest,
 		&i.DeletedAt,
 		&i.CreatedAt,
+		&i.Username,
+		&i.Name,
+	)
+	return i, err
+}
+
+const updateUserName = `-- name: UpdateUserName :one
+UPDATE users
+SET name = $2
+WHERE id = $1
+  AND deleted_at IS NULL
+RETURNING id, avatar_seed, leaderboard_opt_in, shadow_banned, age_band, timezone_offset_minutes_latest, deleted_at, created_at, username, name
+`
+
+type UpdateUserNameParams struct {
+	ID   uuid.UUID `json:"id"`
+	Name *string   `json:"name"`
+}
+
+func (q *Queries) UpdateUserName(ctx context.Context, arg UpdateUserNameParams) (User, error) {
+	row := q.db.QueryRow(ctx, updateUserName, arg.ID, arg.Name)
+	var i User
+	err := row.Scan(
+		&i.ID,
+		&i.AvatarSeed,
+		&i.LeaderboardOptIn,
+		&i.ShadowBanned,
+		&i.AgeBand,
+		&i.TimezoneOffsetMinutesLatest,
+		&i.DeletedAt,
+		&i.CreatedAt,
+		&i.Username,
+		&i.Name,
 	)
 	return i, err
 }
@@ -243,7 +253,7 @@ UPDATE users
 SET timezone_offset_minutes_latest = $2
 WHERE id = $1
   AND deleted_at IS NULL
-RETURNING id, display_name, avatar_seed, leaderboard_opt_in, leaderboard_initials_only, shadow_banned, age_band, timezone_offset_minutes_latest, deleted_at, created_at
+RETURNING id, avatar_seed, leaderboard_opt_in, shadow_banned, age_band, timezone_offset_minutes_latest, deleted_at, created_at, username, name
 `
 
 type UpdateUserTimezoneOffsetParams struct {
@@ -256,15 +266,46 @@ func (q *Queries) UpdateUserTimezoneOffset(ctx context.Context, arg UpdateUserTi
 	var i User
 	err := row.Scan(
 		&i.ID,
-		&i.DisplayName,
 		&i.AvatarSeed,
 		&i.LeaderboardOptIn,
-		&i.LeaderboardInitialsOnly,
 		&i.ShadowBanned,
 		&i.AgeBand,
 		&i.TimezoneOffsetMinutesLatest,
 		&i.DeletedAt,
 		&i.CreatedAt,
+		&i.Username,
+		&i.Name,
+	)
+	return i, err
+}
+
+const updateUsername = `-- name: UpdateUsername :one
+UPDATE users
+SET username = $2
+WHERE id = $1
+  AND deleted_at IS NULL
+RETURNING id, avatar_seed, leaderboard_opt_in, shadow_banned, age_band, timezone_offset_minutes_latest, deleted_at, created_at, username, name
+`
+
+type UpdateUsernameParams struct {
+	ID       uuid.UUID `json:"id"`
+	Username string    `json:"username"`
+}
+
+func (q *Queries) UpdateUsername(ctx context.Context, arg UpdateUsernameParams) (User, error) {
+	row := q.db.QueryRow(ctx, updateUsername, arg.ID, arg.Username)
+	var i User
+	err := row.Scan(
+		&i.ID,
+		&i.AvatarSeed,
+		&i.LeaderboardOptIn,
+		&i.ShadowBanned,
+		&i.AgeBand,
+		&i.TimezoneOffsetMinutesLatest,
+		&i.DeletedAt,
+		&i.CreatedAt,
+		&i.Username,
+		&i.Name,
 	)
 	return i, err
 }

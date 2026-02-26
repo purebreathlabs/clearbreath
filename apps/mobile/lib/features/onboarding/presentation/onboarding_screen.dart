@@ -7,7 +7,6 @@ import '../../../core/theme/theme_extensions.dart';
 import '../domain/onboarding_gate.dart';
 import '../domain/onboarding_controller.dart';
 import '../domain/onboarding_answers.dart';
-import 'steps/display_name_step.dart';
 import 'steps/haptics_step.dart';
 import 'steps/practice_window_step.dart';
 import 'steps/primary_goal_step.dart';
@@ -131,12 +130,6 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                       ReminderTimeStep(
                         timeMinutes: state.answers.reminderTimeMinutes,
                         onPickTime: () => _pickReminderTime(controller),
-                      ),
-                    ),
-                    step(
-                      DisplayNameStep(
-                        value: state.answers.displayName,
-                        onChanged: controller.setDisplayName,
                       ),
                     ),
                   ],

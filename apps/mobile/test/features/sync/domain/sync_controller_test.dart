@@ -138,10 +138,10 @@ LocalSession _buildSession({required String id, required bool syncedToCloud}) {
 UserProfile _profile(String userId) {
   return UserProfile(
     id: userId,
-    displayName: 'Breather123456',
+    username: 'Breather123456',
+    name: '',
     avatarSeed: 'seed',
     leaderboardOptIn: true,
-    leaderboardInitialsOnly: false,
     createdAtUtc: DateTime.utc(2026, 2, 22),
     timezoneOffsetMinutesLatest: 0,
   );

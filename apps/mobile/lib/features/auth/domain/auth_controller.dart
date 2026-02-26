@@ -8,7 +8,6 @@ import '../../../core/network/api_error.dart';
 import '../../../core/network/models/user_models.dart';
 import '../../../shared/providers/app_database_provider.dart';
 import '../../intro/domain/intro_gate.dart';
-import '../../onboarding/domain/onboarding_answers_provider.dart';
 import '../../onboarding/domain/onboarding_gate.dart';
 import '../data/auth_repository.dart';
 import '../data/device_id_store.dart';
@@ -35,6 +34,7 @@ class AuthController extends Notifier<AuthState> {
     required String idToken,
     String? firstName,
     String? lastName,
+    String? email,
   }) async {
     final repo = ref.read(authRepositoryProvider);
     final storage = ref.read(tokenStorageProvider);
@@ -63,6 +63,7 @@ class AuthController extends Notifier<AuthState> {
         deviceId: deviceId,
         firstName: firstName,
         lastName: lastName,
+        email: email,
       );
 
       await storage.writeTokens(
@@ -75,8 +76,6 @@ class AuthController extends Notifier<AuthState> {
       );
       await storage.writeUserProfile(resp.user);
       state = AuthStateSignedIn(profile: resp.user);
-
-      await _syncDisplayNameFromOnboarding(current: resp.user);
     } on DioException catch (e) {
       throw ApiError.fromDioException(e);
     }
@@ -101,13 +100,13 @@ class AuthController extends Notifier<AuthState> {
     state = const AuthStateGuest();
   }
 
-  Future<void> updateDisplayName(String displayName) async {
-    final next = displayName.trim();
+  Future<void> updateUsername(String username) async {
+    final next = username.trim();
     if (next.isEmpty) {
       throw const ApiError(
         statusCode: 400,
         code: 'validation',
-        message: 'Display name is required.',
+        message: 'Username is required.',
         requestId: null,
       );
     }
@@ -116,9 +115,7 @@ class AuthController extends Notifier<AuthState> {
     final storage = ref.read(tokenStorageProvider);
 
     try {
-      final updated = await repo.updateProfile(
-        MePatchRequest(displayName: next),
-      );
+      final updated = await repo.updateProfile(MePatchRequest(username: next));
       await storage.writeUserProfile(updated);
       state = AuthStateSignedIn(profile: updated);
     } on DioException catch (e) {
@@ -138,26 +135,6 @@ class AuthController extends Notifier<AuthState> {
     try {
       final updated = await repo.updateProfile(
         MePatchRequest(leaderboardOptIn: value),
-      );
-      await storage.writeUserProfile(updated);
-      state = AuthStateSignedIn(profile: updated);
-    } on DioException catch (e) {
-      throw ApiError.fromDioException(e);
-    }
-  }
-
-  Future<void> setLeaderboardInitialsOnly(bool value) async {
-    final current = state;
-    if (current is! AuthStateSignedIn) {
-      return;
-    }
-
-    final repo = ref.read(authRepositoryProvider);
-    final storage = ref.read(tokenStorageProvider);
-
-    try {
-      final updated = await repo.updateProfile(
-        MePatchRequest(leaderboardInitialsOnly: value),
       );
       await storage.writeUserProfile(updated);
       state = AuthStateSignedIn(profile: updated);
@@ -253,36 +230,6 @@ class AuthController extends Notifier<AuthState> {
       final fallback = await storage.readUserProfile();
       if (fallback != null) {
         state = AuthStateSignedIn(profile: fallback, sessionReady: true);
-      }
-    }
-  }
-
-  Future<void> _syncDisplayNameFromOnboarding({
-    required UserProfile current,
-  }) async {
-    final next = (await ref.read(
-      onboardingAnswersProvider.future,
-    )).displayName.trim();
-    if (next.isEmpty) {
-      return;
-    }
-    if (next == current.displayName.trim()) {
-      return;
-    }
-
-    final repo = ref.read(authRepositoryProvider);
-    final storage = ref.read(tokenStorageProvider);
-
-    try {
-      final updated = await repo.updateProfile(
-        MePatchRequest(displayName: next),
-      );
-      await storage.writeUserProfile(updated);
-      state = AuthStateSignedIn(profile: updated);
-    } on DioException catch (e) {
-      final apiError = ApiError.fromDioException(e);
-      if (apiError.statusCode == 400 && apiError.code == 'validation') {
-        return;
       }
     }
   }

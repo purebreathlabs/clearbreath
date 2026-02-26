@@ -43,7 +43,7 @@ class SelfRankCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'You',
+                  entry?.displayLabel ?? 'You',
                   style: typography.titleMedium.copyWith(
                     color: colors.textPrimary,
                   ),

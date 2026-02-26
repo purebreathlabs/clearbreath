@@ -21,6 +21,7 @@ type providerSignInRequest struct {
 	DeviceID  string `json:"device_id"`
 	FirstName string `json:"first_name"`
 	LastName  string `json:"last_name"`
+	Email     string `json:"email"`
 }
 
 type refreshRequest struct {
@@ -42,10 +43,10 @@ type authResponse struct {
 
 type userProfile struct {
 	ID                          string `json:"id"`
-	DisplayName                 string `json:"display_name"`
+	Username                    string `json:"username"`
+	Name                        string `json:"name"`
 	AvatarSeed                  string `json:"avatar_seed"`
 	LeaderboardOptIn            bool   `json:"leaderboard_opt_in"`
-	LeaderboardInitialsOnly     bool   `json:"leaderboard_initials_only"`
 	CreatedAtUTC                string `json:"created_at_utc"`
 	TimezoneOffsetMinutesLatest int32  `json:"timezone_offset_minutes_latest"`
 }
@@ -69,6 +70,7 @@ func (h *AuthHandler) ProviderSignIn(w http.ResponseWriter, r *http.Request) {
 		DevAuthHeader: r.Header.Get("X-Dev-Auth"),
 		FirstName:     req.FirstName,
 		LastName:      req.LastName,
+		Email:         req.Email,
 	})
 	if err != nil {
 		if e, ok := apierr.As(err); ok {
@@ -140,10 +142,10 @@ func toAuthResponse(out *authsvc.AuthResult) authResponse {
 		RefreshTokenExpiresAtUTC: out.RefreshTokenExpiresAtUTC.UTC().Format(time.RFC3339),
 		User: userProfile{
 			ID:                          out.User.ID.String(),
-			DisplayName:                 out.User.DisplayName,
+			Username:                    out.User.Username,
+			Name:                        out.User.Name,
 			AvatarSeed:                  out.User.AvatarSeed,
 			LeaderboardOptIn:            out.User.LeaderboardOptIn,
-			LeaderboardInitialsOnly:     out.User.LeaderboardInitialsOnly,
 			CreatedAtUTC:                out.User.CreatedAtUTC.UTC().Format(time.RFC3339),
 			TimezoneOffsetMinutesLatest: out.User.TimezoneOffsetMinutes,
 		},
