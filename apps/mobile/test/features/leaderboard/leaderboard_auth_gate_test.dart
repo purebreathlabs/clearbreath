@@ -41,9 +41,7 @@ void main() {
           mergedStatsProvider.overrideWith(
             (ref) async => StatsSnapshot.empty(),
           ),
-          mergedXPProvider.overrideWith(
-            (ref) async => XPState.empty(),
-          ),
+          mergedXPProvider.overrideWith((ref) async => XPState.empty()),
         ],
         child: const ClearBreathApp(),
       ),

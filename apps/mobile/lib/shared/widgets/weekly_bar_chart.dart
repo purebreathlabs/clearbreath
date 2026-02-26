@@ -73,9 +73,7 @@ class WeeklyBarChart extends StatelessWidget {
                     child: Icon(
                       Icons.chevron_right_rounded,
                       size: 20,
-                      color: canGoNext
-                          ? colors.textSecondary
-                          : colors.disabled,
+                      color: canGoNext ? colors.textSecondary : colors.disabled,
                     ),
                   ),
                 ),

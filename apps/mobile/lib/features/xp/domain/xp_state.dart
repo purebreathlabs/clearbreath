@@ -34,10 +34,8 @@ class XPState {
     );
   }
 
-  factory XPState.empty() => XPState.fromTotalXP(
-    totalXP: 0,
-    currentStreakDays: 0,
-  );
+  factory XPState.empty() =>
+      XPState.fromTotalXP(totalXP: 0, currentStreakDays: 0);
 
   final int totalXP;
   final int currentLevel;

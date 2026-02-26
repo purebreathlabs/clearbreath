@@ -126,7 +126,6 @@ func (s *Service) ingest(ctx context.Context, userID uuid.UUID, sessions []Sessi
 		latestEnded := time.Time{}
 		latestOffset := tzOffset
 
-		// Track accepted sessions for XP awarding (sorted by start time)
 		var accepted []acceptedSession
 
 		for _, in := range sessions {
@@ -140,7 +139,7 @@ func (s *Service) ingest(ctx context.Context, userID uuid.UUID, sessions []Sessi
 				continue
 			}
 
-			norm, rej := normalizeSession(in, preset)
+			norm, rej := normalizeSession(in, preset, now)
 			if rej != nil {
 				out.Rejected = append(out.Rejected, *rej)
 				continue
@@ -195,7 +194,6 @@ func (s *Service) ingest(ctx context.Context, userID uuid.UUID, sessions []Sessi
 		}
 		out.StatsSnapshot = snap
 
-		// Award XP for each accepted session, sorted by start time
 		sortAccepted(accepted)
 		for _, a := range accepted {
 			sess, err := q.GetSessionByClientID(ctx, a.clientSessionID)
@@ -216,7 +214,6 @@ func (s *Service) ingest(ctx context.Context, userID uuid.UUID, sessions []Sessi
 			}
 		}
 
-		// Recompute to get final totals
 		if len(accepted) > 0 {
 			_, _, err := s.xp.RecomputeTotalXP(ctx, q, userID)
 			if err != nil {
@@ -224,8 +221,6 @@ func (s *Service) ingest(ctx context.Context, userID uuid.UUID, sessions []Sessi
 			}
 		}
 
-		// Always read current progress so the response includes XP/level
-		// even for duplicate or all-rejected batches.
 		prog, err := q.GetUserProgress(ctx, userID)
 		if err != nil && !errors.Is(err, pgx.ErrNoRows) {
 			return fmt.Errorf("get user progress: %w", err)
@@ -265,7 +260,7 @@ const (
 	maxPastWindow   = 90 * 24 * time.Hour
 )
 
-func normalizeSession(in SessionInput, preset technique.Preset) (normalizedSession, *RejectedSession) {
+func normalizeSession(in SessionInput, preset technique.Preset, now time.Time) (normalizedSession, *RejectedSession) {
 	rawID := strings.TrimSpace(in.ClientSessionID)
 	if rawID == "" {
 		return normalizedSession{}, &RejectedSession{
@@ -300,7 +295,7 @@ func normalizeSession(in SessionInput, preset technique.Preset) (normalizedSessi
 		}
 	}
 
-	now := time.Now().UTC()
+	now = now.UTC()
 	if started.After(now.Add(maxFutureWindow)) {
 		return normalizedSession{}, &RejectedSession{
 			ClientSessionID: rawID,

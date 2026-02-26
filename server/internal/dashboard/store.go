@@ -219,7 +219,6 @@ func buildRequestWhere(f RequestLogFilters) (string, []interface{}) {
 	if f.Search != "" {
 		conditions = append(conditions, fmt.Sprintf("(path ILIKE $%d OR request_id ILIKE $%d OR error_msg ILIKE $%d)", idx, idx, idx))
 		args = append(args, "%"+f.Search+"%")
-		idx++
 	}
 
 	if len(conditions) == 0 {
@@ -248,7 +247,6 @@ func buildEventWhere(f EventLogFilters) (string, []interface{}) {
 	if f.Search != "" {
 		conditions = append(conditions, fmt.Sprintf("(message ILIKE $%d OR request_id ILIKE $%d OR provider ILIKE $%d)", idx, idx, idx))
 		args = append(args, "%"+f.Search+"%")
-		idx++
 	}
 
 	if len(conditions) == 0 {

@@ -486,7 +486,7 @@ Rate limit:
 
 Query params:
 
-- `ranking` (optional): `xp` (default). Legacy values `streak`, `weekly`, `all_time` are silently mapped to `xp` for backward compatibility.
+- `ranking` (optional): `xp` (default). Legacy values `streak`, `weekly`, `all_time` are silently mapped to `xp` for backward compatibility. Unknown values are treated as `xp`.
 - `limit` (optional, max 50): integer
 
 Response `200`:
@@ -510,7 +510,6 @@ Response `200`:
 
 Errors:
 
-- `400 validation` (missing/invalid ranking)
 - `429 rate_limited`
 - `500 internal`
 
@@ -530,7 +529,7 @@ Rate limit:
 
 Query params:
 
-- `ranking` (optional): `xp` (default). Legacy values silently mapped to `xp`.
+- `ranking` (optional): `xp` (default). Legacy values silently mapped to `xp`. Unknown values are treated as `xp`.
 
 Response `200`:
 
@@ -547,7 +546,6 @@ Notes:
 
 Errors:
 
-- `400 validation` (missing/invalid ranking)
 - `401 unauthorized`
 - `429 rate_limited`
 - `500 internal`
@@ -613,8 +611,8 @@ Auth:
 
 Query params:
 
-- `days` (optional, 1-30, default 7): number of days to fetch.
-- `timezone_offset_minutes` (optional, default 0): for local day computation.
+- `days` (optional, 1-30, default 7): number of days to fetch. Invalid or out-of-range values default to 7.
+- `timezone_offset_minutes` (optional, default 0): for local day computation. Invalid values default to 0.
 
 Response `200`:
 
@@ -641,6 +639,5 @@ Response `200`:
 
 Errors:
 
-- `400 validation` (invalid days or timezone)
 - `401 unauthorized`
 - `500 internal`

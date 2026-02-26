@@ -136,9 +136,10 @@ class SessionsIngestResponse {
         'rejected',
       ).map(RejectedSession.fromJson).toList(growable: false),
       statsSnapshot: StatsSnapshot.fromJson(statsMap),
-      xpAwards: readMapList(json, 'xp_awards')
-          .map(XPAward.fromJson)
-          .toList(growable: false),
+      xpAwards: readMapList(
+        json,
+        'xp_awards',
+      ).map(XPAward.fromJson).toList(growable: false),
       totalXp: totalXp,
       currentLevel: currentLevel,
     );

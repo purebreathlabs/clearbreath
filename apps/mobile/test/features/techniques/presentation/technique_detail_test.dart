@@ -243,7 +243,9 @@ void main() {
     expect(find.text('2 min'), findsOneWidget);
   });
 
-  testWidgets('start session uses XP-derived preset and duration', (tester) async {
+  testWidgets('start session uses XP-derived preset and duration', (
+    tester,
+  ) async {
     final container = createContainer();
     addTearDown(container.dispose);
 
