@@ -370,7 +370,7 @@ Notes:
 - `duration_seconds_actual` is accepted but the server computes the canonical duration from timestamps.
 - `client_session_id` is the idempotency key. Duplicate submissions are treated as no-ops.
 - `local_day` is computed as the local date of `started_at_utc + timezone_offset_minutes`.
-- Session XP awards use `multiplier = min(1.0 + 0.1*current_streak_days, 3.0)`.
+- Session XP awards use `multiplier = min(1.0 + 0.1*streak_days_for_session, 3.0)`, where `streak_days_for_session` is the current streak as of the session’s `local_day` (non-qualifying `local_day` uses the previous day’s streak).
 
 Response `200`:
 
