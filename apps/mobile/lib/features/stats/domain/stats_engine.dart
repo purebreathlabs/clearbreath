@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../session/data/session_repository.dart';
 import '../../session/domain/local_session.dart';
+import '../../xp/domain/xp_engine.dart' as xp;
 import '../data/stats_cache_repository.dart';
 import 'stats_snapshot.dart';
 import 'streak_calculator.dart';
@@ -80,6 +81,10 @@ StatsSnapshot computeStats(
   final todayKey = DateTime.utc(nowLocal.year, nowLocal.month, nowLocal.day);
   final startOfWeekKey = _startOfWeekKey(todayKey);
 
+  final currentStreakDays = currentStreak(minutesByLocalDay, todayKey);
+  final longestStreakDays = longestStreak(minutesByLocalDay);
+  final totalXP = _computeTotalXP(sessions, currentStreakDays);
+
   var weekSeconds = 0;
   for (final entry in secondsByLocalDay.entries) {
     final day = entry.key;
@@ -91,8 +96,8 @@ StatsSnapshot computeStats(
   final minutesThisWeek = weekSeconds ~/ 60;
 
   return StatsSnapshot(
-    currentStreakDays: currentStreak(minutesByLocalDay, todayKey),
-    longestStreakDays: longestStreak(minutesByLocalDay),
+    currentStreakDays: currentStreakDays,
+    longestStreakDays: longestStreakDays,
     minutesThisWeek: minutesThisWeek,
     minutesAllTime: minutesAllTime,
     sessionsAllTime: sessionsAllTime,
@@ -101,6 +106,8 @@ StatsSnapshot computeStats(
     favoriteTechniqueId: favoriteTechniqueId,
     totalBreathsEstimated: totalBreathsEstimated,
     updatedAt: updatedAt,
+    totalXP: totalXP,
+    currentLevel: xp.levelFromTotalXP(totalXP),
   );
 }
 
@@ -112,6 +119,40 @@ DateTime _localDayKey({
     Duration(minutes: timezoneOffsetMinutes),
   );
   return DateTime.utc(localStart.year, localStart.month, localStart.day);
+}
+
+int _computeTotalXP(List<LocalSession> sessions, int streakDays) {
+  if (sessions.isEmpty) return 0;
+
+  final sorted = sessions.toList()
+    ..sort((a, b) => a.startedAtUtc.compareTo(b.startedAtUtc));
+
+  final xpByDay = <DateTime, int>{};
+  var total = 0;
+
+  for (final session in sorted) {
+    final earned = xp.computeSessionXP(
+      durationSeconds: session.durationSecondsActual,
+      endedEarly: session.endedEarly,
+      streakDays: streakDays,
+    );
+    if (earned <= 0) continue;
+
+    final dayKey = _localDayKey(
+      startedAtUtc: session.startedAtUtc,
+      timezoneOffsetMinutes: session.timezoneOffsetMinutes,
+    );
+    final soFar = xpByDay[dayKey] ?? 0;
+    if (soFar >= xp.dailyPracticeXPCap) continue;
+
+    final remaining = xp.dailyPracticeXPCap - soFar;
+    final add = earned > remaining ? remaining : earned;
+
+    xpByDay[dayKey] = soFar + add;
+    total += add;
+  }
+
+  return total;
 }
 
 DateTime _startOfWeekKey(DateTime todayKey) {
