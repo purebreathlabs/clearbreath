@@ -187,6 +187,9 @@ func TestEndToEndDevAuthSessionsLeaderboard(t *testing.T) {
 	if ingest.StatsSnapshot.SessionsAllTime != 1 {
 		t.Fatalf("sessions_all_time: got %d, want 1", ingest.StatsSnapshot.SessionsAllTime)
 	}
+	if ingest.TotalXP <= 0 {
+		t.Fatalf("expected total_xp > 0")
+	}
 
 	dup, err := sessionService.Submit(ctx, userID, []sessionsvc.SessionInput{
 		{
@@ -205,6 +208,15 @@ func TestEndToEndDevAuthSessionsLeaderboard(t *testing.T) {
 	}
 	if dup.DuplicateCount != 1 {
 		t.Fatalf("duplicate: got %d, want 1", dup.DuplicateCount)
+	}
+	if dup.TotalXP != ingest.TotalXP {
+		t.Fatalf("dup total_xp: got %d, want %d", dup.TotalXP, ingest.TotalXP)
+	}
+	if dup.CurrentLevel != ingest.CurrentLevel {
+		t.Fatalf("dup current_level: got %d, want %d", dup.CurrentLevel, ingest.CurrentLevel)
+	}
+	if len(dup.XPAwards) != 0 {
+		t.Fatalf("expected zero xp_awards on duplicate submit")
 	}
 
 	leaderboardService, err := lbsvc.NewService(store, rdb, clk, xpService)
