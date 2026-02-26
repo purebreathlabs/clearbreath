@@ -43,7 +43,7 @@ func (q *Queries) GetLeaderboardXPMetrics(ctx context.Context) ([]GetLeaderboard
 }
 
 const getUsersByIDs = `-- name: GetUsersByIDs :many
-SELECT id, display_name, avatar_seed, leaderboard_initials_only
+SELECT id, username, name, avatar_seed
 FROM users
 WHERE id = ANY($1::uuid[])
   AND deleted_at IS NULL
@@ -52,10 +52,10 @@ WHERE id = ANY($1::uuid[])
 `
 
 type GetUsersByIDsRow struct {
-	ID                      uuid.UUID `json:"id"`
-	DisplayName             string    `json:"display_name"`
-	AvatarSeed              string    `json:"avatar_seed"`
-	LeaderboardInitialsOnly bool      `json:"leaderboard_initials_only"`
+	ID         uuid.UUID `json:"id"`
+	Username   string    `json:"username"`
+	Name       *string   `json:"name"`
+	AvatarSeed string    `json:"avatar_seed"`
 }
 
 func (q *Queries) GetUsersByIDs(ctx context.Context, dollar_1 []uuid.UUID) ([]GetUsersByIDsRow, error) {
@@ -69,9 +69,9 @@ func (q *Queries) GetUsersByIDs(ctx context.Context, dollar_1 []uuid.UUID) ([]Ge
 		var i GetUsersByIDsRow
 		if err := rows.Scan(
 			&i.ID,
-			&i.DisplayName,
+			&i.Username,
+			&i.Name,
 			&i.AvatarSeed,
-			&i.LeaderboardInitialsOnly,
 		); err != nil {
 			return nil, err
 		}

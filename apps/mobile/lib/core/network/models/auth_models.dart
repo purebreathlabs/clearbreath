@@ -8,6 +8,7 @@ class ProviderSignInRequest {
     required this.deviceId,
     this.firstName,
     this.lastName,
+    this.email,
   });
 
   final String provider;
@@ -15,6 +16,7 @@ class ProviderSignInRequest {
   final String deviceId;
   final String? firstName;
   final String? lastName;
+  final String? email;
 
   JsonMap toJson() {
     final map = <String, dynamic>{
@@ -29,6 +31,10 @@ class ProviderSignInRequest {
     final ln = lastName?.trim();
     if (ln != null && ln.isNotEmpty) {
       map['last_name'] = ln;
+    }
+    final em = email?.trim();
+    if (em != null && em.isNotEmpty) {
+      map['email'] = em;
     }
     return map;
   }

@@ -17,17 +17,16 @@ type MeHandler struct {
 }
 
 type patchMeRequest struct {
-	DisplayName             *string `json:"display_name"`
-	LeaderboardOptIn        *bool   `json:"leaderboard_opt_in"`
-	LeaderboardInitialsOnly *bool   `json:"leaderboard_initials_only"`
+	Username         *string `json:"username"`
+	LeaderboardOptIn *bool   `json:"leaderboard_opt_in"`
 }
 
 type meResponse struct {
 	ID                          string `json:"id"`
-	DisplayName                 string `json:"display_name"`
+	Username                    string `json:"username"`
+	Name                        string `json:"name"`
 	AvatarSeed                  string `json:"avatar_seed"`
 	LeaderboardOptIn            bool   `json:"leaderboard_opt_in"`
-	LeaderboardInitialsOnly     bool   `json:"leaderboard_initials_only"`
 	CreatedAtUTC                string `json:"created_at_utc"`
 	TimezoneOffsetMinutesLatest int32  `json:"timezone_offset_minutes_latest"`
 }
@@ -72,9 +71,8 @@ func (h *MeHandler) Patch(w http.ResponseWriter, r *http.Request) {
 	}
 
 	u, err := h.svc.UpdateProfile(r.Context(), userID, usersvc.UpdateInput{
-		DisplayName:             req.DisplayName,
-		LeaderboardOptIn:        req.LeaderboardOptIn,
-		LeaderboardInitialsOnly: req.LeaderboardInitialsOnly,
+		Username:         req.Username,
+		LeaderboardOptIn: req.LeaderboardOptIn,
 	})
 	if err != nil {
 		if e, ok := apierr.As(err); ok {
@@ -109,12 +107,16 @@ func (h *MeHandler) Delete(w http.ResponseWriter, r *http.Request) {
 }
 
 func toMeResponse(u sqlcgen.User) meResponse {
+	name := ""
+	if u.Name != nil {
+		name = *u.Name
+	}
 	return meResponse{
 		ID:                          u.ID.String(),
-		DisplayName:                 u.DisplayName,
+		Username:                    u.Username,
+		Name:                        name,
 		AvatarSeed:                  u.AvatarSeed,
 		LeaderboardOptIn:            u.LeaderboardOptIn,
-		LeaderboardInitialsOnly:     u.LeaderboardInitialsOnly,
 		CreatedAtUTC:                u.CreatedAt.UTC().Format(time.RFC3339),
 		TimezoneOffsetMinutesLatest: u.TimezoneOffsetMinutesLatest,
 	}

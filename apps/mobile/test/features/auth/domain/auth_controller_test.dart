@@ -25,7 +25,7 @@ void main() {
         accessToken: 'access1',
         refreshToken: 'refresh1',
         userId: 'user1',
-        displayName: 'Breather123456',
+        username: 'Breather123456',
       );
 
     final container = ProviderContainer(
@@ -69,7 +69,7 @@ void main() {
           accessToken: 'access2',
           refreshToken: 'refresh2',
           userId: 'user2',
-          displayName: 'Breather999999',
+          username: 'Breather999999',
         ),
         200,
         headers: {
@@ -109,10 +109,10 @@ void main() {
     await tokenStore.writeUserProfile(
       UserProfile(
         id: 'user2',
-        displayName: 'Breather999999',
+        username: 'Breather999999',
+        name: '',
         avatarSeed: 'seed2',
         leaderboardOptIn: true,
-        leaderboardInitialsOnly: false,
         createdAtUtc: DateTime.utc(2026, 2, 22, 0, 0),
         timezoneOffsetMinutesLatest: 0,
       ),
@@ -138,7 +138,7 @@ void main() {
         accessToken: 'access1',
         refreshToken: 'refresh1',
         userId: 'user1',
-        displayName: 'Jane Doe',
+        username: 'janedoe',
       );
 
     final container = ProviderContainer(
@@ -179,7 +179,7 @@ void main() {
             accessToken: 'access2',
             refreshToken: 'refresh2',
             userId: 'user1',
-            displayName: 'Breather123456',
+            username: 'Breather123456',
           ),
           200,
           headers: {
@@ -217,10 +217,10 @@ void main() {
       await tokenStore.writeUserProfile(
         UserProfile(
           id: 'user1',
-          displayName: 'Breather123456',
+          username: 'Breather123456',
+          name: '',
           avatarSeed: 'seed',
           leaderboardOptIn: true,
-          leaderboardInitialsOnly: false,
           createdAtUtc: DateTime.utc(2026, 2, 22, 0, 0),
           timezoneOffsetMinutesLatest: 0,
         ),
@@ -306,6 +306,7 @@ class _FakeAuthRepository extends AuthRepository {
     required String deviceId,
     String? firstName,
     String? lastName,
+    String? email,
   }) async {
     lastFirstName = firstName;
     lastLastName = lastName;
@@ -353,7 +354,7 @@ AuthResponse _authResponse({
   required String accessToken,
   required String refreshToken,
   required String userId,
-  required String displayName,
+  required String username,
 }) {
   return AuthResponse(
     accessToken: accessToken,
@@ -366,10 +367,10 @@ AuthResponse _authResponse({
     ),
     user: UserProfile(
       id: userId,
-      displayName: displayName,
+      username: username,
+      name: '',
       avatarSeed: 'seed',
       leaderboardOptIn: true,
-      leaderboardInitialsOnly: false,
       createdAtUtc: DateTime.utc(2026, 2, 22, 0, 0),
       timezoneOffsetMinutesLatest: 0,
     ),
@@ -380,7 +381,7 @@ String _authResponseJson({
   required String accessToken,
   required String refreshToken,
   required String userId,
-  required String displayName,
+  required String username,
 }) {
   final accessExp = DateTime.now()
       .toUtc()
@@ -399,10 +400,10 @@ String _authResponseJson({
   "refresh_token_expires_at_utc":"$refreshExp",
   "user":{
     "id":"$userId",
-    "display_name":"$displayName",
+    "username":"$username",
+    "name":"",
     "avatar_seed":"seed",
     "leaderboard_opt_in":true,
-    "leaderboard_initials_only":false,
     "created_at_utc":"2026-02-22T00:00:00Z",
     "timezone_offset_minutes_latest":0
   }

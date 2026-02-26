@@ -3,7 +3,6 @@ package leaderboard
 import (
 	"context"
 	"errors"
-	"strings"
 	"testing"
 
 	"github.com/google/uuid"
@@ -55,24 +54,6 @@ func TestWriteZSetRenameRedisNilIsIgnored(t *testing.T) {
 	}
 	if _, ok := r.zsets["lb:xp:tmp"]; !ok {
 		t.Fatalf("expected tmp key to exist")
-	}
-}
-
-func TestInitialsReturnsUOnEmptyOrNonWord(t *testing.T) {
-	if got := initials(""); got != "U" {
-		t.Fatalf("got %q, want %q", got, "U")
-	}
-	if got := initials("   "); got != "U" {
-		t.Fatalf("got %q, want %q", got, "U")
-	}
-	if got := initials(strings.Repeat("-", 10)); got != "U" {
-		t.Fatalf("got %q, want %q", got, "U")
-	}
-	if got := initials("A"); got != "A" {
-		t.Fatalf("got %q, want %q", got, "A")
-	}
-	if got := initials("A B"); got != "AB" {
-		t.Fatalf("got %q, want %q", got, "AB")
 	}
 }
 

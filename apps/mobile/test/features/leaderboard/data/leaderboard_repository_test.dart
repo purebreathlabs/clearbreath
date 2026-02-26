@@ -97,7 +97,7 @@ String _weeklyListJson() {
   "top":[
     {
       "rank":1,
-      "display_name_or_initials":"AB",
+      "username":"AB",
       "avatar_seed":"seed-a",
       "total_xp":120,
       "level":5,
@@ -105,7 +105,7 @@ String _weeklyListJson() {
     },
     {
       "rank":2,
-      "display_name_or_initials":"CD",
+      "username":"CD",
       "avatar_seed":"seed-b",
       "total_xp":60,
       "level":3,

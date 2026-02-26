@@ -108,6 +108,19 @@ Notes:
 - `device_id` is required and must be <= 200 chars.
 - `provider="dev"` requires header `X-Dev-Auth: <DEV_AUTH_SECRET>` when `DEV_AUTH_ENABLED=true`.
 
+Request body (optional fields for name/email):
+
+```json
+{
+  "provider": "dev",
+  "id_token": "user1",
+  "device_id": "device1",
+  "first_name": "Jane",
+  "last_name": "Doe",
+  "email": "jane@example.com"
+}
+```
+
 Response `200`:
 
 ```json
@@ -118,10 +131,10 @@ Response `200`:
   "refresh_token_expires_at_utc": "2026-03-20T12:00:00Z",
   "user": {
     "id": "…",
-    "display_name": "Breather123456",
+    "username": "breather123456",
+    "name": "",
     "avatar_seed": "…",
     "leaderboard_opt_in": true,
-    "leaderboard_initials_only": false,
     "created_at_utc": "2026-02-18T12:00:00Z",
     "timezone_offset_minutes_latest": 0
   }
@@ -209,10 +222,10 @@ Response `200`:
 ```json
 {
   "id": "…",
-  "display_name": "Breather123456",
+  "username": "breather123456",
+  "name": "",
   "avatar_seed": "…",
   "leaderboard_opt_in": true,
-  "leaderboard_initials_only": false,
   "created_at_utc": "2026-02-18T12:00:00Z",
   "timezone_offset_minutes_latest": 0
 }
@@ -227,7 +240,7 @@ Errors:
 
 Purpose:
 
-- Update display name and leaderboard privacy preferences.
+- Update username and leaderboard preferences.
 
 Auth:
 
@@ -237,17 +250,16 @@ Request body (all fields optional):
 
 ```json
 {
-  "display_name": "Alice",
-  "leaderboard_opt_in": true,
-  "leaderboard_initials_only": false
+  "username": "alice_test",
+  "leaderboard_opt_in": true
 }
 ```
 
 Rules:
 
-- `display_name` must be 3–20 chars and only letters/numbers/spaces.
+- `username` must be 3–20 chars, lowercase `[a-z0-9_]`, no leading/trailing `_`.
 - Profanity is rejected (`400 validation`).
-- If `leaderboard_opt_in=false`, `leaderboard_initials_only` is forced to `false`.
+- Duplicate usernames are rejected (`409 username_taken`).
 
 Response `200`:
 
@@ -257,6 +269,7 @@ Errors:
 
 - `400 validation`
 - `401 unauthorized`
+- `409 username_taken` (username already taken by another user)
 - `500 internal`
 
 ### DELETE `/v1/me`
@@ -503,7 +516,8 @@ Response `200`:
   "top": [
     {
       "rank": 1,
-      "display_name_or_initials": "AB",
+      "username": "alice_test",
+      "name": "Alice",
       "avatar_seed": "…",
       "total_xp": 1250,
       "level": 41,

@@ -1,6 +1,6 @@
 -- name: CreateUser :one
-INSERT INTO users (display_name, avatar_seed, age_band, timezone_offset_minutes_latest)
-VALUES ($1, $2, $3, $4)
+INSERT INTO users (username, name, avatar_seed, age_band, timezone_offset_minutes_latest)
+VALUES ($1, $2, $3, $4, $5)
 RETURNING *;
 
 -- name: GetUserByID :one
@@ -16,17 +16,23 @@ FROM users
 WHERE id = $1
 LIMIT 1;
 
--- name: UpdateUserDisplayName :one
+-- name: UpdateUsername :one
 UPDATE users
-SET display_name = $2
+SET username = $2
+WHERE id = $1
+  AND deleted_at IS NULL
+RETURNING *;
+
+-- name: UpdateUserName :one
+UPDATE users
+SET name = $2
 WHERE id = $1
   AND deleted_at IS NULL
 RETURNING *;
 
 -- name: UpdateUserLeaderboardPrefs :one
 UPDATE users
-SET leaderboard_opt_in = $2,
-    leaderboard_initials_only = $3
+SET leaderboard_opt_in = $2
 WHERE id = $1
   AND deleted_at IS NULL
 RETURNING *;
@@ -42,12 +48,14 @@ RETURNING *;
 UPDATE users
 SET deleted_at = now(),
     leaderboard_opt_in = false,
-    leaderboard_initials_only = false,
-    display_name = $2,
+    username = $2,
     avatar_seed = $3
 WHERE id = $1
   AND deleted_at IS NULL
 RETURNING *;
+
+-- name: CheckUsernameExists :one
+SELECT EXISTS(SELECT 1 FROM users WHERE lower(username) = lower($1) AND deleted_at IS NULL);
 
 -- name: DeleteAuthIdentitiesByUserID :exec
 DELETE FROM auth_identities

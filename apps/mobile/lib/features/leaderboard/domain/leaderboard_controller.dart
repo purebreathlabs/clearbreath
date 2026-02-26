@@ -120,9 +120,8 @@ class LeaderboardController extends Notifier<LeaderboardState> {
       final self = await repo.fetchSelf(ranking);
       return LeaderboardEntry(
         rank: self.rank,
-        displayNameOrInitials: auth.profile.leaderboardInitialsOnly
-            ? _initials(auth.profile.displayName)
-            : auth.profile.displayName,
+        username: auth.profile.username,
+        name: auth.profile.name.isEmpty ? null : auth.profile.name,
         avatarSeed: auth.profile.avatarSeed,
         totalXp: self.totalXp,
         level: self.level,
@@ -131,9 +130,8 @@ class LeaderboardController extends Notifier<LeaderboardState> {
     } catch (_) {
       return LeaderboardEntry(
         rank: null,
-        displayNameOrInitials: auth.profile.leaderboardInitialsOnly
-            ? _initials(auth.profile.displayName)
-            : auth.profile.displayName,
+        username: auth.profile.username,
+        name: auth.profile.name.isEmpty ? null : auth.profile.name,
         avatarSeed: auth.profile.avatarSeed,
         totalXp: 0,
         level: 0,
@@ -150,24 +148,4 @@ class LeaderboardController extends Notifier<LeaderboardState> {
     }
     return null;
   }
-}
-
-String _initials(String name) {
-  final trimmed = name.trim();
-  if (trimmed.isEmpty) {
-    return 'C';
-  }
-  final parts = trimmed
-      .split(RegExp(r'\\s+'))
-      .where((p) => p.trim().isNotEmpty)
-      .toList();
-  if (parts.isEmpty) {
-    return 'C';
-  }
-  if (parts.length == 1) {
-    return parts.first.substring(0, 1).toUpperCase();
-  }
-  final first = parts.first.substring(0, 1).toUpperCase();
-  final last = parts.last.substring(0, 1).toUpperCase();
-  return '$first$last';
 }

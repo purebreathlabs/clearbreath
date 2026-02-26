@@ -23,23 +23,23 @@ func TestNewServiceValidation(t *testing.T) {
 	}
 }
 
-func TestCanonicalizeDisplayNameAdditional(t *testing.T) {
+func TestCanonicalizeUsernameAdditional(t *testing.T) {
 	tests := []struct {
 		name    string
 		in      string
 		want    string
 		wantErr string
 	}{
-		{name: "trim and collapse spaces", in: "  A   B  ", want: "A B"},
-		{name: "invalid characters", in: "Al!ce", wantErr: "display_name has invalid characters"},
-		{name: "required", in: "   ", wantErr: "display_name is required"},
-		{name: "too short", in: "Al", wantErr: "display_name must be 3-20 characters"},
-		{name: "too long", in: strings.Repeat("a", 21), wantErr: "display_name must be 3-20 characters"},
+		{name: "lowercase and trim", in: "  Alice  ", want: "alice"},
+		{name: "invalid characters", in: "Al!ce", wantErr: "username has invalid characters"},
+		{name: "required", in: "   ", wantErr: "username is required"},
+		{name: "too short", in: "Al", wantErr: "username must be 3-20 characters"},
+		{name: "too long", in: strings.Repeat("a", 21), wantErr: "username must be 3-20 characters"},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := CanonicalizeDisplayName(tt.in)
+			got, err := CanonicalizeUsername(tt.in)
 			if tt.wantErr != "" {
 				if err == nil {
 					t.Fatalf("expected error")

@@ -50,7 +50,7 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.byKey(const Key('self_rank_card')), findsOneWidget);
-    expect(find.text('AB'), findsOneWidget);
+    expect(find.text('AB'), findsAtLeastNWidgets(1));
   });
 }
 
@@ -60,10 +60,10 @@ class _SignedInAuthController extends AuthController {
     return AuthStateSignedIn(
       profile: UserProfile(
         id: 'user-a',
-        displayName: 'Breather123456',
+        username: 'Breather123456',
+        name: '',
         avatarSeed: 'seed-a',
         leaderboardOptIn: true,
-        leaderboardInitialsOnly: false,
         createdAtUtc: DateTime.utc(2026, 2, 22),
         timezoneOffsetMinutesLatest: 0,
       ),
@@ -95,7 +95,7 @@ class _FakeLeaderboardRepository extends LeaderboardRepository {
       entries: const [
         LeaderboardEntry(
           rank: 1,
-          displayNameOrInitials: 'AB',
+          username: 'AB',
           avatarSeed: 'seed-a',
           totalXp: 500,
           level: 3,

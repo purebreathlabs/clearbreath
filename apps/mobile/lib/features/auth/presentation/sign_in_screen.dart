@@ -176,6 +176,7 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
           token: token,
           firstName: cred.givenName,
           lastName: cred.familyName,
+          email: cred.email,
         );
       },
     );
@@ -215,7 +216,12 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
               lastName = displayName.substring(idx + 1);
             }
           }
-          return (token: token, firstName: firstName, lastName: lastName);
+          return (
+            token: token,
+            firstName: firstName,
+            lastName: lastName,
+            email: account.email,
+          );
         } on GoogleSignInException catch (e) {
           if (e.code == GoogleSignInExceptionCode.canceled) {
             throw const ApiError(
@@ -239,13 +245,16 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
   Future<void> _signInDev() async {
     await _runSignIn(
       provider: AuthProvider.dev,
-      idTokenLoader: () async => (token: '', firstName: null, lastName: null),
+      idTokenLoader: () async =>
+          (token: '', firstName: null, lastName: null, email: null),
     );
   }
 
   Future<void> _runSignIn({
     required AuthProvider provider,
-    required Future<({String token, String? firstName, String? lastName})>
+    required Future<
+      ({String token, String? firstName, String? lastName, String? email})
+    >
     Function()
     idTokenLoader,
   }) async {
@@ -263,6 +272,7 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
             idToken: result.token,
             firstName: result.firstName,
             lastName: result.lastName,
+            email: result.email,
           );
       if (!mounted) {
         return;

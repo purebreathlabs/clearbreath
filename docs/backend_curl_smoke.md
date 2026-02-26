@@ -53,7 +53,7 @@ curl -sS -i -X POST http://localhost:8080/v1/auth/logout -H "Authorization: Bear
 
 ```bash
 curl -sS -i http://localhost:8080/v1/me -H "Authorization: Bearer $ACCESS2"
-curl -sS -i -X PATCH http://localhost:8080/v1/me -H "Authorization: Bearer $ACCESS2" -H 'Content-Type: application/json' -d '{"display_name":"Alice 123"}'
+curl -sS -i -X PATCH http://localhost:8080/v1/me -H "Authorization: Bearer $ACCESS2" -H 'Content-Type: application/json' -d '{"username":"alice_test"}'
 ```
 
 ## Safety acknowledgements
