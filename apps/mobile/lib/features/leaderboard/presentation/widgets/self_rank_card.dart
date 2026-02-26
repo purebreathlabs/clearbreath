@@ -5,11 +5,7 @@ import '../../domain/leaderboard_entry.dart';
 import 'seeded_avatar.dart';
 
 class SelfRankCard extends StatelessWidget {
-  const SelfRankCard({
-    super.key,
-    required this.entry,
-    required this.loading,
-  });
+  const SelfRankCard({super.key, required this.entry, required this.loading});
 
   final LeaderboardEntry? entry;
   final bool loading;

@@ -34,7 +34,7 @@ class DailyLoginRepository {
       );
       await prefs.setString(_lastClaimKey, today);
     } on DioException {
-      // Silently fail — will retry next app open.
+      return;
     }
   }
 

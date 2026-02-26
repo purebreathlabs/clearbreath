@@ -85,7 +85,6 @@ func (h *XPHistoryHandler) History(w http.ResponseWriter, r *http.Request) {
 		})
 	}
 
-	// Get current progress
 	var totalXP int64
 	var currentLevel int32
 	prog, err := h.store.Queries().GetUserProgress(r.Context(), userID)

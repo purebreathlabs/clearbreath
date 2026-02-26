@@ -29,8 +29,10 @@ class XPDayEntry {
   final int loginXP;
 }
 
-final xpHistoryProvider =
-    FutureProvider.family<List<XPDayEntry>, int>((ref, days) async {
+final xpHistoryProvider = FutureProvider.family<List<XPDayEntry>, int>((
+  ref,
+  days,
+) async {
   final auth = ref.watch(authStateProvider);
   if (auth is! AuthStateSignedIn || !auth.sessionReady) {
     return [];
@@ -41,10 +43,7 @@ final xpHistoryProvider =
   try {
     final resp = await dio.get<dynamic>(
       '/v1/xp/history',
-      queryParameters: {
-        'days': days,
-        'timezone_offset_minutes': tz,
-      },
+      queryParameters: {'days': days, 'timezone_offset_minutes': tz},
     );
     final data = resp.data;
     if (data is! Map) return [];

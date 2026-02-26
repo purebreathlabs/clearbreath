@@ -41,7 +41,8 @@ class XPHistorySection extends ConsumerWidget {
               SizedBox(height: spacing.md),
               for (var i = 0; i < days.length; i++) ...[
                 _DayRow(entry: days[i]),
-                if (i < days.length - 1) Divider(height: 1, color: colors.divider),
+                if (i < days.length - 1)
+                  Divider(height: 1, color: colors.divider),
               ],
             ],
           ),
@@ -78,9 +79,7 @@ class _DayRow extends StatelessWidget {
           ),
           Text(
             '+${entry.totalXP} XP',
-            style: typography.titleMedium.copyWith(
-              color: colors.textPrimary,
-            ),
+            style: typography.titleMedium.copyWith(color: colors.textPrimary),
           ),
         ],
       ),
@@ -92,7 +91,9 @@ class _DayRow extends StatelessWidget {
       final date = DateTime.parse(localDay);
       final now = DateTime.now();
       final today = DateTime(now.year, now.month, now.day);
-      final diff = today.difference(DateTime(date.year, date.month, date.day)).inDays;
+      final diff = today
+          .difference(DateTime(date.year, date.month, date.day))
+          .inDays;
       if (diff == 0) return 'Today';
       if (diff == 1) return 'Yesterday';
       const weekdays = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];

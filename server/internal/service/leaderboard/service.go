@@ -61,7 +61,6 @@ func (r redisClientOps) ZScore(ctx context.Context, key string, member string) (
 	return r.c.ZScore(ctx, key, member).Result()
 }
 
-// Ranking type kept for API backward compatibility. All values map to XP.
 type Ranking string
 
 const (
@@ -131,7 +130,6 @@ func (s *Service) Refresh(ctx context.Context) error {
 		return fmt.Errorf("write xp zset: %w", err)
 	}
 
-	// Clean up old ranking keys
 	_ = s.redis.Del(ctx, "lb:streak", "lb:weekly", "lb:all_time")
 
 	return nil
@@ -171,7 +169,7 @@ func (s *Service) writeZSet(ctx context.Context, key string, rows []sqlcgen.GetL
 }
 
 func (s *Service) List(ctx context.Context, ranking Ranking, limit int) (ListResponse, error) {
-	_ = normalizeRanking(ranking) // all rankings map to xp
+	_ = normalizeRanking(ranking)
 	if limit <= 0 || limit > 50 {
 		limit = 50
 	}
@@ -268,7 +266,6 @@ func (s *Service) Self(ctx context.Context, userID uuid.UUID, ranking Ranking) (
 	}, nil
 }
 
-// normalizeRanking maps any ranking value to xp (for backward compat).
 func normalizeRanking(r Ranking) Ranking {
 	return RankingXP
 }

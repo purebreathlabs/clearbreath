@@ -20,7 +20,10 @@ void main() {
 
     test('date range format matches abbreviated month and day', () {
       final title = weekTitle(-3);
-      expect(RegExp(r'^[A-Z][a-z]{2} \d+ .+ [A-Z][a-z]{2} \d+$').hasMatch(title), isTrue);
+      expect(
+        RegExp(r'^[A-Z][a-z]{2} \d+ .+ [A-Z][a-z]{2} \d+$').hasMatch(title),
+        isTrue,
+      );
     });
   });
 

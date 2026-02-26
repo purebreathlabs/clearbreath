@@ -30,9 +30,7 @@ void main() {
     expect(find.text('Leaderboard is locked'), findsOneWidget);
   });
 
-  testWidgets('signed-in user sees self rank card', (
-    tester,
-  ) async {
+  testWidgets('signed-in user sees self rank card', (tester) async {
     final repo = _FakeLeaderboardRepository();
     addTearDown(repo.dispose);
 

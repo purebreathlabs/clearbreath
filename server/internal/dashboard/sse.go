@@ -44,16 +44,22 @@ func (d *Dashboard) SSELogs(w http.ResponseWriter, r *http.Request) {
 			var buf bytes.Buffer
 			if entry.Type == "request" && entry.Request != nil {
 				d.renderRequestSSE(&buf, entry.Request)
-				fmt.Fprintf(w, "event: request-log\ndata: %s\n\n", buf.String())
+				if _, err := fmt.Fprintf(w, "event: request-log\ndata: %s\n\n", buf.String()); err != nil {
+					return
+				}
 			} else if entry.Type == "event" && entry.Event != nil {
 				d.renderEventSSE(&buf, entry.Event)
-				fmt.Fprintf(w, "event: event-log\ndata: %s\n\n", buf.String())
+				if _, err := fmt.Fprintf(w, "event: event-log\ndata: %s\n\n", buf.String()); err != nil {
+					return
+				}
 			}
 			flusher.Flush()
 
 		case <-heartbeat.C:
 			_ = rc.SetWriteDeadline(time.Now().Add(30 * time.Second))
-			fmt.Fprint(w, ":heartbeat\n\n")
+			if _, err := fmt.Fprint(w, ":heartbeat\n\n"); err != nil {
+				return
+			}
 			flusher.Flush()
 
 		case <-r.Context().Done():

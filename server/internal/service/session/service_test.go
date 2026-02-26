@@ -15,6 +15,8 @@ import (
 	"github.com/clearbreath/server/internal/technique"
 )
 
+var nowForNormalize = time.Date(2026, 2, 16, 12, 0, 0, 0, time.UTC)
+
 func TestNewServiceValidation(t *testing.T) {
 	store := &repository.Store{}
 	reg := &technique.Registry{}
@@ -72,7 +74,7 @@ func TestNormalizeSessionValid(t *testing.T) {
 		EndedEarly:                false,
 	}
 
-	norm, rej := normalizeSession(in, preset)
+	norm, rej := normalizeSession(in, preset, nowForNormalize)
 	if rej != nil {
 		t.Fatalf("unexpected reject: %+v", *rej)
 	}
@@ -106,7 +108,7 @@ func TestNormalizeSessionRejectsInvalidUUID(t *testing.T) {
 		EndedEarly:                false,
 	}
 
-	_, rej := normalizeSession(in, preset)
+	_, rej := normalizeSession(in, preset, nowForNormalize)
 	if rej == nil {
 		t.Fatalf("expected reject")
 	}
@@ -136,7 +138,7 @@ func TestNormalizeSessionRejectsMissingClientSessionID(t *testing.T) {
 		EndedEarly:                false,
 	}
 
-	_, rej := normalizeSession(in, preset)
+	_, rej := normalizeSession(in, preset, nowForNormalize)
 	if rej == nil {
 		t.Fatalf("expected reject")
 	}
@@ -166,7 +168,7 @@ func TestNormalizeSessionRejectsInvalidTimezoneOffset(t *testing.T) {
 		EndedEarly:                false,
 	}
 
-	_, rej := normalizeSession(in, preset)
+	_, rej := normalizeSession(in, preset, nowForNormalize)
 	if rej == nil {
 		t.Fatalf("expected reject")
 	}
@@ -195,7 +197,7 @@ func TestNormalizeSessionRejectsInvalidTimestamps(t *testing.T) {
 		EndedEarly:                false,
 	}
 
-	_, rej := normalizeSession(in, preset)
+	_, rej := normalizeSession(in, preset, nowForNormalize)
 	if rej == nil {
 		t.Fatalf("expected reject")
 	}
@@ -225,7 +227,7 @@ func TestNormalizeSessionRejectsZeroDuration(t *testing.T) {
 		EndedEarly:                false,
 	}
 
-	_, rej := normalizeSession(in, preset)
+	_, rej := normalizeSession(in, preset, nowForNormalize)
 	if rej == nil {
 		t.Fatalf("expected reject")
 	}
@@ -255,7 +257,7 @@ func TestNormalizeSessionRejectsDurationExceedsMax(t *testing.T) {
 		EndedEarly:                false,
 	}
 
-	_, rej := normalizeSession(in, preset)
+	_, rej := normalizeSession(in, preset, nowForNormalize)
 	if rej == nil {
 		t.Fatalf("expected reject")
 	}
@@ -288,7 +290,7 @@ func TestNormalizeSessionRejectsDurationBelowPresetMinWhenNotEndedEarly(t *testi
 		EndedEarly:                false,
 	}
 
-	_, rej := normalizeSession(in, preset)
+	_, rej := normalizeSession(in, preset, nowForNormalize)
 	if rej == nil {
 		t.Fatalf("expected reject")
 	}
@@ -321,7 +323,7 @@ func TestNormalizeSessionRejectsNegativeBreaths(t *testing.T) {
 		EndedEarly:                false,
 	}
 
-	_, rej := normalizeSession(in, preset)
+	_, rej := normalizeSession(in, preset, nowForNormalize)
 	if rej == nil {
 		t.Fatalf("expected reject")
 	}
@@ -399,7 +401,7 @@ func TestNormalizeSessionClampsBreathsEstimate(t *testing.T) {
 		EndedEarly:                false,
 	}
 
-	norm, rej := normalizeSession(in, preset)
+	norm, rej := normalizeSession(in, preset, nowForNormalize)
 	if rej != nil {
 		t.Fatalf("unexpected reject: %+v", *rej)
 	}
@@ -430,7 +432,7 @@ func TestNormalizeSessionRejectsWildBreathsEstimate(t *testing.T) {
 		EndedEarly:                false,
 	}
 
-	_, rej := normalizeSession(in, preset)
+	_, rej := normalizeSession(in, preset, nowForNormalize)
 	if rej == nil {
 		t.Fatalf("expected reject")
 	}
@@ -460,7 +462,7 @@ func TestNormalizeSessionLocalDayMidnightBoundaryPositiveOffset(t *testing.T) {
 		EndedEarly:                false,
 	}
 
-	norm, rej := normalizeSession(in, preset)
+	norm, rej := normalizeSession(in, preset, nowForNormalize)
 	if rej != nil {
 		t.Fatalf("unexpected reject: %+v", *rej)
 	}
@@ -492,7 +494,7 @@ func TestNormalizeSessionLocalDayMidnightBoundaryNegativeOffset(t *testing.T) {
 		EndedEarly:                false,
 	}
 
-	norm, rej := normalizeSession(in, preset)
+	norm, rej := normalizeSession(in, preset, nowForNormalize)
 	if rej != nil {
 		t.Fatalf("unexpected reject: %+v", *rej)
 	}
@@ -524,7 +526,7 @@ func TestNormalizeSessionAllowsEndedEarlyBelowPresetMin(t *testing.T) {
 		EndedEarly:                true,
 	}
 
-	norm, rej := normalizeSession(in, preset)
+	norm, rej := normalizeSession(in, preset, nowForNormalize)
 	if rej != nil {
 		t.Fatalf("unexpected reject: %+v", *rej)
 	}
@@ -555,7 +557,7 @@ func TestNormalizeSessionRejectsEndedEarlyTooShort(t *testing.T) {
 		EndedEarly:                true,
 	}
 
-	_, rej := normalizeSession(in, preset)
+	_, rej := normalizeSession(in, preset, nowForNormalize)
 	if rej == nil {
 		t.Fatalf("expected reject")
 	}
@@ -588,7 +590,7 @@ func TestNormalizeSessionRejectsWildBreathsEstimateShortDuration(t *testing.T) {
 		EndedEarly:                true,
 	}
 
-	_, rej := normalizeSession(in, preset)
+	_, rej := normalizeSession(in, preset, nowForNormalize)
 	if rej == nil {
 		t.Fatalf("expected reject")
 	}
@@ -621,7 +623,7 @@ func TestNormalizeSessionClampsBreathsEstimateShortDuration(t *testing.T) {
 		EndedEarly:                true,
 	}
 
-	norm, rej := normalizeSession(in, preset)
+	norm, rej := normalizeSession(in, preset, nowForNormalize)
 	if rej != nil {
 		t.Fatalf("unexpected reject: %+v", *rej)
 	}

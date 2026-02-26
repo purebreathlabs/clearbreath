@@ -53,7 +53,6 @@ func (h *StatsHandler) Snapshot(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Read XP progress from user_progress table
 	var totalXP int64
 	var currentLevel int32
 	prog, err := h.store.Queries().GetUserProgress(r.Context(), userID)

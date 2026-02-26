@@ -54,10 +54,8 @@ func NewService(store *repository.Store, clk clock.Clock) *Service {
 	return s
 }
 
-// buildLevelThresholds returns a 1001-element array where thresholds[L] is the
-// cumulative XP required to reach level L.
 func buildLevelThresholds() []int64 {
-	t := make([]int64, MaxLevel+2) // 0..1000
+	t := make([]int64, MaxLevel+2)
 	t[0] = 0
 	var cumulative int64
 	for k := 0; k <= MaxLevel; k++ {
@@ -68,7 +66,6 @@ func buildLevelThresholds() []int64 {
 	return t
 }
 
-// LevelFromTotalXP returns the current level for the given total XP using binary search.
 func (s *Service) LevelFromTotalXP(totalXP int64) int32 {
 	lo, hi := 0, len(s.thresholds)-1
 	for lo < hi {
@@ -85,7 +82,6 @@ func (s *Service) LevelFromTotalXP(totalXP int64) int32 {
 	return int32(lo)
 }
 
-// CumulativeXPForLevel returns the total XP required to reach the given level.
 func (s *Service) CumulativeXPForLevel(level int32) int64 {
 	if level < 0 {
 		return 0
@@ -96,7 +92,6 @@ func (s *Service) CumulativeXPForLevel(level int32) int64 {
 	return s.thresholds[level]
 }
 
-// XPForNextLevel returns the XP needed to go from level to level+1.
 func (s *Service) XPForNextLevel(level int32) int64 {
 	if level < 0 || int(level+1) >= len(s.thresholds) {
 		return 0
@@ -104,12 +99,10 @@ func (s *Service) XPForNextLevel(level int32) int64 {
 	return s.thresholds[level+1] - s.thresholds[level]
 }
 
-// StreakMultiplier returns the XP multiplier for the given streak length.
 func StreakMultiplier(streakDays int32) float64 {
 	return math.Min(1.0+0.1*float64(streakDays), MaxStreakMultiplier)
 }
 
-// PresetForLevel returns the pace preset appropriate for the given level.
 func PresetForLevel(level int32) string {
 	if level < 15 {
 		return "beginner"
@@ -120,7 +113,6 @@ func PresetForLevel(level int32) string {
 	return "advanced"
 }
 
-// DurationMinutesForLevel returns the session duration in minutes for the given level.
 func DurationMinutesForLevel(level int32) int {
 	if level < 10 {
 		return 2
@@ -137,7 +129,6 @@ func DurationMinutesForLevel(level int32) int {
 	return 20
 }
 
-// AwardSessionXP awards XP for a completed session, applying penalties, multiplier, and daily cap.
 func (s *Service) AwardSessionXP(
 	ctx context.Context,
 	q *sqlcgen.Queries,
@@ -160,7 +151,6 @@ func (s *Service) AwardSessionXP(
 	multiplier := StreakMultiplier(streakDays)
 	rawAmount := int32(math.Floor(float64(baseXP) * multiplier))
 
-	// Daily cap check
 	dailySoFar, err := q.GetDailyPracticeXP(ctx, sqlcgen.GetDailyPracticeXPParams{
 		UserID:   userID,
 		LocalDay: localDay,
@@ -181,7 +171,6 @@ func (s *Service) AwardSessionXP(
 		dailyCapped = true
 	}
 
-	// Get previous progress for level-up detection
 	prevLevel := int32(0)
 	if prog, err := q.GetUserProgress(ctx, userID); err == nil {
 		prevLevel = prog.CurrentLevel
@@ -203,7 +192,6 @@ func (s *Service) AwardSessionXP(
 		return XPAward{}, fmt.Errorf("insert xp event: %w", err)
 	}
 
-	// Recompute total + level
 	totalXP, err := q.GetTotalXP(ctx, userID)
 	if err != nil {
 		return XPAward{}, fmt.Errorf("get total xp: %w", err)
@@ -232,7 +220,6 @@ func (s *Service) AwardSessionXP(
 	}, nil
 }
 
-// AwardDailyOpenXP awards the daily login bonus (idempotent per user per day).
 func (s *Service) AwardDailyOpenXP(
 	ctx context.Context,
 	q *sqlcgen.Queries,
@@ -247,10 +234,8 @@ func (s *Service) AwardDailyOpenXP(
 		return XPAward{}, false, fmt.Errorf("check daily open: %w", err)
 	}
 	if already {
-		// Return current progress even if not awarded
 		prog, err := q.GetUserProgress(ctx, userID)
 		if err != nil {
-			// No progress yet is fine
 			return XPAward{Source: "daily_open"}, false, nil
 		}
 		return XPAward{
@@ -321,7 +306,6 @@ func (s *Service) AwardDailyOpenXP(
 	}, true, nil
 }
 
-// RecomputeTotalXP re-sums from xp_events and updates user_progress.
 func (s *Service) RecomputeTotalXP(
 	ctx context.Context,
 	q *sqlcgen.Queries,

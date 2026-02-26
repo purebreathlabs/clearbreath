@@ -12,19 +12,16 @@ func TestBuildLevelThresholds(t *testing.T) {
 		t.Errorf("threshold[0] = %d, want 0", th[0])
 	}
 
-	// L0->L1 requires floor(2 + 0 + 0) = 2 XP
 	if th[1] != 2 {
 		t.Errorf("threshold[1] = %d, want 2", th[1])
 	}
 
-	// Verify monotonically increasing
 	for i := 1; i < len(th); i++ {
 		if th[i] <= th[i-1] {
 			t.Errorf("threshold[%d] = %d <= threshold[%d] = %d", i, th[i], i-1, th[i-1])
 		}
 	}
 
-	// L999 cumulative should be roughly ~60K (sanity check)
 	if th[1000] < 50000 || th[1000] > 80000 {
 		t.Errorf("threshold[1000] = %d, expected roughly 60K", th[1000])
 	}
@@ -41,7 +38,7 @@ func TestLevelFromTotalXP(t *testing.T) {
 		{1, 0},
 		{2, 1},
 		{3, 1},
-		{4, 2}, // L1->L2 requires floor(2 + 0.05 + 0.0001) = 2, cumulative = 4
+		{4, 2},
 	}
 
 	for _, tt := range tests {
@@ -51,18 +48,15 @@ func TestLevelFromTotalXP(t *testing.T) {
 		}
 	}
 
-	// Verify level 0 at 0 XP
 	if l := s.LevelFromTotalXP(0); l != 0 {
 		t.Errorf("LevelFromTotalXP(0) = %d, want 0", l)
 	}
 
-	// At exactly the cumulative XP for level 999, should be level 999
 	xp999 := s.CumulativeXPForLevel(999)
 	if l := s.LevelFromTotalXP(xp999); l != 999 {
 		t.Errorf("LevelFromTotalXP(%d) = %d, want 999", xp999, l)
 	}
 
-	// Even with way more XP, should cap at 999
 	if l := s.LevelFromTotalXP(999999); l != 999 {
 		t.Errorf("LevelFromTotalXP(999999) = %d, want 999", l)
 	}
@@ -77,7 +71,6 @@ func TestCumulativeXPForLevel(t *testing.T) {
 	if v := s.CumulativeXPForLevel(1); v != 2 {
 		t.Errorf("CumulativeXPForLevel(1) = %d, want 2", v)
 	}
-	// Negative level
 	if v := s.CumulativeXPForLevel(-1); v != 0 {
 		t.Errorf("CumulativeXPForLevel(-1) = %d, want 0", v)
 	}
@@ -86,12 +79,10 @@ func TestCumulativeXPForLevel(t *testing.T) {
 func TestXPForNextLevel(t *testing.T) {
 	s := NewService(nil, nil)
 
-	// L0->L1 = 2
 	if v := s.XPForNextLevel(0); v != 2 {
 		t.Errorf("XPForNextLevel(0) = %d, want 2", v)
 	}
 
-	// Each level's XP should be positive
 	for i := int32(0); i <= MaxLevel; i++ {
 		v := s.XPForNextLevel(i)
 		if v <= 0 {
@@ -110,7 +101,7 @@ func TestStreakMultiplier(t *testing.T) {
 		{5, 1.5},
 		{10, 2.0},
 		{20, 3.0},
-		{25, 3.0}, // capped
+		{25, 3.0},
 		{100, 3.0},
 	}
 
@@ -170,28 +161,24 @@ func TestDurationMinutesForLevel(t *testing.T) {
 }
 
 func TestSessionXPCalculation(t *testing.T) {
-	// 5 min session, no early end, no streak = 5 * 10 = 50 XP
 	baseMinutes := 300 / 60
 	baseXP := baseMinutes * XPPerFullMinute
 	if baseXP != 50 {
 		t.Errorf("5min session base XP = %d, want 50", baseXP)
 	}
 
-	// 5 min early end: floor(5 * 0.5) = 2 min = 20 XP
 	earlyMinutes := int(math.Floor(float64(baseMinutes) * EndedEarlyPenalty))
 	earlyXP := earlyMinutes * XPPerFullMinute
 	if earlyXP != 20 {
 		t.Errorf("5min early-end XP = %d, want 20", earlyXP)
 	}
 
-	// 5 min, streak 10 days (2.0x): 50 * 2 = 100 XP
 	mult := StreakMultiplier(10)
 	withStreak := int(math.Floor(float64(50) * mult))
 	if withStreak != 100 {
 		t.Errorf("5min streak-10 XP = %d, want 100", withStreak)
 	}
 
-	// 5 min, streak 25 days (3.0x capped): 50 * 3 = 150 XP
 	mult = StreakMultiplier(25)
 	withStreak = int(math.Floor(float64(50) * mult))
 	if withStreak != 150 {

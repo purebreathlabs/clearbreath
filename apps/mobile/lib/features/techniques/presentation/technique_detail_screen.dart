@@ -563,8 +563,7 @@ class _HeroImage extends StatelessWidget {
               Image.asset(
                 imagePath!,
                 fit: BoxFit.cover,
-                errorBuilder: (_, _, _) =>
-                    Container(color: colors.surfaceHigh),
+                errorBuilder: (_, _, _) => Container(color: colors.surfaceHigh),
               )
             else
               Container(color: colors.surfaceHigh),

@@ -140,30 +140,20 @@ void main() {
     });
 
     test('ended early 5 min = 20 XP', () {
-      // floor(5 * 0.5) = 2 minutes * 10 = 20
       expect(
-        computeSessionXP(
-          durationSeconds: 300,
-          endedEarly: true,
-          streakDays: 0,
-        ),
+        computeSessionXP(durationSeconds: 300, endedEarly: true, streakDays: 0),
         20,
       );
     });
 
     test('sub-minute session = 0 XP', () {
       expect(
-        computeSessionXP(
-          durationSeconds: 50,
-          endedEarly: false,
-          streakDays: 0,
-        ),
+        computeSessionXP(durationSeconds: 50, endedEarly: false, streakDays: 0),
         0,
       );
     });
 
     test('10 day streak = 2.0x', () {
-      // 5 min = 50 base * 2.0 = 100
       expect(
         computeSessionXP(
           durationSeconds: 300,
@@ -175,7 +165,6 @@ void main() {
     });
 
     test('25 day streak = 3.0x (capped)', () {
-      // 5 min = 50 base * 3.0 = 150
       expect(
         computeSessionXP(
           durationSeconds: 300,
@@ -187,13 +176,8 @@ void main() {
     });
 
     test('ended early 10s session = 0 XP', () {
-      // floor(floor(10/60) * 0.5) * 10 = 0
       expect(
-        computeSessionXP(
-          durationSeconds: 10,
-          endedEarly: true,
-          streakDays: 0,
-        ),
+        computeSessionXP(durationSeconds: 10, endedEarly: true, streakDays: 0),
         0,
       );
     });
