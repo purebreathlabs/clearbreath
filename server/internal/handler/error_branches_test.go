@@ -34,7 +34,7 @@ func TestHandlersReturnUnauthorizedWithoutUserID(t *testing.T) {
 		{name: "safety acks post", run: func(rec *httptest.ResponseRecorder, req *http.Request) {
 			NewSafetyAcknowledgementsHandler(nil).Post(rec, req)
 		}},
-		{name: "stats snapshot", run: func(rec *httptest.ResponseRecorder, req *http.Request) { NewStatsHandler(nil).Snapshot(rec, req) }},
+		{name: "stats snapshot", run: func(rec *httptest.ResponseRecorder, req *http.Request) { NewStatsHandler(nil, nil).Snapshot(rec, req) }},
 		{name: "leaderboard self", run: func(rec *httptest.ResponseRecorder, req *http.Request) { NewLeaderboardHandler(nil).Self(rec, req) }},
 		{name: "auth logout", run: func(rec *httptest.ResponseRecorder, req *http.Request) { NewAuthHandler(nil).Logout(rec, req) }},
 		{name: "sessions submit", run: func(rec *httptest.ResponseRecorder, req *http.Request) { NewSessionsHandler(nil).Submit(rec, req) }},

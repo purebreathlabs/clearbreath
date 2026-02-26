@@ -71,15 +71,63 @@ class RejectedSession {
   final String message;
 }
 
+class XPAward {
+  const XPAward({
+    required this.amount,
+    required this.baseAmount,
+    required this.multiplier,
+    required this.source,
+    required this.dailyCapped,
+    required this.newTotalXp,
+    required this.newLevel,
+    required this.prevLevel,
+    required this.leveledUp,
+  });
+
+  factory XPAward.fromJson(JsonMap json) {
+    return XPAward(
+      amount: readInt(json, 'amount'),
+      baseAmount: readInt(json, 'base_amount'),
+      multiplier: (json['multiplier'] as num?)?.toDouble() ?? 1.0,
+      source: readString(json, 'source'),
+      dailyCapped: json['daily_capped'] == true,
+      newTotalXp: readInt(json, 'new_total_xp'),
+      newLevel: readInt(json, 'new_level'),
+      prevLevel: readInt(json, 'prev_level'),
+      leveledUp: json['leveled_up'] == true,
+    );
+  }
+
+  final int amount;
+  final int baseAmount;
+  final double multiplier;
+  final String source;
+  final bool dailyCapped;
+  final int newTotalXp;
+  final int newLevel;
+  final int prevLevel;
+  final bool leveledUp;
+}
+
 class SessionsIngestResponse {
   const SessionsIngestResponse({
     required this.acceptedCount,
     required this.duplicateCount,
     required this.rejected,
     required this.statsSnapshot,
+    required this.xpAwards,
+    required this.totalXp,
+    required this.currentLevel,
   });
 
   factory SessionsIngestResponse.fromJson(JsonMap json) {
+    final totalXp = readInt(json, 'total_xp');
+    final currentLevel = readInt(json, 'current_level');
+
+    final statsMap = readMap(json, 'stats_snapshot');
+    statsMap.putIfAbsent('total_xp', () => totalXp);
+    statsMap.putIfAbsent('current_level', () => currentLevel);
+
     return SessionsIngestResponse(
       acceptedCount: readInt(json, 'accepted_count'),
       duplicateCount: readInt(json, 'duplicate_count'),
@@ -87,7 +135,12 @@ class SessionsIngestResponse {
         json,
         'rejected',
       ).map(RejectedSession.fromJson).toList(growable: false),
-      statsSnapshot: StatsSnapshot.fromJson(readMap(json, 'stats_snapshot')),
+      statsSnapshot: StatsSnapshot.fromJson(statsMap),
+      xpAwards: readMapList(json, 'xp_awards')
+          .map(XPAward.fromJson)
+          .toList(growable: false),
+      totalXp: totalXp,
+      currentLevel: currentLevel,
     );
   }
 
@@ -95,6 +148,9 @@ class SessionsIngestResponse {
   final int duplicateCount;
   final List<RejectedSession> rejected;
   final StatsSnapshot statsSnapshot;
+  final List<XPAward> xpAwards;
+  final int totalXp;
+  final int currentLevel;
 }
 
 String _formatUtc(DateTime value) {

@@ -35,7 +35,7 @@ void main() {
           );
         }
 
-        expect(options.queryParameters['ranking'], equals('weekly'));
+        expect(options.queryParameters['ranking'], equals('xp'));
         return ResponseBody.fromString(
           _weeklyListJson(),
           200,
@@ -56,14 +56,14 @@ void main() {
 
     final repo = LeaderboardRepository(dio: dio, db: db);
 
-    final first = await repo.fetchList(LeaderboardRanking.weekly);
+    final first = await repo.fetchList(LeaderboardRanking.xp);
     expect(first.fromCache, isFalse);
     expect(first.entries.length, 2);
     expect(first.entries.first.rank, 1);
-    expect(first.entries.first.metricValue, 120);
+    expect(first.entries.first.totalXp, 120);
 
     shouldFail = true;
-    final second = await repo.fetchList(LeaderboardRanking.weekly);
+    final second = await repo.fetchList(LeaderboardRanking.xp);
     expect(second.fromCache, isTrue);
     expect(second.entries.length, 2);
     expect(second.entries.first.rank, 1);
@@ -92,21 +92,23 @@ class _TestAdapter implements HttpClientAdapter {
 String _weeklyListJson() {
   return '''
 {
-  "ranking":"weekly",
+  "ranking":"xp",
   "generated_at_utc":"2026-02-18T12:00:00Z",
   "top":[
     {
       "rank":1,
       "display_name_or_initials":"AB",
       "avatar_seed":"seed-a",
-      "metric_value":120,
+      "total_xp":120,
+      "level":5,
       "user_id":"user-a"
     },
     {
       "rank":2,
       "display_name_or_initials":"CD",
       "avatar_seed":"seed-b",
-      "metric_value":60,
+      "total_xp":60,
+      "level":3,
       "user_id":"user-b"
     }
   ]

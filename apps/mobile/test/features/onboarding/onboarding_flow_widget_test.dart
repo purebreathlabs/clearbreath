@@ -17,15 +17,15 @@ void main() {
       ),
     );
 
-    expect(find.text('Your experience level'), findsOneWidget);
+    expect(find.text('Your goals'), findsOneWidget);
 
     await tester.tap(find.text('Continue'));
     await tester.pumpAndSettle();
-    expect(find.text('Your goals'), findsOneWidget);
+    expect(find.text('When do you usually practice?'), findsOneWidget);
 
     await tester.tap(find.text('Back'));
     await tester.pumpAndSettle();
-    expect(find.text('Your experience level'), findsOneWidget);
+    expect(find.text('Your goals'), findsOneWidget);
 
     await tester.tap(find.text('Skip setup'));
     await tester.pump();

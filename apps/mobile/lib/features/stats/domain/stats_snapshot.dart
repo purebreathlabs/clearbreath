@@ -13,6 +13,8 @@ class StatsSnapshot {
     required this.favoriteTechniqueId,
     required this.totalBreathsEstimated,
     required this.updatedAt,
+    this.totalXP = 0,
+    this.currentLevel = 0,
   }) : minutesByTechnique = Map.unmodifiable(minutesByTechnique);
 
   factory StatsSnapshot.empty() {
@@ -40,4 +42,6 @@ class StatsSnapshot {
   final String? favoriteTechniqueId;
   final int totalBreathsEstimated;
   final DateTime updatedAt;
+  final int totalXP;
+  final int currentLevel;
 }

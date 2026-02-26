@@ -2337,6 +2337,30 @@ class $StatsCacheTable extends StatsCache
     requiredDuringInsert: false,
     defaultValue: const Constant(0),
   );
+  static const VerificationMeta _totalXpMeta = const VerificationMeta(
+    'totalXp',
+  );
+  @override
+  late final GeneratedColumn<int> totalXp = GeneratedColumn<int>(
+    'total_xp',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(0),
+  );
+  static const VerificationMeta _currentLevelMeta = const VerificationMeta(
+    'currentLevel',
+  );
+  @override
+  late final GeneratedColumn<int> currentLevel = GeneratedColumn<int>(
+    'current_level',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(0),
+  );
   static const VerificationMeta _updatedAtMeta = const VerificationMeta(
     'updatedAt',
   );
@@ -2360,6 +2384,8 @@ class $StatsCacheTable extends StatsCache
     longestSessionMinutes,
     favoriteTechniqueId,
     totalBreathsEstimated,
+    totalXp,
+    currentLevel,
     updatedAt,
   ];
   @override
@@ -2458,6 +2484,21 @@ class $StatsCacheTable extends StatsCache
         ),
       );
     }
+    if (data.containsKey('total_xp')) {
+      context.handle(
+        _totalXpMeta,
+        totalXp.isAcceptableOrUnknown(data['total_xp']!, _totalXpMeta),
+      );
+    }
+    if (data.containsKey('current_level')) {
+      context.handle(
+        _currentLevelMeta,
+        currentLevel.isAcceptableOrUnknown(
+          data['current_level']!,
+          _currentLevelMeta,
+        ),
+      );
+    }
     if (data.containsKey('updated_at')) {
       context.handle(
         _updatedAtMeta,
@@ -2515,6 +2556,14 @@ class $StatsCacheTable extends StatsCache
         DriftSqlType.int,
         data['${effectivePrefix}total_breaths_estimated'],
       )!,
+      totalXp: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}total_xp'],
+      )!,
+      currentLevel: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}current_level'],
+      )!,
       updatedAt: attachedDatabase.typeMapping.read(
         DriftSqlType.dateTime,
         data['${effectivePrefix}updated_at'],
@@ -2539,6 +2588,8 @@ class StatsCacheData extends DataClass implements Insertable<StatsCacheData> {
   final int longestSessionMinutes;
   final String? favoriteTechniqueId;
   final int totalBreathsEstimated;
+  final int totalXp;
+  final int currentLevel;
   final DateTime updatedAt;
   const StatsCacheData({
     required this.id,
@@ -2551,6 +2602,8 @@ class StatsCacheData extends DataClass implements Insertable<StatsCacheData> {
     required this.longestSessionMinutes,
     this.favoriteTechniqueId,
     required this.totalBreathsEstimated,
+    required this.totalXp,
+    required this.currentLevel,
     required this.updatedAt,
   });
   @override
@@ -2568,6 +2621,8 @@ class StatsCacheData extends DataClass implements Insertable<StatsCacheData> {
       map['favorite_technique_id'] = Variable<String>(favoriteTechniqueId);
     }
     map['total_breaths_estimated'] = Variable<int>(totalBreathsEstimated);
+    map['total_xp'] = Variable<int>(totalXp);
+    map['current_level'] = Variable<int>(currentLevel);
     map['updated_at'] = Variable<DateTime>(updatedAt);
     return map;
   }
@@ -2586,6 +2641,8 @@ class StatsCacheData extends DataClass implements Insertable<StatsCacheData> {
           ? const Value.absent()
           : Value(favoriteTechniqueId),
       totalBreathsEstimated: Value(totalBreathsEstimated),
+      totalXp: Value(totalXp),
+      currentLevel: Value(currentLevel),
       updatedAt: Value(updatedAt),
     );
   }
@@ -2614,6 +2671,8 @@ class StatsCacheData extends DataClass implements Insertable<StatsCacheData> {
       totalBreathsEstimated: serializer.fromJson<int>(
         json['totalBreathsEstimated'],
       ),
+      totalXp: serializer.fromJson<int>(json['totalXp']),
+      currentLevel: serializer.fromJson<int>(json['currentLevel']),
       updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
     );
   }
@@ -2633,6 +2692,8 @@ class StatsCacheData extends DataClass implements Insertable<StatsCacheData> {
       'longestSessionMinutes': serializer.toJson<int>(longestSessionMinutes),
       'favoriteTechniqueId': serializer.toJson<String?>(favoriteTechniqueId),
       'totalBreathsEstimated': serializer.toJson<int>(totalBreathsEstimated),
+      'totalXp': serializer.toJson<int>(totalXp),
+      'currentLevel': serializer.toJson<int>(currentLevel),
       'updatedAt': serializer.toJson<DateTime>(updatedAt),
     };
   }
@@ -2648,6 +2709,8 @@ class StatsCacheData extends DataClass implements Insertable<StatsCacheData> {
     int? longestSessionMinutes,
     Value<String?> favoriteTechniqueId = const Value.absent(),
     int? totalBreathsEstimated,
+    int? totalXp,
+    int? currentLevel,
     DateTime? updatedAt,
   }) => StatsCacheData(
     id: id ?? this.id,
@@ -2663,6 +2726,8 @@ class StatsCacheData extends DataClass implements Insertable<StatsCacheData> {
         ? favoriteTechniqueId.value
         : this.favoriteTechniqueId,
     totalBreathsEstimated: totalBreathsEstimated ?? this.totalBreathsEstimated,
+    totalXp: totalXp ?? this.totalXp,
+    currentLevel: currentLevel ?? this.currentLevel,
     updatedAt: updatedAt ?? this.updatedAt,
   );
   StatsCacheData copyWithCompanion(StatsCacheCompanion data) {
@@ -2695,6 +2760,10 @@ class StatsCacheData extends DataClass implements Insertable<StatsCacheData> {
       totalBreathsEstimated: data.totalBreathsEstimated.present
           ? data.totalBreathsEstimated.value
           : this.totalBreathsEstimated,
+      totalXp: data.totalXp.present ? data.totalXp.value : this.totalXp,
+      currentLevel: data.currentLevel.present
+          ? data.currentLevel.value
+          : this.currentLevel,
       updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
     );
   }
@@ -2712,6 +2781,8 @@ class StatsCacheData extends DataClass implements Insertable<StatsCacheData> {
           ..write('longestSessionMinutes: $longestSessionMinutes, ')
           ..write('favoriteTechniqueId: $favoriteTechniqueId, ')
           ..write('totalBreathsEstimated: $totalBreathsEstimated, ')
+          ..write('totalXp: $totalXp, ')
+          ..write('currentLevel: $currentLevel, ')
           ..write('updatedAt: $updatedAt')
           ..write(')'))
         .toString();
@@ -2729,6 +2800,8 @@ class StatsCacheData extends DataClass implements Insertable<StatsCacheData> {
     longestSessionMinutes,
     favoriteTechniqueId,
     totalBreathsEstimated,
+    totalXp,
+    currentLevel,
     updatedAt,
   );
   @override
@@ -2745,6 +2818,8 @@ class StatsCacheData extends DataClass implements Insertable<StatsCacheData> {
           other.longestSessionMinutes == this.longestSessionMinutes &&
           other.favoriteTechniqueId == this.favoriteTechniqueId &&
           other.totalBreathsEstimated == this.totalBreathsEstimated &&
+          other.totalXp == this.totalXp &&
+          other.currentLevel == this.currentLevel &&
           other.updatedAt == this.updatedAt);
 }
 
@@ -2759,6 +2834,8 @@ class StatsCacheCompanion extends UpdateCompanion<StatsCacheData> {
   final Value<int> longestSessionMinutes;
   final Value<String?> favoriteTechniqueId;
   final Value<int> totalBreathsEstimated;
+  final Value<int> totalXp;
+  final Value<int> currentLevel;
   final Value<DateTime> updatedAt;
   const StatsCacheCompanion({
     this.id = const Value.absent(),
@@ -2771,6 +2848,8 @@ class StatsCacheCompanion extends UpdateCompanion<StatsCacheData> {
     this.longestSessionMinutes = const Value.absent(),
     this.favoriteTechniqueId = const Value.absent(),
     this.totalBreathsEstimated = const Value.absent(),
+    this.totalXp = const Value.absent(),
+    this.currentLevel = const Value.absent(),
     this.updatedAt = const Value.absent(),
   });
   StatsCacheCompanion.insert({
@@ -2784,6 +2863,8 @@ class StatsCacheCompanion extends UpdateCompanion<StatsCacheData> {
     this.longestSessionMinutes = const Value.absent(),
     this.favoriteTechniqueId = const Value.absent(),
     this.totalBreathsEstimated = const Value.absent(),
+    this.totalXp = const Value.absent(),
+    this.currentLevel = const Value.absent(),
     required DateTime updatedAt,
   }) : updatedAt = Value(updatedAt);
   static Insertable<StatsCacheData> custom({
@@ -2797,6 +2878,8 @@ class StatsCacheCompanion extends UpdateCompanion<StatsCacheData> {
     Expression<int>? longestSessionMinutes,
     Expression<String>? favoriteTechniqueId,
     Expression<int>? totalBreathsEstimated,
+    Expression<int>? totalXp,
+    Expression<int>? currentLevel,
     Expression<DateTime>? updatedAt,
   }) {
     return RawValuesInsertable({
@@ -2814,6 +2897,8 @@ class StatsCacheCompanion extends UpdateCompanion<StatsCacheData> {
         'favorite_technique_id': favoriteTechniqueId,
       if (totalBreathsEstimated != null)
         'total_breaths_estimated': totalBreathsEstimated,
+      if (totalXp != null) 'total_xp': totalXp,
+      if (currentLevel != null) 'current_level': currentLevel,
       if (updatedAt != null) 'updated_at': updatedAt,
     });
   }
@@ -2829,6 +2914,8 @@ class StatsCacheCompanion extends UpdateCompanion<StatsCacheData> {
     Value<int>? longestSessionMinutes,
     Value<String?>? favoriteTechniqueId,
     Value<int>? totalBreathsEstimated,
+    Value<int>? totalXp,
+    Value<int>? currentLevel,
     Value<DateTime>? updatedAt,
   }) {
     return StatsCacheCompanion(
@@ -2845,6 +2932,8 @@ class StatsCacheCompanion extends UpdateCompanion<StatsCacheData> {
       favoriteTechniqueId: favoriteTechniqueId ?? this.favoriteTechniqueId,
       totalBreathsEstimated:
           totalBreathsEstimated ?? this.totalBreathsEstimated,
+      totalXp: totalXp ?? this.totalXp,
+      currentLevel: currentLevel ?? this.currentLevel,
       updatedAt: updatedAt ?? this.updatedAt,
     );
   }
@@ -2890,6 +2979,12 @@ class StatsCacheCompanion extends UpdateCompanion<StatsCacheData> {
         totalBreathsEstimated.value,
       );
     }
+    if (totalXp.present) {
+      map['total_xp'] = Variable<int>(totalXp.value);
+    }
+    if (currentLevel.present) {
+      map['current_level'] = Variable<int>(currentLevel.value);
+    }
     if (updatedAt.present) {
       map['updated_at'] = Variable<DateTime>(updatedAt.value);
     }
@@ -2909,6 +3004,8 @@ class StatsCacheCompanion extends UpdateCompanion<StatsCacheData> {
           ..write('longestSessionMinutes: $longestSessionMinutes, ')
           ..write('favoriteTechniqueId: $favoriteTechniqueId, ')
           ..write('totalBreathsEstimated: $totalBreathsEstimated, ')
+          ..write('totalXp: $totalXp, ')
+          ..write('currentLevel: $currentLevel, ')
           ..write('updatedAt: $updatedAt')
           ..write(')'))
         .toString();
@@ -4854,6 +4951,8 @@ typedef $$StatsCacheTableCreateCompanionBuilder =
       Value<int> longestSessionMinutes,
       Value<String?> favoriteTechniqueId,
       Value<int> totalBreathsEstimated,
+      Value<int> totalXp,
+      Value<int> currentLevel,
       required DateTime updatedAt,
     });
 typedef $$StatsCacheTableUpdateCompanionBuilder =
@@ -4868,6 +4967,8 @@ typedef $$StatsCacheTableUpdateCompanionBuilder =
       Value<int> longestSessionMinutes,
       Value<String?> favoriteTechniqueId,
       Value<int> totalBreathsEstimated,
+      Value<int> totalXp,
+      Value<int> currentLevel,
       Value<DateTime> updatedAt,
     });
 
@@ -4927,6 +5028,16 @@ class $$StatsCacheTableFilterComposer
 
   ColumnFilters<int> get totalBreathsEstimated => $composableBuilder(
     column: $table.totalBreathsEstimated,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get totalXp => $composableBuilder(
+    column: $table.totalXp,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get currentLevel => $composableBuilder(
+    column: $table.currentLevel,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -4995,6 +5106,16 @@ class $$StatsCacheTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<int> get totalXp => $composableBuilder(
+    column: $table.totalXp,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get currentLevel => $composableBuilder(
+    column: $table.currentLevel,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<DateTime> get updatedAt => $composableBuilder(
     column: $table.updatedAt,
     builder: (column) => ColumnOrderings(column),
@@ -5058,6 +5179,14 @@ class $$StatsCacheTableAnnotationComposer
     builder: (column) => column,
   );
 
+  GeneratedColumn<int> get totalXp =>
+      $composableBuilder(column: $table.totalXp, builder: (column) => column);
+
+  GeneratedColumn<int> get currentLevel => $composableBuilder(
+    column: $table.currentLevel,
+    builder: (column) => column,
+  );
+
   GeneratedColumn<DateTime> get updatedAt =>
       $composableBuilder(column: $table.updatedAt, builder: (column) => column);
 }
@@ -5103,6 +5232,8 @@ class $$StatsCacheTableTableManager
                 Value<int> longestSessionMinutes = const Value.absent(),
                 Value<String?> favoriteTechniqueId = const Value.absent(),
                 Value<int> totalBreathsEstimated = const Value.absent(),
+                Value<int> totalXp = const Value.absent(),
+                Value<int> currentLevel = const Value.absent(),
                 Value<DateTime> updatedAt = const Value.absent(),
               }) => StatsCacheCompanion(
                 id: id,
@@ -5115,6 +5246,8 @@ class $$StatsCacheTableTableManager
                 longestSessionMinutes: longestSessionMinutes,
                 favoriteTechniqueId: favoriteTechniqueId,
                 totalBreathsEstimated: totalBreathsEstimated,
+                totalXp: totalXp,
+                currentLevel: currentLevel,
                 updatedAt: updatedAt,
               ),
           createCompanionCallback:
@@ -5129,6 +5262,8 @@ class $$StatsCacheTableTableManager
                 Value<int> longestSessionMinutes = const Value.absent(),
                 Value<String?> favoriteTechniqueId = const Value.absent(),
                 Value<int> totalBreathsEstimated = const Value.absent(),
+                Value<int> totalXp = const Value.absent(),
+                Value<int> currentLevel = const Value.absent(),
                 required DateTime updatedAt,
               }) => StatsCacheCompanion.insert(
                 id: id,
@@ -5141,6 +5276,8 @@ class $$StatsCacheTableTableManager
                 longestSessionMinutes: longestSessionMinutes,
                 favoriteTechniqueId: favoriteTechniqueId,
                 totalBreathsEstimated: totalBreathsEstimated,
+                totalXp: totalXp,
+                currentLevel: currentLevel,
                 updatedAt: updatedAt,
               ),
           withReferenceMapper: (p0) => p0

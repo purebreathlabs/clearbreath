@@ -59,6 +59,8 @@ class CloudStatsRepository {
       longestSessionMinutes: existing?.longestSessionMinutes ?? 0,
       favoriteTechniqueId: existing?.favoriteTechniqueId,
       totalBreathsEstimated: existing?.totalBreathsEstimated ?? 0,
+      totalXP: cloud.totalXp,
+      currentLevel: cloud.currentLevel,
       updatedAt: cloud.updatedAtUtc,
     );
   }

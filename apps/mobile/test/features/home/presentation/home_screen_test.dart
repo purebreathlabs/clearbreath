@@ -69,7 +69,7 @@ void main() {
           favoriteTechniquesProvider.overrideWith((ref) async => [technique]),
           localStatsProvider.overrideWith((ref) async => StatsSnapshot.empty()),
           weeklyMinutesProvider.overrideWith(
-            (ref) async => const [0, 1, 2, 3, 4, 5, 6],
+            (ref, weekOffset) async => const [0, 1, 2, 3, 4, 5, 6],
           ),
         ],
         child: MaterialApp(theme: AppTheme.dark(), home: const HomeScreen()),

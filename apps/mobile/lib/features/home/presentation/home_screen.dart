@@ -13,6 +13,7 @@ import '../../techniques/domain/safety_acknowledgement_repository.dart';
 import '../../techniques/domain/technique.dart';
 import '../../techniques/domain/technique_preset.dart';
 import '../../techniques/presentation/widgets/safety_warning_sheet.dart';
+import '../../xp/domain/xp_provider.dart';
 import '../../../shared/providers/preferences_provider.dart';
 import '../../../shared/widgets/brand_mark.dart';
 import '../domain/recommendation_engine.dart';
@@ -51,11 +52,14 @@ class HomeScreen extends ConsumerWidget {
     final recommendation = ref.watch(dailyRecommendationProvider);
     final favorites = ref.watch(favoriteTechniquesProvider);
     final stats = ref.watch(mergedStatsProvider);
-    final weeklyMinutes = ref.watch(weeklyMinutesProvider);
+    final weeklyMinutes = ref.watch(weeklyMinutesProvider(0));
+
+    final xpAsync = ref.watch(mergedXPProvider);
+    final xpState = xpAsync.asData?.value;
+    final durationMinutes = xpState?.durationMinutes ?? 2;
 
     final prefs = ref.watch(preferencesProvider);
     final row = prefs.asData?.value;
-    final durationMinutes = row?.sessionLengthMinutes ?? 5;
     final localDisplayName = row?.displayName.trim() ?? '';
     final auth = ref.watch(authStateProvider);
     final signedInName = auth is AuthStateSignedIn
@@ -203,18 +207,43 @@ class HomeScreen extends ConsumerWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                SizedBox(
-                  width: double.infinity,
-                  child: FittedBox(
-                    fit: BoxFit.scaleDown,
-                    alignment: Alignment.centerLeft,
-                    child: Text(
-                      greeting,
-                      style: greetingStyle,
-                      maxLines: 1,
-                      softWrap: false,
+                Row(
+                  children: [
+                    Expanded(
+                      child: FittedBox(
+                        fit: BoxFit.scaleDown,
+                        alignment: Alignment.centerLeft,
+                        child: Text(
+                          greeting,
+                          style: greetingStyle,
+                          maxLines: 1,
+                          softWrap: false,
+                        ),
+                      ),
                     ),
-                  ),
+                    if (xpState != null) ...[
+                      SizedBox(width: spacing.md),
+                      Container(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: spacing.md,
+                          vertical: spacing.xs,
+                        ),
+                        decoration: BoxDecoration(
+                          color: colors.surfaceHigh,
+                          borderRadius: BorderRadius.circular(
+                            components.buttonRadius,
+                          ),
+                          border: Border.all(color: colors.border),
+                        ),
+                        child: Text(
+                          'Lv ${xpState.currentLevel}',
+                          style: typography.labelMedium.copyWith(
+                            color: colors.textPrimary,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ],
                 ),
                 SizedBox(height: spacing.xl),
                 recommendationCard,

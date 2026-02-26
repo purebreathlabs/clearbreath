@@ -11,6 +11,7 @@ import (
 	"github.com/clearbreath/server/internal/clock"
 	"github.com/clearbreath/server/internal/repository"
 	"github.com/clearbreath/server/internal/service/stats"
+	"github.com/clearbreath/server/internal/service/xp"
 	"github.com/clearbreath/server/internal/technique"
 )
 
@@ -18,6 +19,7 @@ func TestNewServiceValidation(t *testing.T) {
 	store := &repository.Store{}
 	reg := &technique.Registry{}
 	statsSvc := &stats.Service{}
+	xpSvc := xp.NewService(nil, nil)
 	clk := clock.RealClock{}
 
 	tests := []struct {
@@ -25,18 +27,20 @@ func TestNewServiceValidation(t *testing.T) {
 		store   *repository.Store
 		reg     *technique.Registry
 		stats   *stats.Service
+		xpSvc   *xp.Service
 		clock   clock.Clock
 		wantErr string
 	}{
-		{name: "missing store", store: nil, reg: reg, stats: statsSvc, clock: clk, wantErr: "store is required"},
-		{name: "missing registry", store: store, reg: nil, stats: statsSvc, clock: clk, wantErr: "registry is required"},
-		{name: "missing stats", store: store, reg: reg, stats: nil, clock: clk, wantErr: "stats service is required"},
-		{name: "missing clock", store: store, reg: reg, stats: statsSvc, clock: nil, wantErr: "clock is required"},
+		{name: "missing store", store: nil, reg: reg, stats: statsSvc, xpSvc: xpSvc, clock: clk, wantErr: "store is required"},
+		{name: "missing registry", store: store, reg: nil, stats: statsSvc, xpSvc: xpSvc, clock: clk, wantErr: "registry is required"},
+		{name: "missing stats", store: store, reg: reg, stats: nil, xpSvc: xpSvc, clock: clk, wantErr: "stats service is required"},
+		{name: "missing xp", store: store, reg: reg, stats: statsSvc, xpSvc: nil, clock: clk, wantErr: "xp service is required"},
+		{name: "missing clock", store: store, reg: reg, stats: statsSvc, xpSvc: xpSvc, clock: nil, wantErr: "clock is required"},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			_, err := NewService(tt.store, tt.reg, tt.stats, tt.clock)
+			_, err := NewService(tt.store, tt.reg, tt.stats, tt.xpSvc, tt.clock)
 			if err == nil {
 				t.Fatalf("expected error")
 			}

@@ -62,8 +62,13 @@ void main() {
     "minutes_all_time": 5,
     "sessions_all_time": 1,
     "minutes_by_technique": {"box": 5},
-    "updated_at_utc": "2026-02-22T10:06:00Z"
-  }
+    "updated_at_utc": "2026-02-22T10:06:00Z",
+    "total_xp": 50,
+    "current_level": 1
+  },
+  "xp_awards": [],
+  "total_xp": 50,
+  "current_level": 1
 }
 ''',
         200,

@@ -8,12 +8,10 @@ import '../domain/onboarding_gate.dart';
 import '../domain/onboarding_controller.dart';
 import '../domain/onboarding_answers.dart';
 import 'steps/display_name_step.dart';
-import 'steps/experience_step.dart';
 import 'steps/haptics_step.dart';
 import 'steps/practice_window_step.dart';
 import 'steps/primary_goal_step.dart';
 import 'steps/reminder_time_step.dart';
-import 'steps/session_length_step.dart';
 import '../../../shared/widgets/brand_mark.dart';
 
 class OnboardingScreen extends ConsumerStatefulWidget {
@@ -26,7 +24,7 @@ class OnboardingScreen extends ConsumerStatefulWidget {
 }
 
 class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
-  static const int _hapticsStepIndex = 4;
+  static const int _hapticsStepIndex = 2;
 
   late final PageController _pageController;
   bool _saving = false;
@@ -112,12 +110,6 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                   onPageChanged: _handlePageChanged,
                   children: [
                     step(
-                      ExperienceStep(
-                        value: state.answers.experienceLevel,
-                        onChanged: controller.setExperienceLevel,
-                      ),
-                    ),
-                    step(
                       PrimaryGoalStep(
                         values: state.answers.primaryGoals,
                         onToggle: controller.togglePrimaryGoal,
@@ -127,12 +119,6 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                       PracticeWindowStep(
                         values: state.answers.practiceWindows,
                         onToggle: controller.togglePracticeWindow,
-                      ),
-                    ),
-                    step(
-                      SessionLengthStep(
-                        valueMinutes: state.answers.sessionLengthMinutes,
-                        onChanged: controller.setSessionLengthMinutes,
                       ),
                     ),
                     step(

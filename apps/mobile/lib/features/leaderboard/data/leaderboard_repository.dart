@@ -53,10 +53,15 @@ class LeaderboardListResult {
 
 @immutable
 class LeaderboardSelfResult {
-  const LeaderboardSelfResult({required this.rank, required this.metricValue});
+  const LeaderboardSelfResult({
+    required this.rank,
+    required this.totalXp,
+    required this.level,
+  });
 
   final int? rank;
-  final int metricValue;
+  final int totalXp;
+  final int level;
 }
 
 class LeaderboardRepository {
@@ -149,7 +154,8 @@ class LeaderboardRepository {
 
     return LeaderboardSelfResult(
       rank: parsed.user.rank,
-      metricValue: parsed.user.metricValue,
+      totalXp: parsed.user.totalXp,
+      level: parsed.user.level,
     );
   }
 
@@ -160,7 +166,8 @@ class LeaderboardRepository {
             'rank': row.rank,
             'display_name_or_initials': row.displayNameOrInitials,
             'avatar_seed': row.avatarSeed,
-            'metric_value': row.metricValue,
+            'total_xp': row.totalXp,
+            'level': row.level,
             'user_id': row.userId,
           },
         )
@@ -172,7 +179,8 @@ class LeaderboardRepository {
       rank: row.rank,
       displayNameOrInitials: row.displayNameOrInitials,
       avatarSeed: row.avatarSeed,
-      metricValue: row.metricValue,
+      totalXp: row.totalXp,
+      level: row.level,
       userId: row.userId,
     );
   }

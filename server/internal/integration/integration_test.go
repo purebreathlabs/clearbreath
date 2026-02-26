@@ -26,6 +26,7 @@ import (
 	sessionsvc "github.com/clearbreath/server/internal/service/session"
 	statssvc "github.com/clearbreath/server/internal/service/stats"
 	usersvc "github.com/clearbreath/server/internal/service/user"
+	xpsvc "github.com/clearbreath/server/internal/service/xp"
 	"github.com/clearbreath/server/internal/technique"
 )
 
@@ -105,7 +106,9 @@ func TestEndToEndDevAuthSessionsLeaderboard(t *testing.T) {
 		t.Fatalf("stats service: %v", err)
 	}
 
-	sessionService, err := sessionsvc.NewService(store, reg, statsService, clk)
+	xpService := xpsvc.NewService(store, clk)
+
+	sessionService, err := sessionsvc.NewService(store, reg, statsService, xpService, clk)
 	if err != nil {
 		t.Fatalf("session service: %v", err)
 	}
@@ -204,7 +207,7 @@ func TestEndToEndDevAuthSessionsLeaderboard(t *testing.T) {
 		t.Fatalf("duplicate: got %d, want 1", dup.DuplicateCount)
 	}
 
-	leaderboardService, err := lbsvc.NewService(store, rdb, clk, cfg.LeaderboardDailyCapMin)
+	leaderboardService, err := lbsvc.NewService(store, rdb, clk, xpService)
 	if err != nil {
 		t.Fatalf("leaderboard service: %v", err)
 	}
@@ -220,8 +223,8 @@ func TestEndToEndDevAuthSessionsLeaderboard(t *testing.T) {
 	if self.User == nil || self.User.Rank == nil {
 		t.Fatalf("expected rank")
 	}
-	if self.User.MetricValue <= 0 {
-		t.Fatalf("expected metric >0")
+	if self.User.TotalXP <= 0 {
+		t.Fatalf("expected total_xp >0")
 	}
 }
 

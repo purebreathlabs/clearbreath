@@ -31,7 +31,6 @@ void main() {
       final c1 = container(dbFile);
 
       final controller1 = c1.read(settingsControllerProvider.notifier);
-      await controller1.setSessionLength(10);
       await controller1.setHapticsEnabled(false);
       await controller1.setKeepScreenAwake(false);
       await controller1.setReminderEnabled(false);
@@ -44,8 +43,7 @@ void main() {
         db1.preferences,
       )..where((row) => row.id.equals(1))).getSingleOrNull();
       expect(row1, isNotNull);
-      expect(row1!.sessionLengthMinutes, equals(10));
-      expect(row1.hapticsEnabled, isFalse);
+      expect(row1!.hapticsEnabled, isFalse);
       expect(row1.keepScreenAwake, isFalse);
       expect(row1.reminderEnabled, isFalse);
       expect(row1.reminderTimeMinutes, equals(8 * 60 + 30));
@@ -70,8 +68,7 @@ void main() {
         return completer.future.timeout(const Duration(seconds: 2));
       }
 
-      final state2 = await waitForState((s) => s.sessionLengthMinutes == 10);
-      expect(state2.sessionLengthMinutes, equals(10));
+      final state2 = await waitForState((s) => s.hapticsEnabled == false);
       expect(state2.hapticsEnabled, isFalse);
       expect(state2.keepScreenAwake, isFalse);
       expect(state2.reminderEnabled, isFalse);

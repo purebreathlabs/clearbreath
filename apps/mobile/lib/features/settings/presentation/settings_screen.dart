@@ -8,7 +8,6 @@ import '../../../core/theme/theme_extensions.dart';
 import '../../auth/domain/auth_state.dart';
 import '../../auth/domain/auth_state_provider.dart';
 import '../../notifications/domain/notification_service.dart';
-import '../../../shared/widgets/selection_pill.dart';
 import '../domain/settings_controller.dart';
 
 final packageInfoProvider = FutureProvider<PackageInfo>((ref) async {
@@ -65,57 +64,6 @@ class SettingsScreen extends ConsumerWidget {
       await controller.setReminderTime(minutes);
     }
 
-    Future<void> pickSessionLength() async {
-      final selected = await showModalBottomSheet<int>(
-        context: context,
-        builder: (context) {
-          return SafeArea(
-            child: Padding(
-              padding: EdgeInsets.all(spacing.lg),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  Text(
-                    'Session length',
-                    style: typography.titleLarge.copyWith(
-                      color: colors.textPrimary,
-                    ),
-                  ),
-                  SizedBox(height: spacing.md),
-                  LayoutBuilder(
-                    builder: (context, constraints) {
-                      final tileWidth =
-                          (constraints.maxWidth - spacing.md) / 2.0;
-                      return Wrap(
-                        spacing: spacing.md,
-                        runSpacing: spacing.md,
-                        children: [
-                          for (final minutes in const [2, 5, 10, 20])
-                            SizedBox(
-                              width: tileWidth,
-                              child: SelectionPill(
-                                label: '$minutes min',
-                                selected: minutes == state.sessionLengthMinutes,
-                                onTap: () => Navigator.of(context).pop(minutes),
-                              ),
-                            ),
-                        ],
-                      );
-                    },
-                  ),
-                ],
-              ),
-            ),
-          );
-        },
-      );
-      if (selected == null) {
-        return;
-      }
-      await controller.setSessionLength(selected);
-    }
-
     Widget section(String title, List<Widget> children) {
       return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -150,13 +98,6 @@ class SettingsScreen extends ConsumerWidget {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 section('Practice', [
-                  ListTile(
-                    title: const Text('Session length'),
-                    subtitle: Text('${state.sessionLengthMinutes} minutes'),
-                    trailing: const Icon(Icons.chevron_right_rounded),
-                    onTap: pickSessionLength,
-                  ),
-                  divider(),
                   SwitchListTile(
                     title: const Text('Haptics'),
                     subtitle: const Text('Vibration on phase changes.'),

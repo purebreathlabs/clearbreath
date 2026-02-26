@@ -7,23 +7,25 @@ void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
   test(
-    'all goal/daypart/experience combos produce a valid recommendation',
+    'all goal/daypart/preset combos produce a valid recommendation',
     () async {
       final techniques = await TechniqueRepository().all();
       final engine = RecommendationEngine();
 
+      const presetIds = ['beginner', 'intermediate', 'advanced'];
+
       for (final goal in PrimaryGoal.values) {
         for (final dayPart in DayPart.values) {
-          for (final experience in ExperienceLevel.values) {
+          for (final presetId in presetIds) {
             final rec = await engine.recommend(
               goal: goal,
               dayPart: dayPart,
-              experienceLevel: experience,
+              presetId: presetId,
               techniques: techniques,
             );
 
             expect(rec.technique.id, equals(rec.techniqueId));
-            expect(rec.presetId, equals(experience.name));
+            expect(rec.presetId, equals(presetId));
             expect(rec.rationale, isNotEmpty);
           }
         }
