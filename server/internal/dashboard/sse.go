@@ -3,6 +3,7 @@ package dashboard
 import (
 	"bytes"
 	"fmt"
+	"html"
 	"net/http"
 	"time"
 
@@ -77,6 +78,12 @@ func (d *Dashboard) renderRequestSSE(buf *bytes.Buffer, log *logcollector.Reques
 	statusClass := statusBadgeClass(log.StatusCode)
 	methodClass := methodBadgeClass(log.Method)
 
+	method := html.EscapeString(log.Method)
+	pathTitle := html.EscapeString(log.Path)
+	pathDisplay := html.EscapeString(truncate(log.Path, 60))
+	ipAddress := html.EscapeString(log.IPAddress)
+	requestID := html.EscapeString(log.RequestID[:min(16, len(log.RequestID))])
+
 	fmt.Fprintf(buf, `<tr class="border-b border-zinc-700/50 hover:bg-zinc-800/50 transition-colors animate-fade-in">`+
 		`<td class="px-3 py-2 text-xs text-zinc-400 whitespace-nowrap">%s</td>`+
 		`<td class="px-3 py-2"><span class="px-1.5 py-0.5 text-xs font-medium rounded %s">%s</span></td>`+
@@ -88,18 +95,25 @@ func (d *Dashboard) renderRequestSSE(buf *bytes.Buffer, log *logcollector.Reques
 		`<td class="px-3 py-2 text-xs text-zinc-500 font-mono">%s</td>`+
 		`</tr>`,
 		log.Timestamp.Format("15:04:05.000"),
-		methodClass, log.Method,
-		log.Path, truncate(log.Path, 60),
+		methodClass, method,
+		pathTitle, pathDisplay,
 		statusClass, log.StatusCode,
 		log.DurationMs,
-		log.IPAddress,
-		log.RequestID[:min(16, len(log.RequestID))],
-		userID,
+		ipAddress,
+		requestID,
+		html.EscapeString(userID),
 	)
 }
 
 func (d *Dashboard) renderEventSSE(buf *bytes.Buffer, evt *logcollector.EventLog) {
 	levelClass := levelBadgeClass(evt.Level)
+
+	level := html.EscapeString(evt.Level)
+	eventType := html.EscapeString(evt.EventType)
+	messageTitle := html.EscapeString(evt.Message)
+	messageDisplay := html.EscapeString(truncate(evt.Message, 80))
+	ipAddress := html.EscapeString(evt.IPAddress)
+	provider := html.EscapeString(evt.Provider)
 
 	fmt.Fprintf(buf, `<tr class="border-b border-zinc-700/50 hover:bg-zinc-800/50 transition-colors animate-fade-in">`+
 		`<td class="px-3 py-2 text-xs text-zinc-400 whitespace-nowrap">%s</td>`+
@@ -110,11 +124,11 @@ func (d *Dashboard) renderEventSSE(buf *bytes.Buffer, evt *logcollector.EventLog
 		`<td class="px-3 py-2 text-xs text-zinc-500 font-mono">%s</td>`+
 		`</tr>`,
 		evt.Timestamp.Format("15:04:05.000"),
-		levelClass, evt.Level,
-		evt.EventType,
-		evt.Message, truncate(evt.Message, 80),
-		evt.IPAddress,
-		evt.Provider,
+		levelClass, level,
+		eventType,
+		messageTitle, messageDisplay,
+		ipAddress,
+		provider,
 	)
 }
 

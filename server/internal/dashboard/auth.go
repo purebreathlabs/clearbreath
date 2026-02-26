@@ -94,12 +94,13 @@ func (d *Dashboard) validateSession(r *http.Request) (*sessionPayload, bool) {
 }
 
 func (d *Dashboard) clearSession(w http.ResponseWriter) {
+	secure := d.env != "development"
 	http.SetCookie(w, &http.Cookie{
 		Name:     sessionCookieName,
 		Value:    "",
 		Path:     "/dashboard",
 		HttpOnly: true,
-		Secure:   true,
+		Secure:   secure,
 		SameSite: http.SameSiteStrictMode,
 		MaxAge:   -1,
 	})
