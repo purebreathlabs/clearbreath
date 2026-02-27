@@ -74,3 +74,19 @@ jobs:
           DEV_AUTH_ENABLED: "true"
           DEV_AUTH_SECRET: dev_secret_change_me
         run: make server-test-integration
+
+  deploy:
+    if: github.event_name == 'push'
+    needs: [ci, integration]
+    runs-on: ubuntu-latest
+    concurrency:
+      group: production-deploy
+      cancel-in-progress: false
+    steps:
+      - name: Deploy to production
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.DEPLOY_SSH_KEY }}" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          ssh-keyscan -H "${{ secrets.DEPLOY_HOST }}" >> ~/.ssh/known_hosts
+          ssh -i ~/.ssh/id_ed25519 "${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }}" "bash /home/rahul/production/clearbreath/deploy/cd-deploy.sh"
