@@ -51,6 +51,12 @@ class Preferences extends Table {
 
   TextColumn get guestUsername => text().withDefault(const Constant(''))();
 
+  DateTimeColumn get notificationPromptSnoozedUntilUtc =>
+      dateTime().nullable()();
+
+  IntColumn get notificationPromptSnoozedUntilSessions =>
+      integer().nullable()();
+
   @override
   Set<Column> get primaryKey => {id};
 }

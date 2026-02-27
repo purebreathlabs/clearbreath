@@ -35,6 +35,15 @@ class SessionRepository {
         );
   }
 
+  Future<int> completedSessionsCount() async {
+    final count = _db.sessions.clientSessionId.count();
+    final query = _db.selectOnly(_db.sessions)
+      ..addColumns([count])
+      ..where(_db.sessions.endedEarly.equals(false));
+    final row = await query.getSingle();
+    return row.read(count) ?? 0;
+  }
+
   Future<List<LocalSession>> all() async {
     final rows =
         await (_db.select(_db.sessions)..orderBy([

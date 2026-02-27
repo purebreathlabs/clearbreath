@@ -243,6 +243,28 @@ class $PreferencesTable extends Preferences
     requiredDuringInsert: false,
     defaultValue: const Constant(''),
   );
+  static const VerificationMeta _notificationPromptSnoozedUntilUtcMeta =
+      const VerificationMeta('notificationPromptSnoozedUntilUtc');
+  @override
+  late final GeneratedColumn<DateTime> notificationPromptSnoozedUntilUtc =
+      GeneratedColumn<DateTime>(
+        'notification_prompt_snoozed_until_utc',
+        aliasedName,
+        true,
+        type: DriftSqlType.dateTime,
+        requiredDuringInsert: false,
+      );
+  static const VerificationMeta _notificationPromptSnoozedUntilSessionsMeta =
+      const VerificationMeta('notificationPromptSnoozedUntilSessions');
+  @override
+  late final GeneratedColumn<int> notificationPromptSnoozedUntilSessions =
+      GeneratedColumn<int>(
+        'notification_prompt_snoozed_until_sessions',
+        aliasedName,
+        true,
+        type: DriftSqlType.int,
+        requiredDuringInsert: false,
+      );
   @override
   List<GeneratedColumn> get $columns => [
     id,
@@ -263,6 +285,8 @@ class $PreferencesTable extends Preferences
     notificationPermissionAsked,
     displayName,
     guestUsername,
+    notificationPromptSnoozedUntilUtc,
+    notificationPromptSnoozedUntilSessions,
   ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -432,6 +456,24 @@ class $PreferencesTable extends Preferences
         ),
       );
     }
+    if (data.containsKey('notification_prompt_snoozed_until_utc')) {
+      context.handle(
+        _notificationPromptSnoozedUntilUtcMeta,
+        notificationPromptSnoozedUntilUtc.isAcceptableOrUnknown(
+          data['notification_prompt_snoozed_until_utc']!,
+          _notificationPromptSnoozedUntilUtcMeta,
+        ),
+      );
+    }
+    if (data.containsKey('notification_prompt_snoozed_until_sessions')) {
+      context.handle(
+        _notificationPromptSnoozedUntilSessionsMeta,
+        notificationPromptSnoozedUntilSessions.isAcceptableOrUnknown(
+          data['notification_prompt_snoozed_until_sessions']!,
+          _notificationPromptSnoozedUntilSessionsMeta,
+        ),
+      );
+    }
     return context;
   }
 
@@ -513,6 +555,14 @@ class $PreferencesTable extends Preferences
         DriftSqlType.string,
         data['${effectivePrefix}guest_username'],
       )!,
+      notificationPromptSnoozedUntilUtc: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}notification_prompt_snoozed_until_utc'],
+      ),
+      notificationPromptSnoozedUntilSessions: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}notification_prompt_snoozed_until_sessions'],
+      ),
     );
   }
 
@@ -541,6 +591,8 @@ class Preference extends DataClass implements Insertable<Preference> {
   final bool notificationPermissionAsked;
   final String displayName;
   final String guestUsername;
+  final DateTime? notificationPromptSnoozedUntilUtc;
+  final int? notificationPromptSnoozedUntilSessions;
   const Preference({
     required this.id,
     required this.introComplete,
@@ -560,6 +612,8 @@ class Preference extends DataClass implements Insertable<Preference> {
     required this.notificationPermissionAsked,
     required this.displayName,
     required this.guestUsername,
+    this.notificationPromptSnoozedUntilUtc,
+    this.notificationPromptSnoozedUntilSessions,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -584,6 +638,16 @@ class Preference extends DataClass implements Insertable<Preference> {
     );
     map['display_name'] = Variable<String>(displayName);
     map['guest_username'] = Variable<String>(guestUsername);
+    if (!nullToAbsent || notificationPromptSnoozedUntilUtc != null) {
+      map['notification_prompt_snoozed_until_utc'] = Variable<DateTime>(
+        notificationPromptSnoozedUntilUtc,
+      );
+    }
+    if (!nullToAbsent || notificationPromptSnoozedUntilSessions != null) {
+      map['notification_prompt_snoozed_until_sessions'] = Variable<int>(
+        notificationPromptSnoozedUntilSessions,
+      );
+    }
     return map;
   }
 
@@ -607,6 +671,14 @@ class Preference extends DataClass implements Insertable<Preference> {
       notificationPermissionAsked: Value(notificationPermissionAsked),
       displayName: Value(displayName),
       guestUsername: Value(guestUsername),
+      notificationPromptSnoozedUntilUtc:
+          notificationPromptSnoozedUntilUtc == null && nullToAbsent
+          ? const Value.absent()
+          : Value(notificationPromptSnoozedUntilUtc),
+      notificationPromptSnoozedUntilSessions:
+          notificationPromptSnoozedUntilSessions == null && nullToAbsent
+          ? const Value.absent()
+          : Value(notificationPromptSnoozedUntilSessions),
     );
   }
 
@@ -646,6 +718,12 @@ class Preference extends DataClass implements Insertable<Preference> {
       ),
       displayName: serializer.fromJson<String>(json['displayName']),
       guestUsername: serializer.fromJson<String>(json['guestUsername']),
+      notificationPromptSnoozedUntilUtc: serializer.fromJson<DateTime?>(
+        json['notificationPromptSnoozedUntilUtc'],
+      ),
+      notificationPromptSnoozedUntilSessions: serializer.fromJson<int?>(
+        json['notificationPromptSnoozedUntilSessions'],
+      ),
     );
   }
   @override
@@ -672,6 +750,12 @@ class Preference extends DataClass implements Insertable<Preference> {
       ),
       'displayName': serializer.toJson<String>(displayName),
       'guestUsername': serializer.toJson<String>(guestUsername),
+      'notificationPromptSnoozedUntilUtc': serializer.toJson<DateTime?>(
+        notificationPromptSnoozedUntilUtc,
+      ),
+      'notificationPromptSnoozedUntilSessions': serializer.toJson<int?>(
+        notificationPromptSnoozedUntilSessions,
+      ),
     };
   }
 
@@ -694,6 +778,8 @@ class Preference extends DataClass implements Insertable<Preference> {
     bool? notificationPermissionAsked,
     String? displayName,
     String? guestUsername,
+    Value<DateTime?> notificationPromptSnoozedUntilUtc = const Value.absent(),
+    Value<int?> notificationPromptSnoozedUntilSessions = const Value.absent(),
   }) => Preference(
     id: id ?? this.id,
     introComplete: introComplete ?? this.introComplete,
@@ -714,6 +800,13 @@ class Preference extends DataClass implements Insertable<Preference> {
         notificationPermissionAsked ?? this.notificationPermissionAsked,
     displayName: displayName ?? this.displayName,
     guestUsername: guestUsername ?? this.guestUsername,
+    notificationPromptSnoozedUntilUtc: notificationPromptSnoozedUntilUtc.present
+        ? notificationPromptSnoozedUntilUtc.value
+        : this.notificationPromptSnoozedUntilUtc,
+    notificationPromptSnoozedUntilSessions:
+        notificationPromptSnoozedUntilSessions.present
+        ? notificationPromptSnoozedUntilSessions.value
+        : this.notificationPromptSnoozedUntilSessions,
   );
   Preference copyWithCompanion(PreferencesCompanion data) {
     return Preference(
@@ -769,6 +862,14 @@ class Preference extends DataClass implements Insertable<Preference> {
       guestUsername: data.guestUsername.present
           ? data.guestUsername.value
           : this.guestUsername,
+      notificationPromptSnoozedUntilUtc:
+          data.notificationPromptSnoozedUntilUtc.present
+          ? data.notificationPromptSnoozedUntilUtc.value
+          : this.notificationPromptSnoozedUntilUtc,
+      notificationPromptSnoozedUntilSessions:
+          data.notificationPromptSnoozedUntilSessions.present
+          ? data.notificationPromptSnoozedUntilSessions.value
+          : this.notificationPromptSnoozedUntilSessions,
     );
   }
 
@@ -792,7 +893,13 @@ class Preference extends DataClass implements Insertable<Preference> {
           ..write('firstSessionCompleted: $firstSessionCompleted, ')
           ..write('notificationPermissionAsked: $notificationPermissionAsked, ')
           ..write('displayName: $displayName, ')
-          ..write('guestUsername: $guestUsername')
+          ..write('guestUsername: $guestUsername, ')
+          ..write(
+            'notificationPromptSnoozedUntilUtc: $notificationPromptSnoozedUntilUtc, ',
+          )
+          ..write(
+            'notificationPromptSnoozedUntilSessions: $notificationPromptSnoozedUntilSessions',
+          )
           ..write(')'))
         .toString();
   }
@@ -817,6 +924,8 @@ class Preference extends DataClass implements Insertable<Preference> {
     notificationPermissionAsked,
     displayName,
     guestUsername,
+    notificationPromptSnoozedUntilUtc,
+    notificationPromptSnoozedUntilSessions,
   );
   @override
   bool operator ==(Object other) =>
@@ -840,7 +949,11 @@ class Preference extends DataClass implements Insertable<Preference> {
           other.notificationPermissionAsked ==
               this.notificationPermissionAsked &&
           other.displayName == this.displayName &&
-          other.guestUsername == this.guestUsername);
+          other.guestUsername == this.guestUsername &&
+          other.notificationPromptSnoozedUntilUtc ==
+              this.notificationPromptSnoozedUntilUtc &&
+          other.notificationPromptSnoozedUntilSessions ==
+              this.notificationPromptSnoozedUntilSessions);
 }
 
 class PreferencesCompanion extends UpdateCompanion<Preference> {
@@ -862,6 +975,8 @@ class PreferencesCompanion extends UpdateCompanion<Preference> {
   final Value<bool> notificationPermissionAsked;
   final Value<String> displayName;
   final Value<String> guestUsername;
+  final Value<DateTime?> notificationPromptSnoozedUntilUtc;
+  final Value<int?> notificationPromptSnoozedUntilSessions;
   const PreferencesCompanion({
     this.id = const Value.absent(),
     this.introComplete = const Value.absent(),
@@ -881,6 +996,8 @@ class PreferencesCompanion extends UpdateCompanion<Preference> {
     this.notificationPermissionAsked = const Value.absent(),
     this.displayName = const Value.absent(),
     this.guestUsername = const Value.absent(),
+    this.notificationPromptSnoozedUntilUtc = const Value.absent(),
+    this.notificationPromptSnoozedUntilSessions = const Value.absent(),
   });
   PreferencesCompanion.insert({
     this.id = const Value.absent(),
@@ -901,6 +1018,8 @@ class PreferencesCompanion extends UpdateCompanion<Preference> {
     this.notificationPermissionAsked = const Value.absent(),
     this.displayName = const Value.absent(),
     this.guestUsername = const Value.absent(),
+    this.notificationPromptSnoozedUntilUtc = const Value.absent(),
+    this.notificationPromptSnoozedUntilSessions = const Value.absent(),
   });
   static Insertable<Preference> custom({
     Expression<int>? id,
@@ -921,6 +1040,8 @@ class PreferencesCompanion extends UpdateCompanion<Preference> {
     Expression<bool>? notificationPermissionAsked,
     Expression<String>? displayName,
     Expression<String>? guestUsername,
+    Expression<DateTime>? notificationPromptSnoozedUntilUtc,
+    Expression<int>? notificationPromptSnoozedUntilSessions,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
@@ -947,6 +1068,12 @@ class PreferencesCompanion extends UpdateCompanion<Preference> {
         'notification_permission_asked': notificationPermissionAsked,
       if (displayName != null) 'display_name': displayName,
       if (guestUsername != null) 'guest_username': guestUsername,
+      if (notificationPromptSnoozedUntilUtc != null)
+        'notification_prompt_snoozed_until_utc':
+            notificationPromptSnoozedUntilUtc,
+      if (notificationPromptSnoozedUntilSessions != null)
+        'notification_prompt_snoozed_until_sessions':
+            notificationPromptSnoozedUntilSessions,
     });
   }
 
@@ -969,6 +1096,8 @@ class PreferencesCompanion extends UpdateCompanion<Preference> {
     Value<bool>? notificationPermissionAsked,
     Value<String>? displayName,
     Value<String>? guestUsername,
+    Value<DateTime?>? notificationPromptSnoozedUntilUtc,
+    Value<int?>? notificationPromptSnoozedUntilSessions,
   }) {
     return PreferencesCompanion(
       id: id ?? this.id,
@@ -991,6 +1120,12 @@ class PreferencesCompanion extends UpdateCompanion<Preference> {
           notificationPermissionAsked ?? this.notificationPermissionAsked,
       displayName: displayName ?? this.displayName,
       guestUsername: guestUsername ?? this.guestUsername,
+      notificationPromptSnoozedUntilUtc:
+          notificationPromptSnoozedUntilUtc ??
+          this.notificationPromptSnoozedUntilUtc,
+      notificationPromptSnoozedUntilSessions:
+          notificationPromptSnoozedUntilSessions ??
+          this.notificationPromptSnoozedUntilSessions,
     );
   }
 
@@ -1059,6 +1194,16 @@ class PreferencesCompanion extends UpdateCompanion<Preference> {
     if (guestUsername.present) {
       map['guest_username'] = Variable<String>(guestUsername.value);
     }
+    if (notificationPromptSnoozedUntilUtc.present) {
+      map['notification_prompt_snoozed_until_utc'] = Variable<DateTime>(
+        notificationPromptSnoozedUntilUtc.value,
+      );
+    }
+    if (notificationPromptSnoozedUntilSessions.present) {
+      map['notification_prompt_snoozed_until_sessions'] = Variable<int>(
+        notificationPromptSnoozedUntilSessions.value,
+      );
+    }
     return map;
   }
 
@@ -1082,7 +1227,13 @@ class PreferencesCompanion extends UpdateCompanion<Preference> {
           ..write('firstSessionCompleted: $firstSessionCompleted, ')
           ..write('notificationPermissionAsked: $notificationPermissionAsked, ')
           ..write('displayName: $displayName, ')
-          ..write('guestUsername: $guestUsername')
+          ..write('guestUsername: $guestUsername, ')
+          ..write(
+            'notificationPromptSnoozedUntilUtc: $notificationPromptSnoozedUntilUtc, ',
+          )
+          ..write(
+            'notificationPromptSnoozedUntilSessions: $notificationPromptSnoozedUntilSessions',
+          )
           ..write(')'))
         .toString();
   }
@@ -3997,6 +4148,8 @@ typedef $$PreferencesTableCreateCompanionBuilder =
       Value<bool> notificationPermissionAsked,
       Value<String> displayName,
       Value<String> guestUsername,
+      Value<DateTime?> notificationPromptSnoozedUntilUtc,
+      Value<int?> notificationPromptSnoozedUntilSessions,
     });
 typedef $$PreferencesTableUpdateCompanionBuilder =
     PreferencesCompanion Function({
@@ -4018,6 +4171,8 @@ typedef $$PreferencesTableUpdateCompanionBuilder =
       Value<bool> notificationPermissionAsked,
       Value<String> displayName,
       Value<String> guestUsername,
+      Value<DateTime?> notificationPromptSnoozedUntilUtc,
+      Value<int?> notificationPromptSnoozedUntilSessions,
     });
 
 class $$PreferencesTableFilterComposer
@@ -4118,6 +4273,18 @@ class $$PreferencesTableFilterComposer
     column: $table.guestUsername,
     builder: (column) => ColumnFilters(column),
   );
+
+  ColumnFilters<DateTime> get notificationPromptSnoozedUntilUtc =>
+      $composableBuilder(
+        column: $table.notificationPromptSnoozedUntilUtc,
+        builder: (column) => ColumnFilters(column),
+      );
+
+  ColumnFilters<int> get notificationPromptSnoozedUntilSessions =>
+      $composableBuilder(
+        column: $table.notificationPromptSnoozedUntilSessions,
+        builder: (column) => ColumnFilters(column),
+      );
 }
 
 class $$PreferencesTableOrderingComposer
@@ -4218,6 +4385,18 @@ class $$PreferencesTableOrderingComposer
     column: $table.guestUsername,
     builder: (column) => ColumnOrderings(column),
   );
+
+  ColumnOrderings<DateTime> get notificationPromptSnoozedUntilUtc =>
+      $composableBuilder(
+        column: $table.notificationPromptSnoozedUntilUtc,
+        builder: (column) => ColumnOrderings(column),
+      );
+
+  ColumnOrderings<int> get notificationPromptSnoozedUntilSessions =>
+      $composableBuilder(
+        column: $table.notificationPromptSnoozedUntilSessions,
+        builder: (column) => ColumnOrderings(column),
+      );
 }
 
 class $$PreferencesTableAnnotationComposer
@@ -4316,6 +4495,18 @@ class $$PreferencesTableAnnotationComposer
     column: $table.guestUsername,
     builder: (column) => column,
   );
+
+  GeneratedColumn<DateTime> get notificationPromptSnoozedUntilUtc =>
+      $composableBuilder(
+        column: $table.notificationPromptSnoozedUntilUtc,
+        builder: (column) => column,
+      );
+
+  GeneratedColumn<int> get notificationPromptSnoozedUntilSessions =>
+      $composableBuilder(
+        column: $table.notificationPromptSnoozedUntilSessions,
+        builder: (column) => column,
+      );
 }
 
 class $$PreferencesTableTableManager
@@ -4367,6 +4558,10 @@ class $$PreferencesTableTableManager
                 Value<bool> notificationPermissionAsked = const Value.absent(),
                 Value<String> displayName = const Value.absent(),
                 Value<String> guestUsername = const Value.absent(),
+                Value<DateTime?> notificationPromptSnoozedUntilUtc =
+                    const Value.absent(),
+                Value<int?> notificationPromptSnoozedUntilSessions =
+                    const Value.absent(),
               }) => PreferencesCompanion(
                 id: id,
                 introComplete: introComplete,
@@ -4386,6 +4581,10 @@ class $$PreferencesTableTableManager
                 notificationPermissionAsked: notificationPermissionAsked,
                 displayName: displayName,
                 guestUsername: guestUsername,
+                notificationPromptSnoozedUntilUtc:
+                    notificationPromptSnoozedUntilUtc,
+                notificationPromptSnoozedUntilSessions:
+                    notificationPromptSnoozedUntilSessions,
               ),
           createCompanionCallback:
               ({
@@ -4407,6 +4606,10 @@ class $$PreferencesTableTableManager
                 Value<bool> notificationPermissionAsked = const Value.absent(),
                 Value<String> displayName = const Value.absent(),
                 Value<String> guestUsername = const Value.absent(),
+                Value<DateTime?> notificationPromptSnoozedUntilUtc =
+                    const Value.absent(),
+                Value<int?> notificationPromptSnoozedUntilSessions =
+                    const Value.absent(),
               }) => PreferencesCompanion.insert(
                 id: id,
                 introComplete: introComplete,
@@ -4426,6 +4629,10 @@ class $$PreferencesTableTableManager
                 notificationPermissionAsked: notificationPermissionAsked,
                 displayName: displayName,
                 guestUsername: guestUsername,
+                notificationPromptSnoozedUntilUtc:
+                    notificationPromptSnoozedUntilUtc,
+                notificationPromptSnoozedUntilSessions:
+                    notificationPromptSnoozedUntilSessions,
               ),
           withReferenceMapper: (p0) => p0
               .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
