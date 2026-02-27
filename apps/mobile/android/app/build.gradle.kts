@@ -37,6 +37,12 @@ android {
     }
 
     signingConfigs {
+        getByName("debug") {
+            storeFile = file("debug.keystore")
+            storePassword = "android"
+            keyAlias = "androiddebugkey"
+            keyPassword = "android"
+        }
         if (keyPropertiesFile.exists()) {
             create("release") {
                 keyAlias = keyProperties["keyAlias"] as String
