@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../../core/theme/theme_extensions.dart';
 import '../../../shared/utils/category_colors.dart';
 import '../../../shared/widgets/brand_mark.dart';
+import '../../../shared/widgets/server_status_dot.dart';
 import '../../onboarding/domain/onboarding_answers.dart';
 import '../../session/domain/active_session_config.dart';
 import '../../xp/domain/xp_provider.dart';
@@ -129,6 +130,7 @@ class TechniquesScreen extends ConsumerWidget {
       appBar: AppBar(
         title: const BrandMark(),
         automaticallyImplyLeading: false,
+        actions: const [ServerStatusDot()],
       ),
       body: SafeArea(
         child: Column(

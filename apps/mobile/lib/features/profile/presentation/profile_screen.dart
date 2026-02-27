@@ -6,6 +6,7 @@ import '../../../core/network/api_error.dart';
 import '../../../core/theme/theme_extensions.dart';
 import '../../../shared/providers/preferences_provider.dart';
 import '../../../shared/widgets/brand_mark.dart';
+import '../../../shared/widgets/server_status_dot.dart';
 import '../../auth/domain/auth_state.dart';
 import '../../auth/domain/auth_state_provider.dart';
 import 'widgets/level_card.dart';
@@ -101,6 +102,7 @@ class ProfileScreen extends ConsumerWidget {
       appBar: AppBar(
         title: const BrandMark(),
         automaticallyImplyLeading: false,
+        actions: const [ServerStatusDot()],
       ),
       body: SafeArea(
         child: SingleChildScrollView(
