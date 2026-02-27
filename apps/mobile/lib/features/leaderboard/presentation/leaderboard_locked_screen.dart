@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../core/theme/theme_extensions.dart';
 import '../../../shared/widgets/brand_mark.dart';
+import '../../../shared/widgets/server_status_dot.dart';
 
 class LeaderboardLockedScreen extends StatelessWidget {
   const LeaderboardLockedScreen({super.key});
@@ -17,6 +18,7 @@ class LeaderboardLockedScreen extends StatelessWidget {
       appBar: AppBar(
         title: const BrandMark(),
         automaticallyImplyLeading: false,
+        actions: const [ServerStatusDot()],
       ),
       body: SafeArea(
         child: Padding(

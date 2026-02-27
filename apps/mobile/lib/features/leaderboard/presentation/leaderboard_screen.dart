@@ -5,6 +5,7 @@ import '../../auth/domain/auth_state.dart';
 import '../../auth/domain/auth_state_provider.dart';
 import '../../../core/theme/theme_extensions.dart';
 import '../../../shared/widgets/brand_mark.dart';
+import '../../../shared/widgets/server_status_dot.dart';
 import '../domain/leaderboard_controller.dart';
 import 'widgets/leaderboard_row.dart';
 import 'widgets/self_rank_card.dart';
@@ -37,6 +38,7 @@ class _LeaderboardRestoringScreen extends StatelessWidget {
       appBar: AppBar(
         title: const BrandMark(),
         automaticallyImplyLeading: false,
+        actions: const [ServerStatusDot()],
       ),
       body: Center(
         child: Column(
@@ -152,6 +154,7 @@ class _LeaderboardSignedInScreen extends ConsumerWidget {
       appBar: AppBar(
         title: const BrandMark(),
         automaticallyImplyLeading: false,
+        actions: const [ServerStatusDot()],
       ),
       body: SafeArea(
         child: Padding(

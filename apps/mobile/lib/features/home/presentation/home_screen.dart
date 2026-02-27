@@ -16,6 +16,7 @@ import '../../techniques/presentation/widgets/safety_warning_sheet.dart';
 import '../../xp/domain/xp_provider.dart';
 import '../../../shared/providers/preferences_provider.dart';
 import '../../../shared/widgets/brand_mark.dart';
+import '../../../shared/widgets/server_status_dot.dart';
 import '../domain/recommendation_engine.dart';
 import 'widgets/compact_progress_card.dart';
 import 'widgets/favorites_row.dart';
@@ -200,6 +201,7 @@ class HomeScreen extends ConsumerWidget {
       appBar: AppBar(
         title: const BrandMark(),
         automaticallyImplyLeading: false,
+        actions: const [ServerStatusDot()],
       ),
       body: SafeArea(
         child: SingleChildScrollView(
