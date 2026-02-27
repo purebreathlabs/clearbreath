@@ -50,10 +50,8 @@ String _friendlyMessage(DioException error) {
     DioExceptionType.connectionError =>
       'Could not connect. Check your internet connection.',
     DioExceptionType.connectionTimeout ||
-    DioExceptionType.sendTimeout =>
-      'Connection timed out. Please try again.',
-    DioExceptionType.receiveTimeout =>
-      'Server took too long to respond.',
+    DioExceptionType.sendTimeout => 'Connection timed out. Please try again.',
+    DioExceptionType.receiveTimeout => 'Server took too long to respond.',
     _ => 'Network error. Please try again.',
   };
 }
