@@ -58,6 +58,7 @@ class _SessionCompletionScreenState
   Future<void> _showPermissionDialog() async {
     final spacing = Theme.of(context).extension<AppSpacingTokens>()!;
     final typography = Theme.of(context).extension<AppTypographyTokens>()!;
+    final notifications = ref.read(notificationControllerProvider.notifier);
 
     final confirmed = await showDialog<bool>(
       context: context,
@@ -94,13 +95,11 @@ class _SessionCompletionScreenState
       },
     );
 
-    if (confirmed != true || !mounted) {
-      return;
+    if (confirmed == true && mounted) {
+      await notifications.requestPermissionFromPrompt();
+    } else {
+      await notifications.dismissPermissionPrompt();
     }
-
-    await ref
-        .read(notificationControllerProvider.notifier)
-        .requestPermissionFromPrompt();
   }
 
   @override

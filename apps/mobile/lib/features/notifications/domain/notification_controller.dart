@@ -47,6 +47,8 @@ final notificationControllerProvider =
 
 class NotificationController extends Notifier<NotificationState> {
   static const int _rowId = 1;
+  static const int _snoozeDays = 7;
+  static const int _snoozeSessions = 10;
 
   var _promptPending = false;
 
@@ -98,12 +100,28 @@ class NotificationController extends Notifier<NotificationState> {
       );
     }
 
-    if (!permissionAsked) {
-      _promptPending = true;
-      state = NotificationState.fromPreferences(
-        prefs,
-        showPermissionPrompt: _promptPending,
-      );
+    if (!permissionAsked && !_promptPending) {
+      final nowUtc = ref.read(notificationNowProvider)().toUtc();
+      final completed = await ref
+          .read(sessionRepositoryProvider)
+          .completedSessionsCount();
+      final snoozeUntilUtc = prefs?.notificationPromptSnoozedUntilUtc;
+      final snoozeUntilSessions =
+          prefs?.notificationPromptSnoozedUntilSessions;
+
+      final timeSnoozed =
+          snoozeUntilUtc != null && nowUtc.isBefore(snoozeUntilUtc);
+      final sessionsSnoozed =
+          snoozeUntilSessions != null && completed < snoozeUntilSessions;
+      final snoozed = timeSnoozed && sessionsSnoozed;
+
+      if (!snoozed) {
+        _promptPending = true;
+        state = NotificationState.fromPreferences(
+          prefs,
+          showPermissionPrompt: _promptPending,
+        );
+      }
     }
 
     unawaited(_syncFromDb());
@@ -130,11 +148,39 @@ class NotificationController extends Notifier<NotificationState> {
         PreferencesCompanion(
           id: const Value(_rowId),
           notificationPermissionAsked: const Value(true),
+          notificationPromptSnoozedUntilUtc: const Value(null),
+          notificationPromptSnoozedUntilSessions: const Value(null),
         ),
       );
     } catch (_) {}
 
     await _syncFromDb();
+  }
+
+  Future<void> dismissPermissionPrompt() async {
+    _promptPending = false;
+    state = NotificationState.fromPreferences(
+      ref.read(preferencesProvider).asData?.value,
+      showPermissionPrompt: _promptPending,
+    );
+
+    try {
+      final nowUtc = ref.read(notificationNowProvider)().toUtc();
+      final completed = await ref
+          .read(sessionRepositoryProvider)
+          .completedSessionsCount();
+      await _writePreferences(
+        PreferencesCompanion(
+          id: const Value(_rowId),
+          notificationPromptSnoozedUntilUtc: Value(
+            nowUtc.add(const Duration(days: _snoozeDays)),
+          ),
+          notificationPromptSnoozedUntilSessions: Value(
+            completed + _snoozeSessions,
+          ),
+        ),
+      );
+    } catch (_) {}
   }
 
   Future<void> _syncFromDb() async {
