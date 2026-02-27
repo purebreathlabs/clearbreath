@@ -204,85 +204,93 @@ class HomeScreen extends ConsumerWidget {
         actions: const [ServerStatusDot()],
       ),
       body: SafeArea(
-        child: SingleChildScrollView(
-          physics: const ClampingScrollPhysics(),
-          child: Padding(
-            padding: EdgeInsets.all(spacing.lg),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    Expanded(
-                      child: FittedBox(
-                        fit: BoxFit.scaleDown,
-                        alignment: Alignment.centerLeft,
-                        child: Text(
-                          greeting,
-                          style: greetingStyle,
-                          maxLines: 1,
-                          softWrap: false,
-                        ),
-                      ),
-                    ),
-                    if (xpState != null) ...[
-                      SizedBox(width: spacing.md),
-                      Container(
-                        padding: EdgeInsets.symmetric(
-                          horizontal: spacing.md,
-                          vertical: spacing.xs,
-                        ),
-                        decoration: BoxDecoration(
-                          color: colors.surfaceHigh,
-                          borderRadius: BorderRadius.circular(
-                            components.buttonRadius,
-                          ),
-                          border: Border.all(color: colors.border),
-                        ),
-                        child: Text(
-                          'Lv ${xpState.currentLevel}',
-                          style: typography.labelMedium.copyWith(
-                            color: colors.textPrimary,
+        child: RefreshIndicator(
+          onRefresh: () async {
+            ref.invalidate(mergedStatsProvider);
+            ref.invalidate(weeklyMinutesProvider);
+            ref.invalidate(dailyRecommendationProvider);
+            ref.invalidate(mergedXPProvider);
+          },
+          child: SingleChildScrollView(
+            physics: const AlwaysScrollableScrollPhysics(),
+            child: Padding(
+              padding: EdgeInsets.all(spacing.lg),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Expanded(
+                        child: FittedBox(
+                          fit: BoxFit.scaleDown,
+                          alignment: Alignment.centerLeft,
+                          child: Text(
+                            greeting,
+                            style: greetingStyle,
+                            maxLines: 1,
+                            softWrap: false,
                           ),
                         ),
                       ),
+                      if (xpState != null) ...[
+                        SizedBox(width: spacing.md),
+                        Container(
+                          padding: EdgeInsets.symmetric(
+                            horizontal: spacing.md,
+                            vertical: spacing.xs,
+                          ),
+                          decoration: BoxDecoration(
+                            color: colors.surfaceHigh,
+                            borderRadius: BorderRadius.circular(
+                              components.buttonRadius,
+                            ),
+                            border: Border.all(color: colors.border),
+                          ),
+                          child: Text(
+                            'Lv ${xpState.currentLevel}',
+                            style: typography.labelMedium.copyWith(
+                              color: colors.textPrimary,
+                            ),
+                          ),
+                        ),
+                      ],
                     ],
-                  ],
-                ),
-                SizedBox(height: spacing.xl),
-                recommendationCard,
-                SizedBox(height: spacing.xl),
-                Text(
-                  'Favorites',
-                  style: typography.titleMedium.copyWith(
-                    color: colors.textPrimary,
                   ),
-                ),
-                SizedBox(height: spacing.sm),
-                favorites.when(
-                  data: (items) {
-                    return FavoritesRow(
-                      favorites: items,
-                      onOpen: (technique) =>
-                          context.go('/techniques/${technique.id}'),
-                    );
-                  },
-                  loading: () => const FavoritesRow(
-                    favorites: <Technique>[],
-                    onOpen: _ignoreOpen,
+                  SizedBox(height: spacing.xl),
+                  recommendationCard,
+                  SizedBox(height: spacing.xl),
+                  Text(
+                    'Favorites',
+                    style: typography.titleMedium.copyWith(
+                      color: colors.textPrimary,
+                    ),
                   ),
-                  error: (error, stackTrace) => const FavoritesRow(
-                    favorites: <Technique>[],
-                    onOpen: _ignoreOpen,
+                  SizedBox(height: spacing.sm),
+                  favorites.when(
+                    data: (items) {
+                      return FavoritesRow(
+                        favorites: items,
+                        onOpen: (technique) =>
+                            context.go('/techniques/${technique.id}'),
+                      );
+                    },
+                    loading: () => const FavoritesRow(
+                      favorites: <Technique>[],
+                      onOpen: _ignoreOpen,
+                    ),
+                    error: (error, stackTrace) => const FavoritesRow(
+                      favorites: <Technique>[],
+                      onOpen: _ignoreOpen,
+                    ),
                   ),
-                ),
-                SizedBox(height: spacing.xl),
-                CompactProgressCard(
-                  streakDays: streakDays,
-                  weeklyMinutes: weeklyMinutes.asData?.value ?? const [],
-                  loading: !stats.hasValue || !weeklyMinutes.hasValue,
-                ),
-              ],
+                  SizedBox(height: spacing.xl),
+                  CompactProgressCard(
+                    streakDays: streakDays,
+                    weeklyMinutes: weeklyMinutes.asData?.value ?? const [],
+                    loading: !stats.hasValue || !weeklyMinutes.hasValue,
+                  ),
+                ],
+              ),
             ),
           ),
         ),
