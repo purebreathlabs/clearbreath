@@ -4,8 +4,10 @@ import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/network/api_error.dart';
+import '../../../shared/providers/server_status_provider.dart';
 import '../../auth/domain/auth_state.dart';
 import '../../auth/domain/auth_state_provider.dart';
+import '../../xp/domain/xp_provider.dart';
 import '../data/leaderboard_repository.dart';
 import 'leaderboard_entry.dart';
 import 'leaderboard_ranking.dart';
@@ -34,6 +36,14 @@ class LeaderboardController extends Notifier<LeaderboardState> {
       }
     });
 
+    ref.listen<AsyncValue<bool>>(serverStatusProvider, (prev, next) {
+      final wasOffline = prev?.asData?.value != true;
+      final isOnline = next.asData?.value == true;
+      if (wasOffline && isOnline) {
+        unawaited(Future.microtask(load));
+      }
+    });
+
     final auth = ref.read(authStateProvider);
     if (auth is AuthStateSignedIn && auth.sessionReady) {
       unawaited(Future.microtask(load));
@@ -53,28 +63,38 @@ class LeaderboardController extends Notifier<LeaderboardState> {
     final requestId = ++_requestId;
     const ranking = LeaderboardRanking.xp;
 
-    state = state.copyWith(
-      loading: true,
-      bannerMessage: null,
-      errorMessage: null,
-    );
-
     final repo = ref.read(leaderboardRepositoryProvider);
+
+    final cached = await repo.readCachedList(ranking);
+    if (requestId != _requestId) return;
+
+    if (cached != null && cached.entries.isNotEmpty) {
+      state = state.copyWith(
+        loading: true,
+        entries: cached.entries,
+        generatedAtUtc: cached.generatedAtUtc,
+        fetchedAtUtc: cached.fetchedAtUtc,
+        bannerMessage: null,
+        errorMessage: null,
+      );
+    } else {
+      state = state.copyWith(
+        loading: true,
+        bannerMessage: null,
+        errorMessage: null,
+      );
+    }
 
     try {
       final list = await repo.fetchList(ranking);
 
-      if (requestId != _requestId) {
-        return;
-      }
+      if (requestId != _requestId) return;
 
       final userId = auth.profile.id;
       final fromList = _findSelf(list.entries, userId);
       final self = fromList ?? await _fetchSelfFallback(repo, ranking, auth);
 
-      if (requestId != _requestId) {
-        return;
-      }
+      if (requestId != _requestId) return;
 
       final banner = list.fromCache && list.errorMessage != null
           ? "Couldn't refresh. Showing saved results."
@@ -91,23 +111,37 @@ class LeaderboardController extends Notifier<LeaderboardState> {
       );
     } on DioException catch (e) {
       final message = ApiError.fromDioException(e).message;
-      if (requestId != _requestId) {
-        return;
+      if (requestId != _requestId) return;
+
+      if (state.entries.isNotEmpty) {
+        state = state.copyWith(
+          loading: false,
+          bannerMessage: "Couldn't refresh. Showing saved results.",
+          errorMessage: null,
+        );
+      } else {
+        state = state.copyWith(
+          loading: false,
+          bannerMessage: null,
+          errorMessage: message,
+        );
       }
-      state = state.copyWith(
-        loading: false,
-        bannerMessage: null,
-        errorMessage: message,
-      );
     } catch (_) {
-      if (requestId != _requestId) {
-        return;
+      if (requestId != _requestId) return;
+
+      if (state.entries.isNotEmpty) {
+        state = state.copyWith(
+          loading: false,
+          bannerMessage: "Couldn't refresh. Showing saved results.",
+          errorMessage: null,
+        );
+      } else {
+        state = state.copyWith(
+          loading: false,
+          bannerMessage: null,
+          errorMessage: 'Could not load leaderboard.',
+        );
       }
-      state = state.copyWith(
-        loading: false,
-        bannerMessage: null,
-        errorMessage: 'Could not load leaderboard.',
-      );
     }
   }
 
@@ -128,13 +162,14 @@ class LeaderboardController extends Notifier<LeaderboardState> {
         userId: auth.profile.id,
       );
     } catch (_) {
+      final xp = ref.read(mergedXPProvider).asData?.value;
       return LeaderboardEntry(
         rank: null,
         username: auth.profile.username,
         name: auth.profile.name.isEmpty ? null : auth.profile.name,
         avatarSeed: auth.profile.avatarSeed,
-        totalXp: 0,
-        level: 0,
+        totalXp: xp?.totalXP ?? 0,
+        level: xp?.currentLevel ?? 0,
         userId: auth.profile.id,
       );
     }

@@ -114,6 +114,12 @@ class _LeaderboardSignedInScreen extends ConsumerWidget {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
+                Icon(
+                  Icons.wifi_off_rounded,
+                  size: 48,
+                  color: colors.textTertiary,
+                ),
+                SizedBox(height: spacing.md),
                 Text(
                   state.errorMessage!,
                   style: typography.bodyLarge.copyWith(

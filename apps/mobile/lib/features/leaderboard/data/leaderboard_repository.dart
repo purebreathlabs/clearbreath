@@ -187,6 +187,10 @@ class LeaderboardRepository {
     );
   }
 
+  Future<LeaderboardListResult?> readCachedList(LeaderboardRanking ranking) {
+    return _readCachedList(ranking.toQueryParam());
+  }
+
   Future<LeaderboardListResult?> _readCachedList(String rankingParam) async {
     final row = await (_db.select(
       _db.leaderboardCache,
