@@ -91,6 +91,7 @@ ok "Binary built (v${VERSION}+${BUILD}, ${COMMIT})"
 log "Step 3/7: Backing up current binary..."
 if [[ -f "${BINARY_DST}" ]]; then
     sudo cp "${BINARY_DST}" "${BINARY_BACKUP}"
+    sudo chown rahul:rahul "${BINARY_BACKUP}"
     ok "Backup saved to ${BINARY_BACKUP}"
 else
     echo "  No existing binary to back up (first deploy?)"
@@ -148,7 +149,7 @@ fi
 trap - ERR
 
 # Clean up backup
-sudo rm -f "${BINARY_BACKUP}"
+rm -f "${BINARY_BACKUP}"
 
 # Reload nginx
 sudo nginx -t 2>/dev/null && sudo systemctl reload nginx && ok "Nginx reloaded" || echo "  Nginx reload skipped"
