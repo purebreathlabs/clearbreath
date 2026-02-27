@@ -11,7 +11,7 @@ import '../../stats/domain/stats_snapshot.dart';
 final mergedStatsProvider = FutureProvider<StatsSnapshot>((ref) async {
   final auth = ref.watch(authStateProvider);
 
-  if (auth is AuthStateSignedIn && auth.sessionReady) {
+  if (auth is AuthStateSignedIn) {
     StatsSnapshot? cached;
     try {
       cached = await ref.watch(statsCacheRepositoryProvider).readCached();
@@ -24,20 +24,26 @@ final mergedStatsProvider = FutureProvider<StatsSnapshot>((ref) async {
       }
     }
 
-    final serverOnline = ref.watch(serverStatusProvider).asData?.value == true;
+    if (auth.sessionReady) {
+      final serverOnline =
+          ref.watch(serverStatusProvider).asData?.value == true;
 
-    if (serverOnline) {
-      try {
-        final cloud = await ref.watch(cloudStatsProvider.future);
-        if (cloud != null) {
-          return cloud;
-        }
-      } catch (_) {}
+      if (serverOnline) {
+        try {
+          final cloud = await ref.watch(cloudStatsProvider.future);
+          if (cloud != null) {
+            return cloud;
+          }
+        } catch (_) {}
+      }
     }
 
     if (cached != null) {
       return cached;
     }
+
+    final local = await ref.watch(localStatsProvider.future);
+    return local;
   }
 
   return ref.watch(localStatsProvider.future);

@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../session/data/session_repository.dart';
 import '../../session/domain/local_session.dart';
 import '../../xp/domain/xp_engine.dart' as xp;
-import '../data/stats_cache_repository.dart';
 import 'stats_snapshot.dart';
 import 'streak_calculator.dart';
 
@@ -11,15 +10,7 @@ final localStatsProvider = FutureProvider<StatsSnapshot>((ref) async {
   final sessions = await ref.watch(sessionRepositoryProvider).all();
   final now = DateTime.now().toUtc();
   final offset = DateTime.now().timeZoneOffset.inMinutes;
-
-  final snapshot = computeStats(sessions, now, offset);
-
-  final cache = ref.watch(statsCacheRepositoryProvider);
-  try {
-    await cache.writeCache(snapshot);
-  } catch (_) {}
-
-  return snapshot;
+  return computeStats(sessions, now, offset);
 });
 
 StatsSnapshot computeStats(
