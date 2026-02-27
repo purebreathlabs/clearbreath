@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../shared/providers/server_status_provider.dart';
 import '../../auth/domain/auth_state.dart';
 import '../../auth/domain/auth_state_provider.dart';
 import '../../stats/data/cloud_stats_repository.dart';
@@ -23,12 +24,16 @@ final mergedStatsProvider = FutureProvider<StatsSnapshot>((ref) async {
       }
     }
 
-    try {
-      final cloud = await ref.watch(cloudStatsProvider.future);
-      if (cloud != null) {
-        return cloud;
-      }
-    } catch (_) {}
+    final serverOnline = ref.watch(serverStatusProvider).asData?.value == true;
+
+    if (serverOnline) {
+      try {
+        final cloud = await ref.watch(cloudStatsProvider.future);
+        if (cloud != null) {
+          return cloud;
+        }
+      } catch (_) {}
+    }
 
     if (cached != null) {
       return cached;

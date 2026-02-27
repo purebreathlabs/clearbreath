@@ -14,7 +14,7 @@ class ApiError implements Exception {
       return ApiError(
         statusCode: null,
         code: 'network_error',
-        message: error.message ?? 'Network error',
+        message: _friendlyMessage(error),
         requestId: null,
       );
     }
@@ -43,6 +43,19 @@ class ApiError implements Exception {
     final rid = requestId == null ? '' : ' [$requestId]';
     return 'ApiError$status $code$rid: $message';
   }
+}
+
+String _friendlyMessage(DioException error) {
+  return switch (error.type) {
+    DioExceptionType.connectionError =>
+      'Could not connect. Check your internet connection.',
+    DioExceptionType.connectionTimeout ||
+    DioExceptionType.sendTimeout =>
+      'Connection timed out. Please try again.',
+    DioExceptionType.receiveTimeout =>
+      'Server took too long to respond.',
+    _ => 'Network error. Please try again.',
+  };
 }
 
 ({String? code, String? message, String? requestId}) _parseEnvelope(

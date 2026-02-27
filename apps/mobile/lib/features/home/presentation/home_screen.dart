@@ -280,7 +280,7 @@ class HomeScreen extends ConsumerWidget {
                 CompactProgressCard(
                   streakDays: streakDays,
                   weeklyMinutes: weeklyMinutes.asData?.value ?? const [],
-                  loading: stats.isLoading || weeklyMinutes.isLoading,
+                  loading: !stats.hasValue || !weeklyMinutes.hasValue,
                 ),
               ],
             ),

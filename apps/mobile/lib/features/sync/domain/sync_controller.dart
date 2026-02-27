@@ -12,6 +12,7 @@ import '../../session/data/session_repository.dart';
 import '../../session/domain/local_session.dart';
 import '../../stats/data/stats_cache_repository.dart';
 import '../../stats/domain/stats_snapshot.dart' as domain;
+import '../../../shared/providers/server_status_provider.dart';
 import '../../techniques/data/safety_sync_service.dart';
 import '../../leaderboard/domain/leaderboard_controller.dart';
 import '../data/sync_repository.dart';
@@ -56,6 +57,18 @@ class SyncController extends Notifier<SyncState> {
       }
       if (next is AuthStateGuest) {
         state = const SyncIdle();
+      }
+    });
+
+    ref.listen<AsyncValue<bool>>(serverStatusProvider, (prev, next) {
+      final wasOffline = prev?.asData?.value != true;
+      final isOnline = next.asData?.value == true;
+      if (wasOffline && isOnline) {
+        final auth = ref.read(authStateProvider);
+        if (auth is AuthStateSignedIn && auth.sessionReady) {
+          unawaited(syncUnsyncedSessions());
+          unawaited(_claimDailyOpen(auth.profile.id));
+        }
       }
     });
 

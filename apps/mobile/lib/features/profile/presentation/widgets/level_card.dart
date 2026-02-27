@@ -17,6 +17,7 @@ class LevelCard extends ConsumerWidget {
     final xpAsync = ref.watch(mergedXPProvider);
 
     return xpAsync.when(
+      skipLoadingOnReload: true,
       loading: () => Container(
         padding: EdgeInsets.all(components.cardPadding),
         decoration: BoxDecoration(

@@ -67,6 +67,7 @@ class _StatsSectionState extends ConsumerState<StatsSection> {
     }
 
     return stats.when(
+      skipLoadingOnReload: true,
       loading: () {
         return Container(
           padding: EdgeInsets.all(components.cardPadding),
@@ -121,6 +122,7 @@ class _StatsSectionState extends ConsumerState<StatsSection> {
             ),
             SizedBox(height: spacing.lg),
             weekly.when(
+              skipLoadingOnReload: true,
               data: (minutes) => WeeklyBarChart(
                 minutes: minutes,
                 title: weekTitle(_weekOffset),
