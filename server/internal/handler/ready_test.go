@@ -62,6 +62,8 @@ func TestReadyCheck(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			h := NewReadyHandler(readyMockPinger{tt.dbErr}, readyMockPinger{tt.cacheErr})
+			h.tick(context.Background())
+
 			req := httptest.NewRequest(http.MethodGet, "/ready", nil)
 			rec := httptest.NewRecorder()
 

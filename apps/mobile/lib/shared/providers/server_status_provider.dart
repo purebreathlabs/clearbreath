@@ -11,9 +11,9 @@ final serverStatusProvider = StreamProvider.autoDispose<bool>((ref) {
   final baseUrl = ref.watch(serverStatusBaseUrlProvider);
   final dio = Dio(
     BaseOptions(
-      connectTimeout: const Duration(seconds: 5),
-      receiveTimeout: const Duration(seconds: 5),
-      sendTimeout: const Duration(seconds: 5),
+      connectTimeout: const Duration(seconds: 3),
+      receiveTimeout: const Duration(seconds: 3),
+      sendTimeout: const Duration(seconds: 3),
       validateStatus: (_) => true,
     ),
   );
@@ -32,7 +32,7 @@ final serverStatusProvider = StreamProvider.autoDispose<bool>((ref) {
   }
 
   check();
-  final timer = Timer.periodic(const Duration(seconds: 60), (_) => check());
+  final timer = Timer.periodic(const Duration(seconds: 15), (_) => check());
 
   ref.onDispose(() {
     disposed = true;
