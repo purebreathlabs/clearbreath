@@ -161,6 +161,7 @@ func main() {
 
 	health := handler.NewHealthHandler(pool, redisPinger{rdb})
 	ready := handler.NewReadyHandler(pool, redisPinger{rdb})
+	go ready.Run(appCtx)
 	r.Get("/health", health.Check)
 	r.Get("/ready", ready.Check)
 

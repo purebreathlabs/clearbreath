@@ -9,6 +9,7 @@ import '../../techniques/data/technique_repository.dart';
 import '../../techniques/domain/technique.dart';
 import '../../techniques/domain/technique_preset.dart';
 import '../../xp/domain/xp_provider.dart';
+import '../../xp/domain/xp_state.dart';
 
 enum DayPart { morning, afternoon, evening, night }
 
@@ -50,7 +51,7 @@ final dailyRecommendationProvider = FutureProvider<Recommendation>((ref) async {
   final engine = ref.watch(recommendationEngineProvider);
   final answers = await ref.watch(onboardingAnswersProvider.future);
   final techniques = await ref.watch(allTechniquesProvider.future);
-  final xp = await ref.watch(mergedXPProvider.future);
+  final xp = ref.watch(mergedXPProvider).asData?.value ?? XPState.empty();
 
   final goal = _selectGoal(answers.primaryGoals);
 
