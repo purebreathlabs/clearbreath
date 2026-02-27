@@ -24,9 +24,7 @@ void main() {
 
     final url = 'http://127.0.0.1:${server.port}';
     container = ProviderContainer(
-      overrides: [
-        serverStatusBaseUrlProvider.overrideWithValue(url),
-      ],
+      overrides: [serverStatusBaseUrlProvider.overrideWithValue(url)],
     );
     return container;
   }
