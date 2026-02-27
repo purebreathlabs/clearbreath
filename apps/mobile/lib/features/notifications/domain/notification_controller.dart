@@ -106,8 +106,7 @@ class NotificationController extends Notifier<NotificationState> {
           .read(sessionRepositoryProvider)
           .completedSessionsCount();
       final snoozeUntilUtc = prefs?.notificationPromptSnoozedUntilUtc;
-      final snoozeUntilSessions =
-          prefs?.notificationPromptSnoozedUntilSessions;
+      final snoozeUntilSessions = prefs?.notificationPromptSnoozedUntilSessions;
 
       final timeSnoozed =
           snoozeUntilUtc != null && nowUtc.isBefore(snoozeUntilUtc);
