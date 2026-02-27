@@ -148,7 +148,7 @@ fi
 trap - ERR
 
 # Clean up backup
-rm -f "${BINARY_BACKUP}"
+sudo rm -f "${BINARY_BACKUP}"
 
 # Reload nginx
 sudo nginx -t 2>/dev/null && sudo systemctl reload nginx && ok "Nginx reloaded" || echo "  Nginx reload skipped"
