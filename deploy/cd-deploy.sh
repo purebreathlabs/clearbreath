@@ -13,6 +13,9 @@
 
 set -euo pipefail
 
+# Ensure Go and user binaries are in PATH (non-login SSH sessions skip .profile)
+export PATH="/usr/local/go/bin:/home/rahul/go/bin:${PATH}"
+
 # ── Configuration ──────────────────────────────────────────────────────
 PROJECT_DIR="/home/rahul/production/clearbreath"
 DEPLOY_DIR="/opt/clearbreath"

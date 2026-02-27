@@ -1,4 +1,4 @@
-package main // ClearBreath API
+package main
 
 import (
 	"context"
