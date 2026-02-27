@@ -8,4 +8,5 @@ GeneratedPluginRegistrant.java
 .cxx/
 key.properties
 **/*.keystore
+!app/debug.keystore
 **/*.jks
