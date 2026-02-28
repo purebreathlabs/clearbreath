@@ -1,11 +1,6 @@
 import 'package:flutter/foundation.dart';
 
-enum ConnectionStatus {
-  checking,
-  userOffline,
-  serverDown,
-  online,
-}
+enum ConnectionStatus { checking, userOffline, serverDown, online }
 
 @immutable
 class AppConnectionState {
@@ -17,10 +12,10 @@ class AppConnectionState {
   });
 
   const AppConnectionState.initial()
-      : status = ConnectionStatus.checking,
-        hasInternet = null,
-        serverReachable = null,
-        lastCheckedAt = null;
+    : status = ConnectionStatus.checking,
+      hasInternet = null,
+      serverReachable = null,
+      lastCheckedAt = null;
 
   final ConnectionStatus status;
   final bool? hasInternet;

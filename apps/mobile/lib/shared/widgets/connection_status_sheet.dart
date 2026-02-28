@@ -175,10 +175,7 @@ class _StatusRow extends StatelessWidget {
         Container(
           width: 8,
           height: 8,
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            color: dotColor,
-          ),
+          decoration: BoxDecoration(shape: BoxShape.circle, color: dotColor),
         ),
         SizedBox(width: spacing.sm),
         Text(
