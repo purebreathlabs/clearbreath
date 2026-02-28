@@ -17,6 +17,7 @@ import 'package:clearbreath/features/sync/domain/sync_state.dart';
 import 'package:clearbreath/features/techniques/data/safety_sync_service.dart';
 import 'package:clearbreath/features/techniques/domain/safety_acknowledgement_repository.dart';
 import 'package:clearbreath/shared/providers/app_database_provider.dart';
+import 'package:clearbreath/shared/providers/connection_status_provider.dart';
 import 'package:drift/native.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -71,6 +72,9 @@ void main() {
           safetySpy = _SpySafetySyncService(ref: ref, local: local);
           return safetySpy;
         }),
+        connectivityProvider.overrideWith(
+          (ref) => Stream.value(true),
+        ),
       ],
     );
     addTearDown(() async {

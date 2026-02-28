@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:clearbreath/shared/providers/connection_status_provider.dart';
 import 'package:clearbreath/shared/providers/server_status_provider.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -24,7 +25,12 @@ void main() {
 
     final url = 'http://127.0.0.1:${server.port}';
     container = ProviderContainer(
-      overrides: [serverStatusBaseUrlProvider.overrideWithValue(url)],
+      overrides: [
+        serverStatusBaseUrlProvider.overrideWithValue(url),
+        connectivityProvider.overrideWith(
+          (ref) => Stream.value(true),
+        ),
+      ],
     );
     return container;
   }
