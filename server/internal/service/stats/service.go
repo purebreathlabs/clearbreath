@@ -33,16 +33,53 @@ func NewService(store *repository.Store, clk clock.Clock) (*Service, error) {
 }
 
 func (s *Service) GetSnapshot(ctx context.Context, userID uuid.UUID) (sqlcgen.StatsSnapshot, error) {
-	snap, err := s.store.Queries().GetStatsSnapshot(ctx, userID)
-	if err == nil {
-		return snap, nil
+	var out sqlcgen.StatsSnapshot
+
+	if err := s.store.InTx(ctx, func(q *sqlcgen.Queries) error {
+		u, err := q.GetUserByID(ctx, userID)
+		if err != nil {
+			if errors.Is(err, pgx.ErrNoRows) {
+				return apierr.New(http.StatusUnauthorized, "unauthorized", "unauthorized")
+			}
+			return fmt.Errorf("get user: %w", err)
+		}
+
+		snap, err := q.GetStatsSnapshot(ctx, userID)
+		if err != nil {
+			if !errors.Is(err, pgx.ErrNoRows) {
+				return fmt.Errorf("get stats snapshot: %w", err)
+			}
+			snap, err = computeAndUpsert(ctx, q, userID, s.clock.Now().UTC(), u.TimezoneOffsetMinutesLatest)
+			if err != nil {
+				return err
+			}
+			out = snap
+			return nil
+		}
+
+		now := s.clock.Now().UTC()
+		tz := u.TimezoneOffsetMinutesLatest
+		if snapshotStale(snap.UpdatedAt, now, tz) {
+			snap, err = computeAndUpsert(ctx, q, userID, now, tz)
+			if err != nil {
+				return err
+			}
+		}
+
+		out = snap
+		return nil
+	}); err != nil {
+		return sqlcgen.StatsSnapshot{}, err
 	}
 
-	if !errors.Is(err, pgx.ErrNoRows) {
-		return sqlcgen.StatsSnapshot{}, fmt.Errorf("get stats snapshot: %w", err)
-	}
+	return out, nil
+}
 
-	return s.Recompute(ctx, userID)
+func snapshotStale(updatedAt, now time.Time, tzOffsetMinutes int32) bool {
+	offset := time.Duration(tzOffsetMinutes) * time.Minute
+	localUpdated := dateOnly(updatedAt.UTC().Add(offset))
+	localNow := dateOnly(now.UTC().Add(offset))
+	return !localNow.Equal(localUpdated)
 }
 
 func (s *Service) Recompute(ctx context.Context, userID uuid.UUID) (sqlcgen.StatsSnapshot, error) {

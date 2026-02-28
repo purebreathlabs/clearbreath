@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../shared/providers/server_status_provider.dart';
@@ -39,7 +41,34 @@ final mergedStatsProvider = FutureProvider<StatsSnapshot>((ref) async {
     }
 
     if (cached != null) {
-      return cached;
+      final local = await ref.watch(localStatsProvider.future);
+      return StatsSnapshot(
+        currentStreakDays: local.currentStreakDays,
+        longestStreakDays: max(
+          cached.longestStreakDays,
+          local.longestStreakDays,
+        ),
+        practiceDaysAllTime: max(
+          cached.practiceDaysAllTime,
+          local.practiceDaysAllTime,
+        ),
+        minutesThisWeek: local.minutesThisWeek,
+        minutesAllTime: max(cached.minutesAllTime, local.minutesAllTime),
+        sessionsAllTime: max(cached.sessionsAllTime, local.sessionsAllTime),
+        minutesByTechnique: cached.minutesByTechnique,
+        longestSessionMinutes: max(
+          cached.longestSessionMinutes,
+          local.longestSessionMinutes,
+        ),
+        favoriteTechniqueId: cached.favoriteTechniqueId,
+        totalBreathsEstimated: max(
+          cached.totalBreathsEstimated,
+          local.totalBreathsEstimated,
+        ),
+        totalXP: max(cached.totalXP, local.totalXP),
+        currentLevel: max(cached.currentLevel, local.currentLevel),
+        updatedAt: cached.updatedAt,
+      );
     }
 
     final local = await ref.watch(localStatsProvider.future);

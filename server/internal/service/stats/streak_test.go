@@ -58,3 +58,65 @@ func TestStreakComputation(t *testing.T) {
 		})
 	}
 }
+
+func TestSnapshotStale(t *testing.T) {
+	tests := []struct {
+		name      string
+		updatedAt time.Time
+		now       time.Time
+		tz        int32
+		want      bool
+	}{
+		{
+			name:      "same local day",
+			updatedAt: time.Date(2026, 2, 28, 10, 0, 0, 0, time.UTC),
+			now:       time.Date(2026, 2, 28, 18, 0, 0, 0, time.UTC),
+			tz:        0,
+			want:      false,
+		},
+		{
+			name:      "different local day",
+			updatedAt: time.Date(2026, 2, 27, 10, 0, 0, 0, time.UTC),
+			now:       time.Date(2026, 2, 28, 10, 0, 0, 0, time.UTC),
+			tz:        0,
+			want:      true,
+		},
+		{
+			name:      "positive tz same day",
+			updatedAt: time.Date(2026, 2, 28, 10, 0, 0, 0, time.UTC),
+			now:       time.Date(2026, 2, 28, 15, 0, 0, 0, time.UTC),
+			tz:        330,
+			want:      false,
+		},
+		{
+			name:      "positive tz crosses local midnight",
+			updatedAt: time.Date(2026, 2, 27, 17, 0, 0, 0, time.UTC),
+			now:       time.Date(2026, 2, 27, 19, 0, 0, 0, time.UTC),
+			tz:        330,
+			want:      true,
+		},
+		{
+			name:      "negative tz same day",
+			updatedAt: time.Date(2026, 2, 28, 10, 0, 0, 0, time.UTC),
+			now:       time.Date(2026, 2, 28, 20, 0, 0, 0, time.UTC),
+			tz:        -300,
+			want:      false,
+		},
+		{
+			name:      "negative tz crosses local midnight",
+			updatedAt: time.Date(2026, 2, 28, 3, 0, 0, 0, time.UTC),
+			now:       time.Date(2026, 2, 28, 6, 0, 0, 0, time.UTC),
+			tz:        -300,
+			want:      true,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := snapshotStale(tt.updatedAt, tt.now, tt.tz)
+			if got != tt.want {
+				t.Fatalf("got %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
