@@ -53,11 +53,13 @@ final mergedWeeklyMinutesProvider = FutureProvider.family<List<int>, int>((
   }
 
   final auth = ref.watch(authStateProvider);
-  final serverOnline = ref.watch(serverStatusProvider).asData?.value == true;
-  if (auth is AuthStateSignedIn && auth.sessionReady && serverOnline) {
-    try {
-      return await ref.watch(cloudWeeklyMinutesProvider(weekOffset).future);
-    } catch (_) {}
+  if (auth is AuthStateSignedIn && auth.sessionReady) {
+    final serverOnline = ref.watch(serverStatusProvider).asData?.value == true;
+    if (serverOnline) {
+      try {
+        return await ref.watch(cloudWeeklyMinutesProvider(weekOffset).future);
+      } catch (_) {}
+    }
   }
 
   return ref.watch(localWeeklyMinutesProvider(weekOffset).future);

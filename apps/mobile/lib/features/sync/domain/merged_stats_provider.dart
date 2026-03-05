@@ -57,6 +57,7 @@ final mergedStatsProvider = FutureProvider<StatsSnapshot>((ref) async {
         minutesAllTime: max(cached.minutesAllTime, local.minutesAllTime),
         sessionsAllTime: max(cached.sessionsAllTime, local.sessionsAllTime),
         minutesByTechnique: cached.minutesByTechnique,
+        weeklyMinutesByDay: local.weeklyMinutesByDay,
         longestSessionMinutes: max(
           cached.longestSessionMinutes,
           local.longestSessionMinutes,

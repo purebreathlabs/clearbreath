@@ -73,9 +73,7 @@ void main() {
           safetySpy = _SpySafetySyncService(ref: ref, local: local);
           return safetySpy;
         }),
-        connectivityProvider.overrideWith(
-          (ref) => Stream.value(true),
-        ),
+        connectivityProvider.overrideWith((ref) => Stream.value(true)),
       ],
     );
     addTearDown(() async {

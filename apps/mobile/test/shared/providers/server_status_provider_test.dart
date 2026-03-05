@@ -27,9 +27,7 @@ void main() {
     container = ProviderContainer(
       overrides: [
         serverStatusBaseUrlProvider.overrideWithValue(url),
-        connectivityProvider.overrideWith(
-          (ref) => Stream.value(true),
-        ),
+        connectivityProvider.overrideWith((ref) => Stream.value(true)),
       ],
     );
     return container;

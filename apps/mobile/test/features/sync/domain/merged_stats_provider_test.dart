@@ -52,6 +52,7 @@ void main() {
       minutesAllTime: 200,
       sessionsAllTime: 40,
       minutesByTechnique: const {'box': 200},
+      weeklyMinutesByDay: const [30, 0, 0, 0, 0, 0, 0],
       longestSessionMinutes: 20,
       favoriteTechniqueId: 'box',
       totalBreathsEstimated: 500,
@@ -66,6 +67,7 @@ void main() {
     expect(result.currentStreakDays, equals(0));
     expect(result.minutesAllTime, equals(200));
     expect(result.longestStreakDays, equals(5));
+    expect(result.weeklyMinutesByDay, equals(const [0, 0, 0, 0, 0, 0, 0]));
   });
 
   test(
@@ -122,6 +124,7 @@ void main() {
         minutesAllTime: 100,
         sessionsAllTime: 20,
         minutesByTechnique: const {'box': 100},
+        weeklyMinutesByDay: const [0, 0, 0, 0, 0, 0, 0],
         longestSessionMinutes: 10,
         favoriteTechniqueId: 'box',
         totalBreathsEstimated: 300,
@@ -137,6 +140,7 @@ void main() {
       expect(result.minutesAllTime, equals(100));
       expect(result.sessionsAllTime, equals(20));
       expect(result.minutesThisWeek, greaterThan(0));
+      expect(result.weeklyMinutesByDay.reduce((a, b) => a + b), greaterThan(0));
     },
   );
 

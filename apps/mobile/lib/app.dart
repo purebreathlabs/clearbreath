@@ -36,7 +36,9 @@ class _ClearBreathAppState extends ConsumerState<ClearBreathApp>
     if (state == AppLifecycleState.resumed) {
       ref.invalidate(mergedStatsProvider);
       ref.invalidate(localStatsProvider);
-      ref.invalidate(weeklyMinutesProvider);
+      ref.invalidate(localWeeklyMinutesProvider);
+      ref.invalidate(cloudWeeklyMinutesProvider);
+      ref.invalidate(mergedWeeklyMinutesProvider);
       ref.invalidate(mergedXPProvider);
     }
   }
