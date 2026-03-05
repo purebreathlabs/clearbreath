@@ -77,7 +77,7 @@ func TestLeaderboardListRanksAreContiguousAfterFiltering(t *testing.T) {
 		t.Fatalf("access token manager: %v", err)
 	}
 
-	authService, err := authsvc.NewService(store, clk, accessTokens, cfg.JWTRefreshSecret, cfg.JWTRefreshTTLMinutes, true, cfg.DevAuthSecret, cfg.GoogleOAuthClientID, cfg.AppleOAuthAudience, profanity.NewDefault())
+	authService, err := authsvc.NewService(store, clk, accessTokens, cfg.JWTRefreshSecret, cfg.JWTRefreshTTLMinutes, true, cfg.DevAuthSecret, cfg.GoogleOAuthClientIDs, cfg.AppleOAuthAudience, profanity.NewDefault())
 	if err != nil {
 		t.Fatalf("auth service: %v", err)
 	}

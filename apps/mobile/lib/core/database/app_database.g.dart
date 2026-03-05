@@ -2517,6 +2517,18 @@ class $StatsCacheTable extends StatsCache
         requiredDuringInsert: false,
         defaultValue: const Constant('{}'),
       );
+  static const VerificationMeta _weeklyMinutesByDayJsonMeta =
+      const VerificationMeta('weeklyMinutesByDayJson');
+  @override
+  late final GeneratedColumn<String> weeklyMinutesByDayJson =
+      GeneratedColumn<String>(
+        'weekly_minutes_by_day_json',
+        aliasedName,
+        false,
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+        defaultValue: const Constant('[]'),
+      );
   static const VerificationMeta _longestSessionMinutesMeta =
       const VerificationMeta('longestSessionMinutes');
   @override
@@ -2595,6 +2607,7 @@ class $StatsCacheTable extends StatsCache
     minutesAllTime,
     sessionsAllTime,
     minutesByTechniqueJson,
+    weeklyMinutesByDayJson,
     longestSessionMinutes,
     favoriteTechniqueId,
     totalBreathsEstimated,
@@ -2677,6 +2690,15 @@ class $StatsCacheTable extends StatsCache
         minutesByTechniqueJson.isAcceptableOrUnknown(
           data['minutes_by_technique_json']!,
           _minutesByTechniqueJsonMeta,
+        ),
+      );
+    }
+    if (data.containsKey('weekly_minutes_by_day_json')) {
+      context.handle(
+        _weeklyMinutesByDayJsonMeta,
+        weeklyMinutesByDayJson.isAcceptableOrUnknown(
+          data['weekly_minutes_by_day_json']!,
+          _weeklyMinutesByDayJsonMeta,
         ),
       );
     }
@@ -2771,6 +2793,10 @@ class $StatsCacheTable extends StatsCache
         DriftSqlType.string,
         data['${effectivePrefix}minutes_by_technique_json'],
       )!,
+      weeklyMinutesByDayJson: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}weekly_minutes_by_day_json'],
+      )!,
       longestSessionMinutes: attachedDatabase.typeMapping.read(
         DriftSqlType.int,
         data['${effectivePrefix}longest_session_minutes'],
@@ -2813,6 +2839,7 @@ class StatsCacheData extends DataClass implements Insertable<StatsCacheData> {
   final int minutesAllTime;
   final int sessionsAllTime;
   final String minutesByTechniqueJson;
+  final String weeklyMinutesByDayJson;
   final int longestSessionMinutes;
   final String? favoriteTechniqueId;
   final int totalBreathsEstimated;
@@ -2828,6 +2855,7 @@ class StatsCacheData extends DataClass implements Insertable<StatsCacheData> {
     required this.minutesAllTime,
     required this.sessionsAllTime,
     required this.minutesByTechniqueJson,
+    required this.weeklyMinutesByDayJson,
     required this.longestSessionMinutes,
     this.favoriteTechniqueId,
     required this.totalBreathsEstimated,
@@ -2846,6 +2874,9 @@ class StatsCacheData extends DataClass implements Insertable<StatsCacheData> {
     map['minutes_all_time'] = Variable<int>(minutesAllTime);
     map['sessions_all_time'] = Variable<int>(sessionsAllTime);
     map['minutes_by_technique_json'] = Variable<String>(minutesByTechniqueJson);
+    map['weekly_minutes_by_day_json'] = Variable<String>(
+      weeklyMinutesByDayJson,
+    );
     map['longest_session_minutes'] = Variable<int>(longestSessionMinutes);
     if (!nullToAbsent || favoriteTechniqueId != null) {
       map['favorite_technique_id'] = Variable<String>(favoriteTechniqueId);
@@ -2867,6 +2898,7 @@ class StatsCacheData extends DataClass implements Insertable<StatsCacheData> {
       minutesAllTime: Value(minutesAllTime),
       sessionsAllTime: Value(sessionsAllTime),
       minutesByTechniqueJson: Value(minutesByTechniqueJson),
+      weeklyMinutesByDayJson: Value(weeklyMinutesByDayJson),
       longestSessionMinutes: Value(longestSessionMinutes),
       favoriteTechniqueId: favoriteTechniqueId == null && nullToAbsent
           ? const Value.absent()
@@ -2896,6 +2928,9 @@ class StatsCacheData extends DataClass implements Insertable<StatsCacheData> {
       minutesByTechniqueJson: serializer.fromJson<String>(
         json['minutesByTechniqueJson'],
       ),
+      weeklyMinutesByDayJson: serializer.fromJson<String>(
+        json['weeklyMinutesByDayJson'],
+      ),
       longestSessionMinutes: serializer.fromJson<int>(
         json['longestSessionMinutes'],
       ),
@@ -2924,6 +2959,9 @@ class StatsCacheData extends DataClass implements Insertable<StatsCacheData> {
       'minutesByTechniqueJson': serializer.toJson<String>(
         minutesByTechniqueJson,
       ),
+      'weeklyMinutesByDayJson': serializer.toJson<String>(
+        weeklyMinutesByDayJson,
+      ),
       'longestSessionMinutes': serializer.toJson<int>(longestSessionMinutes),
       'favoriteTechniqueId': serializer.toJson<String?>(favoriteTechniqueId),
       'totalBreathsEstimated': serializer.toJson<int>(totalBreathsEstimated),
@@ -2942,6 +2980,7 @@ class StatsCacheData extends DataClass implements Insertable<StatsCacheData> {
     int? minutesAllTime,
     int? sessionsAllTime,
     String? minutesByTechniqueJson,
+    String? weeklyMinutesByDayJson,
     int? longestSessionMinutes,
     Value<String?> favoriteTechniqueId = const Value.absent(),
     int? totalBreathsEstimated,
@@ -2958,6 +2997,8 @@ class StatsCacheData extends DataClass implements Insertable<StatsCacheData> {
     sessionsAllTime: sessionsAllTime ?? this.sessionsAllTime,
     minutesByTechniqueJson:
         minutesByTechniqueJson ?? this.minutesByTechniqueJson,
+    weeklyMinutesByDayJson:
+        weeklyMinutesByDayJson ?? this.weeklyMinutesByDayJson,
     longestSessionMinutes: longestSessionMinutes ?? this.longestSessionMinutes,
     favoriteTechniqueId: favoriteTechniqueId.present
         ? favoriteTechniqueId.value
@@ -2991,6 +3032,9 @@ class StatsCacheData extends DataClass implements Insertable<StatsCacheData> {
       minutesByTechniqueJson: data.minutesByTechniqueJson.present
           ? data.minutesByTechniqueJson.value
           : this.minutesByTechniqueJson,
+      weeklyMinutesByDayJson: data.weeklyMinutesByDayJson.present
+          ? data.weeklyMinutesByDayJson.value
+          : this.weeklyMinutesByDayJson,
       longestSessionMinutes: data.longestSessionMinutes.present
           ? data.longestSessionMinutes.value
           : this.longestSessionMinutes,
@@ -3019,6 +3063,7 @@ class StatsCacheData extends DataClass implements Insertable<StatsCacheData> {
           ..write('minutesAllTime: $minutesAllTime, ')
           ..write('sessionsAllTime: $sessionsAllTime, ')
           ..write('minutesByTechniqueJson: $minutesByTechniqueJson, ')
+          ..write('weeklyMinutesByDayJson: $weeklyMinutesByDayJson, ')
           ..write('longestSessionMinutes: $longestSessionMinutes, ')
           ..write('favoriteTechniqueId: $favoriteTechniqueId, ')
           ..write('totalBreathsEstimated: $totalBreathsEstimated, ')
@@ -3039,6 +3084,7 @@ class StatsCacheData extends DataClass implements Insertable<StatsCacheData> {
     minutesAllTime,
     sessionsAllTime,
     minutesByTechniqueJson,
+    weeklyMinutesByDayJson,
     longestSessionMinutes,
     favoriteTechniqueId,
     totalBreathsEstimated,
@@ -3058,6 +3104,7 @@ class StatsCacheData extends DataClass implements Insertable<StatsCacheData> {
           other.minutesAllTime == this.minutesAllTime &&
           other.sessionsAllTime == this.sessionsAllTime &&
           other.minutesByTechniqueJson == this.minutesByTechniqueJson &&
+          other.weeklyMinutesByDayJson == this.weeklyMinutesByDayJson &&
           other.longestSessionMinutes == this.longestSessionMinutes &&
           other.favoriteTechniqueId == this.favoriteTechniqueId &&
           other.totalBreathsEstimated == this.totalBreathsEstimated &&
@@ -3075,6 +3122,7 @@ class StatsCacheCompanion extends UpdateCompanion<StatsCacheData> {
   final Value<int> minutesAllTime;
   final Value<int> sessionsAllTime;
   final Value<String> minutesByTechniqueJson;
+  final Value<String> weeklyMinutesByDayJson;
   final Value<int> longestSessionMinutes;
   final Value<String?> favoriteTechniqueId;
   final Value<int> totalBreathsEstimated;
@@ -3090,6 +3138,7 @@ class StatsCacheCompanion extends UpdateCompanion<StatsCacheData> {
     this.minutesAllTime = const Value.absent(),
     this.sessionsAllTime = const Value.absent(),
     this.minutesByTechniqueJson = const Value.absent(),
+    this.weeklyMinutesByDayJson = const Value.absent(),
     this.longestSessionMinutes = const Value.absent(),
     this.favoriteTechniqueId = const Value.absent(),
     this.totalBreathsEstimated = const Value.absent(),
@@ -3106,6 +3155,7 @@ class StatsCacheCompanion extends UpdateCompanion<StatsCacheData> {
     this.minutesAllTime = const Value.absent(),
     this.sessionsAllTime = const Value.absent(),
     this.minutesByTechniqueJson = const Value.absent(),
+    this.weeklyMinutesByDayJson = const Value.absent(),
     this.longestSessionMinutes = const Value.absent(),
     this.favoriteTechniqueId = const Value.absent(),
     this.totalBreathsEstimated = const Value.absent(),
@@ -3122,6 +3172,7 @@ class StatsCacheCompanion extends UpdateCompanion<StatsCacheData> {
     Expression<int>? minutesAllTime,
     Expression<int>? sessionsAllTime,
     Expression<String>? minutesByTechniqueJson,
+    Expression<String>? weeklyMinutesByDayJson,
     Expression<int>? longestSessionMinutes,
     Expression<String>? favoriteTechniqueId,
     Expression<int>? totalBreathsEstimated,
@@ -3140,6 +3191,8 @@ class StatsCacheCompanion extends UpdateCompanion<StatsCacheData> {
       if (sessionsAllTime != null) 'sessions_all_time': sessionsAllTime,
       if (minutesByTechniqueJson != null)
         'minutes_by_technique_json': minutesByTechniqueJson,
+      if (weeklyMinutesByDayJson != null)
+        'weekly_minutes_by_day_json': weeklyMinutesByDayJson,
       if (longestSessionMinutes != null)
         'longest_session_minutes': longestSessionMinutes,
       if (favoriteTechniqueId != null)
@@ -3161,6 +3214,7 @@ class StatsCacheCompanion extends UpdateCompanion<StatsCacheData> {
     Value<int>? minutesAllTime,
     Value<int>? sessionsAllTime,
     Value<String>? minutesByTechniqueJson,
+    Value<String>? weeklyMinutesByDayJson,
     Value<int>? longestSessionMinutes,
     Value<String?>? favoriteTechniqueId,
     Value<int>? totalBreathsEstimated,
@@ -3178,6 +3232,8 @@ class StatsCacheCompanion extends UpdateCompanion<StatsCacheData> {
       sessionsAllTime: sessionsAllTime ?? this.sessionsAllTime,
       minutesByTechniqueJson:
           minutesByTechniqueJson ?? this.minutesByTechniqueJson,
+      weeklyMinutesByDayJson:
+          weeklyMinutesByDayJson ?? this.weeklyMinutesByDayJson,
       longestSessionMinutes:
           longestSessionMinutes ?? this.longestSessionMinutes,
       favoriteTechniqueId: favoriteTechniqueId ?? this.favoriteTechniqueId,
@@ -3218,6 +3274,11 @@ class StatsCacheCompanion extends UpdateCompanion<StatsCacheData> {
         minutesByTechniqueJson.value,
       );
     }
+    if (weeklyMinutesByDayJson.present) {
+      map['weekly_minutes_by_day_json'] = Variable<String>(
+        weeklyMinutesByDayJson.value,
+      );
+    }
     if (longestSessionMinutes.present) {
       map['longest_session_minutes'] = Variable<int>(
         longestSessionMinutes.value,
@@ -3256,6 +3317,7 @@ class StatsCacheCompanion extends UpdateCompanion<StatsCacheData> {
           ..write('minutesAllTime: $minutesAllTime, ')
           ..write('sessionsAllTime: $sessionsAllTime, ')
           ..write('minutesByTechniqueJson: $minutesByTechniqueJson, ')
+          ..write('weeklyMinutesByDayJson: $weeklyMinutesByDayJson, ')
           ..write('longestSessionMinutes: $longestSessionMinutes, ')
           ..write('favoriteTechniqueId: $favoriteTechniqueId, ')
           ..write('totalBreathsEstimated: $totalBreathsEstimated, ')
@@ -5281,6 +5343,7 @@ typedef $$StatsCacheTableCreateCompanionBuilder =
       Value<int> minutesAllTime,
       Value<int> sessionsAllTime,
       Value<String> minutesByTechniqueJson,
+      Value<String> weeklyMinutesByDayJson,
       Value<int> longestSessionMinutes,
       Value<String?> favoriteTechniqueId,
       Value<int> totalBreathsEstimated,
@@ -5298,6 +5361,7 @@ typedef $$StatsCacheTableUpdateCompanionBuilder =
       Value<int> minutesAllTime,
       Value<int> sessionsAllTime,
       Value<String> minutesByTechniqueJson,
+      Value<String> weeklyMinutesByDayJson,
       Value<int> longestSessionMinutes,
       Value<String?> favoriteTechniqueId,
       Value<int> totalBreathsEstimated,
@@ -5352,6 +5416,11 @@ class $$StatsCacheTableFilterComposer
 
   ColumnFilters<String> get minutesByTechniqueJson => $composableBuilder(
     column: $table.minutesByTechniqueJson,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get weeklyMinutesByDayJson => $composableBuilder(
+    column: $table.weeklyMinutesByDayJson,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -5435,6 +5504,11 @@ class $$StatsCacheTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<String> get weeklyMinutesByDayJson => $composableBuilder(
+    column: $table.weeklyMinutesByDayJson,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<int> get longestSessionMinutes => $composableBuilder(
     column: $table.longestSessionMinutes,
     builder: (column) => ColumnOrderings(column),
@@ -5513,6 +5587,11 @@ class $$StatsCacheTableAnnotationComposer
     builder: (column) => column,
   );
 
+  GeneratedColumn<String> get weeklyMinutesByDayJson => $composableBuilder(
+    column: $table.weeklyMinutesByDayJson,
+    builder: (column) => column,
+  );
+
   GeneratedColumn<int> get longestSessionMinutes => $composableBuilder(
     column: $table.longestSessionMinutes,
     builder: (column) => column,
@@ -5579,6 +5658,7 @@ class $$StatsCacheTableTableManager
                 Value<int> minutesAllTime = const Value.absent(),
                 Value<int> sessionsAllTime = const Value.absent(),
                 Value<String> minutesByTechniqueJson = const Value.absent(),
+                Value<String> weeklyMinutesByDayJson = const Value.absent(),
                 Value<int> longestSessionMinutes = const Value.absent(),
                 Value<String?> favoriteTechniqueId = const Value.absent(),
                 Value<int> totalBreathsEstimated = const Value.absent(),
@@ -5594,6 +5674,7 @@ class $$StatsCacheTableTableManager
                 minutesAllTime: minutesAllTime,
                 sessionsAllTime: sessionsAllTime,
                 minutesByTechniqueJson: minutesByTechniqueJson,
+                weeklyMinutesByDayJson: weeklyMinutesByDayJson,
                 longestSessionMinutes: longestSessionMinutes,
                 favoriteTechniqueId: favoriteTechniqueId,
                 totalBreathsEstimated: totalBreathsEstimated,
@@ -5611,6 +5692,7 @@ class $$StatsCacheTableTableManager
                 Value<int> minutesAllTime = const Value.absent(),
                 Value<int> sessionsAllTime = const Value.absent(),
                 Value<String> minutesByTechniqueJson = const Value.absent(),
+                Value<String> weeklyMinutesByDayJson = const Value.absent(),
                 Value<int> longestSessionMinutes = const Value.absent(),
                 Value<String?> favoriteTechniqueId = const Value.absent(),
                 Value<int> totalBreathsEstimated = const Value.absent(),
@@ -5626,6 +5708,7 @@ class $$StatsCacheTableTableManager
                 minutesAllTime: minutesAllTime,
                 sessionsAllTime: sessionsAllTime,
                 minutesByTechniqueJson: minutesByTechniqueJson,
+                weeklyMinutesByDayJson: weeklyMinutesByDayJson,
                 longestSessionMinutes: longestSessionMinutes,
                 favoriteTechniqueId: favoriteTechniqueId,
                 totalBreathsEstimated: totalBreathsEstimated,

@@ -19,6 +19,9 @@ class StatsCache extends Table {
   TextColumn get minutesByTechniqueJson =>
       text().withDefault(const Constant('{}'))();
 
+  TextColumn get weeklyMinutesByDayJson =>
+      text().withDefault(const Constant('[]'))();
+
   IntColumn get longestSessionMinutes =>
       integer().withDefault(const Constant(0))();
 

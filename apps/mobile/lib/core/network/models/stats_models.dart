@@ -9,6 +9,7 @@ class StatsSnapshot {
     required this.minutesAllTime,
     required this.sessionsAllTime,
     required this.minutesByTechnique,
+    required this.weeklyMinutesByDay,
     required this.updatedAtUtc,
     required this.totalXp,
     required this.currentLevel,
@@ -23,6 +24,9 @@ class StatsSnapshot {
       minutesAllTime: readInt(json, 'minutes_all_time'),
       sessionsAllTime: readInt(json, 'sessions_all_time'),
       minutesByTechnique: readStringIntMap(json, 'minutes_by_technique'),
+      weeklyMinutesByDay: json['weekly_minutes_by_day'] == null
+          ? const []
+          : readIntList(json, 'weekly_minutes_by_day'),
       updatedAtUtc: readDateTimeUtc(json, 'updated_at_utc'),
       totalXp: readInt(json, 'total_xp'),
       currentLevel: readInt(json, 'current_level'),
@@ -36,7 +40,31 @@ class StatsSnapshot {
   final int minutesAllTime;
   final int sessionsAllTime;
   final Map<String, int> minutesByTechnique;
+  final List<int> weeklyMinutesByDay;
   final DateTime updatedAtUtc;
   final int totalXp;
   final int currentLevel;
+}
+
+class WeeklyBreakdown {
+  const WeeklyBreakdown({
+    required this.weekOffset,
+    required this.weekStartLocal,
+    required this.weeklyMinutesByDay,
+    required this.updatedAtUtc,
+  });
+
+  factory WeeklyBreakdown.fromJson(JsonMap json) {
+    return WeeklyBreakdown(
+      weekOffset: readInt(json, 'week_offset'),
+      weekStartLocal: readString(json, 'week_start_local'),
+      weeklyMinutesByDay: readIntList(json, 'weekly_minutes_by_day'),
+      updatedAtUtc: readDateTimeUtc(json, 'updated_at_utc'),
+    );
+  }
+
+  final int weekOffset;
+  final String weekStartLocal;
+  final List<int> weeklyMinutesByDay;
+  final DateTime updatedAtUtc;
 }

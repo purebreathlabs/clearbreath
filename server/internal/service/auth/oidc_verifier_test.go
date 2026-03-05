@@ -216,11 +216,11 @@ func TestVerifyProviderGoogleAndAppleSuccessWithLocalOIDC(t *testing.T) {
 	raw := signIDToken(t, priv, kid, issuer, clientID, "user1", time.Now().Add(2*time.Minute))
 
 	s := &Service{
-		googleClientID: clientID,
-		appleAudience:  clientID,
+		googleClientIDs: []string{clientID},
+		appleAudience:   clientID,
 	}
 	s.verifierInitOnce.Do(func() {
-		s.googleVerifier = newOIDCVerifier(issuer, clientID)
+		s.googleVerifiers = []*oidcVerifier{newOIDCVerifier(issuer, clientID)}
 		s.appleVerifier = newOIDCVerifier(issuer, clientID)
 	})
 
@@ -283,15 +283,77 @@ func TestVerifyProviderReturnsProviderTokenError(t *testing.T) {
 	clientID := "client1"
 
 	s := &Service{
-		googleClientID: clientID,
+		googleClientIDs: []string{clientID},
 	}
 	s.verifierInitOnce.Do(func() {
-		s.googleVerifier = newOIDCVerifier(issuer, clientID)
+		s.googleVerifiers = []*oidcVerifier{newOIDCVerifier(issuer, clientID)}
 		s.appleVerifier = newOIDCVerifier(issuer, clientID)
 	})
 
 	if _, _, err := s.verifyProvider(context.Background(), "google", "not-a-jwt", "device1", ""); err == nil {
 		t.Fatalf("expected error")
+	}
+}
+
+func TestVerifyProviderGoogleAcceptsAnyConfiguredAudience(t *testing.T) {
+	priv, err := rsa.GenerateKey(rand.Reader, 2048)
+	if err != nil {
+		t.Fatalf("generate key: %v", err)
+	}
+
+	kid := "kid1"
+	jwks := map[string]any{
+		"keys": []map[string]any{
+			{
+				"kty": "RSA",
+				"use": "sig",
+				"alg": "RS256",
+				"kid": kid,
+				"n":   base64.RawURLEncoding.EncodeToString(priv.N.Bytes()),
+				"e":   base64.RawURLEncoding.EncodeToString([]byte{0x01, 0x00, 0x01}),
+			},
+		},
+	}
+
+	var issuer string
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		switch r.URL.Path {
+		case "/.well-known/openid-configuration":
+			w.Header().Set("Content-Type", "application/json")
+			_ = json.NewEncoder(w).Encode(map[string]any{
+				"issuer":   issuer,
+				"jwks_uri": issuer + "/keys",
+			})
+		case "/keys":
+			w.Header().Set("Content-Type", "application/json")
+			_ = json.NewEncoder(w).Encode(jwks)
+		default:
+			w.WriteHeader(http.StatusNotFound)
+		}
+	}))
+	defer srv.Close()
+	issuer = srv.URL
+
+	firstClientID := "web-client-id"
+	secondClientID := "ios-client-id"
+	raw := signIDToken(t, priv, kid, issuer, secondClientID, "user1", time.Now().Add(2*time.Minute))
+
+	s := &Service{
+		googleClientIDs: []string{firstClientID, secondClientID},
+	}
+	s.verifierInitOnce.Do(func() {
+		s.googleVerifiers = []*oidcVerifier{
+			newOIDCVerifier(issuer, firstClientID),
+			newOIDCVerifier(issuer, secondClientID),
+		}
+	})
+
+	sub, _, err := s.verifyProvider(context.Background(), "google", raw, "device1", "")
+	if err != nil {
+		t.Fatalf("verify google: %v", err)
+	}
+	if sub != "user1" {
+		t.Fatalf("sub: got %q, want %q", sub, "user1")
 	}
 }
 

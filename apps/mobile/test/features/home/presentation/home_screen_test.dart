@@ -73,7 +73,7 @@ void main() {
           dailyRecommendationProvider.overrideWith((ref) async => rec),
           favoriteTechniquesProvider.overrideWith((ref) async => [technique]),
           localStatsProvider.overrideWith((ref) async => StatsSnapshot.empty()),
-          weeklyMinutesProvider.overrideWith(
+          mergedWeeklyMinutesProvider.overrideWith(
             (ref, weekOffset) async => const [0, 1, 2, 3, 4, 5, 6],
           ),
         ],
@@ -113,7 +113,7 @@ void main() {
           mergedStatsProvider.overrideWith(
             (ref) async => StatsSnapshot.empty(),
           ),
-          weeklyMinutesProvider.overrideWith(
+          mergedWeeklyMinutesProvider.overrideWith(
             (ref, weekOffset) async => const [0, 0, 0, 0, 0, 0, 0],
           ),
         ],
@@ -125,6 +125,54 @@ void main() {
 
     expect(find.textContaining('Rahul'), findsOneWidget);
   });
+
+  testWidgets(
+    'uses merged stats snapshot for current streak and weekly summary',
+    (tester) async {
+      final technique = buildTechnique('box');
+      final preset = technique.presets['beginner']!;
+      final rec = Recommendation(
+        techniqueId: technique.id,
+        presetId: 'beginner',
+        rationale: 'Test rationale',
+        technique: technique,
+        preset: preset,
+      );
+
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            dailyRecommendationProvider.overrideWith((ref) async => rec),
+            favoriteTechniquesProvider.overrideWith((ref) async => [technique]),
+            mergedStatsProvider.overrideWith(
+              (ref) async => StatsSnapshot(
+                currentStreakDays: 1,
+                longestStreakDays: 1,
+                practiceDaysAllTime: 1,
+                minutesThisWeek: 5,
+                minutesAllTime: 5,
+                sessionsAllTime: 1,
+                minutesByTechnique: const {'box': 5},
+                weeklyMinutesByDay: const [5, 0, 0, 0, 0, 0, 0],
+                longestSessionMinutes: 5,
+                favoriteTechniqueId: 'box',
+                totalBreathsEstimated: 30,
+                updatedAt: DateTime.utc(2026, 3, 6),
+              ),
+            ),
+          ],
+          child: MaterialApp(theme: AppTheme.dark(), home: const HomeScreen()),
+        ),
+      );
+
+      await tester.pumpAndSettle();
+
+      expect(find.text('1'), findsWidgets);
+      expect(find.text('5'), findsWidgets);
+      expect(find.text('days'), findsOneWidget);
+      expect(find.text('min'), findsOneWidget);
+    },
+  );
 }
 
 class _SignedInAuthController extends AuthController {

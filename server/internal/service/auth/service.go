@@ -35,9 +35,9 @@ type Service struct {
 	refreshTTL       time.Duration
 	devAuthEnabled   bool
 	devAuthSecret    string
-	googleClientID   string
+	googleClientIDs  []string
 	appleAudience    string
-	googleVerifier   *oidcVerifier
+	googleVerifiers  []*oidcVerifier
 	appleVerifier    *oidcVerifier
 	verifierInitOnce sync.Once
 	filter           *profanity.Filter
@@ -76,7 +76,7 @@ type AuthResult struct {
 	User                     UserProfile
 }
 
-func NewService(store *repository.Store, clk clock.Clock, accessTokens *internalauth.AccessTokenManager, refreshSecret string, refreshTTLMinutes int, devAuthEnabled bool, devAuthSecret string, googleClientID string, appleAudience string, filter *profanity.Filter) (*Service, error) {
+func NewService(store *repository.Store, clk clock.Clock, accessTokens *internalauth.AccessTokenManager, refreshSecret string, refreshTTLMinutes int, devAuthEnabled bool, devAuthSecret string, googleClientIDs []string, appleAudience string, filter *profanity.Filter) (*Service, error) {
 	if store == nil {
 		return nil, fmt.Errorf("store is required")
 	}
@@ -96,17 +96,26 @@ func NewService(store *repository.Store, clk clock.Clock, accessTokens *internal
 		return nil, fmt.Errorf("profanity filter is required")
 	}
 
+	cleanGoogleClientIDs := make([]string, 0, len(googleClientIDs))
+	for _, clientID := range googleClientIDs {
+		trimmed := strings.TrimSpace(clientID)
+		if trimmed == "" {
+			continue
+		}
+		cleanGoogleClientIDs = append(cleanGoogleClientIDs, trimmed)
+	}
+
 	return &Service{
-		store:          store,
-		clock:          clk,
-		accessTokens:   accessTokens,
-		refreshSecret:  refreshSecret,
-		refreshTTL:     time.Duration(refreshTTLMinutes) * time.Minute,
-		devAuthEnabled: devAuthEnabled,
-		devAuthSecret:  devAuthSecret,
-		googleClientID: googleClientID,
-		appleAudience:  appleAudience,
-		filter:         filter,
+		store:           store,
+		clock:           clk,
+		accessTokens:    accessTokens,
+		refreshSecret:   refreshSecret,
+		refreshTTL:      time.Duration(refreshTTLMinutes) * time.Minute,
+		devAuthEnabled:  devAuthEnabled,
+		devAuthSecret:   devAuthSecret,
+		googleClientIDs: cleanGoogleClientIDs,
+		appleAudience:   appleAudience,
+		filter:          filter,
 	}, nil
 }
 
@@ -429,15 +438,28 @@ func (s *Service) verifyProvider(ctx context.Context, provider string, idToken s
 		if strings.TrimSpace(idToken) == "" {
 			return "", "", apierr.New(http.StatusBadRequest, "validation", "id_token is required")
 		}
-		if strings.TrimSpace(s.googleClientID) == "" {
+		if len(s.googleClientIDs) == 0 {
 			return "", "", apierr.New(http.StatusInternalServerError, "provider_not_configured", "google auth is not configured")
 		}
-		v := s.getGoogleVerifier()
-		sub, email, err := v.Verify(ctx, idToken)
-		if err != nil {
-			return "", "", err
+		verifiers := s.getGoogleVerifiers()
+		if len(verifiers) == 0 {
+			return "", "", apierr.New(http.StatusInternalServerError, "provider_not_configured", "google auth is not configured")
 		}
-		return sub, email, nil
+		var verifyErr error
+		for _, verifier := range verifiers {
+			sub, email, err := verifier.Verify(ctx, idToken)
+			if err == nil {
+				return sub, email, nil
+			}
+			if providerErr, ok := apierr.As(err); ok && providerErr.Code == "invalid_provider_token" {
+				continue
+			}
+			verifyErr = err
+		}
+		if verifyErr != nil {
+			return "", "", verifyErr
+		}
+		return "", "", apierr.New(http.StatusUnauthorized, "invalid_provider_token", "invalid provider token")
 
 	case "apple":
 		if strings.TrimSpace(idToken) == "" {
@@ -458,17 +480,23 @@ func (s *Service) verifyProvider(ctx context.Context, provider string, idToken s
 	}
 }
 
-func (s *Service) getGoogleVerifier() *oidcVerifier {
+func (s *Service) getGoogleVerifiers() []*oidcVerifier {
 	s.verifierInitOnce.Do(func() {
-		s.googleVerifier = newOIDCVerifier("https://accounts.google.com", s.googleClientID)
+		s.googleVerifiers = make([]*oidcVerifier, 0, len(s.googleClientIDs))
+		for _, clientID := range s.googleClientIDs {
+			s.googleVerifiers = append(s.googleVerifiers, newOIDCVerifier("https://accounts.google.com", clientID))
+		}
 		s.appleVerifier = newOIDCVerifier("https://appleid.apple.com", s.appleAudience)
 	})
-	return s.googleVerifier
+	return s.googleVerifiers
 }
 
 func (s *Service) getAppleVerifier() *oidcVerifier {
 	s.verifierInitOnce.Do(func() {
-		s.googleVerifier = newOIDCVerifier("https://accounts.google.com", s.googleClientID)
+		s.googleVerifiers = make([]*oidcVerifier, 0, len(s.googleClientIDs))
+		for _, clientID := range s.googleClientIDs {
+			s.googleVerifiers = append(s.googleVerifiers, newOIDCVerifier("https://accounts.google.com", clientID))
+		}
 		s.appleVerifier = newOIDCVerifier("https://appleid.apple.com", s.appleAudience)
 	})
 	return s.appleVerifier

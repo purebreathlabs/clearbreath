@@ -147,6 +147,7 @@ void main() {
     final snapshot = computeStats(sessions, now, 0);
 
     expect(snapshot.minutesThisWeek, equals(7));
+    expect(snapshot.weeklyMinutesByDay, equals(const [5, 0, 2, 0, 0, 0, 0]));
   });
 
   test('caps practice XP per local day', () {

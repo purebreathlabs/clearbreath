@@ -58,6 +58,7 @@ type statsSnapshotResponse struct {
 	MinutesAllTime      int32            `json:"minutes_all_time"`
 	SessionsAllTime     int32            `json:"sessions_all_time"`
 	MinutesByTechnique  map[string]int32 `json:"minutes_by_technique"`
+	WeeklyMinutesByDay  []int32          `json:"weekly_minutes_by_day"`
 	UpdatedAtUTC        string           `json:"updated_at_utc"`
 }
 
@@ -129,7 +130,7 @@ func (h *SessionsHandler) ingest(w http.ResponseWriter, r *http.Request, isSync 
 }
 
 func toIngestSessionsResponse(out sessionsvc.IngestResult) (ingestSessionsResponse, error) {
-	snap, err := toStatsSnapshotResponse(out.StatsSnapshot)
+	snap, err := toStatsSnapshotResponse(out.StatsSnapshot, out.WeeklyMinutesByDay)
 	if err != nil {
 		return ingestSessionsResponse{}, err
 	}
@@ -149,7 +150,7 @@ func toIngestSessionsResponse(out sessionsvc.IngestResult) (ingestSessionsRespon
 	}, nil
 }
 
-func toStatsSnapshotResponse(s sqlcgen.StatsSnapshot) (statsSnapshotResponse, error) {
+func toStatsSnapshotResponse(s sqlcgen.StatsSnapshot, weeklyMinutesByDay []int32) (statsSnapshotResponse, error) {
 	var m map[string]int32
 	if err := json.Unmarshal(s.MinutesByTechnique, &m); err != nil {
 		return statsSnapshotResponse{}, err
@@ -166,6 +167,17 @@ func toStatsSnapshotResponse(s sqlcgen.StatsSnapshot) (statsSnapshotResponse, er
 		MinutesAllTime:      s.MinutesAllTime,
 		SessionsAllTime:     s.SessionsAllTime,
 		MinutesByTechnique:  m,
+		WeeklyMinutesByDay:  normalizedWeeklyMinutesByDay(weeklyMinutesByDay),
 		UpdatedAtUTC:        s.UpdatedAt.UTC().Format(time.RFC3339),
 	}, nil
+}
+
+func normalizedWeeklyMinutesByDay(value []int32) []int32 {
+	out := make([]int32, 7)
+	for i := 0; i < len(out) && i < len(value); i++ {
+		if value[i] > 0 {
+			out[i] = value[i]
+		}
+	}
+	return out
 }

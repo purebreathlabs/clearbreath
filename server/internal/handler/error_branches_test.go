@@ -35,6 +35,7 @@ func TestHandlersReturnUnauthorizedWithoutUserID(t *testing.T) {
 			NewSafetyAcknowledgementsHandler(nil).Post(rec, req)
 		}},
 		{name: "stats snapshot", run: func(rec *httptest.ResponseRecorder, req *http.Request) { NewStatsHandler(nil, nil).Snapshot(rec, req) }},
+		{name: "stats weekly", run: func(rec *httptest.ResponseRecorder, req *http.Request) { NewStatsHandler(nil, nil).Weekly(rec, req) }},
 		{name: "leaderboard self", run: func(rec *httptest.ResponseRecorder, req *http.Request) { NewLeaderboardHandler(nil).Self(rec, req) }},
 		{name: "auth logout", run: func(rec *httptest.ResponseRecorder, req *http.Request) { NewAuthHandler(nil).Logout(rec, req) }},
 		{name: "sessions submit", run: func(rec *httptest.ResponseRecorder, req *http.Request) { NewSessionsHandler(nil).Submit(rec, req) }},
@@ -119,7 +120,7 @@ func TestToStatsSnapshotResponseInvalidJSON(t *testing.T) {
 		SessionsAllTime:    5,
 		MinutesByTechnique: []byte("{"),
 		UpdatedAt:          time.Date(2026, 2, 16, 12, 0, 0, 0, time.UTC),
-	})
+	}, nil)
 	if err == nil {
 		t.Fatalf("expected error")
 	}
@@ -134,7 +135,7 @@ func TestToStatsSnapshotResponseNullMapDefaultsEmpty(t *testing.T) {
 		SessionsAllTime:    5,
 		MinutesByTechnique: []byte("null"),
 		UpdatedAt:          time.Date(2026, 2, 16, 12, 0, 0, 0, time.UTC),
-	})
+	}, nil)
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
@@ -155,5 +156,25 @@ func TestToIngestSessionsResponsePropagatesSnapshotError(t *testing.T) {
 	})
 	if err == nil {
 		t.Fatalf("expected error")
+	}
+}
+
+func TestStatsHandlerWeeklyRejectsInvalidWeekOffset(t *testing.T) {
+	userID := uuid.MustParse("3b9c6e7a-77f2-4b4c-8d7e-3e4a2c4f5a11")
+	req := httptest.NewRequest(http.MethodGet, "/v1/stats/weekly?week_offset=1", nil)
+	req = req.WithContext(auth.ContextWithUserID(contextBackground{}, userID))
+	rec := httptest.NewRecorder()
+
+	NewStatsHandler(nil, nil).Weekly(rec, req)
+
+	if rec.Code != http.StatusBadRequest {
+		t.Fatalf("status: got %d, want %d", rec.Code, http.StatusBadRequest)
+	}
+	var e httpError
+	if err := json.NewDecoder(rec.Body).Decode(&e); err != nil {
+		t.Fatalf("decode: %v", err)
+	}
+	if e.Code != "validation" {
+		t.Fatalf("code: got %q, want %q", e.Code, "validation")
 	}
 }

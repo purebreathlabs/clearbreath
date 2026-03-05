@@ -48,6 +48,24 @@ class CloudStatsRepository {
     return merged;
   }
 
+  Future<List<int>> fetchWeeklyMinutes(int weekOffset) async {
+    final resp = await _dio.get<dynamic>(
+      '/v1/stats/weekly',
+      queryParameters: {'week_offset': weekOffset},
+    );
+    final data = resp.data;
+    if (data is! Map) {
+      throw FormatException('Invalid weekly stats response.');
+    }
+    final weekly = api.WeeklyBreakdown.fromJson(data.cast<String, dynamic>());
+    if (weekly.weeklyMinutesByDay.length != 7) {
+      throw FormatException('Invalid weekly stats response.');
+    }
+    return List.unmodifiable(
+      weekly.weeklyMinutesByDay.map((value) => value < 0 ? 0 : value),
+    );
+  }
+
   StatsSnapshot _toDomain(api.StatsSnapshot cloud, StatsSnapshot? existing) {
     return StatsSnapshot(
       currentStreakDays: cloud.currentStreakDays,
@@ -57,6 +75,7 @@ class CloudStatsRepository {
       minutesAllTime: cloud.minutesAllTime,
       sessionsAllTime: cloud.sessionsAllTime,
       minutesByTechnique: cloud.minutesByTechnique,
+      weeklyMinutesByDay: cloud.weeklyMinutesByDay,
       longestSessionMinutes: existing?.longestSessionMinutes ?? 0,
       favoriteTechniqueId: existing?.favoriteTechniqueId,
       totalBreathsEstimated: existing?.totalBreathsEstimated ?? 0,

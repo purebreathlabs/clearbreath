@@ -33,7 +33,7 @@ class _StatsSectionState extends ConsumerState<StatsSection> {
     final components = Theme.of(context).extension<AppComponentTokens>()!;
 
     final stats = ref.watch(mergedStatsProvider);
-    final weekly = ref.watch(weeklyMinutesProvider(_weekOffset));
+    final weekly = ref.watch(mergedWeeklyMinutesProvider(_weekOffset));
     final techniques = ref.watch(allTechniquesProvider);
 
     Widget errorState(String message) {
@@ -57,7 +57,9 @@ class _StatsSectionState extends ConsumerState<StatsSection> {
             OutlinedButton(
               onPressed: () {
                 ref.invalidate(mergedStatsProvider);
-                ref.invalidate(weeklyMinutesProvider);
+                ref.invalidate(localWeeklyMinutesProvider);
+                ref.invalidate(cloudWeeklyMinutesProvider);
+                ref.invalidate(mergedWeeklyMinutesProvider);
               },
               child: const Text('Retry'),
             ),

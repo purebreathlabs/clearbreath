@@ -60,7 +60,7 @@ func TestNewServiceValidation(t *testing.T) {
 				f = profanity.NewDefault()
 			}
 
-			_, err := NewService(tt.store, clk, tt.accessTokens, tt.refreshSecret, tt.refreshTTLMin, false, "", "", "", f)
+			_, err := NewService(tt.store, clk, tt.accessTokens, tt.refreshSecret, tt.refreshTTLMin, false, "", nil, "", f)
 			if err == nil {
 				t.Fatalf("expected error")
 			}
@@ -179,16 +179,19 @@ func TestVerifyProviderUnsupportedProvider(t *testing.T) {
 
 func TestGetGoogleAndAppleVerifierInitializedOnce(t *testing.T) {
 	s := &Service{
-		googleClientID: "google",
-		appleAudience:  "apple",
+		googleClientIDs: []string{"google-a", "google-b"},
+		appleAudience:   "apple",
 	}
 
-	g1 := s.getGoogleVerifier()
-	if g1 == nil {
-		t.Fatalf("expected google verifier")
+	g1 := s.getGoogleVerifiers()
+	if len(g1) != 2 {
+		t.Fatalf("expected two google verifiers")
 	}
-	if g1.issuer != "https://accounts.google.com" || g1.clientID != "google" {
-		t.Fatalf("unexpected google verifier config")
+	if g1[0].issuer != "https://accounts.google.com" || g1[0].clientID != "google-a" {
+		t.Fatalf("unexpected first google verifier config")
+	}
+	if g1[1].issuer != "https://accounts.google.com" || g1[1].clientID != "google-b" {
+		t.Fatalf("unexpected second google verifier config")
 	}
 
 	a1 := s.getAppleVerifier()
@@ -199,11 +202,11 @@ func TestGetGoogleAndAppleVerifierInitializedOnce(t *testing.T) {
 		t.Fatalf("unexpected apple verifier config")
 	}
 
-	g2 := s.getGoogleVerifier()
+	g2 := s.getGoogleVerifiers()
 	a2 := s.getAppleVerifier()
 
-	if g1 != g2 {
-		t.Fatalf("expected google verifier singleton")
+	if len(g2) != 2 || g1[0] != g2[0] || g1[1] != g2[1] {
+		t.Fatalf("expected google verifier singletons")
 	}
 	if a1 != a2 {
 		t.Fatalf("expected apple verifier singleton")
@@ -212,8 +215,8 @@ func TestGetGoogleAndAppleVerifierInitializedOnce(t *testing.T) {
 
 func TestGetAppleVerifierInitializedOnce(t *testing.T) {
 	s := &Service{
-		googleClientID: "google",
-		appleAudience:  "apple",
+		googleClientIDs: []string{"google"},
+		appleAudience:   "apple",
 	}
 
 	a1 := s.getAppleVerifier()
@@ -224,21 +227,21 @@ func TestGetAppleVerifierInitializedOnce(t *testing.T) {
 		t.Fatalf("unexpected apple verifier config")
 	}
 
-	g1 := s.getGoogleVerifier()
-	if g1 == nil {
-		t.Fatalf("expected google verifier")
+	g1 := s.getGoogleVerifiers()
+	if len(g1) != 1 {
+		t.Fatalf("expected one google verifier")
 	}
-	if g1.issuer != "https://accounts.google.com" || g1.clientID != "google" {
+	if g1[0].issuer != "https://accounts.google.com" || g1[0].clientID != "google" {
 		t.Fatalf("unexpected google verifier config")
 	}
 
 	a2 := s.getAppleVerifier()
-	g2 := s.getGoogleVerifier()
+	g2 := s.getGoogleVerifiers()
 
 	if a1 != a2 {
 		t.Fatalf("expected apple verifier singleton")
 	}
-	if g1 != g2 {
+	if len(g2) != 1 || g1[0] != g2[0] {
 		t.Fatalf("expected google verifier singleton")
 	}
 }

@@ -47,7 +47,7 @@ func TestConfigValidate(t *testing.T) {
 		JWTRefreshSecret:         strings.Repeat("b", 32),
 		JWTAccessTTLMinutes:      15,
 		JWTRefreshTTLMinutes:     60,
-		GoogleOAuthClientID:      "",
+		GoogleOAuthClientIDs:     nil,
 		AppleOAuthAudience:       "",
 		RateLimitAuthPerHour:     30,
 		RateLimitAuthBurstPerMin: 10,
@@ -81,19 +81,19 @@ func TestConfigValidate(t *testing.T) {
 		{name: "LEADERBOARD_DAILY_CAP_MINUTES must be positive", mutate: func(c *Config) { c.LeaderboardDailyCapMin = 0 }, want: "LEADERBOARD_DAILY_CAP_MINUTES must be positive"},
 		{name: "DEV_AUTH_SECRET required when enabled", mutate: func(c *Config) { c.DevAuthEnabled = true }, want: "DEV_AUTH_SECRET is required when DEV_AUTH_ENABLED is true"},
 		{
-			name: "google client id required outside development",
+			name: "google client ids required outside development",
 			mutate: func(c *Config) {
 				c.Env = "staging"
-				c.GoogleOAuthClientID = ""
+				c.GoogleOAuthClientIDs = nil
 				c.AppleOAuthAudience = strings.Repeat("x", 10)
 			},
-			want: "GOOGLE_OAUTH_CLIENT_ID is required when ENV is not development",
+			want: "GOOGLE_OAUTH_CLIENT_IDS is required when ENV is not development",
 		},
 		{
 			name: "apple audience required outside development",
 			mutate: func(c *Config) {
 				c.Env = "staging"
-				c.GoogleOAuthClientID = strings.Repeat("x", 10)
+				c.GoogleOAuthClientIDs = []string{strings.Repeat("x", 10)}
 				c.AppleOAuthAudience = ""
 			},
 			want: "APPLE_OAUTH_AUDIENCE is required when ENV is not development",
@@ -117,7 +117,7 @@ func TestConfigValidate(t *testing.T) {
 
 	okCfg := valid
 	okCfg.Env = "staging"
-	okCfg.GoogleOAuthClientID = "x"
+	okCfg.GoogleOAuthClientIDs = []string{"x"}
 	okCfg.AppleOAuthAudience = "x"
 	if err := okCfg.Validate(); err != nil {
 		t.Fatalf("expected ok, got %v", err)
@@ -169,5 +169,30 @@ func TestLoadParseErrors(t *testing.T) {
 				t.Fatalf("error: got %q, want contains %q", err.Error(), tt.want)
 			}
 		})
+	}
+}
+
+func TestLoadGoogleOAuthClientIDsCSV(t *testing.T) {
+	t.Setenv("ENV", "staging")
+	t.Setenv("DATABASE_URL", "postgres://example")
+	t.Setenv("REDIS_ADDR", "localhost:6380")
+	t.Setenv("JWT_ACCESS_SECRET", strings.Repeat("a", 32))
+	t.Setenv("JWT_REFRESH_SECRET", strings.Repeat("b", 32))
+	t.Setenv("GOOGLE_OAUTH_CLIENT_IDS", " web-id , , ios-id ")
+	t.Setenv("APPLE_OAUTH_AUDIENCE", "life.clearbreath.clearbreath")
+	t.Setenv("DEV_AUTH_ENABLED", "false")
+
+	cfg, err := Load()
+	if err != nil {
+		t.Fatalf("load: %v", err)
+	}
+	if len(cfg.GoogleOAuthClientIDs) != 2 {
+		t.Fatalf("google client ids length: got %d, want %d", len(cfg.GoogleOAuthClientIDs), 2)
+	}
+	if cfg.GoogleOAuthClientIDs[0] != "web-id" {
+		t.Fatalf("google client id[0]: got %q, want %q", cfg.GoogleOAuthClientIDs[0], "web-id")
+	}
+	if cfg.GoogleOAuthClientIDs[1] != "ios-id" {
+		t.Fatalf("google client id[1]: got %q, want %q", cfg.GoogleOAuthClientIDs[1], "ios-id")
 	}
 }

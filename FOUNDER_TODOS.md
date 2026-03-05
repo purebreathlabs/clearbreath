@@ -8,8 +8,8 @@ This is a checklist of external setup and manual verification steps that are not
 
 - Google OAuth client IDs
   - [x] Created Android + iOS + Web OAuth client IDs in Google Cloud Console for `life.clearbreath.clearbreath`.
-  - [x] Backend env `GOOGLE_OAUTH_CLIENT_ID` set in `server/.env` (Web client ID).
-  - [x] `serverClientId` + `clientId` configured in `sign_in_screen.dart`.
+  - [x] Backend env `GOOGLE_OAUTH_CLIENT_IDS` set in `server/.env` (comma-separated Web + iOS client IDs).
+  - [x] `GOOGLE_WEB_CLIENT_ID` + `GOOGLE_IOS_CLIENT_ID` passed to Flutter via dart-define.
   - [x] iOS `Info.plist` configured with `GIDClientID` and `CFBundleURLSchemes`.
   - [x] Release keystore SHA-1 registered in Google Cloud Console as separate Android client.
   - Google OAuth Client ID reference:

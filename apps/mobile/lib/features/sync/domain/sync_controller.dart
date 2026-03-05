@@ -105,6 +105,7 @@ class SyncController extends Notifier<SyncState> {
         minutesAllTime: existing.minutesAllTime,
         sessionsAllTime: existing.sessionsAllTime,
         minutesByTechnique: existing.minutesByTechnique,
+        weeklyMinutesByDay: existing.weeklyMinutesByDay,
         longestSessionMinutes: existing.longestSessionMinutes,
         favoriteTechniqueId: existing.favoriteTechniqueId,
         totalBreathsEstimated: existing.totalBreathsEstimated,
@@ -220,7 +221,9 @@ class SyncController extends Notifier<SyncState> {
     ref.read(latestXpAwardsProvider.notifier).set(response.xpAwards);
 
     ref.invalidate(mergedStatsProvider);
-    ref.invalidate(weeklyMinutesProvider);
+    ref.invalidate(localWeeklyMinutesProvider);
+    ref.invalidate(cloudWeeklyMinutesProvider);
+    ref.invalidate(mergedWeeklyMinutesProvider);
 
     if (response.acceptedCount > 0) {
       Future.delayed(const Duration(seconds: 2), () {
@@ -240,6 +243,7 @@ class SyncController extends Notifier<SyncState> {
       minutesAllTime: snapshot.minutesAllTime,
       sessionsAllTime: snapshot.sessionsAllTime,
       minutesByTechnique: snapshot.minutesByTechnique,
+      weeklyMinutesByDay: snapshot.weeklyMinutesByDay,
       longestSessionMinutes: existing?.longestSessionMinutes ?? 0,
       favoriteTechniqueId: existing?.favoriteTechniqueId,
       totalBreathsEstimated: existing?.totalBreathsEstimated ?? 0,

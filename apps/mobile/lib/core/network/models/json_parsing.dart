@@ -131,3 +131,23 @@ Map<String, int> readStringIntMap(JsonMap json, String key) {
   }
   return out;
 }
+
+List<int> readIntList(JsonMap json, String key) {
+  final value = json[key];
+  if (value is! List) {
+    throw FormatException('Missing or invalid $key.');
+  }
+  final out = <int>[];
+  for (final item in value) {
+    if (item is int) {
+      out.add(item);
+      continue;
+    }
+    if (item is num) {
+      out.add(item.round());
+      continue;
+    }
+    throw FormatException('Invalid item in $key.');
+  }
+  return out;
+}

@@ -10,13 +10,15 @@ class StatsSnapshot {
     required this.minutesAllTime,
     required this.sessionsAllTime,
     required Map<String, int> minutesByTechnique,
+    required List<int> weeklyMinutesByDay,
     required this.longestSessionMinutes,
     required this.favoriteTechniqueId,
     required this.totalBreathsEstimated,
     required this.updatedAt,
     this.totalXP = 0,
     this.currentLevel = 0,
-  }) : minutesByTechnique = Map.unmodifiable(minutesByTechnique);
+  }) : minutesByTechnique = Map.unmodifiable(minutesByTechnique),
+       weeklyMinutesByDay = List.unmodifiable(weeklyMinutesByDay);
 
   factory StatsSnapshot.empty() {
     return StatsSnapshot(
@@ -27,6 +29,7 @@ class StatsSnapshot {
       minutesAllTime: 0,
       sessionsAllTime: 0,
       minutesByTechnique: const {},
+      weeklyMinutesByDay: const [0, 0, 0, 0, 0, 0, 0],
       longestSessionMinutes: 0,
       favoriteTechniqueId: null,
       totalBreathsEstimated: 0,
@@ -41,6 +44,7 @@ class StatsSnapshot {
   final int minutesAllTime;
   final int sessionsAllTime;
   final Map<String, int> minutesByTechnique;
+  final List<int> weeklyMinutesByDay;
   final int longestSessionMinutes;
   final String? favoriteTechniqueId;
   final int totalBreathsEstimated;

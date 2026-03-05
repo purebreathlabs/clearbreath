@@ -21,7 +21,8 @@ final mergedStatsProvider = FutureProvider<StatsSnapshot>((ref) async {
 
     if (cached != null) {
       final age = DateTime.now().toUtc().difference(cached.updatedAt.toUtc());
-      if (age < const Duration(minutes: 5)) {
+      if (age < const Duration(minutes: 5) &&
+          cached.weeklyMinutesByDay.length == 7) {
         return cached;
       }
     }

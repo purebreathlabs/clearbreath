@@ -103,7 +103,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	authService, err := authsvc.NewService(store, clk, accessTokens, cfg.JWTRefreshSecret, cfg.JWTRefreshTTLMinutes, cfg.DevAuthEnabled, cfg.DevAuthSecret, cfg.GoogleOAuthClientID, cfg.AppleOAuthAudience, profanity.NewDefault())
+	authService, err := authsvc.NewService(store, clk, accessTokens, cfg.JWTRefreshSecret, cfg.JWTRefreshTTLMinutes, cfg.DevAuthEnabled, cfg.DevAuthSecret, cfg.GoogleOAuthClientIDs, cfg.AppleOAuthAudience, profanity.NewDefault())
 	if err != nil {
 		slog.Error("failed to init auth service", "error", err)
 		os.Exit(1)
@@ -193,6 +193,7 @@ func main() {
 
 	statsHandler := handler.NewStatsHandler(statsService, store)
 	r.With(middleware.Auth(accessTokens, store)).Get("/v1/stats/snapshot", statsHandler.Snapshot)
+	r.With(middleware.Auth(accessTokens, store)).Get("/v1/stats/weekly", statsHandler.Weekly)
 
 	xpHistoryHandler := handler.NewXPHistoryHandler(xpService, store)
 	r.With(middleware.Auth(accessTokens, store)).Get("/v1/xp/history", xpHistoryHandler.History)

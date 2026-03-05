@@ -21,7 +21,7 @@ type Config struct {
 	JWTRefreshSecret         string
 	JWTAccessTTLMinutes      int
 	JWTRefreshTTLMinutes     int
-	GoogleOAuthClientID      string
+	GoogleOAuthClientIDs     []string
 	AppleOAuthAudience       string
 	RateLimitAuthPerHour     int
 	RateLimitAuthBurstPerMin int
@@ -85,7 +85,7 @@ func Load() (*Config, error) {
 		JWTRefreshSecret:         os.Getenv("JWT_REFRESH_SECRET"),
 		JWTAccessTTLMinutes:      jwtAccessTTLMinutes,
 		JWTRefreshTTLMinutes:     jwtRefreshTTLMinutes,
-		GoogleOAuthClientID:      os.Getenv("GOOGLE_OAUTH_CLIENT_ID"),
+		GoogleOAuthClientIDs:     splitAndTrimCSV(os.Getenv("GOOGLE_OAUTH_CLIENT_IDS")),
 		AppleOAuthAudience:       os.Getenv("APPLE_OAUTH_AUDIENCE"),
 		RateLimitAuthPerHour:     rateLimitAuthPerHour,
 		RateLimitAuthBurstPerMin: rateLimitAuthBurstPerMin,
@@ -225,8 +225,8 @@ func (c *Config) Validate() error {
 		}
 	}
 	if c.Env != "development" {
-		if strings.TrimSpace(c.GoogleOAuthClientID) == "" {
-			return fmt.Errorf("GOOGLE_OAUTH_CLIENT_ID is required when ENV is not development")
+		if len(c.GoogleOAuthClientIDs) == 0 {
+			return fmt.Errorf("GOOGLE_OAUTH_CLIENT_IDS is required when ENV is not development")
 		}
 		if strings.TrimSpace(c.AppleOAuthAudience) == "" {
 			return fmt.Errorf("APPLE_OAUTH_AUDIENCE is required when ENV is not development")

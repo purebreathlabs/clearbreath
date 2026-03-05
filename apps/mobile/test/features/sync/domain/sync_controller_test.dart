@@ -46,6 +46,7 @@ void main() {
         minutesAllTime: 34,
         sessionsAllTime: 7,
         minutesByTechnique: const {'box': 34},
+        weeklyMinutesByDay: const [12, 0, 0, 0, 0, 0, 0],
         updatedAtUtc: DateTime.utc(2026, 2, 22, 12, 0),
         totalXp: 150,
         currentLevel: 2,
@@ -119,6 +120,7 @@ void main() {
     expect(cached, isNotNull);
     expect(cached!.minutesAllTime, equals(34));
     expect(cached.currentStreakDays, equals(2));
+    expect(cached.weeklyMinutesByDay, equals(const [12, 0, 0, 0, 0, 0, 0]));
   });
 }
 

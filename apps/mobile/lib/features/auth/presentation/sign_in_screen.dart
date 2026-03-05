@@ -186,11 +186,22 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
     await _runSignIn(
       provider: AuthProvider.google,
       idTokenLoader: () async {
+        final webClientId = AppConfig.googleWebClientId;
+        final iosClientId = AppConfig.googleIosClientId;
+        if (!Platform.isIOS && webClientId.isEmpty) {
+          throw const ApiError(
+            statusCode: 500,
+            code: 'provider_not_configured',
+            message: 'Sign-in provider is not configured yet.',
+            requestId: null,
+          );
+        }
+
         await (_googleInit ??= GoogleSignIn.instance.initialize(
-          serverClientId:
-              '884656805579-ptcbmv99ha49rcfm7lelagp5e0ooeepm.apps.googleusercontent.com',
-          clientId:
-              '884656805579-d246uemq96mrn466l2uml85cer23vca9.apps.googleusercontent.com',
+          serverClientId: webClientId.isEmpty ? null : webClientId,
+          clientId: Platform.isIOS && iosClientId.isNotEmpty
+              ? iosClientId
+              : null,
         ));
 
         try {

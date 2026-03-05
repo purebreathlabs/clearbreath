@@ -10,7 +10,9 @@ FLUTTER ?= flutter
 DART ?= $(shell if command -v dart >/dev/null 2>&1; then echo dart; else FLUTTER_PATH="$$(command -v $(FLUTTER) 2>/dev/null || echo $(FLUTTER))"; echo "$$(dirname "$$FLUTTER_PATH")/dart"; fi)
 MOBILE_RUN_ARGS ?=
 API_BASE_URL ?= https://api.clearbreath.life
-MOBILE_DART_DEFINES ?= --dart-define=API_BASE_URL=$(API_BASE_URL)
+GOOGLE_WEB_CLIENT_ID ?=
+GOOGLE_IOS_CLIENT_ID ?=
+MOBILE_DART_DEFINES ?= --dart-define=API_BASE_URL=$(API_BASE_URL) --dart-define=GOOGLE_WEB_CLIENT_ID=$(GOOGLE_WEB_CLIENT_ID) --dart-define=GOOGLE_IOS_CLIENT_ID=$(GOOGLE_IOS_CLIENT_ID)
 GOLANGCI_LINT := $(HOME)/go/bin/golangci-lint
 SQLC := $(HOME)/go/bin/sqlc
 GOOSE := $(HOME)/go/bin/goose

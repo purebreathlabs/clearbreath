@@ -45,6 +45,14 @@ WHERE user_id = $1
   AND local_day >= $2
   AND local_day < $3;
 
+-- name: GetSessionDayTotalsInRange :many
+SELECT local_day, COALESCE(SUM(duration_seconds_actual), 0)::bigint AS total_seconds
+FROM sessions
+WHERE user_id = $1
+  AND local_day >= $2
+  AND local_day < $3
+GROUP BY local_day
+ORDER BY local_day;
+
 -- name: GetSessionByClientID :one
 SELECT id, duration_seconds_actual, ended_early, local_day FROM sessions WHERE client_session_id = $1;
-
