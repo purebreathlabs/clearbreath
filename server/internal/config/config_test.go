@@ -196,3 +196,26 @@ func TestLoadGoogleOAuthClientIDsCSV(t *testing.T) {
 		t.Fatalf("google client id[1]: got %q, want %q", cfg.GoogleOAuthClientIDs[1], "ios-id")
 	}
 }
+
+func TestLoadGoogleOAuthClientIDLegacyFallback(t *testing.T) {
+	t.Setenv("ENV", "staging")
+	t.Setenv("DATABASE_URL", "postgres://example")
+	t.Setenv("REDIS_ADDR", "localhost:6380")
+	t.Setenv("JWT_ACCESS_SECRET", strings.Repeat("a", 32))
+	t.Setenv("JWT_REFRESH_SECRET", strings.Repeat("b", 32))
+	t.Setenv("GOOGLE_OAUTH_CLIENT_IDS", "")
+	t.Setenv("GOOGLE_OAUTH_CLIENT_ID", "legacy-web-id")
+	t.Setenv("APPLE_OAUTH_AUDIENCE", "life.clearbreath.clearbreath")
+	t.Setenv("DEV_AUTH_ENABLED", "false")
+
+	cfg, err := Load()
+	if err != nil {
+		t.Fatalf("load: %v", err)
+	}
+	if len(cfg.GoogleOAuthClientIDs) != 1 {
+		t.Fatalf("google client ids length: got %d, want %d", len(cfg.GoogleOAuthClientIDs), 1)
+	}
+	if cfg.GoogleOAuthClientIDs[0] != "legacy-web-id" {
+		t.Fatalf("google client id[0]: got %q, want %q", cfg.GoogleOAuthClientIDs[0], "legacy-web-id")
+	}
+}

@@ -72,6 +72,10 @@ func Load() (*Config, error) {
 		return nil, fmt.Errorf("parse LEADERBOARD_DAILY_CAP_MINUTES: %w", err)
 	}
 	dashboardEnabled := envBoolOrDefault("DASHBOARD_ENABLED", false)
+	googleOAuthClientIDs := os.Getenv("GOOGLE_OAUTH_CLIENT_IDS")
+	if strings.TrimSpace(googleOAuthClientIDs) == "" {
+		googleOAuthClientIDs = os.Getenv("GOOGLE_OAUTH_CLIENT_ID")
+	}
 
 	cfg := &Config{
 		Port:                     envOrDefault("PORT", "8080"),
@@ -85,7 +89,7 @@ func Load() (*Config, error) {
 		JWTRefreshSecret:         os.Getenv("JWT_REFRESH_SECRET"),
 		JWTAccessTTLMinutes:      jwtAccessTTLMinutes,
 		JWTRefreshTTLMinutes:     jwtRefreshTTLMinutes,
-		GoogleOAuthClientIDs:     splitAndTrimCSV(os.Getenv("GOOGLE_OAUTH_CLIENT_IDS")),
+		GoogleOAuthClientIDs:     splitAndTrimCSV(googleOAuthClientIDs),
 		AppleOAuthAudience:       os.Getenv("APPLE_OAUTH_AUDIENCE"),
 		RateLimitAuthPerHour:     rateLimitAuthPerHour,
 		RateLimitAuthBurstPerMin: rateLimitAuthBurstPerMin,
