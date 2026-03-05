@@ -50,13 +50,14 @@ type RejectedSession struct {
 }
 
 type IngestResult struct {
-	AcceptedCount  int                   `json:"accepted_count"`
-	DuplicateCount int                   `json:"duplicate_count"`
-	Rejected       []RejectedSession     `json:"rejected"`
-	StatsSnapshot  sqlcgen.StatsSnapshot `json:"stats_snapshot"`
-	XPAwards       []xp.XPAward          `json:"xp_awards"`
-	TotalXP        int64                 `json:"total_xp"`
-	CurrentLevel   int32                 `json:"current_level"`
+	AcceptedCount      int                   `json:"accepted_count"`
+	DuplicateCount     int                   `json:"duplicate_count"`
+	Rejected           []RejectedSession     `json:"rejected"`
+	StatsSnapshot      sqlcgen.StatsSnapshot `json:"stats_snapshot"`
+	WeeklyMinutesByDay []int32               `json:"weekly_minutes_by_day"`
+	XPAwards           []xp.XPAward          `json:"xp_awards"`
+	TotalXP            int64                 `json:"total_xp"`
+	CurrentLevel       int32                 `json:"current_level"`
 }
 
 func NewService(store *repository.Store, registry *technique.Registry, statsSvc *stats.Service, xpSvc *xp.Service, clk clock.Clock) (*Service, error) {
@@ -193,6 +194,12 @@ func (s *Service) ingest(ctx context.Context, userID uuid.UUID, sessions []Sessi
 			return err
 		}
 		out.StatsSnapshot = snap
+
+		weekly, err := s.stats.GetWeeklyBreakdownTx(ctx, q, userID, 0, now, tzOffset)
+		if err != nil {
+			return err
+		}
+		out.WeeklyMinutesByDay = weekly.WeeklyMinutesByDay
 
 		dayTotals, err := q.GetSessionDayTotals(ctx, userID)
 		if err != nil {

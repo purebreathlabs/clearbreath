@@ -44,6 +44,9 @@ class StatsCacheRepository {
             minutesByTechniqueJson: Value(
               jsonEncode(snapshot.minutesByTechnique),
             ),
+            weeklyMinutesByDayJson: Value(
+              jsonEncode(snapshot.weeklyMinutesByDay),
+            ),
             longestSessionMinutes: Value(snapshot.longestSessionMinutes),
             favoriteTechniqueId: Value(snapshot.favoriteTechniqueId),
             totalBreathsEstimated: Value(snapshot.totalBreathsEstimated),
@@ -63,6 +66,7 @@ class StatsCacheRepository {
       minutesAllTime: row.minutesAllTime,
       sessionsAllTime: row.sessionsAllTime,
       minutesByTechnique: _decodeMinutesByTechnique(row.minutesByTechniqueJson),
+      weeklyMinutesByDay: _decodeWeeklyMinutesByDay(row.weeklyMinutesByDayJson),
       longestSessionMinutes: row.longestSessionMinutes,
       favoriteTechniqueId: row.favoriteTechniqueId,
       totalBreathsEstimated: row.totalBreathsEstimated,
@@ -97,6 +101,33 @@ class StatsCacheRepository {
       return result;
     } catch (_) {
       return const {};
+    }
+  }
+
+  List<int> _decodeWeeklyMinutesByDay(String encoded) {
+    try {
+      final decoded = jsonDecode(encoded);
+      if (decoded is! List) {
+        return const [];
+      }
+      final result = <int>[];
+      for (final item in decoded) {
+        if (item is int) {
+          result.add(item);
+          continue;
+        }
+        if (item is num) {
+          result.add(item.round());
+          continue;
+        }
+        return const [];
+      }
+      if (result.length != 7) {
+        return const [];
+      }
+      return List.unmodifiable(result.map((value) => value < 0 ? 0 : value));
+    } catch (_) {
+      return const [];
     }
   }
 }

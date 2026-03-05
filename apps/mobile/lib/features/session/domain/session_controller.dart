@@ -192,7 +192,9 @@ class SessionController extends Notifier<SessionState> {
         ref.invalidate(localStatsProvider);
         await ref.read(localStatsProvider.future);
         ref.invalidate(mergedStatsProvider);
-        ref.invalidate(weeklyMinutesProvider);
+        ref.invalidate(localWeeklyMinutesProvider);
+        ref.invalidate(cloudWeeklyMinutesProvider);
+        ref.invalidate(mergedWeeklyMinutesProvider);
         if (ref.read(authStateProvider) is AuthStateSignedIn) {
           unawaited(
             ref.read(syncControllerProvider.notifier).submitSession(local),
@@ -302,7 +304,9 @@ class SessionController extends Notifier<SessionState> {
     ref.invalidate(localStatsProvider);
     await ref.read(localStatsProvider.future);
     ref.invalidate(mergedStatsProvider);
-    ref.invalidate(weeklyMinutesProvider);
+    ref.invalidate(localWeeklyMinutesProvider);
+    ref.invalidate(cloudWeeklyMinutesProvider);
+    ref.invalidate(mergedWeeklyMinutesProvider);
     ref.read(latestXpAwardsProvider.notifier).clear();
     ref.read(lastCompletedSessionProvider.notifier).set(local);
     unawaited(

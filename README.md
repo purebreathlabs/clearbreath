@@ -109,11 +109,18 @@ The arm64-v8a APK is at `apps/mobile/build/app/outputs/flutter-apk/app-arm64-v8a
 
 #### Google Sign-In (local dev)
 
-Google Sign-In works on debug builds if the debug keystore SHA-1 is registered in the
-Google Cloud Console Android OAuth client. The `serverClientId` (Web client ID) is
-configured in `sign_in_screen.dart` and the backend reads `GOOGLE_OAUTH_CLIENT_ID` from
-`server/.env`. No additional URL or redirect configuration is needed for native Android
-sign-in.
+The backend reads `GOOGLE_OAUTH_CLIENT_IDS` from `server/.env` and should include
+the Web client ID plus any native client IDs whose tokens the server accepts.
+Android debug builds should pass the Web client ID via dart define. iOS can use the
+checked-in `Info.plist` Google config, and dart defines override it when supplied:
+
+```bash
+GOOGLE_WEB_CLIENT_ID=<web-client-id.apps.googleusercontent.com> \
+GOOGLE_IOS_CLIENT_ID=<ios-client-id.apps.googleusercontent.com> \
+make mobile-run
+```
+
+No additional URL or redirect configuration is needed for native Android sign-in.
 
 ### Web
 

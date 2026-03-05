@@ -164,6 +164,7 @@ void main() {
             minutesAllTime: 0,
             sessionsAllTime: 0,
             minutesByTechnique: const {},
+            weeklyMinutesByDay: const [0, 0, 0, 0, 0, 0, 0],
             longestSessionMinutes: 0,
             favoriteTechniqueId: null,
             totalBreathsEstimated: 0,

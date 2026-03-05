@@ -85,6 +85,7 @@ type ingestHTTPResponse struct {
 		MinutesAllTime     int32            `json:"minutes_all_time"`
 		SessionsAllTime    int32            `json:"sessions_all_time"`
 		MinutesByTechnique map[string]int32 `json:"minutes_by_technique"`
+		WeeklyMinutesByDay []int32          `json:"weekly_minutes_by_day"`
 		UpdatedAtUTC       string           `json:"updated_at_utc"`
 		TotalXP            int64            `json:"total_xp"`
 		CurrentLevel       int32            `json:"current_level"`
@@ -103,7 +104,15 @@ type statsHTTPResponse struct {
 	MinutesAllTime     int32            `json:"minutes_all_time"`
 	SessionsAllTime    int32            `json:"sessions_all_time"`
 	MinutesByTechnique map[string]int32 `json:"minutes_by_technique"`
+	WeeklyMinutesByDay []int32          `json:"weekly_minutes_by_day"`
 	UpdatedAtUTC       string           `json:"updated_at_utc"`
+}
+
+type weeklyBreakdownHTTPResponse struct {
+	WeekOffset         int     `json:"week_offset"`
+	WeekStartLocal     string  `json:"week_start_local"`
+	WeeklyMinutesByDay []int32 `json:"weekly_minutes_by_day"`
+	UpdatedAtUTC       string  `json:"updated_at_utc"`
 }
 
 type leaderboardHTTPResponse struct {
@@ -194,7 +203,7 @@ func TestHTTPAPIContractSmoke(t *testing.T) {
 		_ = godotenv.Load(envPath)
 	}
 	setBaseIntegrationEnv(t)
-	t.Setenv("GOOGLE_OAUTH_CLIENT_ID", "")
+	t.Setenv("GOOGLE_OAUTH_CLIENT_IDS", "")
 	t.Setenv("APPLE_OAUTH_AUDIENCE", "")
 	if p := os.Getenv("TECHNIQUE_REGISTRY_PATH"); p == "" || !fileExists(p) {
 		registryPath, err := resolveExistingFilePath("registry/techniques.json", "../../registry/techniques.json")
@@ -239,7 +248,7 @@ func TestHTTPAPIContractSmoke(t *testing.T) {
 		t.Fatalf("access token manager: %v", err)
 	}
 
-	authService, err := authsvc.NewService(store, clk, accessTokens, cfg.JWTRefreshSecret, cfg.JWTRefreshTTLMinutes, cfg.DevAuthEnabled, cfg.DevAuthSecret, cfg.GoogleOAuthClientID, cfg.AppleOAuthAudience, profanity.NewDefault())
+	authService, err := authsvc.NewService(store, clk, accessTokens, cfg.JWTRefreshSecret, cfg.JWTRefreshTTLMinutes, cfg.DevAuthEnabled, cfg.DevAuthSecret, cfg.GoogleOAuthClientIDs, cfg.AppleOAuthAudience, profanity.NewDefault())
 	if err != nil {
 		t.Fatalf("auth service: %v", err)
 	}
@@ -312,6 +321,7 @@ func TestHTTPAPIContractSmoke(t *testing.T) {
 
 	statsHandler := handler.NewStatsHandler(statsService, store)
 	r.With(middleware.Auth(accessTokens, store)).Get("/v1/stats/snapshot", statsHandler.Snapshot)
+	r.With(middleware.Auth(accessTokens, store)).Get("/v1/stats/weekly", statsHandler.Weekly)
 
 	leaderboardHandler := handler.NewLeaderboardHandler(leaderboardService)
 	leaderboardRateLimitMin := middleware.RateLimitIP(rdb, "rl:leaderboard:min", cfg.RateLimitLeaderboardPerM, time.Minute)
@@ -572,6 +582,16 @@ func TestHTTPAPIContractSmoke(t *testing.T) {
 	if snap0.SessionsAllTime != 0 {
 		t.Fatalf("sessions_all_time: got %d, want 0", snap0.SessionsAllTime)
 	}
+	if len(snap0.WeeklyMinutesByDay) != 7 {
+		t.Fatalf("weekly_minutes_by_day length: got %d, want 7", len(snap0.WeeklyMinutesByDay))
+	}
+	var snap0WeekTotal int32
+	for _, minutes := range snap0.WeeklyMinutesByDay {
+		snap0WeekTotal += minutes
+	}
+	if snap0WeekTotal != snap0.MinutesThisWeek {
+		t.Fatalf("weekly_minutes_by_day total: got %d, want %d", snap0WeekTotal, snap0.MinutesThisWeek)
+	}
 
 	status, hdr, body = doJSON(t, client, http.MethodPost, srv.URL+"/v1/auth/refresh", map[string]any{
 		"refresh_token": auth1.RefreshToken,
@@ -742,6 +762,16 @@ func TestHTTPAPIContractSmoke(t *testing.T) {
 	if len(ingest.XPAwards) < 1 {
 		t.Fatalf("expected at least one xp award, got %d", len(ingest.XPAwards))
 	}
+	if len(ingest.StatsSnapshot.WeeklyMinutesByDay) != 7 {
+		t.Fatalf("ingest weekly_minutes_by_day length: got %d, want 7", len(ingest.StatsSnapshot.WeeklyMinutesByDay))
+	}
+	var ingestWeekTotal int32
+	for _, minutes := range ingest.StatsSnapshot.WeeklyMinutesByDay {
+		ingestWeekTotal += minutes
+	}
+	if ingestWeekTotal != ingest.StatsSnapshot.MinutesThisWeek {
+		t.Fatalf("ingest weekly_minutes_by_day total: got %d, want %d", ingestWeekTotal, ingest.StatsSnapshot.MinutesThisWeek)
+	}
 
 	status, hdr, body = doJSON(t, client, http.MethodGet, srv.URL+"/v1/me", nil, map[string]string{
 		"Authorization": "Bearer " + auth2.AccessToken,
@@ -787,6 +817,9 @@ func TestHTTPAPIContractSmoke(t *testing.T) {
 	if ingest2.AcceptedCount != 1 || ingest2.StatsSnapshot.SessionsAllTime != 2 {
 		t.Fatalf("unexpected sync counts")
 	}
+	if len(ingest2.StatsSnapshot.WeeklyMinutesByDay) != 7 {
+		t.Fatalf("sync weekly_minutes_by_day length: got %d, want 7", len(ingest2.StatsSnapshot.WeeklyMinutesByDay))
+	}
 
 	status, hdr, body = doJSON(t, client, http.MethodGet, srv.URL+"/v1/stats/snapshot", nil, map[string]string{
 		"Authorization": "Bearer " + auth2.AccessToken,
@@ -802,6 +835,42 @@ func TestHTTPAPIContractSmoke(t *testing.T) {
 	}
 	if snap.SessionsAllTime != 2 {
 		t.Fatalf("sessions_all_time: got %d, want 2", snap.SessionsAllTime)
+	}
+	if len(snap.WeeklyMinutesByDay) != 7 {
+		t.Fatalf("snapshot weekly_minutes_by_day length: got %d, want 7", len(snap.WeeklyMinutesByDay))
+	}
+	var snapWeekTotal int32
+	for _, minutes := range snap.WeeklyMinutesByDay {
+		snapWeekTotal += minutes
+	}
+	if snapWeekTotal != snap.MinutesThisWeek {
+		t.Fatalf("snapshot weekly_minutes_by_day total: got %d, want %d", snapWeekTotal, snap.MinutesThisWeek)
+	}
+
+	status, hdr, body = doJSON(t, client, http.MethodGet, srv.URL+"/v1/stats/weekly?week_offset=0", nil, map[string]string{
+		"Authorization": "Bearer " + auth2.AccessToken,
+	})
+	requireRequestID(t, hdr, body)
+	if status != http.StatusOK {
+		t.Fatalf("stats weekly: status %d body %s", status, string(body))
+	}
+
+	var weekly weeklyBreakdownHTTPResponse
+	if err := json.Unmarshal(body, &weekly); err != nil {
+		t.Fatalf("decode weekly: %v", err)
+	}
+	if weekly.WeekOffset != 0 {
+		t.Fatalf("week_offset: got %d, want 0", weekly.WeekOffset)
+	}
+	if len(weekly.WeeklyMinutesByDay) != 7 {
+		t.Fatalf("weekly endpoint weekly_minutes_by_day length: got %d, want 7", len(weekly.WeeklyMinutesByDay))
+	}
+	var weeklyTotal int32
+	for _, minutes := range weekly.WeeklyMinutesByDay {
+		weeklyTotal += minutes
+	}
+	if weeklyTotal != snap.MinutesThisWeek {
+		t.Fatalf("weekly endpoint total: got %d, want %d", weeklyTotal, snap.MinutesThisWeek)
 	}
 
 	if err := leaderboardService.Refresh(ctx); err != nil {

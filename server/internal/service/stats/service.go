@@ -22,6 +22,13 @@ type Service struct {
 	clock clock.Clock
 }
 
+type WeeklyBreakdown struct {
+	WeekOffset         int
+	WeekStartLocal     time.Time
+	WeeklyMinutesByDay []int32
+	UpdatedAt          time.Time
+}
+
 func NewService(store *repository.Store, clk clock.Clock) (*Service, error) {
 	if store == nil {
 		return nil, fmt.Errorf("store is required")
@@ -71,8 +78,67 @@ func (s *Service) Recompute(ctx context.Context, userID uuid.UUID) (sqlcgen.Stat
 	return out, nil
 }
 
+func (s *Service) GetWeeklyBreakdown(ctx context.Context, userID uuid.UUID, weekOffset int) (WeeklyBreakdown, error) {
+	now := s.clock.Now().UTC()
+	var out WeeklyBreakdown
+
+	if err := s.store.InTx(ctx, func(q *sqlcgen.Queries) error {
+		u, err := q.GetUserByID(ctx, userID)
+		if err != nil {
+			if errors.Is(err, pgx.ErrNoRows) {
+				return apierr.New(http.StatusUnauthorized, "unauthorized", "unauthorized")
+			}
+			return fmt.Errorf("get user: %w", err)
+		}
+
+		breakdown, err := s.GetWeeklyBreakdownTx(
+			ctx,
+			q,
+			userID,
+			weekOffset,
+			now,
+			u.TimezoneOffsetMinutesLatest,
+		)
+		if err != nil {
+			return err
+		}
+		out = breakdown
+		return nil
+	}); err != nil {
+		return WeeklyBreakdown{}, err
+	}
+
+	return out, nil
+}
+
 func (s *Service) ComputeAndUpsertTx(ctx context.Context, q *sqlcgen.Queries, userID uuid.UUID, now time.Time, timezoneOffsetMinutes int32) (sqlcgen.StatsSnapshot, error) {
 	return computeAndUpsert(ctx, q, userID, now, timezoneOffsetMinutes)
+}
+
+func (s *Service) GetWeeklyBreakdownTx(ctx context.Context, q *sqlcgen.Queries, userID uuid.UUID, weekOffset int, now time.Time, timezoneOffsetMinutes int32) (WeeklyBreakdown, error) {
+	if q == nil {
+		return WeeklyBreakdown{}, fmt.Errorf("queries are required")
+	}
+	if weekOffset < -52 || weekOffset > 0 {
+		return WeeklyBreakdown{}, apierr.New(http.StatusBadRequest, "validation", "week_offset is invalid")
+	}
+
+	weekStart, weekEnd := weeklyWindow(now, timezoneOffsetMinutes, weekOffset)
+	rows, err := q.GetSessionDayTotalsInRange(ctx, sqlcgen.GetSessionDayTotalsInRangeParams{
+		UserID:     userID,
+		LocalDay:   weekStart,
+		LocalDay_2: weekEnd,
+	})
+	if err != nil {
+		return WeeklyBreakdown{}, fmt.Errorf("get session day totals in range: %w", err)
+	}
+
+	return WeeklyBreakdown{
+		WeekOffset:         weekOffset,
+		WeekStartLocal:     weekStart,
+		WeeklyMinutesByDay: buildWeeklyMinutesByDay(rows, weekStart),
+		UpdatedAt:          now.UTC(),
+	}, nil
 }
 
 func computeAndUpsert(ctx context.Context, q *sqlcgen.Queries, userID uuid.UUID, now time.Time, timezoneOffsetMinutes int32) (sqlcgen.StatsSnapshot, error) {
@@ -225,6 +291,30 @@ func isoWeekStartMonday(date time.Time) time.Time {
 		weekday = 7
 	}
 	return d.AddDate(0, 0, -(weekday - 1))
+}
+
+func weeklyWindow(now time.Time, timezoneOffsetMinutes int32, weekOffset int) (time.Time, time.Time) {
+	localNow := now.UTC().Add(time.Duration(timezoneOffsetMinutes) * time.Minute)
+	today := dateOnly(localNow)
+	weekStart := isoWeekStartMonday(today).AddDate(0, 0, weekOffset*7)
+	return weekStart, weekStart.AddDate(0, 0, 7)
+}
+
+func buildWeeklyMinutesByDay(rows []sqlcgen.GetSessionDayTotalsInRangeRow, weekStart time.Time) []int32 {
+	weekly := make([]int32, 7)
+	for _, row := range rows {
+		day := dateOnly(row.LocalDay)
+		dayOffset := int(day.Sub(weekStart).Hours() / 24)
+		if dayOffset < 0 || dayOffset >= len(weekly) {
+			continue
+		}
+		minutes := row.TotalSeconds / 60
+		if minutes < 0 {
+			minutes = 0
+		}
+		weekly[dayOffset] = int32(minutes)
+	}
+	return weekly
 }
 
 func sortTimes(ts []time.Time) {

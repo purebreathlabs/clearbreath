@@ -1,8 +1,13 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../shared/providers/server_status_provider.dart';
+import '../../auth/domain/auth_state.dart';
+import '../../auth/domain/auth_state_provider.dart';
+import '../data/cloud_stats_repository.dart';
 import '../../session/data/session_repository.dart';
+import '../../sync/domain/merged_stats_provider.dart';
 
-final weeklyMinutesProvider = FutureProvider.family<List<int>, int>((
+final localWeeklyMinutesProvider = FutureProvider.family<List<int>, int>((
   ref,
   weekOffset,
 ) async {
@@ -23,6 +28,39 @@ final weeklyMinutesProvider = FutureProvider.family<List<int>, int>((
     result.add(minutesByDay[dayKey] ?? 0);
   }
   return List.unmodifiable(result);
+});
+
+final cloudWeeklyMinutesProvider = FutureProvider.family<List<int>, int>((
+  ref,
+  weekOffset,
+) async {
+  final auth = ref.watch(authStateProvider);
+  if (auth is! AuthStateSignedIn || !auth.sessionReady) {
+    throw StateError('Cloud weekly minutes require a signed-in session.');
+  }
+  return ref.watch(cloudStatsRepositoryProvider).fetchWeeklyMinutes(weekOffset);
+});
+
+final mergedWeeklyMinutesProvider = FutureProvider.family<List<int>, int>((
+  ref,
+  weekOffset,
+) async {
+  if (weekOffset == 0) {
+    final snapshot = await ref.watch(mergedStatsProvider.future);
+    if (snapshot.weeklyMinutesByDay.length == 7) {
+      return snapshot.weeklyMinutesByDay;
+    }
+  }
+
+  final auth = ref.watch(authStateProvider);
+  final serverOnline = ref.watch(serverStatusProvider).asData?.value == true;
+  if (auth is AuthStateSignedIn && auth.sessionReady && serverOnline) {
+    try {
+      return await ref.watch(cloudWeeklyMinutesProvider(weekOffset).future);
+    } catch (_) {}
+  }
+
+  return ref.watch(localWeeklyMinutesProvider(weekOffset).future);
 });
 
 DateTime _startOfWeekKey(DateTime todayKey) {

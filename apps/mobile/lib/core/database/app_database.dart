@@ -46,7 +46,7 @@ class AppDatabase extends _$AppDatabase {
   }
 
   @override
-  int get schemaVersion => 10;
+  int get schemaVersion => 11;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -141,6 +141,14 @@ class AppDatabase extends _$AppDatabase {
           await migrator.addColumn(
             preferences,
             preferences.notificationPromptSnoozedUntilSessions,
+          );
+        } catch (_) {}
+      }
+      if (from < 11) {
+        try {
+          await migrator.addColumn(
+            statsCache,
+            statsCache.weeklyMinutesByDayJson,
           );
         } catch (_) {}
       }

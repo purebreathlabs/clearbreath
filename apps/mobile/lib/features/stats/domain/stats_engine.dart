@@ -92,6 +92,11 @@ StatsSnapshot computeStats(
     weekSeconds += entry.value;
   }
   final minutesThisWeek = weekSeconds ~/ 60;
+  final weeklyMinutesByDay = List<int>.generate(7, (index) {
+    final day = startOfWeekKey.add(Duration(days: index));
+    final minutes = minutesByLocalDay[day] ?? 0;
+    return minutes < 0 ? 0 : minutes;
+  }, growable: false);
 
   return StatsSnapshot(
     currentStreakDays: currentStreakDays,
@@ -101,6 +106,7 @@ StatsSnapshot computeStats(
     minutesAllTime: minutesAllTime,
     sessionsAllTime: sessionsAllTime,
     minutesByTechnique: minutesByTechnique,
+    weeklyMinutesByDay: weeklyMinutesByDay,
     longestSessionMinutes: longestSessionMinutes,
     favoriteTechniqueId: favoriteTechniqueId,
     totalBreathsEstimated: totalBreathsEstimated,

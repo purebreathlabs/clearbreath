@@ -6,8 +6,8 @@ import '../../../core/theme/theme_extensions.dart';
 import '../../auth/domain/auth_state.dart';
 import '../../auth/domain/auth_state_provider.dart';
 import '../../session/domain/active_session_config.dart';
-import '../../stats/domain/weekly_minutes_provider.dart';
 import '../../sync/domain/merged_stats_provider.dart';
+import '../../stats/domain/weekly_minutes_provider.dart';
 import '../../techniques/domain/favorites_provider.dart';
 import '../../techniques/domain/safety_acknowledgement_repository.dart';
 import '../../techniques/domain/technique.dart';
@@ -53,7 +53,7 @@ class HomeScreen extends ConsumerWidget {
     final recommendation = ref.watch(dailyRecommendationProvider);
     final favorites = ref.watch(favoriteTechniquesProvider);
     final stats = ref.watch(mergedStatsProvider);
-    final weeklyMinutes = ref.watch(weeklyMinutesProvider(0));
+    final weeklyMinutes = ref.watch(mergedWeeklyMinutesProvider(0));
 
     final xpAsync = ref.watch(mergedXPProvider);
     final xpState = xpAsync.asData?.value;
@@ -207,7 +207,9 @@ class HomeScreen extends ConsumerWidget {
         child: RefreshIndicator(
           onRefresh: () async {
             ref.invalidate(mergedStatsProvider);
-            ref.invalidate(weeklyMinutesProvider);
+            ref.invalidate(localWeeklyMinutesProvider);
+            ref.invalidate(cloudWeeklyMinutesProvider);
+            ref.invalidate(mergedWeeklyMinutesProvider);
             ref.invalidate(dailyRecommendationProvider);
             ref.invalidate(mergedXPProvider);
           },

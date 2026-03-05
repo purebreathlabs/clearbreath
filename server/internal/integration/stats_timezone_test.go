@@ -78,7 +78,7 @@ func TestTimezoneOffsetUpdateAndWeekBoundaryStats(t *testing.T) {
 		t.Fatalf("access token manager: %v", err)
 	}
 
-	authService, err := authsvc.NewService(store, clk, accessTokens, cfg.JWTRefreshSecret, cfg.JWTRefreshTTLMinutes, true, cfg.DevAuthSecret, cfg.GoogleOAuthClientID, cfg.AppleOAuthAudience, profanity.NewDefault())
+	authService, err := authsvc.NewService(store, clk, accessTokens, cfg.JWTRefreshSecret, cfg.JWTRefreshTTLMinutes, true, cfg.DevAuthSecret, cfg.GoogleOAuthClientIDs, cfg.AppleOAuthAudience, profanity.NewDefault())
 	if err != nil {
 		t.Fatalf("auth service: %v", err)
 	}
@@ -170,6 +170,15 @@ func TestTimezoneOffsetUpdateAndWeekBoundaryStats(t *testing.T) {
 	}
 	if out.StatsSnapshot.LongestStreakDays != 2 {
 		t.Fatalf("longest_streak_days: got %d, want 2", out.StatsSnapshot.LongestStreakDays)
+	}
+	wantWeekly := []int32{4, 0, 0, 0, 0, 0, 0}
+	if len(out.WeeklyMinutesByDay) != len(wantWeekly) {
+		t.Fatalf("weekly_minutes_by_day length: got %d, want %d", len(out.WeeklyMinutesByDay), len(wantWeekly))
+	}
+	for i := range wantWeekly {
+		if out.WeeklyMinutesByDay[i] != wantWeekly[i] {
+			t.Fatalf("weekly_minutes_by_day[%d]: got %d, want %d", i, out.WeeklyMinutesByDay[i], wantWeekly[i])
+		}
 	}
 
 	u, err := store.Queries().GetUserByID(ctx, userID)

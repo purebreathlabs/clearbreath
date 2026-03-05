@@ -53,6 +53,7 @@ void main() {
     minutesAllTime: 34,
     sessionsAllTime: 7,
     minutesByTechnique: const {'box': 12},
+    weeklyMinutesByDay: const [0, 1, 2, 3, 4, 1, 1],
     longestSessionMinutes: 10,
     favoriteTechniqueId: 'box',
     totalBreathsEstimated: 123,
@@ -94,7 +95,7 @@ void main() {
             (ref) => Stream<Preference?>.value(prefs),
           ),
           localStatsProvider.overrideWith((ref) async => snapshot),
-          weeklyMinutesProvider.overrideWith(
+          mergedWeeklyMinutesProvider.overrideWith(
             (ref, weekOffset) async => const [0, 1, 2, 3, 4, 5, 6],
           ),
           allTechniquesProvider.overrideWith((ref) async => [technique]),
@@ -140,7 +141,7 @@ void main() {
           ),
           mergedStatsProvider.overrideWith((ref) async => snapshot),
           mergedXPProvider.overrideWith((ref) async => XPState.empty()),
-          weeklyMinutesProvider.overrideWith(
+          mergedWeeklyMinutesProvider.overrideWith(
             (ref, weekOffset) async => const [0, 1, 2, 3, 4, 5, 6],
           ),
           allTechniquesProvider.overrideWith((ref) async => [technique]),

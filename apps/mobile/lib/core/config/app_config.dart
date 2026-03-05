@@ -15,6 +15,14 @@ class AppConfig {
     'DEV_AUTH_SECRET',
     defaultValue: '',
   );
+
+  static final String googleWebClientId = _trimmedDefine(
+    const String.fromEnvironment('GOOGLE_WEB_CLIENT_ID', defaultValue: ''),
+  );
+
+  static final String googleIosClientId = _trimmedDefine(
+    const String.fromEnvironment('GOOGLE_IOS_CLIENT_ID', defaultValue: ''),
+  );
 }
 
 String _sanitizeBaseUrl(String value) {
@@ -39,4 +47,8 @@ String _sanitizeBaseUrl(String value) {
   }
 
   return normalized;
+}
+
+String _trimmedDefine(String value) {
+  return value.trim();
 }

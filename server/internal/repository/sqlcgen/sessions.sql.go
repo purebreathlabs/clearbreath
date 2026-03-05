@@ -81,6 +81,47 @@ func (q *Queries) GetSessionDayTotals(ctx context.Context, userID uuid.UUID) ([]
 	return items, nil
 }
 
+const getSessionDayTotalsInRange = `-- name: GetSessionDayTotalsInRange :many
+SELECT local_day, COALESCE(SUM(duration_seconds_actual), 0)::bigint AS total_seconds
+FROM sessions
+WHERE user_id = $1
+  AND local_day >= $2
+  AND local_day < $3
+GROUP BY local_day
+ORDER BY local_day
+`
+
+type GetSessionDayTotalsInRangeParams struct {
+	UserID     uuid.UUID `json:"user_id"`
+	LocalDay   time.Time `json:"local_day"`
+	LocalDay_2 time.Time `json:"local_day_2"`
+}
+
+type GetSessionDayTotalsInRangeRow struct {
+	LocalDay     time.Time `json:"local_day"`
+	TotalSeconds int64     `json:"total_seconds"`
+}
+
+func (q *Queries) GetSessionDayTotalsInRange(ctx context.Context, arg GetSessionDayTotalsInRangeParams) ([]GetSessionDayTotalsInRangeRow, error) {
+	rows, err := q.db.Query(ctx, getSessionDayTotalsInRange, arg.UserID, arg.LocalDay, arg.LocalDay_2)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []GetSessionDayTotalsInRangeRow{}
+	for rows.Next() {
+		var i GetSessionDayTotalsInRangeRow
+		if err := rows.Scan(&i.LocalDay, &i.TotalSeconds); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const getSessionSecondsInRange = `-- name: GetSessionSecondsInRange :one
 SELECT COALESCE(SUM(duration_seconds_actual), 0)::bigint AS total_seconds
 FROM sessions
