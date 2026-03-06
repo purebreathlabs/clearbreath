@@ -33,7 +33,7 @@ class Preferences extends Table {
       boolean().withDefault(const Constant(true))();
 
   IntColumn get reminderTimeMinutes =>
-      integer().withDefault(const Constant(22 * 60))();
+      integer().withDefault(const Constant(8 * 60))();
 
   BoolColumn get reminderEnabled =>
       boolean().withDefault(const Constant(true))();

@@ -6,6 +6,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_timezone/flutter_timezone.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:timezone/data/latest.dart' as tzdata;
 import 'package:timezone/timezone.dart' as tz;
 
@@ -21,6 +22,8 @@ abstract class NotificationService {
   Future<void> showTest();
   Future<void> cancelAll();
   Future<void> dispose();
+
+  Future<List<PendingNotificationRequest>> getPendingNotifications();
 }
 
 final notificationServiceProvider = Provider<NotificationService>((ref) {
@@ -41,6 +44,8 @@ class _FlutterLocalNotificationService implements NotificationService {
   static const String _channelDescription =
       'Daily practice reminders and streak warnings';
 
+  static const String _timezoneCacheKey = 'notification_cached_timezone';
+
   final FlutterLocalNotificationsPlugin _plugin =
       FlutterLocalNotificationsPlugin();
   Future<void>? _initFuture;
@@ -53,10 +58,23 @@ class _FlutterLocalNotificationService implements NotificationService {
     tzdata.initializeTimeZones();
     try {
       final info = await FlutterTimezone.getLocalTimezone();
+      debugPrint('NotificationService: detected timezone: ${info.identifier}');
       final location = tz.getLocation(info.identifier);
       tz.setLocalLocation(location);
-    } catch (_) {
-      tz.setLocalLocation(tz.UTC);
+      await _cacheTimezone(info.identifier);
+    } catch (e, st) {
+      debugPrint('NotificationService: timezone detection failed: $e\n$st');
+      final cached = await _getCachedTimezone();
+      if (cached != null) {
+        debugPrint('NotificationService: using cached timezone: $cached');
+        tz.setLocalLocation(tz.getLocation(cached));
+      } else {
+        debugPrint(
+          'NotificationService: WARNING - falling back to UTC, '
+          'notifications may fire at wrong time',
+        );
+        tz.setLocalLocation(tz.UTC);
+      }
     }
 
     const android = AndroidInitializationSettings('ic_notification');
@@ -67,6 +85,25 @@ class _FlutterLocalNotificationService implements NotificationService {
     );
     const settings = InitializationSettings(android: android, iOS: ios);
     await _plugin.initialize(settings: settings);
+  }
+
+  Future<void> _cacheTimezone(String timezoneId) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString(_timezoneCacheKey, timezoneId);
+    } catch (e) {
+      debugPrint('NotificationService: failed to cache timezone: $e');
+    }
+  }
+
+  Future<String?> _getCachedTimezone() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      return prefs.getString(_timezoneCacheKey);
+    } catch (e) {
+      debugPrint('NotificationService: failed to read cached timezone: $e');
+      return null;
+    }
   }
 
   NotificationDetails _details() {
@@ -94,7 +131,8 @@ class _FlutterLocalNotificationService implements NotificationService {
 
     try {
       await _ensureInitialized();
-    } catch (_) {
+    } catch (e, st) {
+      debugPrint('NotificationService: init failed during requestPermission: $e\n$st');
       return false;
     }
 
@@ -120,7 +158,9 @@ class _FlutterLocalNotificationService implements NotificationService {
         );
         return granted ?? false;
       }
-    } catch (_) {}
+    } catch (e, st) {
+      debugPrint('NotificationService: requestPermission failed: $e\n$st');
+    }
 
     return true;
   }
@@ -136,6 +176,10 @@ class _FlutterLocalNotificationService implements NotificationService {
       await cancelDailyReminder();
 
       final scheduled = _nextDailyInstance(time);
+      debugPrint(
+        'NotificationService: scheduling daily reminder at '
+        '${scheduled.toString()} (tz: ${tz.local.name})',
+      );
 
       await _plugin.zonedSchedule(
         id: _dailyReminderId,
@@ -143,10 +187,12 @@ class _FlutterLocalNotificationService implements NotificationService {
         body: 'Take 2 minutes to breathe today.',
         scheduledDate: scheduled,
         notificationDetails: _details(),
-        androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
+        androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
         matchDateTimeComponents: DateTimeComponents.time,
       );
-    } catch (_) {}
+    } catch (e, st) {
+      debugPrint('NotificationService: scheduleDailyReminder failed: $e\n$st');
+    }
   }
 
   tz.TZDateTime _nextDailyInstance(TimeOfDay time) {
@@ -170,7 +216,9 @@ class _FlutterLocalNotificationService implements NotificationService {
     try {
       await _ensureInitialized();
       await _plugin.cancel(id: _dailyReminderId);
-    } catch (_) {}
+    } catch (e, st) {
+      debugPrint('NotificationService: cancelDailyReminder failed: $e\n$st');
+    }
   }
 
   @override
@@ -188,15 +236,22 @@ class _FlutterLocalNotificationService implements NotificationService {
           : scheduledAtLocal;
       final scheduled = tz.TZDateTime.from(local, tz.local);
 
+      debugPrint(
+        'NotificationService: scheduling streak warning at '
+        '${scheduled.toString()} (tz: ${tz.local.name})',
+      );
+
       await _plugin.zonedSchedule(
         id: _streakWarningId,
         title: 'Streak at risk',
         body: 'Practice 2 minutes before midnight to keep your streak.',
         scheduledDate: scheduled,
         notificationDetails: _details(),
-        androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
+        androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
       );
-    } catch (_) {}
+    } catch (e, st) {
+      debugPrint('NotificationService: scheduleStreakWarning failed: $e\n$st');
+    }
   }
 
   @override
@@ -207,7 +262,9 @@ class _FlutterLocalNotificationService implements NotificationService {
     try {
       await _ensureInitialized();
       await _plugin.cancel(id: _streakWarningId);
-    } catch (_) {}
+    } catch (e, st) {
+      debugPrint('NotificationService: cancelStreakWarning failed: $e\n$st');
+    }
   }
 
   @override
@@ -218,7 +275,9 @@ class _FlutterLocalNotificationService implements NotificationService {
     try {
       await _ensureInitialized();
       await _plugin.cancelAll();
-    } catch (_) {}
+    } catch (e, st) {
+      debugPrint('NotificationService: cancelAll failed: $e\n$st');
+    }
   }
 
   @override
@@ -235,7 +294,20 @@ class _FlutterLocalNotificationService implements NotificationService {
         body: 'If you see the ClearBreath icon, it works!',
         notificationDetails: _details(),
       );
-    } catch (_) {}
+    } catch (e, st) {
+      debugPrint('NotificationService: showTest failed: $e\n$st');
+    }
+  }
+
+  @override
+  Future<List<PendingNotificationRequest>> getPendingNotifications() async {
+    try {
+      await _ensureInitialized();
+      return _plugin.pendingNotificationRequests();
+    } catch (e, st) {
+      debugPrint('NotificationService: getPendingNotifications failed: $e\n$st');
+      return [];
+    }
   }
 
   @override
@@ -268,4 +340,8 @@ class _NoopNotificationService implements NotificationService {
 
   @override
   Future<void> showTest() async {}
+
+  @override
+  Future<List<PendingNotificationRequest>> getPendingNotifications() async =>
+      [];
 }

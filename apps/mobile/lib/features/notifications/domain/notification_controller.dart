@@ -140,7 +140,9 @@ class NotificationController extends Notifier<NotificationState> {
     final service = ref.read(notificationServiceProvider);
     try {
       await service.requestPermission();
-    } catch (_) {}
+    } catch (e, st) {
+      debugPrint('NotificationController: requestPermission failed: $e\n$st');
+    }
 
     try {
       await _writePreferences(
@@ -151,7 +153,9 @@ class NotificationController extends Notifier<NotificationState> {
           notificationPromptSnoozedUntilSessions: const Value(null),
         ),
       );
-    } catch (_) {}
+    } catch (e, st) {
+      debugPrint('NotificationController: writePreferences failed: $e\n$st');
+    }
 
     await _syncFromDb();
   }
@@ -179,7 +183,9 @@ class NotificationController extends Notifier<NotificationState> {
           ),
         ),
       );
-    } catch (_) {}
+    } catch (e, st) {
+      debugPrint('NotificationController: dismissPermissionPrompt failed: $e\n$st');
+    }
   }
 
   Future<void> _syncFromDb() async {
@@ -193,7 +199,8 @@ class NotificationController extends Notifier<NotificationState> {
       return (db.select(
         db.preferences,
       )..where((row) => row.id.equals(_rowId))).getSingleOrNull();
-    } catch (_) {
+    } catch (e, st) {
+      debugPrint('NotificationController: readPreferences failed: $e\n$st');
       return null;
     }
   }
@@ -238,7 +245,9 @@ class NotificationController extends Notifier<NotificationState> {
     try {
       final snapshot = await ref.read(mergedStatsProvider.future);
       currentStreakDays = snapshot.currentStreakDays;
-    } catch (_) {}
+    } catch (e, st) {
+      debugPrint('NotificationController: failed to read streak: $e\n$st');
+    }
 
     final hasQualifiedToday = await _hasQualifyingSessionToday();
     final now = ref.read(notificationNowProvider)();
@@ -274,7 +283,8 @@ class NotificationController extends Notifier<NotificationState> {
 
       final minutes = minutesByDay[todayKey] ?? 0;
       return minutes >= 2;
-    } catch (_) {
+    } catch (e, st) {
+      debugPrint('NotificationController: _hasQualifyingSessionToday failed: $e\n$st');
       return false;
     }
   }

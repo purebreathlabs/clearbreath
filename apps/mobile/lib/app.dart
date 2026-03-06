@@ -3,6 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'core/router/app_router.dart';
 import 'core/theme/app_theme.dart';
+import 'features/notifications/data/fcm_token_service.dart';
+import 'features/notifications/domain/fcm_foreground_handler.dart';
 import 'features/notifications/domain/notification_controller.dart';
 import 'features/stats/domain/stats_engine.dart';
 import 'features/stats/domain/weekly_minutes_provider.dart';
@@ -19,10 +21,21 @@ class ClearBreathApp extends ConsumerStatefulWidget {
 
 class _ClearBreathAppState extends ConsumerState<ClearBreathApp>
     with WidgetsBindingObserver {
+  final _fcmForegroundHandler = FCMForegroundHandler();
+  bool _fcmInitialized = false;
+
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
+    _initFCM();
+  }
+
+  Future<void> _initFCM() async {
+    if (_fcmInitialized) return;
+    _fcmInitialized = true;
+    await _fcmForegroundHandler.initialize();
+    await ref.read(fcmTokenServiceProvider).initialize();
   }
 
   @override

@@ -1,5 +1,6 @@
 # Go
 server/bin/
+server/api
 coverage.out
 *.exe
 *.dll
@@ -22,6 +23,9 @@ coverage.out
 .env
 .env.local
 .env.*.local
+
+# Firebase service account credentials
+server/fcm-service-account.json
 
 # IDE
 .vscode/

@@ -1,0 +1,46 @@
+{
+  "project_info": {
+    "project_number": "884656805579",
+    "project_id": "clearbreath",
+    "storage_bucket": "clearbreath.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:884656805579:android:3216835a6e8f53c022ad4e",
+        "android_client_info": {
+          "package_name": "life.clearbreath.clearbreath"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "884656805579-ptcbmv99ha49rcfm7lelagp5e0ooeepm.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBEgXtTURyLJWxLk6H78JNXSXc3ZGyz09c"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "884656805579-ptcbmv99ha49rcfm7lelagp5e0ooeepm.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "884656805579-kb298tik2g9e92fi5dbn5nas1ivlsvhl.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "life.clearbreath.clearbreath"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

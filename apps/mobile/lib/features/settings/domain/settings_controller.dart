@@ -3,6 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/database/app_database.dart';
 import '../../../shared/providers/preferences_provider.dart';
+import '../../notifications/data/notification_preferences_repository.dart';
+import '../../notifications/domain/notification_constants.dart';
 import '../data/settings_repository.dart';
 
 @immutable
@@ -22,7 +24,7 @@ class SettingsState {
         hapticsEnabled: true,
         keepScreenAwake: true,
         reminderEnabled: true,
-        reminderTimeMinutes: 22 * 60,
+        reminderTimeMinutes: kDefaultReminderTimeMinutes,
         streakWarningEnabled: true,
         displayName: '',
       );
@@ -67,15 +69,42 @@ class SettingsController extends Notifier<SettingsState> {
 
   Future<void> setReminderEnabled(bool value) async {
     await ref.read(settingsRepositoryProvider).setReminderEnabled(value);
+    _syncNotificationPrefs(
+      reminderEnabled: value,
+      reminderTimeMinutes: state.reminderTimeMinutes,
+      streakWarningEnabled: state.streakWarningEnabled,
+    );
   }
 
   Future<void> setReminderTime(int minutesFromMidnight) async {
     final safe = minutesFromMidnight.clamp(0, 23 * 60 + 59);
     await ref.read(settingsRepositoryProvider).setReminderTimeMinutes(safe);
+    _syncNotificationPrefs(
+      reminderEnabled: state.reminderEnabled,
+      reminderTimeMinutes: safe,
+      streakWarningEnabled: state.streakWarningEnabled,
+    );
   }
 
   Future<void> setStreakWarningEnabled(bool value) async {
     await ref.read(settingsRepositoryProvider).setStreakWarningEnabled(value);
+    _syncNotificationPrefs(
+      reminderEnabled: state.reminderEnabled,
+      reminderTimeMinutes: state.reminderTimeMinutes,
+      streakWarningEnabled: value,
+    );
+  }
+
+  void _syncNotificationPrefs({
+    required bool reminderEnabled,
+    required int reminderTimeMinutes,
+    required bool streakWarningEnabled,
+  }) {
+    ref.read(notificationPreferencesRepositoryProvider).syncToBackend(
+      reminderEnabled: reminderEnabled,
+      reminderTimeMinutes: reminderTimeMinutes,
+      streakWarningEnabled: streakWarningEnabled,
+    );
   }
 
   Future<void> setDisplayName(String value) async {

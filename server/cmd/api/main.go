@@ -20,13 +20,16 @@ import (
 	"github.com/clearbreath/server/internal/clock"
 	"github.com/clearbreath/server/internal/config"
 	"github.com/clearbreath/server/internal/dashboard"
+	"github.com/clearbreath/server/internal/fcm"
 	"github.com/clearbreath/server/internal/handler"
 	"github.com/clearbreath/server/internal/logcollector"
 	"github.com/clearbreath/server/internal/middleware"
 	"github.com/clearbreath/server/internal/profanity"
 	"github.com/clearbreath/server/internal/repository"
+	"github.com/clearbreath/server/internal/scheduler"
 	authsvc "github.com/clearbreath/server/internal/service/auth"
 	lbsvc "github.com/clearbreath/server/internal/service/leaderboard"
+	notifsvc "github.com/clearbreath/server/internal/service/notification"
 	safetysvc "github.com/clearbreath/server/internal/service/safety"
 	sessionsvc "github.com/clearbreath/server/internal/service/session"
 	statssvc "github.com/clearbreath/server/internal/service/stats"
@@ -202,6 +205,75 @@ func main() {
 	leaderboardRateLimitMin := middleware.RateLimitIP(rdb, "rl:leaderboard:min", cfg.RateLimitLeaderboardPerM, time.Minute)
 	r.With(leaderboardRateLimitMin).Get("/v1/leaderboard", leaderboardHandler.List)
 	r.With(middleware.Auth(accessTokens, store), leaderboardRateLimitMin).Get("/v1/leaderboard/self", leaderboardHandler.Self)
+
+	// Notification push service
+	var fcmSender fcm.Sender
+	if cfg.NotificationsEnabled {
+		if cfg.FCMServiceAccountJSON != "" {
+			fs, err := fcm.NewFirebaseSender(appCtx, []byte(cfg.FCMServiceAccountJSON))
+			if err != nil {
+				slog.Error("failed to init firebase sender", "error", err)
+				os.Exit(1)
+			}
+			fcmSender = fs
+			slog.Info("FCM sender initialized (firebase, inline JSON)")
+		} else if os.Getenv("GOOGLE_APPLICATION_CREDENTIALS") != "" {
+			fs, err := fcm.NewFirebaseSenderFromDefault(appCtx)
+			if err != nil {
+				slog.Error("failed to init firebase sender from default credentials", "error", err)
+				os.Exit(1)
+			}
+			fcmSender = fs
+			slog.Info("FCM sender initialized (firebase, ADC)")
+		} else {
+			fcmSender = fcm.NewNoopSender()
+			slog.Info("FCM sender initialized (noop, no credentials)")
+		}
+	} else {
+		fcmSender = fcm.NewNoopSender()
+		slog.Info("FCM sender initialized (noop)")
+	}
+
+	notifSvc, err := notifsvc.NewService(store, fcmSender)
+	if err != nil {
+		slog.Error("failed to init notification service", "error", err)
+		os.Exit(1)
+	}
+	notifHandler := handler.NewNotificationHandler(notifSvc)
+
+	// Public notification endpoints (guests allowed)
+	notifRateLimitMin := middleware.RateLimitIP(rdb, "rl:notif:ip", 30, time.Minute)
+	r.Route("/v1/notifications", func(r chi.Router) {
+		r.Use(notifRateLimitMin)
+		r.Use(middleware.OptionalAuth(accessTokens, store))
+		r.Put("/installations", notifHandler.UpsertInstallation)
+		r.Get("/installations", notifHandler.GetInstallation)
+	})
+
+	// Authenticated notification endpoints
+	r.Route("/v1/me/notifications", func(r chi.Router) {
+		r.Use(middleware.Auth(accessTokens, store))
+		r.Put("/installations", notifHandler.BindInstallation)
+		r.Delete("/installations/{deviceID}", notifHandler.UnbindInstallation)
+	})
+
+	// Dev-only notification endpoints
+	if cfg.DevAuthEnabled {
+		r.Route("/v1/dev/notifications", func(r chi.Router) {
+			r.Use(middleware.DevAuth(cfg.DevAuthSecret))
+			r.Post("/test-send", notifHandler.TestSend)
+			r.Post("/dispatch", notifHandler.DevDispatch)
+		})
+	}
+
+	// Start notification scheduler if enabled
+	if cfg.NotificationsEnabled {
+		go func() {
+			notifScheduler := scheduler.NewNotificationScheduler(store, fcmSender, rdb)
+			notifScheduler.Run(appCtx)
+		}()
+		slog.Info("notification scheduler started")
+	}
 
 	// Dashboard routes
 	if cfg.DashboardEnabled {

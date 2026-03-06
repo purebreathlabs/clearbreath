@@ -35,6 +35,8 @@ type Config struct {
 	DashboardUsername        string
 	DashboardPasswordHash    string
 	DashboardSessionSecret   string
+	NotificationsEnabled     bool
+	FCMServiceAccountJSON    string
 }
 
 func Load() (*Config, error) {
@@ -72,6 +74,7 @@ func Load() (*Config, error) {
 		return nil, fmt.Errorf("parse LEADERBOARD_DAILY_CAP_MINUTES: %w", err)
 	}
 	dashboardEnabled := envBoolOrDefault("DASHBOARD_ENABLED", false)
+	notificationsEnabled := envBoolOrDefault("NOTIFICATIONS_ENABLED", false)
 	googleOAuthClientIDs := os.Getenv("GOOGLE_OAUTH_CLIENT_IDS")
 	if strings.TrimSpace(googleOAuthClientIDs) == "" {
 		googleOAuthClientIDs = os.Getenv("GOOGLE_OAUTH_CLIENT_ID")
@@ -103,6 +106,8 @@ func Load() (*Config, error) {
 		DashboardUsername:        os.Getenv("DASHBOARD_USERNAME"),
 		DashboardPasswordHash:    os.Getenv("DASHBOARD_PASSWORD_HASH"),
 		DashboardSessionSecret:   os.Getenv("DASHBOARD_SESSION_SECRET"),
+		NotificationsEnabled:     notificationsEnabled,
+		FCMServiceAccountJSON:    os.Getenv("FCM_SERVICE_ACCOUNT_JSON"),
 	}
 
 	if err := cfg.Validate(); err != nil {
@@ -226,6 +231,11 @@ func (c *Config) Validate() error {
 		}
 		if len(c.DashboardSessionSecret) < 32 {
 			return fmt.Errorf("DASHBOARD_SESSION_SECRET must be at least 32 chars")
+		}
+	}
+	if c.NotificationsEnabled && strings.TrimSpace(c.FCMServiceAccountJSON) == "" {
+		if os.Getenv("GOOGLE_APPLICATION_CREDENTIALS") == "" {
+			return fmt.Errorf("FCM_SERVICE_ACCOUNT_JSON or GOOGLE_APPLICATION_CREDENTIALS is required when NOTIFICATIONS_ENABLED is true")
 		}
 	}
 	if c.Env != "development" {

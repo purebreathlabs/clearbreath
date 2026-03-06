@@ -9,6 +9,7 @@ import '../../../core/network/models/user_models.dart';
 import '../../../shared/providers/app_database_provider.dart';
 import '../../intro/domain/intro_gate.dart';
 import '../../onboarding/domain/onboarding_gate.dart';
+import '../../notifications/data/fcm_token_service.dart';
 import '../data/auth_repository.dart';
 import '../data/device_id_store.dart';
 import '../data/token_storage.dart';
@@ -76,6 +77,8 @@ class AuthController extends Notifier<AuthState> {
       );
       await storage.writeUserProfile(resp.user);
       state = AuthStateSignedIn(profile: resp.user);
+
+      unawaited(ref.read(fcmTokenServiceProvider).resync());
     } on DioException catch (e) {
       throw ApiError.fromDioException(e);
     }
@@ -87,6 +90,10 @@ class AuthController extends Notifier<AuthState> {
     final db = ref.read(appDatabaseProvider);
     final introGate = ref.read(introGateProvider);
     final onboardingGate = ref.read(onboardingGateProvider);
+
+    try {
+      await ref.read(fcmTokenServiceProvider).onSignOut();
+    } catch (_) {}
 
     try {
       final deviceId = await ref.read(deviceIdProvider.future);

@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CLIENT_ID</key>
+	<string>884656805579-kb298tik2g9e92fi5dbn5nas1ivlsvhl.apps.googleusercontent.com</string>
+	<key>REVERSED_CLIENT_ID</key>
+	<string>com.googleusercontent.apps.884656805579-kb298tik2g9e92fi5dbn5nas1ivlsvhl</string>
+	<key>ANDROID_CLIENT_ID</key>
+	<string>884656805579-d246uemq96mrn466l2uml85cer23vca9.apps.googleusercontent.com</string>
+	<key>API_KEY</key>
+	<string>AIzaSyCCMjJ2ReW5JGXRRBa-Pf3G1feeeVjWOVY</string>
+	<key>GCM_SENDER_ID</key>
+	<string>884656805579</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>life.clearbreath.clearbreath</string>
+	<key>PROJECT_ID</key>
+	<string>clearbreath</string>
+	<key>STORAGE_BUCKET</key>
+	<string>clearbreath.firebasestorage.app</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:884656805579:ios:c8d70a63f6ed3ec922ad4e</string>
+</dict>
+</plist>

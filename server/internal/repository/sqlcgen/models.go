@@ -32,6 +32,28 @@ type EventLog struct {
 	Metadata  []byte      `json:"metadata"`
 }
 
+type NotificationInstallation struct {
+	DeviceID               string      `json:"device_id"`
+	UserID                 pgtype.UUID `json:"user_id"`
+	Platform               string      `json:"platform"`
+	FcmToken               string      `json:"fcm_token"`
+	PermissionStatus       string      `json:"permission_status"`
+	ReminderEnabled        bool        `json:"reminder_enabled"`
+	ReminderTimeMinutes    int32       `json:"reminder_time_minutes"`
+	StreakWarningEnabled   bool        `json:"streak_warning_enabled"`
+	TimezoneIana           string      `json:"timezone_iana"`
+	TimezoneOffsetMinutes  int32       `json:"timezone_offset_minutes"`
+	AppVersion             string      `json:"app_version"`
+	BuildNumber            string      `json:"build_number"`
+	Locale                 string      `json:"locale"`
+	LastSeenAt             time.Time   `json:"last_seen_at"`
+	LastDailySentLocalDay  pgtype.Date `json:"last_daily_sent_local_day"`
+	LastStreakSentLocalDay pgtype.Date `json:"last_streak_sent_local_day"`
+	LastSendError          *string     `json:"last_send_error"`
+	CreatedAt              time.Time   `json:"created_at"`
+	UpdatedAt              time.Time   `json:"updated_at"`
+}
+
 type RefreshToken struct {
 	ID         uuid.UUID          `json:"id"`
 	UserID     uuid.UUID          `json:"user_id"`

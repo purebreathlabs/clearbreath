@@ -1,5 +1,7 @@
 import 'package:flutter/foundation.dart';
 
+import '../../notifications/domain/notification_constants.dart';
+
 enum ExperienceLevel { beginner, intermediate, advanced }
 
 enum PrimaryGoal { calm, sleep, focus, energy, hrv, spiritual }
@@ -19,7 +21,7 @@ class OnboardingAnswers {
   }) : primaryGoals = Set.unmodifiable(primaryGoals),
        practiceWindows = Set.unmodifiable(practiceWindows);
 
-  static const int defaultReminderTimeMinutes = 8 * 60;
+  static const int defaultReminderTimeMinutes = kDefaultReminderTimeMinutes;
 
   factory OnboardingAnswers.defaults() {
     return OnboardingAnswers(

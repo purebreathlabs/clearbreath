@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -282,6 +283,60 @@ class SettingsScreen extends ConsumerWidget {
                     onTap: () =>
                         ref.read(notificationServiceProvider).showTest(),
                   ),
+                  if (kDebugMode) ...[
+                    divider(),
+                    ListTile(
+                      leading: const Icon(Icons.bug_report_outlined),
+                      title: const Text('Notification diagnostics'),
+                      subtitle: Text(
+                        'Reminder: ${reminderTimeOfDay.format(context)} '
+                        '(${state.reminderTimeMinutes} min) '
+                        '${state.reminderEnabled ? "ON" : "OFF"}\n'
+                        'Streak warning: ${state.streakWarningEnabled ? "ON" : "OFF"}',
+                      ),
+                      isThreeLine: true,
+                      onTap: () async {
+                        final service = ref.read(notificationServiceProvider);
+                        final pending = await service.getPendingNotifications();
+                        if (!context.mounted) return;
+                        showDialog(
+                          context: context,
+                          builder: (context) => AlertDialog(
+                            title: const Text('Pending Notifications'),
+                            content: SizedBox(
+                              width: double.maxFinite,
+                              child: pending.isEmpty
+                                  ? const Text('No pending notifications.')
+                                  : ListView.builder(
+                                      shrinkWrap: true,
+                                      itemCount: pending.length,
+                                      itemBuilder: (context, index) {
+                                        final n = pending[index];
+                                        return ListTile(
+                                          dense: true,
+                                          title: Text(
+                                            'ID: ${n.id}',
+                                            style: typography.bodyMedium,
+                                          ),
+                                          subtitle: Text(
+                                            '${n.title}\n${n.body}',
+                                            style: typography.bodyMedium,
+                                          ),
+                                        );
+                                      },
+                                    ),
+                            ),
+                            actions: [
+                              TextButton(
+                                onPressed: () => Navigator.of(context).pop(),
+                                child: const Text('Close'),
+                              ),
+                            ],
+                          ),
+                        );
+                      },
+                    ),
+                  ],
                 ]),
               ],
             ),

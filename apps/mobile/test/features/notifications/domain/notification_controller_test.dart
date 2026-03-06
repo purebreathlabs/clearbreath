@@ -1,5 +1,6 @@
 import 'package:clearbreath/features/notifications/domain/notification_controller.dart';
 import 'package:clearbreath/features/notifications/domain/notification_service.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:clearbreath/features/session/data/session_repository.dart';
 import 'package:clearbreath/features/session/domain/local_session.dart';
 import 'package:clearbreath/features/settings/data/settings_repository.dart';
@@ -279,4 +280,8 @@ class _FakeNotificationService implements NotificationService {
 
   @override
   Future<void> dispose() async {}
+
+  @override
+  Future<List<PendingNotificationRequest>> getPendingNotifications() async =>
+      [];
 }
