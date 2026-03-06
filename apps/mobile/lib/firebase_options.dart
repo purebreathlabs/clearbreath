@@ -63,8 +63,10 @@ class DefaultFirebaseOptions {
     messagingSenderId: '884656805579',
     projectId: 'clearbreath',
     storageBucket: 'clearbreath.firebasestorage.app',
-    androidClientId: '884656805579-d246uemq96mrn466l2uml85cer23vca9.apps.googleusercontent.com',
-    iosClientId: '884656805579-kb298tik2g9e92fi5dbn5nas1ivlsvhl.apps.googleusercontent.com',
+    androidClientId:
+        '884656805579-d246uemq96mrn466l2uml85cer23vca9.apps.googleusercontent.com',
+    iosClientId:
+        '884656805579-kb298tik2g9e92fi5dbn5nas1ivlsvhl.apps.googleusercontent.com',
     iosBundleId: 'life.clearbreath.clearbreath',
   );
 }

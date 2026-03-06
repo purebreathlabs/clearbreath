@@ -100,11 +100,13 @@ class SettingsController extends Notifier<SettingsState> {
     required int reminderTimeMinutes,
     required bool streakWarningEnabled,
   }) {
-    ref.read(notificationPreferencesRepositoryProvider).syncToBackend(
-      reminderEnabled: reminderEnabled,
-      reminderTimeMinutes: reminderTimeMinutes,
-      streakWarningEnabled: streakWarningEnabled,
-    );
+    ref
+        .read(notificationPreferencesRepositoryProvider)
+        .syncToBackend(
+          reminderEnabled: reminderEnabled,
+          reminderTimeMinutes: reminderTimeMinutes,
+          streakWarningEnabled: streakWarningEnabled,
+        );
   }
 
   Future<void> setDisplayName(String value) async {

@@ -12,8 +12,8 @@ import '../../auth/domain/auth_state_provider.dart';
 
 final notificationPreferencesRepositoryProvider =
     Provider<NotificationPreferencesRepository>((ref) {
-  return NotificationPreferencesRepository(ref);
-});
+      return NotificationPreferencesRepository(ref);
+    });
 
 class NotificationPreferencesRepository {
   NotificationPreferencesRepository(this._ref);

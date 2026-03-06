@@ -132,7 +132,9 @@ class _FlutterLocalNotificationService implements NotificationService {
     try {
       await _ensureInitialized();
     } catch (e, st) {
-      debugPrint('NotificationService: init failed during requestPermission: $e\n$st');
+      debugPrint(
+        'NotificationService: init failed during requestPermission: $e\n$st',
+      );
       return false;
     }
 
@@ -305,7 +307,9 @@ class _FlutterLocalNotificationService implements NotificationService {
       await _ensureInitialized();
       return _plugin.pendingNotificationRequests();
     } catch (e, st) {
-      debugPrint('NotificationService: getPendingNotifications failed: $e\n$st');
+      debugPrint(
+        'NotificationService: getPendingNotifications failed: $e\n$st',
+      );
       return [];
     }
   }

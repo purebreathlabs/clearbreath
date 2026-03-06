@@ -184,7 +184,9 @@ class NotificationController extends Notifier<NotificationState> {
         ),
       );
     } catch (e, st) {
-      debugPrint('NotificationController: dismissPermissionPrompt failed: $e\n$st');
+      debugPrint(
+        'NotificationController: dismissPermissionPrompt failed: $e\n$st',
+      );
     }
   }
 
@@ -284,7 +286,9 @@ class NotificationController extends Notifier<NotificationState> {
       final minutes = minutesByDay[todayKey] ?? 0;
       return minutes >= 2;
     } catch (e, st) {
-      debugPrint('NotificationController: _hasQualifyingSessionToday failed: $e\n$st');
+      debugPrint(
+        'NotificationController: _hasQualifyingSessionToday failed: $e\n$st',
+      );
       return false;
     }
   }

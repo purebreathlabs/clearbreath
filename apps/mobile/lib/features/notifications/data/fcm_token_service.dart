@@ -144,7 +144,9 @@ class FCMTokenService {
       final prefs = await SharedPreferences.getInstance();
       await prefs.setString(_lastTokenKey, token);
 
-      debugPrint('FCMTokenService: registered (${authState.isSignedIn ? "auth" : "guest"})');
+      debugPrint(
+        'FCMTokenService: registered (${authState.isSignedIn ? "auth" : "guest"})',
+      );
     } catch (e) {
       debugPrint('FCMTokenService: registration failed: $e');
     }
