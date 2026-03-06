@@ -116,10 +116,11 @@ func (s *Service) SendTest(ctx context.Context, deviceID string, kind string, cu
 
 	title := "Test notification"
 	body := "This is a test push from ClearBreath."
-	if kind == "daily_reminder" {
+	switch kind {
+	case "daily_reminder":
 		title = "Daily reminder"
 		body = "Take 2 minutes to breathe today."
-	} else if kind == "streak_warning" {
+	case "streak_warning":
 		title = "Streak at risk"
 		body = "Practice 2 minutes before midnight to keep your streak."
 	}

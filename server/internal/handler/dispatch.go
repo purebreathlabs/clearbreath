@@ -88,7 +88,7 @@ func dispatchDailyReminders(ctx context.Context, store *repository.Store, sender
 			}
 
 			_ = store.Queries().MarkDailyReminderSent(ctx, sqlcgen.MarkDailyReminderSentParams{
-				DeviceID:             inst.DeviceID,
+				DeviceID:              inst.DeviceID,
 				LastDailySentLocalDay: pgtype.Date{Time: localDate, Valid: true},
 			})
 			totalSent++
@@ -158,7 +158,7 @@ func dispatchStreakWarnings(ctx context.Context, store *repository.Store, sender
 			}
 
 			_ = store.Queries().MarkStreakWarningSent(ctx, sqlcgen.MarkStreakWarningSentParams{
-				DeviceID:              inst.DeviceID,
+				DeviceID:               inst.DeviceID,
 				LastStreakSentLocalDay: pgtype.Date{Time: localDate, Valid: true},
 			})
 			totalSent++
