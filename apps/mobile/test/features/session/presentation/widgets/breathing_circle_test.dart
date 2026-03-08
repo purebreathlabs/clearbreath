@@ -4,9 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
-  testWidgets('renders ring with phase title and timer inside', (
-    tester,
-  ) async {
+  testWidgets('renders ring with phase title and timer inside', (tester) async {
     await tester.pumpWidget(
       MaterialApp(
         theme: AppTheme.dark(),
@@ -31,8 +29,9 @@ void main() {
     expect(find.text('INHALE'), findsOneWidget);
     expect(find.text('00:02'), findsOneWidget);
 
-    final renderBox =
-        tester.renderObject<RenderBox>(find.byType(BreathingCircle));
+    final renderBox = tester.renderObject<RenderBox>(
+      find.byType(BreathingCircle),
+    );
     expect(renderBox.size.width, lessThanOrEqualTo(280));
     expect(renderBox.size.height, lessThanOrEqualTo(280));
   });

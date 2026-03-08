@@ -26,47 +26,83 @@ void main() {
 
   group('phaseTitle', () {
     test('inhale', () {
-      final model = SessionUiModel.from(makeState(phase: SessionPhase.inhale), null, null);
+      final model = SessionUiModel.from(
+        makeState(phase: SessionPhase.inhale),
+        null,
+        null,
+      );
       expect(model.phaseTitle, 'INHALE');
     });
 
     test('exhale', () {
-      final model = SessionUiModel.from(makeState(phase: SessionPhase.exhale), null, null);
+      final model = SessionUiModel.from(
+        makeState(phase: SessionPhase.exhale),
+        null,
+        null,
+      );
       expect(model.phaseTitle, 'EXHALE');
     });
 
     test('hold', () {
-      final model = SessionUiModel.from(makeState(phase: SessionPhase.hold), null, null);
+      final model = SessionUiModel.from(
+        makeState(phase: SessionPhase.hold),
+        null,
+        null,
+      );
       expect(model.phaseTitle, 'HOLD');
     });
 
     test('holdAfterExhale', () {
-      final model = SessionUiModel.from(makeState(phase: SessionPhase.holdAfterExhale), null, null);
+      final model = SessionUiModel.from(
+        makeState(phase: SessionPhase.holdAfterExhale),
+        null,
+        null,
+      );
       expect(model.phaseTitle, 'HOLD');
     });
 
     test('rest', () {
-      final model = SessionUiModel.from(makeState(phase: SessionPhase.rest), null, null);
+      final model = SessionUiModel.from(
+        makeState(phase: SessionPhase.rest),
+        null,
+        null,
+      );
       expect(model.phaseTitle, 'REST');
     });
 
     test('round', () {
-      final model = SessionUiModel.from(makeState(phase: SessionPhase.round), null, null);
+      final model = SessionUiModel.from(
+        makeState(phase: SessionPhase.round),
+        null,
+        null,
+      );
       expect(model.phaseTitle, 'BREATHE');
     });
 
     test('countdown', () {
-      final model = SessionUiModel.from(makeState(phase: SessionPhase.countdown), null, null);
+      final model = SessionUiModel.from(
+        makeState(phase: SessionPhase.countdown),
+        null,
+        null,
+      );
       expect(model.phaseTitle, 'READY');
     });
 
     test('paused', () {
-      final model = SessionUiModel.from(makeState(phase: SessionPhase.paused), null, null);
+      final model = SessionUiModel.from(
+        makeState(phase: SessionPhase.paused),
+        null,
+        null,
+      );
       expect(model.phaseTitle, 'PAUSED');
     });
 
     test('completed', () {
-      final model = SessionUiModel.from(makeState(phase: SessionPhase.completed), null, null);
+      final model = SessionUiModel.from(
+        makeState(phase: SessionPhase.completed),
+        null,
+        null,
+      );
       expect(model.phaseTitle, 'COMPLETE');
     });
   });
@@ -87,11 +123,7 @@ void main() {
     });
 
     test('null when only currentRound present', () {
-      final model = SessionUiModel.from(
-        makeState(currentRound: 1),
-        null,
-        null,
-      );
+      final model = SessionUiModel.from(makeState(currentRound: 1), null, null);
       expect(model.roundLabel, isNull);
     });
   });
@@ -152,17 +184,29 @@ void main() {
 
   group('isHoldPhase', () {
     test('true for hold', () {
-      final model = SessionUiModel.from(makeState(phase: SessionPhase.hold), null, null);
+      final model = SessionUiModel.from(
+        makeState(phase: SessionPhase.hold),
+        null,
+        null,
+      );
       expect(model.isHoldPhase, isTrue);
     });
 
     test('true for holdAfterExhale', () {
-      final model = SessionUiModel.from(makeState(phase: SessionPhase.holdAfterExhale), null, null);
+      final model = SessionUiModel.from(
+        makeState(phase: SessionPhase.holdAfterExhale),
+        null,
+        null,
+      );
       expect(model.isHoldPhase, isTrue);
     });
 
     test('false for inhale', () {
-      final model = SessionUiModel.from(makeState(phase: SessionPhase.inhale), null, null);
+      final model = SessionUiModel.from(
+        makeState(phase: SessionPhase.inhale),
+        null,
+        null,
+      );
       expect(model.isHoldPhase, isFalse);
     });
   });
@@ -200,27 +244,47 @@ void main() {
 
   group('showPhaseTitle', () {
     test('true when breathing', () {
-      final model = SessionUiModel.from(makeState(phase: SessionPhase.inhale), null, null);
+      final model = SessionUiModel.from(
+        makeState(phase: SessionPhase.inhale),
+        null,
+        null,
+      );
       expect(model.showPhaseTitle, isTrue);
     });
 
     test('true when paused', () {
-      final model = SessionUiModel.from(makeState(phase: SessionPhase.paused), null, null);
+      final model = SessionUiModel.from(
+        makeState(phase: SessionPhase.paused),
+        null,
+        null,
+      );
       expect(model.showPhaseTitle, isTrue);
     });
 
     test('true when countdown', () {
-      final model = SessionUiModel.from(makeState(phase: SessionPhase.countdown), null, null);
+      final model = SessionUiModel.from(
+        makeState(phase: SessionPhase.countdown),
+        null,
+        null,
+      );
       expect(model.showPhaseTitle, isTrue);
     });
 
     test('false when idle', () {
-      final model = SessionUiModel.from(makeState(phase: SessionPhase.idle), null, null);
+      final model = SessionUiModel.from(
+        makeState(phase: SessionPhase.idle),
+        null,
+        null,
+      );
       expect(model.showPhaseTitle, isFalse);
     });
 
     test('false when completed', () {
-      final model = SessionUiModel.from(makeState(phase: SessionPhase.completed), null, null);
+      final model = SessionUiModel.from(
+        makeState(phase: SessionPhase.completed),
+        null,
+        null,
+      );
       expect(model.showPhaseTitle, isFalse);
     });
   });

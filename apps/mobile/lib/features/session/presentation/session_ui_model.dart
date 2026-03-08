@@ -33,7 +33,8 @@ class SessionUiModel {
       roundLabel: _roundLabel(state.currentRound, state.totalRounds),
       stageMode: technique?.animationMode ?? _fallbackMode(state.techniqueId),
       phaseProgress: progress,
-      isHoldPhase: state.phase == SessionPhase.hold ||
+      isHoldPhase:
+          state.phase == SessionPhase.hold ||
           state.phase == SessionPhase.holdAfterExhale,
       showPhaseTitle: state.isBreathing || state.isCountdown || state.isPaused,
       canPause: state.canPause,
@@ -92,7 +93,10 @@ class SessionUiModel {
     return t.clamp(0.0, 1.0);
   }
 
-  static Duration _phaseDurationFor(SessionState state, TechniquePreset? preset) {
+  static Duration _phaseDurationFor(
+    SessionState state,
+    TechniquePreset? preset,
+  ) {
     if (state.phase == SessionPhase.countdown) {
       return const Duration(seconds: 3);
     }
@@ -102,8 +106,9 @@ class SessionUiModel {
         SessionPhase.inhale => Duration(milliseconds: preset.inhaleMs),
         SessionPhase.hold => Duration(milliseconds: preset.holdMs),
         SessionPhase.exhale => Duration(milliseconds: preset.exhaleMs),
-        SessionPhase.holdAfterExhale =>
-          Duration(milliseconds: preset.holdAfterExhaleMs),
+        SessionPhase.holdAfterExhale => Duration(
+          milliseconds: preset.holdAfterExhaleMs,
+        ),
         _ => const Duration(seconds: 1),
       };
     }

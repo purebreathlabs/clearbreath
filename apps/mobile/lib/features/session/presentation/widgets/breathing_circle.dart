@@ -71,8 +71,10 @@ class _BreathingCircleState extends State<BreathingCircle>
 
     return LayoutBuilder(
       builder: (context, constraints) {
-        final size =
-            min(constraints.maxWidth, constraints.maxHeight).clamp(0.0, 280.0);
+        final size = min(
+          constraints.maxWidth,
+          constraints.maxHeight,
+        ).clamp(0.0, 280.0);
 
         return Center(
           child: AnimatedBuilder(

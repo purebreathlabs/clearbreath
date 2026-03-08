@@ -99,8 +99,9 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
 
     final techniques = ref.watch(allTechniquesProvider);
     final technique = _findTechnique(techniques, state.techniqueId);
-    final preset =
-        technique != null ? technique.presets[state.presetId ?? ''] : null;
+    final preset = technique != null
+        ? technique.presets[state.presetId ?? '']
+        : null;
 
     final uiModel = SessionUiModel.from(state, technique, preset);
     final bpm = preset is BpmRoundsPreset ? preset.bpm : 60;
@@ -133,9 +134,7 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
               Container(
                 decoration: BoxDecoration(
                   color: colors.surface,
-                  border: Border(
-                    bottom: BorderSide(color: colors.divider),
-                  ),
+                  border: Border(bottom: BorderSide(color: colors.divider)),
                 ),
                 padding: EdgeInsets.symmetric(
                   horizontal: hPad,
@@ -149,7 +148,8 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
                       child: IconButton(
                         icon: const Icon(Icons.arrow_back, size: 20),
                         onPressed: () => _requestExit(
-                          confirm: state.isBreathing ||
+                          confirm:
+                              state.isBreathing ||
                               state.isCountdown ||
                               state.isPaused,
                         ),
@@ -179,12 +179,7 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
               // === FOCAL STAGE ===
               Expanded(
                 child: Center(
-                  child: _buildStage(
-                    uiModel,
-                    state,
-                    bpm,
-                    maxRingSize,
-                  ),
+                  child: _buildStage(uiModel, state, bpm, maxRingSize),
                 ),
               ),
 
@@ -192,9 +187,7 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
               Container(
                 decoration: BoxDecoration(
                   color: colors.surface,
-                  border: Border(
-                    top: BorderSide(color: colors.divider),
-                  ),
+                  border: Border(top: BorderSide(color: colors.divider)),
                 ),
                 padding: EdgeInsets.fromLTRB(
                   hPad,
@@ -242,20 +235,17 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
                             onPressed: uiModel.canResume
                                 ? _controller.resume
                                 : uiModel.canPause
-                                    ? _controller.pause
-                                    : null,
-                            child: Text(
-                              uiModel.canResume ? 'Resume' : 'Pause',
-                            ),
+                                ? _controller.pause
+                                : null,
+                            child: Text(uiModel.canResume ? 'Resume' : 'Pause'),
                           ),
                         ),
                         SizedBox(width: spacing.md),
                         Expanded(
                           child: OutlinedButton(
                             onPressed: uiModel.canStop
-                                ? () => _requestExit(
-                                      confirm: !state.isCompleted,
-                                    )
+                                ? () =>
+                                      _requestExit(confirm: !state.isCompleted)
                                 : null,
                             child: const Text('Stop'),
                           ),
@@ -292,31 +282,31 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
   ) {
     return switch (uiModel.stageMode) {
       AnimationMode.metronome => MetronomePulse(
-          bpm: bpm,
-          progress: uiModel.phaseProgress,
-          isActiveRound: state.phase == SessionPhase.round,
-          phaseTitle: uiModel.phaseTitle,
-          primaryTimer: uiModel.primaryTimer,
-          roundLabel: uiModel.roundLabel,
-          maxRingSize: maxRingSize - 40,
-        ),
+        bpm: bpm,
+        progress: uiModel.phaseProgress,
+        isActiveRound: state.phase == SessionPhase.round,
+        phaseTitle: uiModel.phaseTitle,
+        primaryTimer: uiModel.primaryTimer,
+        roundLabel: uiModel.roundLabel,
+        maxRingSize: maxRingSize - 40,
+      ),
       AnimationMode.alternateNostril => AlternateNostrilIndicator(
-          activeNostril: state.activeNostril,
+        activeNostril: state.activeNostril,
+        progress: uiModel.phaseProgress,
+        isHoldPhase: uiModel.isHoldPhase,
+        phaseTitle: uiModel.phaseTitle,
+        primaryTimer: uiModel.primaryTimer,
+      ),
+      AnimationMode.circle => SizedBox(
+        width: maxRingSize,
+        height: maxRingSize,
+        child: BreathingCircle(
           progress: uiModel.phaseProgress,
           isHoldPhase: uiModel.isHoldPhase,
           phaseTitle: uiModel.phaseTitle,
           primaryTimer: uiModel.primaryTimer,
         ),
-      AnimationMode.circle => SizedBox(
-          width: maxRingSize,
-          height: maxRingSize,
-          child: BreathingCircle(
-            progress: uiModel.phaseProgress,
-            isHoldPhase: uiModel.isHoldPhase,
-            phaseTitle: uiModel.phaseTitle,
-            primaryTimer: uiModel.primaryTimer,
-          ),
-        ),
+      ),
     };
   }
 

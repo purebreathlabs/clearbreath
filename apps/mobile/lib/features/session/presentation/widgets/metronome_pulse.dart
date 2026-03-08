@@ -78,8 +78,10 @@ class _MetronomePulseState extends State<MetronomePulse>
 
     return LayoutBuilder(
       builder: (context, constraints) {
-        final ringSize =
-            min(constraints.maxWidth, widget.maxRingSize).clamp(0.0, 280.0);
+        final ringSize = min(
+          constraints.maxWidth,
+          widget.maxRingSize,
+        ).clamp(0.0, 280.0);
 
         return Center(
           child: Column(
