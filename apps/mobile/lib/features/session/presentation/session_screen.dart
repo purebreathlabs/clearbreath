@@ -13,12 +13,11 @@ import '../domain/local_session.dart';
 import '../domain/session_controller.dart';
 import '../domain/session_phase.dart';
 import '../domain/session_state.dart';
+import 'session_ui_model.dart';
 import 'widgets/alternate_nostril_indicator.dart';
 import 'widgets/breathing_circle.dart';
 import 'widgets/metronome_pulse.dart';
 import 'widgets/session_audio_controls.dart';
-import 'widgets/session_phase_label.dart';
-import 'widgets/session_timer_display.dart';
 
 class SessionScreen extends ConsumerStatefulWidget {
   const SessionScreen({super.key});
@@ -100,36 +99,18 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
 
     final techniques = ref.watch(allTechniquesProvider);
     final technique = _findTechnique(techniques, state.techniqueId);
-    final preset = technique != null
-        ? technique.presets[state.presetId ?? '']
-        : null;
+    final preset =
+        technique != null ? technique.presets[state.presetId ?? ''] : null;
 
-    final animationMode =
-        technique?.animationMode ?? _fallbackAnimationMode(state.techniqueId);
+    final uiModel = SessionUiModel.from(state, technique, preset);
     final bpm = preset is BpmRoundsPreset ? preset.bpm : 60;
-    final phaseDuration = _phaseDurationFor(state, preset);
 
-    final phaseWidget = switch (animationMode) {
-      AnimationMode.metronome => MetronomePulse(
-        bpm: bpm,
-        phase: state.phase,
-        phaseRemaining: state.phaseRemaining,
-        phaseDuration: phaseDuration,
-        currentRound: state.currentRound,
-        totalRounds: state.totalRounds,
-      ),
-      AnimationMode.alternateNostril => AlternateNostrilIndicator(
-        activeNostril: state.activeNostril,
-        phase: state.phase,
-        phaseRemaining: state.phaseRemaining,
-        phaseDuration: phaseDuration,
-      ),
-      AnimationMode.circle => BreathingCircle(
-        phase: state.phase,
-        phaseRemaining: state.phaseRemaining,
-        phaseDuration: phaseDuration,
-      ),
-    };
+    final screenHeight = MediaQuery.of(context).size.height;
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isCompact = screenHeight < 760;
+    final isNarrow = screenWidth < 360;
+    final hPad = isNarrow ? spacing.md : spacing.lg;
+    final maxRingSize = isCompact ? 220.0 : 280.0;
 
     final canPop = _allowPop || state.isIdle || state.isCompleted;
 
@@ -145,52 +126,136 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
         unawaited(_requestExit(confirm: true));
       },
       child: Scaffold(
-        appBar: AppBar(title: Text(technique?.name ?? 'Session')),
         body: SafeArea(
-          child: Padding(
-            padding: EdgeInsets.all(spacing.lg),
-            child: Stack(
-              children: [
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
+          child: Column(
+            children: [
+              // === HEADER ===
+              Container(
+                decoration: BoxDecoration(
+                  color: colors.surface,
+                  border: Border(
+                    bottom: BorderSide(color: colors.divider),
+                  ),
+                ),
+                padding: EdgeInsets.symmetric(
+                  horizontal: hPad,
+                  vertical: spacing.sm,
+                ),
+                child: Row(
                   children: [
-                    if (animationMode == AnimationMode.metronome)
-                      SessionPhaseLabel(phase: state.phase),
-                    if (animationMode == AnimationMode.metronome)
-                      SizedBox(height: spacing.lg),
-                    Expanded(child: Center(child: phaseWidget)),
-                    SizedBox(height: spacing.xl),
-                    SessionTimerDisplay(
-                      phaseRemaining: state.phaseRemaining,
-                      totalElapsed: state.totalElapsed,
-                      currentRound: state.currentRound,
-                      totalRounds: state.totalRounds,
+                    SizedBox(
+                      width: 40,
+                      height: 40,
+                      child: IconButton(
+                        icon: const Icon(Icons.arrow_back, size: 20),
+                        onPressed: () => _requestExit(
+                          confirm: state.isBreathing ||
+                              state.isCountdown ||
+                              state.isPaused,
+                        ),
+                        padding: EdgeInsets.zero,
+                        style: IconButton.styleFrom(
+                          backgroundColor: colors.surfaceHigh,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                            side: BorderSide(color: colors.border),
+                          ),
+                        ),
+                      ),
                     ),
-                    SizedBox(height: spacing.xl),
+                    SizedBox(width: spacing.md),
+                    Expanded(
+                      child: Text(
+                        technique?.name ?? 'Session',
+                        style: typography.titleMedium,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                    const SessionAudioControls(),
+                  ],
+                ),
+              ),
+
+              // === FOCAL STAGE ===
+              Expanded(
+                child: Center(
+                  child: _buildStage(
+                    uiModel,
+                    state,
+                    bpm,
+                    maxRingSize,
+                  ),
+                ),
+              ),
+
+              // === DOCK ===
+              Container(
+                decoration: BoxDecoration(
+                  color: colors.surface,
+                  border: Border(
+                    top: BorderSide(color: colors.divider),
+                  ),
+                ),
+                padding: EdgeInsets.fromLTRB(
+                  hPad,
+                  isCompact ? spacing.md : spacing.lg,
+                  hPad,
+                  isCompact ? spacing.md : spacing.lg,
+                ),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    // Secondary info row
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          uiModel.secondaryTimer,
+                          style: typography.bodyMedium.copyWith(
+                            color: colors.textSecondary,
+                          ),
+                        ),
+                        if (uiModel.roundLabel != null &&
+                            uiModel.stageMode != AnimationMode.metronome) ...[
+                          Text(
+                            '  \u00b7  ',
+                            style: typography.bodyMedium.copyWith(
+                              color: colors.textTertiary,
+                            ),
+                          ),
+                          Text(
+                            uiModel.roundLabel!,
+                            style: typography.bodyMedium.copyWith(
+                              color: colors.textSecondary,
+                            ),
+                          ),
+                        ],
+                      ],
+                    ),
+                    SizedBox(height: isCompact ? spacing.md : spacing.lg),
+
+                    // Buttons
                     Row(
                       children: [
                         Expanded(
                           child: FilledButton(
-                            onPressed: state.canResume
+                            onPressed: uiModel.canResume
                                 ? _controller.resume
-                                : state.canPause
-                                ? _controller.pause
-                                : null,
+                                : uiModel.canPause
+                                    ? _controller.pause
+                                    : null,
                             child: Text(
-                              state.canResume
-                                  ? 'Resume'
-                                  : state.canPause
-                                  ? 'Pause'
-                                  : 'Pause',
+                              uiModel.canResume ? 'Resume' : 'Pause',
                             ),
                           ),
                         ),
                         SizedBox(width: spacing.md),
                         Expanded(
                           child: OutlinedButton(
-                            onPressed: state.canStop
-                                ? () =>
-                                      _requestExit(confirm: !state.isCompleted)
+                            onPressed: uiModel.canStop
+                                ? () => _requestExit(
+                                      confirm: !state.isCompleted,
+                                    )
                                 : null,
                             child: const Text('Stop'),
                           ),
@@ -199,30 +264,60 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
                     ),
                   ],
                 ),
-                Align(
-                  alignment: Alignment.topRight,
-                  child: const SessionAudioControls(),
-                ),
-                if (techniques.hasError)
-                  Align(
-                    alignment: Alignment.bottomCenter,
-                    child: Padding(
-                      padding: EdgeInsets.only(bottom: spacing.lg),
-                      child: Text(
-                        'Could not load technique visuals.',
-                        style: typography.bodyMedium.copyWith(
-                          color: colors.textSecondary,
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
+              ),
+
+              if (techniques.hasError)
+                Padding(
+                  padding: EdgeInsets.all(spacing.lg),
+                  child: Text(
+                    'Could not load technique visuals.',
+                    style: typography.bodyMedium.copyWith(
+                      color: colors.textSecondary,
                     ),
+                    textAlign: TextAlign.center,
                   ),
-              ],
-            ),
+                ),
+            ],
           ),
         ),
       ),
     );
+  }
+
+  Widget _buildStage(
+    SessionUiModel uiModel,
+    SessionState state,
+    int bpm,
+    double maxRingSize,
+  ) {
+    return switch (uiModel.stageMode) {
+      AnimationMode.metronome => MetronomePulse(
+          bpm: bpm,
+          progress: uiModel.phaseProgress,
+          isActiveRound: state.phase == SessionPhase.round,
+          phaseTitle: uiModel.phaseTitle,
+          primaryTimer: uiModel.primaryTimer,
+          roundLabel: uiModel.roundLabel,
+          maxRingSize: maxRingSize - 40,
+        ),
+      AnimationMode.alternateNostril => AlternateNostrilIndicator(
+          activeNostril: state.activeNostril,
+          progress: uiModel.phaseProgress,
+          isHoldPhase: uiModel.isHoldPhase,
+          phaseTitle: uiModel.phaseTitle,
+          primaryTimer: uiModel.primaryTimer,
+        ),
+      AnimationMode.circle => SizedBox(
+          width: maxRingSize,
+          height: maxRingSize,
+          child: BreathingCircle(
+            progress: uiModel.phaseProgress,
+            isHoldPhase: uiModel.isHoldPhase,
+            phaseTitle: uiModel.phaseTitle,
+            primaryTimer: uiModel.primaryTimer,
+          ),
+        ),
+    };
   }
 
   Technique? _findTechnique(
@@ -239,42 +334,6 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
       }
     }
     return null;
-  }
-
-  AnimationMode _fallbackAnimationMode(String? techniqueId) {
-    return switch (techniqueId) {
-      'kapalbhati' || 'bhastrika' => AnimationMode.metronome,
-      'anulom_vilom' => AnimationMode.alternateNostril,
-      _ => AnimationMode.circle,
-    };
-  }
-
-  Duration _phaseDurationFor(SessionState state, TechniquePreset? preset) {
-    if (state.phase == SessionPhase.countdown) {
-      return const Duration(seconds: 3);
-    }
-
-    if (preset is PhasePreset) {
-      return switch (state.phase) {
-        SessionPhase.inhale => Duration(milliseconds: preset.inhaleMs),
-        SessionPhase.hold => Duration(milliseconds: preset.holdMs),
-        SessionPhase.exhale => Duration(milliseconds: preset.exhaleMs),
-        SessionPhase.holdAfterExhale => Duration(
-          milliseconds: preset.holdAfterExhaleMs,
-        ),
-        _ => const Duration(seconds: 1),
-      };
-    }
-
-    if (preset is BpmRoundsPreset) {
-      return switch (state.phase) {
-        SessionPhase.round => Duration(seconds: preset.roundSeconds),
-        SessionPhase.rest => Duration(seconds: preset.restSeconds),
-        _ => const Duration(seconds: 1),
-      };
-    }
-
-    return const Duration(seconds: 1);
   }
 
   Future<void> _requestExit({required bool confirm}) async {
@@ -323,7 +382,7 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
         return AlertDialog(
           title: const Text('End session early?'),
           content: Text(
-            'This session will stop and won’t count as completed.',
+            'This session will stop and won\u2019t count as completed.',
             style: typography.bodyMedium,
           ),
           actions: [

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 import '../../../../core/theme/theme_extensions.dart';
-import '../../domain/session_phase.dart';
 import '../../domain/session_plan.dart';
 import 'breathing_circle.dart';
 
@@ -9,15 +8,17 @@ class AlternateNostrilIndicator extends StatelessWidget {
   const AlternateNostrilIndicator({
     super.key,
     required this.activeNostril,
-    required this.phase,
-    required this.phaseRemaining,
-    required this.phaseDuration,
+    required this.progress,
+    required this.isHoldPhase,
+    required this.phaseTitle,
+    required this.primaryTimer,
   });
 
   final NostrilSide? activeNostril;
-  final SessionPhase phase;
-  final Duration phaseRemaining;
-  final Duration phaseDuration;
+  final double progress;
+  final bool isHoldPhase;
+  final String phaseTitle;
+  final String primaryTimer;
 
   @override
   Widget build(BuildContext context) {
@@ -64,9 +65,10 @@ class AlternateNostrilIndicator extends StatelessWidget {
         SizedBox(
           height: 260,
           child: BreathingCircle(
-            phase: phase,
-            phaseRemaining: phaseRemaining,
-            phaseDuration: phaseDuration,
+            progress: progress,
+            isHoldPhase: isHoldPhase,
+            phaseTitle: phaseTitle,
+            primaryTimer: primaryTimer,
           ),
         ),
       ],

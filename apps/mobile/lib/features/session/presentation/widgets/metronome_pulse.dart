@@ -3,25 +3,27 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 
 import '../../../../core/theme/theme_extensions.dart';
-import '../../domain/session_phase.dart';
+import 'breathing_ring_painter.dart';
 
 class MetronomePulse extends StatefulWidget {
   const MetronomePulse({
     super.key,
     required this.bpm,
-    required this.phase,
-    required this.phaseRemaining,
-    required this.phaseDuration,
-    required this.currentRound,
-    required this.totalRounds,
+    required this.progress,
+    required this.isActiveRound,
+    required this.phaseTitle,
+    required this.primaryTimer,
+    required this.roundLabel,
+    this.maxRingSize = 240,
   });
 
   final int bpm;
-  final SessionPhase phase;
-  final Duration phaseRemaining;
-  final Duration phaseDuration;
-  final int? currentRound;
-  final int? totalRounds;
+  final double progress;
+  final bool isActiveRound;
+  final String phaseTitle;
+  final String primaryTimer;
+  final String? roundLabel;
+  final double maxRingSize;
 
   @override
   State<MetronomePulse> createState() => _MetronomePulseState();
@@ -41,14 +43,15 @@ class _MetronomePulseState extends State<MetronomePulse>
   @override
   void didUpdateWidget(MetronomePulse oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (oldWidget.bpm != widget.bpm || oldWidget.phase != widget.phase) {
+    if (oldWidget.bpm != widget.bpm ||
+        oldWidget.isActiveRound != widget.isActiveRound) {
       _syncController();
     }
   }
 
   void _syncController() {
     final beat = _beatDuration(widget.bpm);
-    if (beat == null || widget.phase != SessionPhase.round) {
+    if (beat == null || !widget.isActiveRound) {
       _controller
         ..stop()
         ..duration = beat ?? const Duration(milliseconds: 600);
@@ -69,58 +72,87 @@ class _MetronomePulseState extends State<MetronomePulse>
 
   @override
   Widget build(BuildContext context) {
+    final colors = Theme.of(context).extension<AppColorTokens>()!;
     final typography = Theme.of(context).extension<AppTypographyTokens>()!;
     final spacing = Theme.of(context).extension<AppSpacingTokens>()!;
-    final colors = Theme.of(context).extension<AppColorTokens>()!;
-
-    final roundLabel = _roundLabel(widget.currentRound, widget.totalRounds);
 
     return LayoutBuilder(
       builder: (context, constraints) {
-        final available = min(constraints.maxWidth, constraints.maxHeight);
-        final dotBase = (available * 0.18).clamp(20.0, 34.0);
+        final ringSize =
+            min(constraints.maxWidth, widget.maxRingSize).clamp(0.0, 280.0);
 
         return Center(
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              if (roundLabel != null)
+              // Round label above the ring
+              if (widget.roundLabel != null) ...[
                 Text(
-                  roundLabel,
-                  key: const Key('metronome_round_label'),
-                  style: typography.titleMedium.copyWith(
+                  widget.roundLabel!,
+                  style: typography.labelMedium.copyWith(
                     color: colors.textSecondary,
+                    letterSpacing: 0.6,
                   ),
                 ),
-              if (roundLabel != null) SizedBox(height: spacing.lg),
+                SizedBox(height: spacing.md),
+              ],
+
+              // The ring — pulses during active round
               AnimatedBuilder(
                 animation: _controller,
                 builder: (context, child) {
-                  final t = Curves.easeOut.transform(_controller.value);
-                  final scale = widget.phase == SessionPhase.round
-                      ? 0.6 + 0.5 * t
-                      : 0.6;
+                  final t = widget.isActiveRound
+                      ? Curves.easeOut.transform(_controller.value)
+                      : 0.0;
+                  final scale = widget.isActiveRound ? 0.96 + 0.04 * t : 1.0;
+                  final glow = widget.isActiveRound ? t * 0.5 : 0.0;
 
-                  return Transform.scale(scale: scale, child: child);
+                  return Transform.scale(
+                    scale: scale,
+                    child: SizedBox(
+                      width: ringSize,
+                      height: ringSize,
+                      child: CustomPaint(
+                        painter: BreathingRingPainter(
+                          progress: widget.progress,
+                          arcColor: colors.textPrimary,
+                          trackColor: colors.border,
+                          glowIntensity: glow,
+                        ),
+                        child: Center(
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              AnimatedSwitcher(
+                                duration: const Duration(milliseconds: 180),
+                                switchInCurve: Curves.easeOut,
+                                switchOutCurve: Curves.easeIn,
+                                child: Text(
+                                  widget.phaseTitle,
+                                  key: ValueKey(widget.phaseTitle),
+                                  style: typography.titleLarge.copyWith(
+                                    color: colors.textPrimary,
+                                    letterSpacing: 1.6,
+                                  ),
+                                  textAlign: TextAlign.center,
+                                ),
+                              ),
+                              const SizedBox(height: 6),
+                              Text(
+                                widget.primaryTimer,
+                                style: typography.displayMedium.copyWith(
+                                  color: colors.textPrimary,
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  );
                 },
-                child: Container(
-                  width: dotBase,
-                  height: dotBase,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: colors.textPrimary,
-                  ),
-                ),
               ),
-              SizedBox(height: spacing.xl),
-              if (widget.phase == SessionPhase.rest)
-                Text(
-                  _formatDuration(widget.phaseRemaining),
-                  key: const Key('metronome_rest_remaining'),
-                  style: typography.displayMedium.copyWith(
-                    color: colors.textPrimary,
-                  ),
-                ),
             ],
           ),
         );
@@ -137,21 +169,5 @@ class _MetronomePulseState extends State<MetronomePulse>
       return null;
     }
     return Duration(microseconds: us);
-  }
-
-  String? _roundLabel(int? currentRound, int? totalRounds) {
-    if (currentRound == null || totalRounds == null) {
-      return null;
-    }
-    return 'Round $currentRound of $totalRounds';
-  }
-
-  String _formatDuration(Duration duration) {
-    final totalSeconds = duration.inSeconds.abs();
-    final minutes = totalSeconds ~/ 60;
-    final seconds = totalSeconds % 60;
-    final mm = minutes.toString().padLeft(2, '0');
-    final ss = seconds.toString().padLeft(2, '0');
-    return '$mm:$ss';
   }
 }

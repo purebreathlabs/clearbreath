@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -15,6 +17,8 @@ class SessionAudioControls extends ConsumerStatefulWidget {
 class _SessionAudioControlsState extends ConsumerState<SessionAudioControls> {
   late bool _muted;
   late double _volume;
+  bool _expanded = false;
+  Timer? _collapseTimer;
 
   @override
   void initState() {
@@ -25,19 +29,54 @@ class _SessionAudioControlsState extends ConsumerState<SessionAudioControls> {
   }
 
   @override
+  void dispose() {
+    _collapseTimer?.cancel();
+    super.dispose();
+  }
+
+  void _toggle() {
+    setState(() => _expanded = !_expanded);
+    _resetCollapseTimer();
+  }
+
+  void _collapse() {
+    if (_expanded) {
+      setState(() => _expanded = false);
+    }
+    _collapseTimer?.cancel();
+  }
+
+  void _resetCollapseTimer() {
+    _collapseTimer?.cancel();
+    if (_expanded) {
+      _collapseTimer = Timer(const Duration(seconds: 3), _collapse);
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     final audio = ref.read(audioCueServiceProvider);
-    final spacing = Theme.of(context).extension<AppSpacingTokens>()!;
     final colors = Theme.of(context).extension<AppColorTokens>()!;
     final components = Theme.of(context).extension<AppComponentTokens>()!;
 
-    final maxHeight = spacing.sm * 2 + kMinInteractiveDimension;
+    final icon = _muted ? Icons.volume_off_rounded : Icons.volume_up_rounded;
 
-    return ConstrainedBox(
-      constraints: BoxConstraints(maxHeight: maxHeight),
-      child: Container(
-        width: 200,
-        padding: EdgeInsets.all(spacing.sm),
+    if (!_expanded) {
+      return IconButton(
+        key: const Key('session_mute_toggle'),
+        onPressed: _toggle,
+        icon: Icon(icon, color: colors.textPrimary),
+        tooltip: 'Volume',
+      );
+    }
+
+    return TapRegion(
+      onTapOutside: (_) => _collapse(),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 250),
+        curve: Curves.easeOut,
+        width: 180,
+        padding: const EdgeInsets.symmetric(horizontal: 4),
         decoration: BoxDecoration(
           color: colors.surface,
           borderRadius: BorderRadius.circular(components.cardRadius),
@@ -54,11 +93,9 @@ class _SessionAudioControlsState extends ConsumerState<SessionAudioControls> {
                 } else {
                   audio.unmute();
                 }
+                _resetCollapseTimer();
               },
-              icon: Icon(
-                _muted ? Icons.volume_off_rounded : Icons.volume_up_rounded,
-                color: colors.textPrimary,
-              ),
+              icon: Icon(icon, color: colors.textPrimary),
               tooltip: _muted ? 'Unmute' : 'Mute',
             ),
             Expanded(
@@ -79,6 +116,7 @@ class _SessionAudioControlsState extends ConsumerState<SessionAudioControls> {
                     });
                     audio.unmute();
                     audio.setVolume(next);
+                    _resetCollapseTimer();
                   },
                 ),
               ),

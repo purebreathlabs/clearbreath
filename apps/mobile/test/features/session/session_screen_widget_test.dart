@@ -296,6 +296,7 @@ void main() {
 
     await tester.tap(find.text('Resume'));
     await tester.pump();
+    await tester.pump(const Duration(milliseconds: 200));
     expect(find.text('PAUSED'), findsNothing);
 
     await tester.tap(find.text('Stop'));

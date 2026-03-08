@@ -132,6 +132,7 @@ class SessionController extends Notifier<SessionState> {
 
   void pause() {
     _pausedByInterruption = false;
+    _audio.stopMetronome();
     final machine = _machine;
     if (machine == null) {
       return;
@@ -163,6 +164,7 @@ class SessionController extends Notifier<SessionState> {
 
   void stop() {
     _pausedByInterruption = false;
+    _audio.stopMetronome();
     _stopTicker();
     _machine?.stop(completed: false);
     _machine = null;
@@ -210,7 +212,6 @@ class SessionController extends Notifier<SessionState> {
     if (machine == null) {
       return;
     }
-    final before = machine.state;
     final delta = _tickSource.delta();
     final transitions = machine.tick(delta);
     final after = machine.state;
@@ -226,12 +227,6 @@ class SessionController extends Notifier<SessionState> {
 
     if (transitions.contains(SessionPhase.completed)) {
       _handleCompleted(after);
-    }
-
-    final breathDelta = after.breathsCompleted - before.breathsCompleted;
-    if (breathDelta > 0 && before.phase == SessionPhase.round) {
-      unawaited(_audio.playTick());
-      unawaited(_haptics.tick());
     }
 
     state = after;
@@ -259,15 +254,24 @@ class SessionController extends Notifier<SessionState> {
       return;
     }
 
-    if (phase == SessionPhase.hold ||
-        phase == SessionPhase.holdAfterExhale ||
-        phase == SessionPhase.rest) {
+    if (phase == SessionPhase.hold || phase == SessionPhase.holdAfterExhale) {
       unawaited(_audio.playHoldCue());
       unawaited(_haptics.phaseTransition());
       return;
     }
 
+    if (phase == SessionPhase.rest) {
+      _audio.stopMetronome();
+      unawaited(_audio.playRestCue());
+      unawaited(_haptics.phaseTransition());
+      return;
+    }
+
     if (phase == SessionPhase.round) {
+      final bpm = _activeConfig?.preset is BpmRoundsPreset
+          ? (_activeConfig!.preset as BpmRoundsPreset).bpm
+          : 60;
+      _audio.startMetronome(bpm: bpm);
       unawaited(_haptics.phaseTransition());
     }
   }
@@ -342,6 +346,7 @@ class SessionController extends Notifier<SessionState> {
         return;
       }
       _pausedByInterruption = true;
+      _audio.stopMetronome();
       final machine = _machine;
       if (machine == null) {
         return;

@@ -15,8 +15,12 @@ abstract class AudioCueService {
   Future<void> playInhaleCue();
   Future<void> playExhaleCue();
   Future<void> playHoldCue();
+  Future<void> playRestCue();
   Future<void> playTick();
   Future<void> playComplete();
+
+  void startMetronome({required int bpm});
+  void stopMetronome();
 
   Future<void> dispose();
 }
@@ -35,6 +39,7 @@ class _JustAudioCueService implements AudioCueService {
 
   String? _currentCueAsset;
   bool _tickLoaded = false;
+  Timer? _metronomeTimer;
 
   bool _muted = false;
   double _volume = 1.0;
@@ -85,6 +90,9 @@ class _JustAudioCueService implements AudioCueService {
   Future<void> playHoldCue() => _playCue('assets/audio/hold_cue.mp3');
 
   @override
+  Future<void> playRestCue() => _playCue('assets/audio/rest_cue.mp3');
+
+  @override
   Future<void> playComplete() => _playCue('assets/audio/session_complete.mp3');
 
   @override
@@ -114,7 +122,24 @@ class _JustAudioCueService implements AudioCueService {
   }
 
   @override
+  void startMetronome({required int bpm}) {
+    stopMetronome();
+    if (bpm <= 0) return;
+    final interval = Duration(microseconds: (60000000 / bpm).round());
+    _metronomeTimer = Timer.periodic(interval, (_) {
+      playTick();
+    });
+  }
+
+  @override
+  void stopMetronome() {
+    _metronomeTimer?.cancel();
+    _metronomeTimer = null;
+  }
+
+  @override
   Future<void> dispose() async {
+    stopMetronome();
     await _cuePlayer.dispose();
     await _tickPlayer.dispose();
   }
@@ -151,8 +176,17 @@ class _NoopAudioCueService implements AudioCueService {
   Future<void> playHoldCue() async {}
 
   @override
+  Future<void> playRestCue() async {}
+
+  @override
   Future<void> playInhaleCue() async {}
 
   @override
   Future<void> playTick() async {}
+
+  @override
+  void startMetronome({required int bpm}) {}
+
+  @override
+  void stopMetronome() {}
 }

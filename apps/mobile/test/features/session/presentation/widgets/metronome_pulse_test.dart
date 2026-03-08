@@ -1,26 +1,25 @@
 import 'package:clearbreath/core/theme/app_theme.dart';
-import 'package:clearbreath/features/session/domain/session_phase.dart';
 import 'package:clearbreath/features/session/presentation/widgets/metronome_pulse.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
-  testWidgets('renders round label when round info provided', (tester) async {
+  testWidgets('renders ring with phase title and timer', (tester) async {
     await tester.pumpWidget(
       MaterialApp(
         theme: AppTheme.dark(),
         home: const Scaffold(
           body: Center(
             child: SizedBox(
-              width: 280,
-              height: 280,
+              width: 300,
+              height: 400,
               child: MetronomePulse(
                 bpm: 60,
-                phase: SessionPhase.round,
-                phaseRemaining: Duration(seconds: 2),
-                phaseDuration: Duration(seconds: 2),
-                currentRound: 2,
-                totalRounds: 3,
+                progress: 0.5,
+                isActiveRound: true,
+                phaseTitle: 'BREATHE',
+                primaryTimer: '00:13',
+                roundLabel: 'Round 1 of 3',
               ),
             ),
           ),
@@ -28,27 +27,28 @@ void main() {
       ),
     );
 
-    expect(find.byKey(const Key('metronome_round_label')), findsOneWidget);
-    expect(find.text('Round 2 of 3'), findsOneWidget);
-    expect(find.byKey(const Key('metronome_rest_remaining')), findsNothing);
+    expect(find.byType(CustomPaint), findsWidgets);
+    expect(find.text('BREATHE'), findsOneWidget);
+    expect(find.text('00:13'), findsOneWidget);
+    expect(find.text('Round 1 of 3'), findsOneWidget);
   });
 
-  testWidgets('renders rest remaining during rest phase', (tester) async {
+  testWidgets('shows REST during rest phase', (tester) async {
     await tester.pumpWidget(
       MaterialApp(
         theme: AppTheme.dark(),
         home: const Scaffold(
           body: Center(
             child: SizedBox(
-              width: 280,
-              height: 280,
+              width: 300,
+              height: 400,
               child: MetronomePulse(
                 bpm: 60,
-                phase: SessionPhase.rest,
-                phaseRemaining: Duration(seconds: 2),
-                phaseDuration: Duration(seconds: 1),
-                currentRound: 1,
-                totalRounds: 3,
+                progress: 0.3,
+                isActiveRound: false,
+                phaseTitle: 'REST',
+                primaryTimer: '00:08',
+                roundLabel: 'Round 1 of 3',
               ),
             ),
           ),
@@ -56,7 +56,35 @@ void main() {
       ),
     );
 
-    expect(find.byKey(const Key('metronome_rest_remaining')), findsOneWidget);
-    expect(find.text('00:02'), findsOneWidget);
+    expect(find.text('REST'), findsOneWidget);
+    expect(find.text('00:08'), findsOneWidget);
+    expect(find.text('Round 1 of 3'), findsOneWidget);
+  });
+
+  testWidgets('pulse animation runs during active round', (tester) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: AppTheme.dark(),
+        home: const Scaffold(
+          body: Center(
+            child: SizedBox(
+              width: 300,
+              height: 400,
+              child: MetronomePulse(
+                bpm: 60,
+                progress: 0.5,
+                isActiveRound: true,
+                phaseTitle: 'BREATHE',
+                primaryTimer: '00:10',
+                roundLabel: null,
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+
+    await tester.pump(const Duration(milliseconds: 500));
+    expect(find.byType(MetronomePulse), findsOneWidget);
   });
 }
