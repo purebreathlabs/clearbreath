@@ -131,14 +131,10 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
           child: Column(
             children: [
               // === HEADER ===
-              Container(
-                decoration: BoxDecoration(
-                  color: colors.surface,
-                  border: Border(bottom: BorderSide(color: colors.divider)),
-                ),
+              Padding(
                 padding: EdgeInsets.symmetric(
                   horizontal: hPad,
-                  vertical: spacing.sm,
+                  vertical: spacing.md,
                 ),
                 child: Row(
                   children: [
@@ -146,7 +142,11 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
                       width: 40,
                       height: 40,
                       child: IconButton(
-                        icon: const Icon(Icons.arrow_back, size: 20),
+                        icon: Icon(
+                          Icons.arrow_back_ios_new,
+                          size: 18,
+                          color: colors.textSecondary,
+                        ),
                         onPressed: () => _requestExit(
                           confirm:
                               state.isBreathing ||
@@ -154,20 +154,15 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
                               state.isPaused,
                         ),
                         padding: EdgeInsets.zero,
-                        style: IconButton.styleFrom(
-                          backgroundColor: colors.surfaceHigh,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10),
-                            side: BorderSide(color: colors.border),
-                          ),
-                        ),
                       ),
                     ),
-                    SizedBox(width: spacing.md),
+                    SizedBox(width: spacing.sm),
                     Expanded(
                       child: Text(
                         technique?.name ?? 'Session',
-                        style: typography.titleMedium,
+                        style: typography.titleMedium.copyWith(
+                          color: colors.textSecondary,
+                        ),
                         overflow: TextOverflow.ellipsis,
                       ),
                     ),
@@ -184,73 +179,76 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
               ),
 
               // === DOCK ===
-              Container(
-                decoration: BoxDecoration(
-                  color: colors.surface,
-                  border: Border(top: BorderSide(color: colors.divider)),
-                ),
+              Padding(
                 padding: EdgeInsets.fromLTRB(
                   hPad,
-                  isCompact ? spacing.md : spacing.lg,
+                  spacing.md,
                   hPad,
-                  isCompact ? spacing.md : spacing.lg,
+                  spacing.xl,
                 ),
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    // Secondary info row
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          uiModel.secondaryTimer,
-                          style: typography.bodyMedium.copyWith(
-                            color: colors.textSecondary,
-                          ),
-                        ),
-                        if (uiModel.roundLabel != null &&
-                            uiModel.stageMode != AnimationMode.metronome) ...[
+                    // Info row
+                    if (uiModel.roundLabel != null &&
+                        uiModel.stageMode != AnimationMode.metronome)
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
                           Text(
-                            '  \u00b7  ',
-                            style: typography.bodyMedium.copyWith(
+                            uiModel.secondaryTimer,
+                            style: typography.labelMedium.copyWith(
                               color: colors.textTertiary,
                             ),
                           ),
                           Text(
                             uiModel.roundLabel!,
-                            style: typography.bodyMedium.copyWith(
-                              color: colors.textSecondary,
+                            style: typography.labelMedium.copyWith(
+                              color: colors.textTertiary,
                             ),
                           ),
                         ],
-                      ],
-                    ),
-                    SizedBox(height: isCompact ? spacing.md : spacing.lg),
+                      )
+                    else
+                      Text(
+                        uiModel.secondaryTimer,
+                        style: typography.labelMedium.copyWith(
+                          color: colors.textTertiary,
+                        ),
+                      ),
+                    SizedBox(height: spacing.lg),
 
-                    // Buttons
-                    Row(
-                      children: [
-                        Expanded(
-                          child: FilledButton(
-                            onPressed: uiModel.canResume
-                                ? _controller.resume
-                                : uiModel.canPause
-                                ? _controller.pause
-                                : null,
-                            child: Text(uiModel.canResume ? 'Resume' : 'Pause'),
+                    // Primary action
+                    SizedBox(
+                      width: double.infinity,
+                      height: 56,
+                      child: FilledButton(
+                        onPressed: uiModel.canResume
+                            ? _controller.resume
+                            : uiModel.canPause
+                            ? _controller.pause
+                            : null,
+                        style: FilledButton.styleFrom(
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(18),
                           ),
                         ),
-                        SizedBox(width: spacing.md),
-                        Expanded(
-                          child: OutlinedButton(
-                            onPressed: uiModel.canStop
-                                ? () =>
-                                      _requestExit(confirm: !state.isCompleted)
-                                : null,
-                            child: const Text('Stop'),
-                          ),
-                        ),
-                      ],
+                        child: Text(uiModel.canResume ? 'Resume' : 'Pause'),
+                      ),
+                    ),
+                    SizedBox(height: spacing.md),
+
+                    // End session link
+                    TextButton(
+                      onPressed: uiModel.canStop
+                          ? () =>
+                                _requestExit(confirm: !state.isCompleted)
+                          : null,
+                      style: TextButton.styleFrom(
+                        foregroundColor: colors.textTertiary,
+                        textStyle: typography.bodyMedium,
+                      ),
+                      child: const Text('End Session'),
                     ),
                   ],
                 ),
@@ -288,6 +286,7 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
         phaseTitle: uiModel.phaseTitle,
         primaryTimer: uiModel.primaryTimer,
         roundLabel: uiModel.roundLabel,
+        arcColor: uiModel.phaseColor,
         maxRingSize: maxRingSize - 40,
       ),
       AnimationMode.alternateNostril => AlternateNostrilIndicator(
@@ -296,15 +295,27 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
         isHoldPhase: uiModel.isHoldPhase,
         phaseTitle: uiModel.phaseTitle,
         primaryTimer: uiModel.primaryTimer,
+        arcColor: uiModel.phaseColor,
+        phase: uiModel.phase,
+        phaseDuration: uiModel.phaseDuration,
+        phaseRemaining: uiModel.phaseRemaining,
+        isPaused: uiModel.isPaused,
       ),
-      AnimationMode.circle => SizedBox(
-        width: maxRingSize,
-        height: maxRingSize,
-        child: BreathingCircle(
-          progress: uiModel.phaseProgress,
-          isHoldPhase: uiModel.isHoldPhase,
-          phaseTitle: uiModel.phaseTitle,
-          primaryTimer: uiModel.primaryTimer,
+      AnimationMode.circle => RepaintBoundary(
+        child: SizedBox(
+          width: maxRingSize,
+          height: maxRingSize,
+          child: BreathingCircle(
+            progress: uiModel.phaseProgress,
+            isHoldPhase: uiModel.isHoldPhase,
+            phaseTitle: uiModel.phaseTitle,
+            primaryTimer: uiModel.primaryTimer,
+            arcColor: uiModel.phaseColor,
+            phase: uiModel.phase,
+            phaseDuration: uiModel.phaseDuration,
+            phaseRemaining: uiModel.phaseRemaining,
+            isPaused: uiModel.isPaused,
+          ),
         ),
       ),
     };

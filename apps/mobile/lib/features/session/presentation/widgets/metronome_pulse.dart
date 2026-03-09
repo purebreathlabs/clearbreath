@@ -14,6 +14,7 @@ class MetronomePulse extends StatefulWidget {
     required this.phaseTitle,
     required this.primaryTimer,
     required this.roundLabel,
+    required this.arcColor,
     this.maxRingSize = 240,
   });
 
@@ -23,6 +24,7 @@ class MetronomePulse extends StatefulWidget {
   final String phaseTitle;
   final String primaryTimer;
   final String? roundLabel;
+  final Color arcColor;
   final double maxRingSize;
 
   @override
@@ -109,47 +111,55 @@ class _MetronomePulseState extends State<MetronomePulse>
                   final scale = widget.isActiveRound ? 0.96 + 0.04 * t : 1.0;
                   final glow = widget.isActiveRound ? t * 0.5 : 0.0;
 
-                  return Transform.scale(
-                    scale: scale,
-                    child: SizedBox(
-                      width: ringSize,
-                      height: ringSize,
-                      child: CustomPaint(
-                        painter: BreathingRingPainter(
-                          progress: widget.progress,
-                          arcColor: colors.textPrimary,
-                          trackColor: colors.border,
-                          glowIntensity: glow,
-                        ),
-                        child: Center(
-                          child: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              AnimatedSwitcher(
-                                duration: const Duration(milliseconds: 180),
-                                switchInCurve: Curves.easeOut,
-                                switchOutCurve: Curves.easeIn,
-                                child: Text(
-                                  widget.phaseTitle,
-                                  key: ValueKey(widget.phaseTitle),
-                                  style: typography.titleLarge.copyWith(
-                                    color: colors.textPrimary,
-                                    letterSpacing: 1.6,
-                                  ),
-                                  textAlign: TextAlign.center,
-                                ),
-                              ),
-                              const SizedBox(height: 6),
-                              Text(
-                                widget.primaryTimer,
-                                style: typography.displayMedium.copyWith(
-                                  color: colors.textPrimary,
-                                ),
-                                textAlign: TextAlign.center,
-                              ),
-                            ],
+                  return TweenAnimationBuilder<Color?>(
+                    tween: ColorTween(end: widget.arcColor),
+                    duration: const Duration(milliseconds: 400),
+                    curve: Curves.easeInOut,
+                    builder: (context, color, child) {
+                      return Transform.scale(
+                        scale: scale,
+                        child: SizedBox(
+                          width: ringSize,
+                          height: ringSize,
+                          child: CustomPaint(
+                            painter: BreathingRingPainter(
+                              progress: widget.progress,
+                              arcColor: color!,
+                              trackColor: colors.border,
+                              glowIntensity: glow,
+                            ),
+                            child: child,
                           ),
                         ),
+                      );
+                    },
+                    child: Center(
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          AnimatedSwitcher(
+                            duration: const Duration(milliseconds: 180),
+                            switchInCurve: Curves.easeOut,
+                            switchOutCurve: Curves.easeIn,
+                            child: Text(
+                              widget.phaseTitle,
+                              key: ValueKey(widget.phaseTitle),
+                              style: typography.titleLarge.copyWith(
+                                color: colors.textPrimary,
+                                letterSpacing: 1.6,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                          ),
+                          const SizedBox(height: 6),
+                          Text(
+                            widget.primaryTimer,
+                            style: typography.displayMedium.copyWith(
+                              color: colors.textPrimary,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                        ],
                       ),
                     ),
                   );

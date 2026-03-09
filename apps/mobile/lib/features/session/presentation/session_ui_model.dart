@@ -1,7 +1,10 @@
+import 'dart:ui';
+
 import '../../techniques/domain/technique.dart';
 import '../../techniques/domain/technique_preset.dart';
 import '../domain/session_phase.dart';
 import '../domain/session_state.dart';
+import 'phase_colors.dart';
 
 class SessionUiModel {
   const SessionUiModel({
@@ -11,6 +14,11 @@ class SessionUiModel {
     required this.roundLabel,
     required this.stageMode,
     required this.phaseProgress,
+    required this.phaseColor,
+    required this.phase,
+    required this.phaseDuration,
+    required this.phaseRemaining,
+    required this.isPaused,
     required this.isHoldPhase,
     required this.showPhaseTitle,
     required this.canPause,
@@ -33,6 +41,11 @@ class SessionUiModel {
       roundLabel: _roundLabel(state.currentRound, state.totalRounds),
       stageMode: technique?.animationMode ?? _fallbackMode(state.techniqueId),
       phaseProgress: progress,
+      phaseColor: PhaseColors.forPhase(state.phase),
+      phase: state.phase,
+      phaseDuration: phaseDuration,
+      phaseRemaining: state.phaseRemaining,
+      isPaused: state.isPaused,
       isHoldPhase:
           state.phase == SessionPhase.hold ||
           state.phase == SessionPhase.holdAfterExhale,
@@ -49,6 +62,11 @@ class SessionUiModel {
   final String? roundLabel;
   final AnimationMode stageMode;
   final double phaseProgress;
+  final Color phaseColor;
+  final SessionPhase phase;
+  final Duration phaseDuration;
+  final Duration phaseRemaining;
+  final bool isPaused;
   final bool isHoldPhase;
   final bool showPhaseTitle;
   final bool canPause;

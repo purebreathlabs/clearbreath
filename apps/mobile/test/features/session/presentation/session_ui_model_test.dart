@@ -1,5 +1,6 @@
 import 'package:clearbreath/features/session/domain/session_phase.dart';
 import 'package:clearbreath/features/session/domain/session_state.dart';
+import 'package:clearbreath/features/session/presentation/phase_colors.dart';
 import 'package:clearbreath/features/session/presentation/session_ui_model.dart';
 import 'package:clearbreath/features/techniques/domain/technique.dart';
 import 'package:clearbreath/features/techniques/domain/technique_preset.dart';
@@ -286,6 +287,80 @@ void main() {
         null,
       );
       expect(model.showPhaseTitle, isFalse);
+    });
+  });
+
+  group('phaseColor', () {
+    test('inhale returns sky blue', () {
+      final model = SessionUiModel.from(
+        makeState(phase: SessionPhase.inhale),
+        null,
+        null,
+      );
+      expect(model.phaseColor, PhaseColors.inhale);
+    });
+
+    test('exhale returns amber', () {
+      final model = SessionUiModel.from(
+        makeState(phase: SessionPhase.exhale),
+        null,
+        null,
+      );
+      expect(model.phaseColor, PhaseColors.exhale);
+    });
+
+    test('hold returns lavender', () {
+      final model = SessionUiModel.from(
+        makeState(phase: SessionPhase.hold),
+        null,
+        null,
+      );
+      expect(model.phaseColor, PhaseColors.hold);
+    });
+
+    test('holdAfterExhale returns lavender', () {
+      final model = SessionUiModel.from(
+        makeState(phase: SessionPhase.holdAfterExhale),
+        null,
+        null,
+      );
+      expect(model.phaseColor, PhaseColors.hold);
+    });
+
+    test('rest returns sage green', () {
+      final model = SessionUiModel.from(
+        makeState(phase: SessionPhase.rest),
+        null,
+        null,
+      );
+      expect(model.phaseColor, PhaseColors.rest);
+    });
+
+    test('round returns coral', () {
+      final model = SessionUiModel.from(
+        makeState(phase: SessionPhase.round),
+        null,
+        null,
+      );
+      expect(model.phaseColor, PhaseColors.round);
+    });
+
+    test('countdown returns gray', () {
+      final model = SessionUiModel.from(
+        makeState(phase: SessionPhase.countdown),
+        null,
+        null,
+      );
+      expect(model.phaseColor, PhaseColors.countdown);
+    });
+
+    test('paused returns dim gray', () {
+      final model = SessionUiModel.from(
+        makeState(phase: SessionPhase.paused),
+        null,
+        null,
+      );
+      expect(model.phaseColor, PhaseColors.paused);
     });
   });
 }

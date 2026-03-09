@@ -299,7 +299,7 @@ void main() {
     await tester.pump(const Duration(milliseconds: 200));
     expect(find.text('PAUSED'), findsNothing);
 
-    await tester.tap(find.text('Stop'));
+    await tester.tap(find.text('End Session'));
     await tester.pump();
     expect(find.text('End session early?'), findsOneWidget);
 
