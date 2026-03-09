@@ -241,8 +241,7 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
                     // End session link
                     TextButton(
                       onPressed: uiModel.canStop
-                          ? () =>
-                                _requestExit(confirm: !state.isCompleted)
+                          ? () => _requestExit(confirm: !state.isCompleted)
                           : null,
                       style: TextButton.styleFrom(
                         foregroundColor: colors.textTertiary,

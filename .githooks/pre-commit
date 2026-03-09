@@ -1,0 +1,30 @@
+#!/bin/sh
+
+# Check if any Dart files are staged
+DART_STAGED=$(git diff --cached --name-only --diff-filter=ACM | grep '\.dart$' || true)
+
+if [ -n "$DART_STAGED" ]; then
+  echo "Running dart format on staged files..."
+  cd apps/mobile
+  dart format --set-exit-if-changed --output=none lib/ test/ 2>/dev/null
+  if [ $? -ne 0 ]; then
+    echo ""
+    echo "dart format check failed. Run 'make mobile-fmt' and stage the changes."
+    exit 1
+  fi
+fi
+
+# Check if any Go files are staged
+GO_STAGED=$(git diff --cached --name-only --diff-filter=ACM | grep '\.go$' || true)
+
+if [ -n "$GO_STAGED" ]; then
+  echo "Running gofmt check on staged files..."
+  cd server 2>/dev/null || true
+  UNFORMATTED=$(gofmt -l . 2>/dev/null | head -5)
+  if [ -n "$UNFORMATTED" ]; then
+    echo ""
+    echo "gofmt check failed. Run 'gofmt -w .' in server/ and stage the changes."
+    echo "$UNFORMATTED"
+    exit 1
+  fi
+fi

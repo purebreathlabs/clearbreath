@@ -46,10 +46,7 @@ class _BreathingCircleState extends State<BreathingCircle>
       vsync: this,
       duration: const Duration(milliseconds: 1600),
     );
-    _arc = AnimationController(
-      vsync: this,
-      value: widget.progress,
-    );
+    _arc = AnimationController(vsync: this, value: widget.progress);
     _syncPulse();
     _syncArc(phaseChanged: false);
   }
@@ -113,11 +110,7 @@ class _BreathingCircleState extends State<BreathingCircle>
       _arc.value = 1.0;
       return;
     }
-    _arc.animateTo(
-      1.0,
-      duration: widget.phaseRemaining,
-      curve: Curves.linear,
-    );
+    _arc.animateTo(1.0, duration: widget.phaseRemaining, curve: Curves.linear);
   }
 
   @override
