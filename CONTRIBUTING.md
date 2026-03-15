@@ -81,8 +81,51 @@ make web-build
 - Include before and after screenshots for UI changes
 - Use American English in all documentation and UI text
 - Ensure local checks and CI pass before requesting review
-- Add an entry under `[Unreleased]` in [CHANGELOG.md](CHANGELOG.md) when
-  applicable
+
+## Commit Messages and PR Titles
+
+This project follows [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/).
+PR titles are validated automatically on every pull request.
+
+**Format:** `type(scope): description`
+
+| Type | Use for |
+| --- | --- |
+| `feat` | A new feature |
+| `fix` | A bug fix |
+| `docs` | Documentation changes only |
+| `chore` | Build process, tooling, or dependency updates |
+| `refactor` | Code change that is neither a fix nor a feature |
+| `test` | Adding or updating tests |
+| `style` | Formatting with no logic change |
+| `perf` | Performance improvements |
+| `ci` | CI/CD configuration changes |
+| `build` | Build system changes |
+| `revert` | Reverts a previous commit |
+
+**Scopes** (optional, but encouraged): `mobile` `server` `web` `app` `deps` `ci`
+
+**Rules:**
+
+- All lowercase
+- No period at the end of the description
+- One space after the colon
+- Scope must be lowercase if provided
+- Add `!` before the colon for breaking changes: `feat(server)!: remove v1 auth endpoint`
+
+The changelog is auto-generated from commit history on each release using
+[git-cliff](https://git-cliff.org). You do not need to update `CHANGELOG.md` manually.
+
+**Examples:**
+
+```
+feat(mobile): add haptic feedback on phase transitions
+fix(server): handle nil pointer in refresh token validation
+docs: update local development prerequisites
+chore(deps): upgrade flutter to 3.38
+ci: add dev branch to mobile workflow triggers
+refactor(server): extract session store into its own package
+```
 
 ## AI-Assisted PRs
 

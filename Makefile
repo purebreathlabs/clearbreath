@@ -4,7 +4,8 @@
        web-dev web-build \
        docker-up docker-down \
        db-create db-migrate db-migrate-status db-migrate-new sqlc-generate setup clean \
-       version version-sync version-bump-patch version-bump-minor version-bump-major
+       version version-sync version-bump-patch version-bump-minor version-bump-major \
+       changelog
 
 FLUTTER ?= flutter
 DART ?= $(shell if command -v dart >/dev/null 2>&1; then echo dart; else FLUTTER_PATH="$$(command -v $(FLUTTER) 2>/dev/null || echo $(FLUTTER))"; echo "$$(dirname "$$FLUTTER_PATH")/dart"; fi)
@@ -154,3 +155,6 @@ version-bump-minor:
 
 version-bump-major:
 	@bash scripts/version-bump.sh major
+
+changelog:
+	git-cliff -o CHANGELOG.md

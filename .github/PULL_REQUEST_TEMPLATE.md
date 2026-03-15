@@ -1,23 +1,27 @@
+<!-- Title format: type(scope): description -->
+<!-- Types: feat  fix  docs  chore  refactor  test  style  perf  ci  build  revert -->
+<!-- Scopes (optional): mobile  server  web  app  deps  ci -->
+<!-- All lowercase. No period at end. Example: feat(mobile): add box breathing animation -->
+
 ## What
 
-Describe the change clearly and link any related issue.
+<!-- What does this PR change? Link a related issue if one exists. -->
 
 ## Why
 
-Explain the problem this pull request solves and why this approach was chosen.
-
-## Screenshots
-
-Add before and after screenshots for UI changes, if applicable.
+<!-- Why is this change needed? What problem does it solve? -->
 
 ## Testing
 
-Describe exactly what you tested and how.
+<!-- How did you test this? What cases did you cover? -->
+
+## Screenshots
+
+<!-- UI changes: add before/after screenshots. No UI change: delete this section. -->
 
 ## Checklist
 
-- [ ] I tested this change locally
-- [ ] Relevant CI checks pass
-- [ ] This pull request targets `dev`
-- [ ] I updated docs if needed
-- [ ] I added a changelog entry under `[Unreleased]` if applicable
+- [ ] Tested locally
+- [ ] CI passes
+- [ ] Targets `dev`, not `main`
+- [ ] Docs updated if needed

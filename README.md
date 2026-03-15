@@ -146,7 +146,7 @@ make web-dev
 ## Current Focus
 
 - Preparing the Google Play launch, with the first release currently pending review
-- Running final launch-readiness checks across onboarding, screenshots, and public documentation
+- Polishing onboarding and the first-session experience for new users
 - Organizing post-launch alpha testing and early feedback collection for the first live users
 
 ## Roadmap

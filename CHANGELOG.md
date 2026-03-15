@@ -34,5 +34,5 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Project inception and initial internal development
 
-Future changelog entries should be added under `[Unreleased]` in pull requests.
-Maintainers move them into a versioned release section at release time.
+This changelog is auto-generated from conventional commits using [git-cliff](https://git-cliff.org).
+Run `make changelog` to regenerate locally.

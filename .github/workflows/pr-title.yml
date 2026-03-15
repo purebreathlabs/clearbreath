@@ -1,0 +1,48 @@
+name: PR Title
+
+on:
+  pull_request:
+    types: [opened, edited, synchronize, reopened]
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Validate title
+        env:
+          TITLE: ${{ github.event.pull_request.title }}
+        run: |
+          pattern='^(feat|fix|docs|chore|refactor|test|style|perf|ci|build|revert)(\([a-z][a-z0-9/-]*\))?(!)?: [a-z].+'
+          if ! echo "$TITLE" | grep -qE "$pattern"; then
+            echo ""
+            echo "  Invalid PR title: \"$TITLE\""
+            echo ""
+            echo "  Titles must follow conventional commits: type(scope): description"
+            echo ""
+            echo "  Types:"
+            echo "    feat     A new feature"
+            echo "    fix      A bug fix"
+            echo "    docs     Documentation only"
+            echo "    chore    Tooling, deps, build"
+            echo "    refactor Code change without feature or fix"
+            echo "    test     Adding or updating tests"
+            echo "    style    Formatting with no logic change"
+            echo "    perf     Performance improvement"
+            echo "    ci       CI/CD changes"
+            echo "    build    Build system changes"
+            echo "    revert   Reverts a previous commit"
+            echo ""
+            echo "  Scopes (optional): mobile  server  web  app  deps  ci"
+            echo ""
+            echo "  Examples:"
+            echo "    feat(mobile): add haptic feedback on phase transitions"
+            echo "    fix(server): handle nil pointer in refresh token validation"
+            echo "    docs: update contributing guide"
+            echo "    chore(deps): bump go version to 1.25"
+            echo "    feat!: breaking api change"
+            echo ""
+            echo "  Rules: all lowercase, no period at end, space after colon"
+            echo ""
+            exit 1
+          fi
+          echo "PR title is valid."
