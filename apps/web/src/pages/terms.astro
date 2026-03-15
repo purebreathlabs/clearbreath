@@ -6,59 +6,154 @@ import Layout from '../layouts/Layout.astro';
   title="Terms of Service — ClearBreath"
   description="ClearBreath terms of service and safety disclaimers."
 >
-  <article class="space-y-10">
-    <header class="space-y-3">
-      <h1 class="text-4xl tracking-tight font-light text-white">
-        Terms of Service
-      </h1>
-      <p class="text-sm text-white/60">Last updated: 2026-02-22</p>
-    </header>
+  <style>
+    .noise-bg {
+      position: absolute;
+      inset: 0;
+      z-index: -1;
+      opacity: 0.03;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+      pointer-events: none;
+    }
+    .fade-up {
+      animation: fadeUp 1s ease-out forwards;
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    .delay-100 { animation-delay: 100ms; }
+    .delay-200 { animation-delay: 200ms; }
+    @keyframes fadeUp {
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .legal-content h2 {
+      font-size: 1.5rem;
+      font-weight: 500;
+      color: #fff;
+      margin-top: 3rem;
+      margin-bottom: 1rem;
+      letter-spacing: -0.025em;
+    }
+    .legal-content h3 {
+      font-size: 1.25rem;
+      font-weight: 500;
+      color: rgba(255, 255, 255, 0.9);
+      margin-top: 2rem;
+      margin-bottom: 0.75rem;
+    }
+    .legal-content p, .legal-content ul {
+      color: rgba(255, 255, 255, 0.6);
+      line-height: 1.8;
+      font-weight: 300;
+      margin-bottom: 1.5rem;
+      font-size: 1.05rem;
+    }
+    .legal-content ul {
+      padding-left: 1.5rem;
+      list-style-type: disc;
+    }
+    .legal-content li {
+      margin-bottom: 0.5rem;
+    }
+    .legal-content a {
+      color: #fff;
+      text-decoration: underline;
+      text-underline-offset: 4px;
+      text-decoration-color: rgba(255, 255, 255, 0.3);
+      transition: text-decoration-color 0.2s;
+    }
+    .legal-content a:hover {
+      text-decoration-color: #fff;
+    }
+  </style>
 
-    <section class="space-y-4">
-      <p class="text-white/70">
-        ClearBreath provides guided breathing exercises. By using the app, you
-        agree to these terms.
-      </p>
-    </section>
+  <div class="relative pt-12 md:pt-20 pb-24">
+    <div class="noise-bg"></div>
+    
+    <div class="max-w-3xl mx-auto px-6 relative z-10">
+      <header class="mb-16 md:mb-24 fade-up">
+        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-white/10 bg-white/5 backdrop-blur-md mb-6 text-xs font-medium text-white/80 tracking-wide uppercase">
+          Legal
+        </div>
+        <h1 class="text-5xl md:text-7xl font-semibold tracking-tighter text-white leading-tight mb-6">
+          Terms of <br class="hidden md:block"/><span class="text-transparent bg-clip-text bg-gradient-to-br from-white to-white/40 italic font-light">Service</span>
+        </h1>
+        <p class="text-white/50 text-lg font-light flex items-center gap-3">
+          <span>Effective Date: March 15, 2026</span>
+          <span class="w-1 h-1 rounded-full bg-white/20"></span>
+          <span>Last Updated: March 15, 2026</span>
+        </p>
+      </header>
 
-    <section class="space-y-3">
-      <h2 class="text-xl font-semibold text-white">Not Medical Advice</h2>
-      <p class="text-white/70">
-        ClearBreath is not medical advice. Breathing practices may not be
-        appropriate for everyone. Stop if you feel unwell and consult a
-        qualified professional if you have medical concerns.
-      </p>
-    </section>
+      <div class="legal-content fade-up delay-100">
+        <p>
+          Welcome to ClearBreath. By accessing or using our mobile application or website ("Service"), you agree to be bound by these Terms of Service. If you do not agree to these terms, please do not use ClearBreath.
+        </p>
 
-    <section class="space-y-3">
-      <h2 class="text-xl font-semibold text-white">Your Responsibility</h2>
-      <ul class="list-disc pl-5 text-white/70 space-y-2">
-        <li>Use the app safely and responsibly.</li>
-        <li>
-          Follow any technique-specific safety guidance shown in the app.
-        </li>
-      </ul>
-    </section>
+        <div class="p-6 my-10 rounded-xl border-l-4 border-white bg-white/5">
+          <h2 class="!mt-0 !mb-2 !text-xl">Medical Disclaimer</h2>
+          <p class="!mb-0 text-white/80 font-normal">
+            ClearBreath is a wellness and fitness application designed to guide breathing exercises. <strong>We do not provide medical advice, diagnosis, or treatment.</strong> Breathing exercises can have profound physiological effects. Always consult with a qualified healthcare professional before beginning any new practice, especially if you have a history of respiratory, cardiovascular, psychological conditions, or are pregnant. If you feel dizzy, lightheaded, or experience any discomfort, stop immediately.
+          </p>
+        </div>
 
-    <section class="space-y-3">
-      <h2 class="text-xl font-semibold text-white">Service Availability</h2>
-      <p class="text-white/70">
-        We may update, change, or discontinue features over time.
-      </p>
-    </section>
+        <h2>1. Use of the Service</h2>
+        <p>
+          ClearBreath grants you a personal, non-exclusive, non-transferable, revocable license to use the Service for personal, non-commercial purposes. 
+        </p>
+        <ul>
+          <li>You are responsible for ensuring that your use of the Service complies with all local laws and regulations.</li>
+          <li>You may not use the Service in a manner that could disable, overburden, or impair our infrastructure.</li>
+          <li>You may not attempt to reverse engineer, decompile, or otherwise extract the source code of the Service.</li>
+        </ul>
 
-    <section class="space-y-2 border-t border-white/10 pt-8">
-      <h2 class="text-xl font-semibold text-white">Contact</h2>
-      <p class="text-white/70">
-        If you have questions, contact support at:{' '}
-        <a
-          href="mailto:support@clearbreath.life"
-          class="text-white hover:underline"
-        >
-          support@clearbreath.life
-        </a>
-      </p>
-    </section>
-  </article>
+        <h2>2. Accounts and Leaderboard</h2>
+        <p>
+          While ClearBreath functions primarily offline, you may choose to create an account for cloud synchronization and leaderboard access.
+        </p>
+        <ul>
+          <li>You are responsible for maintaining the confidentiality of your authentication credentials.</li>
+          <li>When participating in the leaderboard, your chosen display name must not contain profanity, hate speech, or impersonate others. We reserve the right to alter display names, remove users from the leaderboard, or shadow-ban accounts that violate this rule or engage in cheating (e.g., submitting fraudulent session data).</li>
+        </ul>
+
+        <h2>3. Content and Intellectual Property</h2>
+        <p>
+          All content, visual interfaces, interactive features, information, graphics, design, and other elements of the Service are the property of ClearBreath or its licensors. You may not reproduce, distribute, or create derivative works from this content without express written permission.
+        </p>
+
+        <h2>4. Availability and Modifications</h2>
+        <p>
+          We strive to keep ClearBreath running smoothly, but we do not guarantee that the Service will be uninterrupted or error-free. We reserve the right to modify, suspend, or discontinue any part of the Service at any time, with or without notice.
+        </p>
+
+        <h2>5. Limitation of Liability</h2>
+        <p>
+          To the maximum extent permitted by applicable law, ClearBreath, its developers, and affiliates shall not be liable for any indirect, incidental, special, consequential, or punitive damages, or any loss of profits or revenues, whether incurred directly or indirectly, or any loss of data, use, goodwill, or other intangible losses, resulting from:
+        </p>
+        <ul>
+          <li>Your access to or use of or inability to access or use the Service.</li>
+          <li>Any conduct or content of any third party on the Service.</li>
+          <li>Any health or medical issues arising from your use of the breathing techniques provided by the Service.</li>
+        </ul>
+
+        <h2>6. Indemnification</h2>
+        <p>
+          You agree to indemnify, defend, and hold harmless ClearBreath from any claims, liabilities, damages, losses, and expenses arising out of or in any way connected with your access to or use of the Service or your violation of these Terms.
+        </p>
+
+        <h2>7. Governing Law</h2>
+        <p>
+          These Terms shall be governed by and construed in accordance with the laws of the jurisdiction in which the creators of ClearBreath operate, without regard to its conflict of law provisions.
+        </p>
+
+        <div class="mt-16 p-8 rounded-2xl border border-white/10 bg-white/5">
+          <h2 class="!mt-0">Contact</h2>
+          <p class="mb-0">
+            For any questions regarding these Terms of Service, please contact us at: <br/>
+            <a href="mailto:support@clearbreath.life" class="font-medium text-white">support@clearbreath.life</a>
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
 </Layout>
-

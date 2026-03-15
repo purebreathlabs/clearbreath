@@ -6,64 +6,159 @@ import Layout from '../layouts/Layout.astro';
   title="Privacy Policy — ClearBreath"
   description="How ClearBreath handles your data and privacy."
 >
-  <article class="space-y-10">
-    <header class="space-y-3">
-      <h1 class="text-4xl tracking-tight font-light text-white">
-        Privacy Policy
-      </h1>
-      <p class="text-sm text-white/60">Last updated: 2026-02-22</p>
-    </header>
+  <style>
+    .noise-bg {
+      position: absolute;
+      inset: 0;
+      z-index: -1;
+      opacity: 0.03;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+      pointer-events: none;
+    }
+    .fade-up {
+      animation: fadeUp 1s ease-out forwards;
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    .delay-100 { animation-delay: 100ms; }
+    .delay-200 { animation-delay: 200ms; }
+    @keyframes fadeUp {
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .legal-content h2 {
+      font-size: 1.5rem;
+      font-weight: 500;
+      color: #fff;
+      margin-top: 3rem;
+      margin-bottom: 1rem;
+      letter-spacing: -0.025em;
+    }
+    .legal-content h3 {
+      font-size: 1.25rem;
+      font-weight: 500;
+      color: rgba(255, 255, 255, 0.9);
+      margin-top: 2rem;
+      margin-bottom: 0.75rem;
+    }
+    .legal-content p, .legal-content ul {
+      color: rgba(255, 255, 255, 0.6);
+      line-height: 1.8;
+      font-weight: 300;
+      margin-bottom: 1.5rem;
+      font-size: 1.05rem;
+    }
+    .legal-content ul {
+      padding-left: 1.5rem;
+      list-style-type: disc;
+    }
+    .legal-content li {
+      margin-bottom: 0.5rem;
+    }
+    .legal-content a {
+      color: #fff;
+      text-decoration: underline;
+      text-underline-offset: 4px;
+      text-decoration-color: rgba(255, 255, 255, 0.3);
+      transition: text-decoration-color 0.2s;
+    }
+    .legal-content a:hover {
+      text-decoration-color: #fff;
+    }
+  </style>
 
-    <section class="space-y-4">
-      <p class="text-white/70">
-        ClearBreath is a breathing practice app. This document is provided for
-        transparency and accessibility.
-      </p>
-    </section>
+  <div class="relative pt-12 md:pt-20 pb-24">
+    <div class="noise-bg"></div>
+    
+    <div class="max-w-3xl mx-auto px-6 relative z-10">
+      <header class="mb-16 md:mb-24 fade-up">
+        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-white/10 bg-white/5 backdrop-blur-md mb-6 text-xs font-medium text-white/80 tracking-wide uppercase">
+          Legal
+        </div>
+        <h1 class="text-5xl md:text-7xl font-semibold tracking-tighter text-white leading-tight mb-6">
+          Privacy <br class="hidden md:block"/><span class="text-transparent bg-clip-text bg-gradient-to-br from-white to-white/40 italic font-light">Policy</span>
+        </h1>
+        <p class="text-white/50 text-lg font-light flex items-center gap-3">
+          <span>Effective Date: March 15, 2026</span>
+          <span class="w-1 h-1 rounded-full bg-white/20"></span>
+          <span>Last Updated: March 15, 2026</span>
+        </p>
+      </header>
 
-    <section class="space-y-3">
-      <h2 class="text-xl font-semibold text-white">Information We Collect</h2>
-      <ul class="list-disc pl-5 text-white/70 space-y-2">
-        <li>
-          Practice data you create in the app (for example, completed breathing
-          sessions and preferences).
-        </li>
-      </ul>
-    </section>
+      <div class="legal-content fade-up delay-100">
+        <p>
+          At ClearBreath ("we", "our", or "us"), your privacy is a fundamental priority. We designed ClearBreath to be a secure, offline-first application that respects your data and requires minimal information to function. This Privacy Policy explains how we collect, use, and protect your information when you use our mobile application and website (clearbreath.life).
+        </p>
 
-    <section class="space-y-3">
-      <h2 class="text-xl font-semibold text-white">How We Use Information</h2>
-      <ul class="list-disc pl-5 text-white/70 space-y-2">
-        <li>
-          To provide and improve core app functionality (for example, showing
-          your streak and practice history).
-        </li>
-      </ul>
-    </section>
+        <h2>1. Information We Collect</h2>
+        
+        <h3>A. Local Practice Data (Guest Mode)</h3>
+        <p>
+          By default, ClearBreath operates entirely on your device. We do not require an account or internet connection for core breathing exercises. Data stored locally includes:
+        </p>
+        <ul>
+          <li>Session history (durations, timestamps, completed techniques)</li>
+          <li>App preferences (haptics, sound volume, daily reminders)</li>
+          <li>Current streaks and milestone progression (XP and level)</li>
+        </ul>
+        <p>This data remains on your device and is not transmitted to our servers unless you explicitly choose to create an account.</p>
 
-    <section class="space-y-4">
-      <h2 class="text-xl font-semibold text-white">Data Storage</h2>
-      <ul class="list-disc pl-5 text-white/70 space-y-2">
-        <li>By default, your practice data is stored on your device.</li>
-        <li>
-          If you choose to sign in, the app may sync selected practice data to
-          the ClearBreath backend.
-        </li>
-      </ul>
-    </section>
+        <h3>B. Account Information (Optional)</h3>
+        <p>
+          If you choose to use our cloud backup or global leaderboard features, you must sign in via Apple or Google. When you do, we collect:
+        </p>
+        <ul>
+          <li>A unique identifier provided by the authentication provider</li>
+          <li>Your selected display name (subject to a profanity filter)</li>
+          <li>Your synced practice data (sessions, streaks, XP) to enable cross-device access and leaderboard placement</li>
+        </ul>
+        <p>We do not collect or store your email address, passwords, or contact lists.</p>
 
-    <section class="space-y-2 border-t border-white/10 pt-8">
-      <h2 class="text-xl font-semibold text-white">Contact</h2>
-      <p class="text-white/70">
-        If you have questions, contact support at:{' '}
-        <a
-          href="mailto:support@clearbreath.life"
-          class="text-white hover:underline"
-        >
-          support@clearbreath.life
-        </a>
-      </p>
-    </section>
-  </article>
+        <h3>C. Anonymous Analytics</h3>
+        <p>
+          To help us improve the app and resolve bugs, we may collect minimal, anonymized usage data (such as app start events, screen views, or feature toggles). This data is completely de-identified and cannot be linked back to you. You can opt out of this collection at any time in the app's Settings > Privacy menu.
+        </p>
+
+        <h2>2. How We Use Your Information</h2>
+        <p>We use the information we collect strictly to provide and improve the ClearBreath experience:</p>
+        <ul>
+          <li>To maintain your practice history and streaks across devices (if signed in).</li>
+          <li>To display your rank on the global leaderboard (you can opt out or use initials-only mode).</li>
+          <li>To analyze overall app performance and stability.</li>
+        </ul>
+        <p><strong>We never sell your data, nor do we use it for advertising purposes. ClearBreath has no ads and no third-party tracking SDKs for marketing.</strong></p>
+
+        <h2>3. Data Storage and Security</h2>
+        <p>
+          Your cloud-synced data is stored securely using industry-standard encryption (TLS in transit, encrypted at rest) on our servers, which are hosted with reliable cloud infrastructure providers. We maintain strict access controls and validate all data integrity server-side.
+        </p>
+
+        <h2>4. Your Controls and Choices</h2>
+        <p>We believe you should have total control over your data:</p>
+        <ul>
+          <li><strong>Delete Account:</strong> You can permanently delete your account and all associated server data directly from the Profile settings in the app. This action is immediate and irreversible.</li>
+          <li><strong>Leaderboard Visibility:</strong> You can hide your profile from the public leaderboard or choose to display only your initials.</li>
+          <li><strong>Local Data Wipe:</strong> You can clear your local app storage by uninstalling the application.</li>
+        </ul>
+
+        <h2>5. Children's Privacy</h2>
+        <p>
+          ClearBreath does not knowingly collect personal information from children under the age of 13. While the app may be used by individuals of various ages safely, cloud accounts are restricted to users eligible under the terms of our authentication providers (Apple and Google). If we become aware that we have inadvertently collected personal data from a child under 13 without verifiable parental consent, we will delete that data immediately.
+        </p>
+
+        <h2>6. Changes to This Policy</h2>
+        <p>
+          We may update this Privacy Policy periodically to reflect changes in our practices or legal requirements. We will notify you of any material changes by updating the "Last Updated" date at the top of this policy and, if you are signed in, through an in-app notice.
+        </p>
+
+        <div class="mt-16 p-8 rounded-2xl border border-white/10 bg-white/5">
+          <h2 class="!mt-0">Contact Us</h2>
+          <p class="mb-0">
+            If you have any questions, concerns, or requests regarding this Privacy Policy, please contact us at: <br/>
+            <a href="mailto:support@clearbreath.life" class="font-medium text-white">support@clearbreath.life</a>
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
 </Layout>
-
