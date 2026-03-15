@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
-
 import '../../../core/theme/theme_extensions.dart';
 
 class ShareCardWidget extends StatelessWidget {
@@ -40,14 +38,13 @@ class ShareCardWidget extends StatelessWidget {
             Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                SvgPicture.asset(
-                  'assets/branding/clearbreath_logo.svg',
+                Image.asset(
+                  'assets/branding/logo.png',
                   width: 36,
                   height: 36,
-                  colorFilter: ColorFilter.mode(
-                    colors.textPrimary,
-                    BlendMode.srcIn,
-                  ),
+                  color: colors.textPrimary,
+                  colorBlendMode: BlendMode.srcIn,
+                  semanticLabel: 'ClearBreath',
                 ),
                 SizedBox(width: spacing.sm),
                 Text(

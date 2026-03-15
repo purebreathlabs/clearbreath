@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="assets/clearbreath-rounded.png" width="120" alt="ClearBreath logo">
+  <img src="assets/logo.png" width="120" alt="ClearBreath logo">
 </p>
 
 <h1 align="center">ClearBreath</h1>
@@ -35,8 +35,17 @@ stats, and gentle structure without extra friction.
 
 ## Screenshots
 
-Screenshots for the mobile app and landing page will be added before the public
-launch.
+<p align="center">
+  <img src="assets/splash-screen.png" width="19%" alt="Splash" />
+  &nbsp;
+  <img src="assets/technique-screen.png" width="19%" alt="Techniques" />
+  &nbsp;
+  <img src="assets/session-screen.png" width="19%" alt="Breathing session" />
+  &nbsp;
+  <img src="assets/profile-screen.png" width="19%" alt="Profile and XP" />
+  &nbsp;
+  <img src="assets/leaderboard-screen.png" width="19%" alt="Leaderboard" />
+</p>
 
 ## Tech Stack
 
@@ -141,7 +150,6 @@ make web-dev
 - Finishing the public open-source launch and contributor onboarding
 - Hardening CI for a `dev` branch workflow
 - Polishing mobile experience and launch readiness
-- Refreshing screenshots and public-facing documentation
 
 ## Roadmap
 

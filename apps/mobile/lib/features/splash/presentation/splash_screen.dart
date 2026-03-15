@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../core/theme/theme_extensions.dart';
@@ -128,14 +127,13 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
                     return Transform.scale(scale: _scale.value, child: child);
                   },
                   child: RepaintBoundary(
-                    child: SvgPicture.asset(
-                      'assets/branding/clearbreath_logo.svg',
+                    child: Image.asset(
+                      'assets/branding/logo.png',
                       width: 160,
                       height: 160,
-                      colorFilter: ColorFilter.mode(
-                        colors.textPrimary,
-                        BlendMode.srcIn,
-                      ),
+                      color: colors.textPrimary,
+                      colorBlendMode: BlendMode.srcIn,
+                      semanticLabel: 'ClearBreath',
                     ),
                   ),
                 ),

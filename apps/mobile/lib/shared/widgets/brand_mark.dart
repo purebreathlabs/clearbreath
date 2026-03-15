@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
-
 import '../../core/theme/theme_extensions.dart';
 
 class BrandMark extends StatelessWidget {
@@ -28,14 +26,13 @@ class BrandMark extends StatelessWidget {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        SvgPicture.asset(
-          'assets/branding/clearbreath_logo.svg',
+        Image.asset(
+          'assets/branding/logo.png',
           width: logoSize,
           height: logoSize,
-          semanticsLabel: 'ClearBreath',
-          colorFilter: ColorFilter.mode(colors.textPrimary, BlendMode.srcIn),
-          allowDrawingOutsideViewBox: true,
-          clipBehavior: Clip.none,
+          semanticLabel: 'ClearBreath',
+          color: colors.textPrimary,
+          colorBlendMode: BlendMode.srcIn,
         ),
         if (showText) ...[
           SizedBox(width: spacing.sm),
