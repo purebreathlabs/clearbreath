@@ -1,0 +1,8 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Discord community
+    url: https://github.com/purebreathlabs/clearbreath#community
+    about: Placeholder link until the public Discord invite is published.
+  - name: Security policy
+    url: https://github.com/purebreathlabs/clearbreath/security/policy
+    about: Please report vulnerabilities privately using the security policy.

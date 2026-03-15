@@ -2,7 +2,7 @@ name: Server Image
 
 on:
   push:
-    branches: [main]
+    branches: [main, dev]
     paths: [server/**, VERSION, deploy/**]
   pull_request:
     paths: [server/**, VERSION, deploy/**]
@@ -37,10 +37,9 @@ jobs:
         with:
           context: server
           file: server/Dockerfile
-          push: ${{ github.event_name != 'pull_request' }}
+          push: ${{ github.event_name != 'pull_request' && github.ref == 'refs/heads/main' }}
           build-args: |
             VERSION=${{ env.VERSION }}+${{ github.sha }}
           tags: |
             ${{ env.IMAGE }}:sha-${{ github.sha }}
             ${{ env.IMAGE }}:latest
-

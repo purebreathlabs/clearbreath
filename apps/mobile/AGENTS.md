@@ -1,4 +1,4 @@
-# AGENTS.md — Flutter Mobile
+# AGENTS.md - Flutter Mobile
 
 ## Commands (from repo root)
 - Run: `make mobile-run`
@@ -26,11 +26,11 @@
 - Lint rules: flutter_lints. Run `make mobile-analyze` and fix all warnings before committing.
 
 ## Project structure
-- `lib/main.dart` — ProviderScope entry
-- `lib/app.dart` — MaterialApp.router with GoRouter
-- `lib/core/theme/` — dark theme, design tokens
-- `lib/core/router/` — GoRouter config and route guards
-- `lib/core/constants/` — app-wide constants
-- `lib/features/` — feature modules (home, session, techniques, stats, leaderboard, auth, onboarding, settings, xp, profile, sync)
-- `lib/shared/providers/` — cross-feature Riverpod providers
-- `lib/shared/widgets/` — reusable widgets
+- `lib/main.dart` - ProviderScope entry
+- `lib/app.dart` - MaterialApp.router with GoRouter
+- `lib/core/theme/` - dark theme, design tokens
+- `lib/core/router/` - GoRouter config and route guards
+- `lib/core/constants/` - app-wide constants
+- `lib/features/` - feature modules (home, session, techniques, stats, leaderboard, auth, onboarding, settings, xp, profile, sync)
+- `lib/shared/providers/` - cross-feature Riverpod providers
+- `lib/shared/widgets/` - reusable widgets

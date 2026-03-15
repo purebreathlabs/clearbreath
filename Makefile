@@ -13,10 +13,10 @@ API_BASE_URL ?= https://api.clearbreath.life
 GOOGLE_WEB_CLIENT_ID ?=
 GOOGLE_IOS_CLIENT_ID ?=
 MOBILE_DART_DEFINES ?= --dart-define=API_BASE_URL=$(API_BASE_URL) --dart-define=GOOGLE_WEB_CLIENT_ID=$(GOOGLE_WEB_CLIENT_ID) --dart-define=GOOGLE_IOS_CLIENT_ID=$(GOOGLE_IOS_CLIENT_ID)
-GOLANGCI_LINT := $(HOME)/go/bin/golangci-lint
-SQLC := $(HOME)/go/bin/sqlc
-GOOSE := $(HOME)/go/bin/goose
-PSQL := /opt/homebrew/opt/postgresql@17/bin/psql
+GOLANGCI_LINT ?= $(shell command -v golangci-lint 2>/dev/null || echo $(HOME)/go/bin/golangci-lint)
+SQLC ?= $(shell command -v sqlc 2>/dev/null || echo $(HOME)/go/bin/sqlc)
+GOOSE ?= $(shell command -v goose 2>/dev/null || echo $(HOME)/go/bin/goose)
+PSQL ?= $(shell command -v psql 2>/dev/null || echo /opt/homebrew/opt/postgresql@17/bin/psql)
 VERSION := $(shell cat VERSION 2>/dev/null || echo 0.0.0)
 BUILD := $(shell git rev-list --count HEAD 2>/dev/null || echo 1)
 

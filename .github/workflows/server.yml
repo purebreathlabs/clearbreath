@@ -2,7 +2,7 @@ name: Server CI
 
 on:
   push:
-    branches: [main]
+    branches: [main, dev]
     paths: [server/**]
   pull_request:
     paths: [server/**]
@@ -78,7 +78,7 @@ jobs:
         run: make server-test-integration
 
   deploy:
-    if: github.event_name == 'push'
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     needs: [ci, integration]
     runs-on: blacksmith-4vcpu-ubuntu-2404
     concurrency:

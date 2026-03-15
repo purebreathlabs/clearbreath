@@ -1,163 +1,195 @@
-# ClearBreath
+<p align="center">
+  <img src="assets/clearbreath-rounded.png" width="120" alt="ClearBreath logo">
+</p>
 
-Pranayama and breathing exercise platform.
+<h1 align="center">ClearBreath</h1>
 
-## Structure
+<p align="center">A free, open-source pranayama and breathing exercise platform.</p>
 
-```
-server/          Go API (Chi + pgx + Redis)
-apps/mobile/     Flutter mobile app (iOS + Android)
-apps/web/        Astro landing page (clearbreath.life)
-docs/            Product requirements and architecture
-```
+<p align="center">
+  <a href="https://github.com/purebreathlabs/clearbreath/actions/workflows/server.yml">
+    <img alt="Server CI" src="https://github.com/purebreathlabs/clearbreath/actions/workflows/server.yml/badge.svg">
+  </a>
+  <a href="https://github.com/purebreathlabs/clearbreath/actions/workflows/mobile.yml">
+    <img alt="Mobile CI" src="https://github.com/purebreathlabs/clearbreath/actions/workflows/mobile.yml/badge.svg">
+  </a>
+  <a href="LICENSE">
+    <img alt="License: MIT" src="https://img.shields.io/badge/license-MIT-green.svg">
+  </a>
+  <a href="CHANGELOG.md">
+    <img alt="Version 0.0.2" src="https://img.shields.io/badge/version-0.0.2-blue.svg">
+  </a>
+</p>
 
-## Prerequisites
+## Why ClearBreath
+
+Most breathing and mindfulness apps lock core routines behind subscriptions,
+interrupt practice with ads, or ask users to trust a closed product with
+personal wellness data. ClearBreath takes the opposite approach.
+
+ClearBreath is built to stay always free, open source, and easy to inspect.
+No paywalls. No subscriptions. No ads. No data selling.
+
+It is designed for practitioners who want guided pranayama sessions, streaks,
+stats, and gentle structure without extra friction.
+
+## Screenshots
+
+Screenshots for the mobile app and landing page will be added before the public
+launch.
+
+## Tech Stack
+
+| Component | Technology | Directory |
+| --- | --- | --- |
+| Server | Go 1.25, Chi, PostgreSQL 17, Redis 7 | `server/` |
+| Mobile | Flutter 3.38, Riverpod, Drift | `apps/mobile/` |
+| Web | Astro, Tailwind CSS | `apps/web/` |
+| CI/CD | GitHub Actions | `.github/workflows/` |
+
+## Quick Start
+
+### Prerequisites
 
 - Go 1.25+
-- Flutter 3.38+ (at `~/sdk/flutter/bin/flutter` if not in PATH)
+- Flutter 3.38+
 - Bun 1.3+
 - PostgreSQL 17
 - Redis 7+
-- Docker (optional, for containerized dev)
+- Docker
 
-## Setup
+If Flutter is not on your `PATH`, pass `FLUTTER=~/sdk/flutter/bin/flutter` to
+mobile `make` commands.
 
-Create the database:
+### Clone the Repo
 
-```
-make db-create
-```
-
-Copy environment files:
-
-```
-cp .env.example server/.env
+```bash
+git clone https://github.com/purebreathlabs/clearbreath.git
+cd clearbreath
 ```
 
-Install all dependencies:
+### Install Dependencies
 
-```
+```bash
 make setup
 ```
 
-## Running
+### Configure Local Environment
 
-All commands are available as both `make` targets and `bun run` shortcuts.
-
-| Task | Make | Bun |
-|------|------|-----|
-| Go API | `make server-dev` | `bun run server` |
-| Flutter app | `make mobile-run` | `bun run mobile` |
-| Astro dev server | `make web-dev` | `bun run web` |
-| Docker up | `make docker-up` | `bun run docker:up` |
-| Docker down | `make docker-down` | `bun run docker:down` |
-| Setup | `make setup` | `bun run setup` |
-| Clean | `make clean` | `bun run clean` |
-
-`bun run dev` is an alias for `bun run server`.
-
-### Server
-
-```
-bun run server
+```bash
+cp .env.example server/.env
 ```
 
-Starts the Go API on http://localhost:8080. Test with:
-
-```
-curl http://localhost:8080/health
-```
-
-### Mobile
-
-```
-bun run mobile:get
-bun run mobile
-```
-
-#### Local backend testing (Android emulator)
-
-Start dependencies and server first, then run mobile with dart-define flags:
+### Start Local Services
 
 ```bash
 make docker-up
+```
+
+### Run the API
+
+```bash
 make server-dev
-
-make mobile-run MOBILE_RUN_ARGS="--dart-define=API_BASE_URL=http://10.0.2.2:8080 --dart-define=DEV_AUTH_ENABLED=true"
 ```
 
-`10.0.2.2` is the Android emulator alias for the host machine's `localhost`.
-
-#### Local backend testing (physical Android on same WiFi)
-
-Find your machine's local IP (`ip -4 addr show | grep 192.168`) and use it:
+### Verify the API
 
 ```bash
-make mobile-run MOBILE_RUN_ARGS="--dart-define=API_BASE_URL=http://192.168.x.x:8080 --dart-define=DEV_AUTH_ENABLED=true"
+curl http://localhost:8080/health
 ```
 
-#### Release APK for local testing
+### Run the Mobile App
 
 ```bash
-flutter build apk --release --split-per-abi \
-  --dart-define=API_BASE_URL=http://192.168.x.x:8080 \
-  --dart-define=DEV_AUTH_ENABLED=true \
-  --dart-define=DEV_AUTH_SECRET=dev_secret_change_me
-```
-
-The arm64-v8a APK is at `apps/mobile/build/app/outputs/flutter-apk/app-arm64-v8a-release.apk`.
-
-#### Google Sign-In (local dev)
-
-The backend reads `GOOGLE_OAUTH_CLIENT_IDS` from `server/.env` and should include
-the Web client ID plus any native client IDs whose tokens the server accepts.
-Android debug builds should pass the Web client ID via dart define. iOS can use the
-checked-in `Info.plist` Google config, and dart defines override it when supplied:
-
-```bash
-GOOGLE_WEB_CLIENT_ID=<web-client-id.apps.googleusercontent.com> \
-GOOGLE_IOS_CLIENT_ID=<ios-client-id.apps.googleusercontent.com> \
 make mobile-run
 ```
 
-No additional URL or redirect configuration is needed for native Android sign-in.
+By default, the mobile app points at the hosted API.
+For Android emulator testing against your local API, use:
 
-### Web
-
-```
-bun run web
-```
-
-Starts the Astro dev server on http://localhost:4321.
-
-### Docker (Postgres + Redis)
-
-For containerized databases instead of local brew services:
-
-```
-bun run docker:up
+```bash
+make mobile-run API_BASE_URL=http://10.0.2.2:8080 MOBILE_RUN_ARGS="--dart-define=DEV_AUTH_ENABLED=true"
 ```
 
-Update `server/.env` to use ports 5433 (postgres) and 6380 (redis).
+For a physical Android device on the same Wi-Fi network, replace `10.0.2.2`
+with your machine's local IP.
 
-Stop with:
+### Run the Web App
 
+```bash
+make web-dev
 ```
-bun run docker:down
+
+## Project Structure
+
+```text
+.
+├── .github/
+├── apps/
+│   ├── mobile/
+│   └── web/
+├── assets/
+├── deploy/
+├── scripts/
+├── server/
+├── Makefile
+├── VERSION
+└── melos.yaml
 ```
 
-## Build
+## Current Focus
 
-| Target | Make | Bun |
-|--------|------|-----|
-| Go binary (`server/bin/api`) | `make server-build` | `bun run server:build` |
-| Android APK | `make mobile-build` | `bun run mobile:build` |
-| Static site (`apps/web/dist/`) | `make web-build` | `bun run web:build` |
+- Finishing the public open-source launch and contributor onboarding
+- Hardening CI for a `dev` branch workflow
+- Polishing mobile experience and launch readiness
+- Refreshing screenshots and public-facing documentation
 
-## Lint & Test
+## Roadmap
 
-```
-bun run server:lint     # golangci-lint
-bun run server:test     # go test
-bun run mobile:analyze  # flutter analyze
-```
+- Google Play launch
+- App Store launch
+- Documentation website
+- Alpha and beta testing program
+- Landing page improvements
+- Community features and improvements
+
+## Contributing
+
+Contributions are welcome across code, docs, tests, and community operations.
+Please read [CONTRIBUTING.md](CONTRIBUTING.md) before opening a pull request.
+All contributor pull requests should target the `dev` branch.
+
+## Community
+
+- Contributors: https://github.com/purebreathlabs/clearbreath/graphs/contributors
+- Support: see [SUPPORT.md](SUPPORT.md)
+- GitHub Discussions will be enabled as the community grows
+- Discord link coming soon
+
+Thank you to everyone who contributes to ClearBreath.
+
+## Sponsors
+
+ClearBreath is and will remain always free.
+If you find it valuable, consider sponsoring the project to help cover hosting
+and development costs:
+https://github.com/sponsors/prodigyrahul
+
+## About PureBreathLabs
+
+PureBreathLabs builds breathing tools that stay accessible to everyone.
+The goal is simple: always free, open source, no paywalls, and no
+subscriptions.
+
+## Maintainers
+
+- Rahul Mistry
+- GitHub: [`@prodigyrahul`](https://github.com/prodigyrahul)
+- X: [`@_rahulmistry`](https://x.com/_rahulmistry)
+- Discord: `prodigyrahul`
+- Email: `rahulmistry.sde@gmail.com`
+
+## License
+
+This project is licensed under the MIT License.
+See [LICENSE](LICENSE) for details.
