@@ -3,9 +3,9 @@ name: Server Image
 on:
   push:
     branches: [main, dev]
-    paths: [server/**, VERSION, deploy/**]
+    paths: [server/**, VERSION]
   pull_request:
-    paths: [server/**, VERSION, deploy/**]
+    paths: [server/**, VERSION]
   workflow_dispatch:
 
 jobs:

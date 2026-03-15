@@ -91,4 +91,133 @@ jobs:
           echo "${{ secrets.DEPLOY_SSH_KEY }}" > ~/.ssh/id_ed25519
           chmod 600 ~/.ssh/id_ed25519
           ssh-keyscan -H "${{ secrets.DEPLOY_HOST }}" >> ~/.ssh/known_hosts
-          ssh -i ~/.ssh/id_ed25519 "${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }}" "bash /home/rahul/production/clearbreath/deploy/cd-deploy.sh"
+          ssh -i ~/.ssh/id_ed25519 "${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }}" 'bash -s' <<'EOF'
+          set -euo pipefail
+
+          export PATH="/usr/local/go/bin:/home/rahul/go/bin:${PATH}"
+
+          PROJECT_DIR="/home/rahul/production/clearbreath"
+          DEPLOY_DIR="/opt/clearbreath"
+          SERVER_DIR="${PROJECT_DIR}/server"
+          MIGRATIONS_DIR="${SERVER_DIR}/migrations"
+          BINARY_DST="${DEPLOY_DIR}/api"
+          BINARY_BACKUP="${DEPLOY_DIR}/api.backup"
+          GOOSE="/home/rahul/go/bin/goose"
+          SERVICE_NAME="clearbreath-api"
+          ROLLED_BACK=false
+
+          log()  { echo "==> $*"; }
+          ok()   { echo "  OK: $*"; }
+          fail() { echo "  FAIL: $*" >&2; }
+
+          rollback() {
+              if [[ "${ROLLED_BACK}" == "true" ]]; then
+                  return
+              fi
+              ROLLED_BACK=true
+
+              echo ""
+              fail "Deployment failed, rolling back"
+
+              if [[ -f "${BINARY_BACKUP}" ]]; then
+                  sudo cp "${BINARY_BACKUP}" "${BINARY_DST}"
+                  sudo chown clearbreath:clearbreath "${BINARY_DST}"
+                  sudo chmod 755 "${BINARY_DST}"
+                  ok "Restored previous binary from backup"
+              fi
+
+              sudo systemctl start "${SERVICE_NAME}" 2>/dev/null || true
+              sleep 2
+
+              if sudo systemctl is-active --quiet "${SERVICE_NAME}"; then
+                  ok "Service restored and running"
+              else
+                  fail "Service could not be restored"
+                  fail "Check: sudo journalctl -u ${SERVICE_NAME} -n 50 --no-pager"
+              fi
+          }
+
+          log "Pre-flight checks"
+          [[ -d "${PROJECT_DIR}" ]] || { fail "Project dir ${PROJECT_DIR} not found"; exit 1; }
+          [[ -d "${DEPLOY_DIR}" ]] || { fail "Deploy dir ${DEPLOY_DIR} not found"; exit 1; }
+          [[ -f "${DEPLOY_DIR}/.env" ]] || { fail "Env file ${DEPLOY_DIR}/.env not found"; exit 1; }
+          [[ -f "${GOOSE}" ]] || { fail "Goose not found at ${GOOSE}"; exit 1; }
+          command -v go >/dev/null || { fail "Go not found"; exit 1; }
+          ok "All checks passed"
+
+          log "Syncing main branch checkout"
+          cd "${PROJECT_DIR}"
+          git fetch origin main
+          git checkout -f main
+          git reset --hard origin/main
+          git clean -fd
+          ok "Server checkout updated"
+
+          log "Building binary"
+          VERSION=$(cat "${PROJECT_DIR}/VERSION" 2>/dev/null || echo "0.0.0")
+          BUILD=$(git -C "${PROJECT_DIR}" rev-list --count HEAD 2>/dev/null || echo "1")
+          COMMIT=$(git -C "${PROJECT_DIR}" rev-parse --short HEAD 2>/dev/null || echo "unknown")
+
+          cd "${SERVER_DIR}"
+          CGO_ENABLED=0 go build -ldflags="-s -w -X main.version=${VERSION}+${BUILD}" -o /tmp/clearbreath-api ./cmd/api
+          ok "Binary built (v${VERSION}+${BUILD}, ${COMMIT})"
+
+          log "Backing up current binary"
+          if [[ -f "${BINARY_DST}" ]]; then
+              sudo cp "${BINARY_DST}" "${BINARY_BACKUP}"
+              sudo chown "${USER}:${USER}" "${BINARY_BACKUP}"
+              ok "Backup saved"
+          else
+              echo "  No existing binary to back up"
+          fi
+
+          log "Stopping service"
+          sudo systemctl stop "${SERVICE_NAME}" 2>/dev/null && ok "Service stopped" || echo "  Service was not running"
+
+          trap rollback ERR
+
+          log "Deploying binary and registry"
+          sudo cp /tmp/clearbreath-api "${BINARY_DST}"
+          sudo chown clearbreath:clearbreath "${BINARY_DST}"
+          sudo chmod 755 "${BINARY_DST}"
+          sudo cp -r "${SERVER_DIR}/registry" "${DEPLOY_DIR}/"
+          sudo chown -R clearbreath:clearbreath "${DEPLOY_DIR}/registry"
+          ok "Binary and registry deployed"
+
+          log "Running database migrations"
+          DB_URL=$(sudo grep '^DATABASE_URL=' "${DEPLOY_DIR}/.env" | cut -d'=' -f2-)
+          "${GOOSE}" -dir "${MIGRATIONS_DIR}" postgres "${DB_URL}" up
+          ok "Migrations applied"
+
+          log "Starting service"
+          sudo systemctl start "${SERVICE_NAME}"
+          sleep 2
+
+          if ! sudo systemctl is-active --quiet "${SERVICE_NAME}"; then
+              fail "Service failed to start"
+              sudo systemctl status "${SERVICE_NAME}" --no-pager || true
+              sudo journalctl -u "${SERVICE_NAME}" -n 50 --no-pager || true
+              exit 1
+          fi
+          ok "Service is running"
+
+          if curl -sf http://localhost:8080/health >/dev/null 2>&1; then
+              ok "Health check passed"
+          else
+              echo "  Retrying health check in 3s..."
+              sleep 3
+              curl -sf http://localhost:8080/health >/dev/null 2>&1
+              ok "Health check passed"
+          fi
+
+          trap - ERR
+
+          sudo rm -f "${BINARY_BACKUP}" || true
+          sudo nginx -t >/dev/null 2>&1 && sudo systemctl reload nginx && ok "Nginx reloaded" || echo "  Nginx reload skipped"
+
+          echo ""
+          echo "========================================="
+          echo "  Deployment successful"
+          echo "  Version: v${VERSION}+${BUILD} (${COMMIT})"
+          echo "========================================="
+          EOF

@@ -129,7 +129,6 @@ make web-dev
 │   ├── mobile/
 │   └── web/
 ├── assets/
-├── deploy/
 ├── scripts/
 ├── server/
 ├── Makefile
@@ -158,6 +157,9 @@ make web-dev
 Contributions are welcome across code, docs, tests, and community operations.
 Please read [CONTRIBUTING.md](CONTRIBUTING.md) before opening a pull request.
 All contributor pull requests should target the `dev` branch.
+
+Production deployment infrastructure is maintainer-only and kept outside the
+public repository.
 
 ## Community
 
