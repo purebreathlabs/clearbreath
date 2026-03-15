@@ -9,24 +9,6 @@ import { seoPages } from '../lib/seo_pages';
   fullWidth={true}
 >
   <style>
-    .circle-animate {
-      animation: breathe 8s ease-in-out infinite;
-    }
-    .circle-glow {
-      box-shadow: 0 0 120px 40px rgba(255, 255, 255, 0.05);
-    }
-    
-    @keyframes breathe {
-      0%, 100% {
-        transform: scale(0.8);
-        opacity: 0.3;
-      }
-      50% {
-        transform: scale(1.1);
-        opacity: 0.8;
-      }
-    }
-
     .fade-up {
       animation: fadeUp 1s ease-out forwards;
       opacity: 0;
@@ -56,39 +38,31 @@ import { seoPages } from '../lib/seo_pages';
     }
   </style>
 
-  {/* HERO SECTION */}
-  <section class="relative min-h-[90dvh] flex flex-col justify-center pt-32 pb-20 overflow-hidden">
+  <section class="relative min-h-[90dvh] flex flex-col justify-center pt-28 pb-14 sm:pt-32 sm:pb-20 overflow-hidden">
     <div class="noise-bg"></div>
-    
-    {/* Abstract Breathing Visual */}
-    <div class="absolute top-1/2 left-[80%] -translate-x-1/2 -translate-y-1/2 w-[300px] h-[300px] md:w-[600px] md:h-[600px] pointer-events-none opacity-30 z-0">
-      <div class="absolute inset-0 rounded-full border border-white/10 circle-animate" style="animation-delay: 0s;"></div>
-      <div class="absolute inset-8 rounded-full border border-white/20 circle-animate circle-glow" style="animation-delay: 2s;"></div>
-      <div class="absolute inset-16 rounded-full border border-white/30 circle-animate" style="animation-delay: 4s;"></div>
-    </div>
 
-    <div class="relative z-10 w-full max-w-6xl mx-auto px-6 grid lg:grid-cols-2 gap-12 items-center">
+    <div class="relative z-10 w-full max-w-6xl mx-auto px-6 grid items-center gap-10 md:gap-14 lg:grid-cols-[minmax(0,1.14fr)_minmax(360px,0.86fr)] lg:gap-8 xl:gap-12">
       <div class="flex flex-col items-start text-left">
-        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-white/10 bg-white/5 backdrop-blur-md mb-8 fade-up text-xs font-medium text-white/80 tracking-wide uppercase">
+        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-white/10 bg-white/5 backdrop-blur-md mb-6 sm:mb-8 fade-up text-xs font-medium text-white/80 tracking-wide uppercase">
           <span class="w-1.5 h-1.5 rounded-full bg-white animate-pulse"></span>
-          Now Available
+          Coming Soon
         </div>
-        
-        <h1 class="text-6xl md:text-8xl font-semibold tracking-tighter text-white leading-[1.1] fade-up delay-100 mb-6">
-          Breathe with <br />
-          <span class="text-transparent bg-clip-text bg-gradient-to-br from-white via-white to-white/40 italic font-light pr-4">intention.</span>
+
+        <h1 class="max-w-[10.5ch] text-5xl sm:text-6xl md:text-7xl xl:text-[6rem] font-semibold tracking-tighter text-white leading-[0.98] fade-up delay-100 mb-5 sm:mb-6">
+          <span class="block lg:whitespace-nowrap">Breathe with</span>
+          <span class="text-transparent bg-clip-text bg-gradient-to-br from-white via-white to-white/40 italic font-light pr-2 sm:pr-4">intention.</span>
         </h1>
-        
-        <p class="mt-2 text-lg md:text-2xl text-white/60 max-w-xl font-light fade-up delay-200 leading-relaxed">
+
+        <p class="mt-1 sm:mt-2 text-base sm:text-lg md:text-xl text-white/60 max-w-xl font-light fade-up delay-200 leading-relaxed">
           A guest-first pranayama experience. Guided pacing, calming cues, and pure focus—no distractions.
         </p>
 
-        <div class="mt-12 flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto fade-up delay-300">
+        <div class="mt-8 sm:mt-10 md:mt-12 flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto fade-up delay-300">
           <a
             href="#download"
             class="group relative inline-flex h-14 items-center justify-center gap-2 rounded-full bg-white px-8 text-base font-semibold text-black transition-all hover:scale-105 active:scale-95 w-full sm:w-auto overflow-hidden"
           >
-            <span class="relative z-10">Get the App Free</span>
+            <span class="relative z-10">Get the App at Launch</span>
             <div class="absolute inset-0 bg-neutral-200 opacity-0 group-hover:opacity-100 transition-opacity"></div>
           </a>
           <a
@@ -99,19 +73,23 @@ import { seoPages } from '../lib/seo_pages';
           </a>
         </div>
       </div>
-      
+
       <div class="relative fade-up delay-400 flex justify-center lg:justify-end">
-        <div class="absolute inset-0 bg-gradient-to-tr from-white/10 to-transparent rounded-[3rem] blur-3xl transform scale-90 -z-10"></div>
-        <img 
-          src="/images/addition.png" 
-          alt="ClearBreath App Preview" 
-          class="w-full max-w-[450px] object-contain drop-shadow-[0_0_40px_rgba(255,255,255,0.15)] transform hover:scale-[1.02] transition-transform duration-700 ease-out"
-        />
+        <div class="relative w-full max-w-[19rem] sm:max-w-[22rem] md:max-w-[26rem] lg:max-w-[31rem] xl:max-w-[33rem]">
+          <div class="absolute inset-x-[18%] bottom-[11%] h-px bg-gradient-to-r from-transparent via-white/30 to-transparent opacity-70"></div>
+          <div class="absolute inset-x-[20%] bottom-[3%] h-14 bg-gradient-to-t from-white/[0.05] to-transparent blur-3xl opacity-40"></div>
+          <img
+            src="/images/hero-breathing-trimmed.png"
+            alt="ClearBreath App Preview"
+            width="1084"
+            height="818"
+            class="relative w-full h-auto drop-shadow-[0_10px_36px_rgba(255,255,255,0.08)] transform transition-transform duration-700 ease-out hover:scale-[1.01]"
+          />
+        </div>
       </div>
     </div>
   </section>
 
-  {/* FEATURES OVERVIEW */}
   <section id="features" class="py-24 md:py-32 relative border-t border-white/5">
     <div class="max-w-6xl mx-auto px-6">
       <div class="mb-16 md:mb-24">
@@ -170,7 +148,6 @@ import { seoPages } from '../lib/seo_pages';
     </div>
   </section>
 
-  {/* PRANAYAMA LIBRARY (TECHNIQUES) */}
   <section id="techniques" class="py-24 md:py-32 relative border-t border-white/5">
     <div class="max-w-6xl mx-auto px-6">
       <div class="flex flex-col md:flex-row md:items-end justify-between gap-8 mb-16">
@@ -209,7 +186,6 @@ import { seoPages } from '../lib/seo_pages';
     </div>
   </section>
 
-  {/* DOWNLOAD CTA SECTION */}
   <section id="download" class="py-32 md:py-48 relative border-t border-white/5 overflow-hidden flex items-center justify-center">
     <div class="absolute inset-0 bg-gradient-to-b from-transparent to-white/5 pointer-events-none"></div>
     
