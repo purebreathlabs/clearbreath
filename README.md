@@ -36,15 +36,13 @@ stats, and gentle structure without extra friction.
 ## Screenshots
 
 <p align="center">
-  <img src="assets/splash-screen.png" width="19%" alt="Splash" />
+  <img src="assets/splash-screen.png" width="22%" alt="Splash" />
   &nbsp;
-  <img src="assets/technique-screen.png" width="19%" alt="Techniques" />
+  <img src="assets/technique-screen.png" width="22%" alt="Techniques" />
   &nbsp;
-  <img src="assets/session-screen.png" width="19%" alt="Breathing session" />
+  <img src="assets/session-screen.png" width="22%" alt="Breathing session" />
   &nbsp;
-  <img src="assets/profile-screen.png" width="19%" alt="Profile and XP" />
-  &nbsp;
-  <img src="assets/leaderboard-screen.png" width="19%" alt="Leaderboard" />
+  <img src="assets/leaderboard-screen.png" width="22%" alt="Leaderboard" />
 </p>
 
 ## Tech Stack
