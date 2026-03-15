@@ -147,16 +147,15 @@ make web-dev
 
 ## Current Focus
 
-- Finishing the public open-source launch and contributor onboarding
-- Hardening CI for a `dev` branch workflow
-- Polishing mobile experience and launch readiness
+- Preparing the Google Play launch, with the first release currently pending review
+- Running final launch-readiness checks across onboarding, screenshots, and public documentation
+- Organizing post-launch alpha testing and early feedback collection for the first live users
 
 ## Roadmap
 
-- Google Play launch
 - App Store launch
+- Expanded alpha and beta testing program
 - Documentation website
-- Alpha and beta testing program
 - Landing page improvements
 - Community features and improvements
 
