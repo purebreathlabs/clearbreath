@@ -1,12 +1,34 @@
 ---
 const year = new Date().getFullYear();
+const nav = [
+  { href: '/privacy', label: 'Privacy Policy' },
+  { href: '/terms', label: 'Terms of Service' },
+];
 ---
 
-<footer class="border-t border-white/10">
-  <div class="mx-auto w-full max-w-3xl px-6 py-8">
-    <p class="text-sm text-white/60">
-      © {year} ClearBreath. For wellness and relaxation purposes only.
-    </p>
+<footer class="border-t border-white/5 bg-black/80 backdrop-blur-md relative z-10">
+  <div class="mx-auto w-full max-w-5xl px-6 py-12 flex flex-col md:flex-row items-center justify-between gap-6">
+    <div class="flex items-center gap-3 opacity-60">
+      <img src="/only_logo.svg" alt="ClearBreath Logo" class="h-5 w-5" />
+      <p class="text-sm font-medium">
+        © {year} ClearBreath.
+      </p>
+    </div>
+    
+    <nav class="flex items-center gap-6" aria-label="Footer navigation">
+      {nav.map((item) => (
+        <a
+          href={item.href}
+          class="text-sm font-medium text-white/40 hover:text-white transition-colors"
+        >
+          {item.label}
+        </a>
+      ))}
+    </nav>
+    
+    <div class="text-xs text-white/30 font-light">
+      For wellness and relaxation purposes only.
+    </div>
   </div>
 </footer>
 

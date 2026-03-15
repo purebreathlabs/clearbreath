@@ -53,110 +53,163 @@ const sleepSuggestions = [
   'hrv-resonance-breathing',
 ];
 const sleepPages = seoPages.filter((p) => sleepSuggestions.includes(p.slug));
+
+const imageMap: Record<string, string> = {
+  'hrv_resonance': '/images/hrv.png',
+  'ultra_slow': '/images/addtional-3.png',
+  'box': '/images/box-breathing.png',
+  'four_seven_eight': '/images/addition.png',
+  'anulom_vilom': '/images/anulom-vilom.png',
+  'ujjayi': '/images/ujjayi.png',
+  'bhramari': '/images/bhramari.png',
+  'kapalbhati': '/images/kapaalbhati.png',
+  'bhastrika': '/images/bhastrika.png',
+};
+
+const imageUrl = (page.kind === 'technique' && page.techniqueId) ? imageMap[page.techniqueId] : '/images/addition-2.png';
 ---
 
 <Layout title={page.title} description={page.description}>
-  <article class="space-y-8">
-    <header class="space-y-3">
-      <p class="text-sm text-white/60">
-        {page.kind === 'technique' ? 'Technique guide' : 'Guide'}
-      </p>
-      <h1 class="text-4xl tracking-tight font-light text-white">{page.h1}</h1>
-      <p class="text-white/70">{page.description}</p>
-      <div class="pt-2 flex flex-wrap gap-3">
-        <a
-          href="/#download"
-          class="inline-flex items-center justify-center rounded-xl bg-white text-black px-5 py-3 text-sm font-semibold"
-        >
-          Get ClearBreath
-        </a>
-        <a
-          href="/terms"
-          class="inline-flex items-center justify-center rounded-xl border border-white/15 text-white px-5 py-3 text-sm font-semibold hover:border-white/25"
-        >
-          Not medical advice
-        </a>
+  <article class="flex flex-col gap-12 lg:gap-20">
+    {/* HERO SECTION FOR TECHNIQUE */}
+    <header class="flex flex-col md:flex-row gap-10 items-center">
+      <div class="flex-1 space-y-6">
+        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-white/10 bg-white/5 text-xs font-medium text-white/80 uppercase tracking-widest">
+          {page.kind === 'technique' ? 'Technique Guide' : 'Wellness Guide'}
+        </div>
+        <h1 class="text-4xl md:text-6xl tracking-tight font-semibold text-white leading-tight">
+          {page.h1}
+        </h1>
+        <p class="text-lg text-white/70 font-light leading-relaxed max-w-xl">
+          {page.description}
+        </p>
+        <div class="pt-4 flex flex-wrap gap-4">
+          <a
+            href="/#download"
+            class="inline-flex h-12 items-center justify-center rounded-full bg-white text-black px-8 text-sm font-semibold transition-transform hover:scale-105"
+          >
+            Get ClearBreath
+          </a>
+          <a
+            href="/terms"
+            class="inline-flex h-12 items-center justify-center rounded-full border border-white/20 text-white px-8 text-sm font-medium hover:bg-white/5 transition-colors"
+          >
+            Disclaimer
+          </a>
+        </div>
+      </div>
+      
+      <div class="w-full md:w-1/2 flex justify-center relative">
+        <div class="absolute inset-0 bg-gradient-to-tr from-white/5 to-transparent rounded-3xl blur-2xl transform scale-95 -z-10"></div>
+        {imageUrl && (
+          <img 
+            src={imageUrl} 
+            alt={page.h1} 
+            class="w-full max-w-[400px] object-contain drop-shadow-[0_0_30px_rgba(255,255,255,0.1)] rounded-3xl"
+          />
+        )}
       </div>
     </header>
 
-    {page.kind === 'hub' ? (
-      <section class="space-y-4">
-        <h2 class="text-xl font-semibold text-white">Techniques to try</h2>
-        <p class="text-white/70">
-          If you are winding down for the night, start gentle and keep the breath
-          comfortable. If any technique feels uncomfortable, stop and return to
-          normal breathing.
-        </p>
-        <div class="grid gap-3">
-          {sleepPages.map((p) => (
-            <a
-              href={`/${p.slug}`}
-              class="rounded-2xl border border-white/10 px-5 py-4 hover:border-white/20 transition-colors"
-            >
-              <div class="text-white font-semibold">{p.h1}</div>
-              <div class="mt-1 text-sm text-white/65">{p.description}</div>
-            </a>
-          ))}
-        </div>
-      </section>
-    ) : (
-      <>
-        <section class="space-y-5">
-          <div class="rounded-2xl border border-white/10 px-5 py-5">
-            <div class="text-white font-semibold">{technique!.name}</div>
-            <div class="mt-1 text-sm text-white/65">
-              {technique!.shortDescription}
-            </div>
-          </div>
-        </section>
+    <div class="w-full h-px bg-gradient-to-r from-transparent via-white/10 to-transparent my-4"></div>
 
-        <section class="space-y-5">
-          <div class="space-y-2">
-            <h2 class="text-xl font-semibold text-white">What it is</h2>
-            <p class="text-white/70">{technique!.about.what}</p>
-          </div>
-          <div class="space-y-2">
-            <h2 class="text-xl font-semibold text-white">How to do it</h2>
-            <p class="text-white/70">{technique!.about.how}</p>
-          </div>
-          <div class="space-y-2">
-            <h2 class="text-xl font-semibold text-white">Best time</h2>
-            <p class="text-white/70">{technique!.about.bestTime}</p>
-          </div>
-          <div class="space-y-2">
-            <h2 class="text-xl font-semibold text-white">Benefits</h2>
-            <p class="text-white/70">{technique!.about.benefits}</p>
-          </div>
-          <div class="space-y-2">
-            <h2 class="text-xl font-semibold text-white">Warnings</h2>
-            <p class="text-white/70">{technique!.about.warnings}</p>
-          </div>
-        </section>
-
-        {(technique!.safety.requiresAck || technique!.safety.body.trim()) && (
-          <section class="space-y-3">
-            <h2 class="text-xl font-semibold text-white">Safety</h2>
-            <div class="rounded-2xl border border-white/10 px-5 py-5">
-              <div class="text-white font-semibold">
-                {technique!.safety.title || 'Safety guidance'}
-              </div>
-              <p class="mt-2 text-white/70">
-                {technique!.safety.body.trim() ||
-                  'Practice gently. Stop if you feel unwell.'}
-              </p>
+    {/* CONTENT SECTION */}
+    <div class="grid md:grid-cols-[1fr_300px] gap-12">
+      <div class="space-y-12">
+        {page.kind === 'hub' ? (
+          <section class="space-y-6">
+            <h2 class="text-2xl font-semibold text-white tracking-tight">Techniques to try</h2>
+            <p class="text-white/70 font-light leading-relaxed">
+              If you are winding down for the night, start gentle and keep the breath
+              comfortable. If any technique feels uncomfortable, stop and return to
+              normal breathing.
+            </p>
+            <div class="grid gap-4 mt-6">
+              {sleepPages.map((p) => (
+                <a
+                  href={`/${p.slug}`}
+                  class="group flex flex-col justify-center rounded-2xl border border-white/10 bg-white/[0.02] p-6 hover:bg-white/[0.04] hover:border-white/30 transition-all duration-300"
+                >
+                  <div class="text-lg text-white font-medium mb-2 group-hover:text-white transition-colors">{p.h1}</div>
+                  <div class="text-sm text-white/60 font-light leading-relaxed">{p.description}</div>
+                </a>
+              ))}
             </div>
           </section>
-        )}
-      </>
-    )}
+        ) : (
+          <>
+            <section class="space-y-8">
+              <div class="space-y-3">
+                <div class="flex items-center gap-3">
+                  <div class="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center">
+                    <span class="text-white text-sm font-bold">1</span>
+                  </div>
+                  <h2 class="text-2xl font-semibold text-white tracking-tight">What it is</h2>
+                </div>
+                <p class="text-white/70 font-light leading-relaxed pl-11">{technique!.about.what}</p>
+              </div>
 
-    <section class="space-y-3 border-t border-white/10 pt-8">
-      <h2 class="text-xl font-semibold text-white">About ClearBreath</h2>
-      <p class="text-white/70">
-        ClearBreath is for wellness and relaxation purposes only. It is not
-        medical advice and does not diagnose, treat, cure, or prevent any
-        disease.
-      </p>
-    </section>
+              <div class="space-y-3">
+                <div class="flex items-center gap-3">
+                  <div class="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center">
+                    <span class="text-white text-sm font-bold">2</span>
+                  </div>
+                  <h2 class="text-2xl font-semibold text-white tracking-tight">How to do it</h2>
+                </div>
+                <p class="text-white/70 font-light leading-relaxed pl-11">{technique!.about.how}</p>
+              </div>
+
+              <div class="space-y-3">
+                <div class="flex items-center gap-3">
+                  <div class="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center">
+                    <span class="text-white text-sm font-bold">3</span>
+                  </div>
+                  <h2 class="text-2xl font-semibold text-white tracking-tight">Benefits</h2>
+                </div>
+                <p class="text-white/70 font-light leading-relaxed pl-11">{technique!.about.benefits}</p>
+              </div>
+            </section>
+          </>
+        )}
+      </div>
+
+      {/* SIDEBAR */}
+      <aside class="space-y-8">
+        {page.kind === 'technique' && (
+          <div class="rounded-3xl border border-white/10 bg-neutral-900/50 p-6 space-y-6">
+            <div>
+              <h3 class="text-xs font-semibold text-white/40 uppercase tracking-widest mb-2">Best Time</h3>
+              <p class="text-white/80 font-light text-sm leading-relaxed">{technique!.about.bestTime}</p>
+            </div>
+            
+            <div class="h-px w-full bg-white/10"></div>
+            
+            <div>
+              <h3 class="text-xs font-semibold text-white/40 uppercase tracking-widest mb-2">Warnings</h3>
+              <p class="text-white/80 font-light text-sm leading-relaxed">{technique!.about.warnings}</p>
+            </div>
+          </div>
+        )}
+
+        {page.kind === 'technique' && (technique!.safety.requiresAck || technique!.safety.body.trim()) && (
+          <div class="rounded-3xl border border-red-500/20 bg-red-500/5 p-6 relative overflow-hidden">
+            <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-red-500/50 to-transparent"></div>
+            <h3 class="text-sm font-semibold text-red-400 mb-3 flex items-center gap-2">
+              <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+              </svg>
+              {technique!.safety.title || 'Safety guidance'}
+            </h3>
+            <p class="text-white/70 font-light text-sm leading-relaxed">
+              {technique!.safety.body.trim() || 'Practice gently. Stop if you feel unwell.'}
+            </p>
+          </div>
+        )}
+        
+        <div class="rounded-3xl border border-white/5 bg-white/[0.02] p-6 text-sm text-white/50 font-light">
+          ClearBreath is for wellness and relaxation purposes only. It is not medical advice and does not diagnose, treat, cure, or prevent any disease.
+        </div>
+      </aside>
+    </div>
   </article>
 </Layout>

@@ -1,24 +1,64 @@
 ---
 const nav = [
-  { href: '/', label: 'Home' },
-  { href: '/privacy', label: 'Privacy' },
-  { href: '/terms', label: 'Terms' },
+  { href: '/#features', label: 'Features' },
+  { href: '/#techniques', label: 'Techniques' },
 ];
 ---
 
-<header class="border-b border-white/10">
-  <div class="mx-auto w-full max-w-3xl px-6 py-5 flex items-center justify-between">
-    <a href="/" class="text-white font-semibold tracking-wide">ClearBreath</a>
-    <nav class="flex items-center gap-6" aria-label="Primary navigation">
-      {nav.map((item) => (
-        <a
-          href={item.href}
-          class="text-sm text-white/75 hover:text-white transition-colors"
-        >
-          {item.label}
-        </a>
-      ))}
-    </nav>
+<header id="site-header" class="fixed top-6 inset-x-0 z-50 px-4 md:px-6 flex justify-center pointer-events-none">
+  <div id="header-container" class="w-full max-w-6xl px-4 sm:px-5 h-14 flex items-center justify-between transition-all duration-500 ease-out bg-neutral-950/60 backdrop-blur-xl border border-white/10 rounded-full shadow-2xl pointer-events-auto">
+    <a href="/" class="flex items-center gap-2 sm:gap-3 text-white group">
+      <img src="/images/only_logo.svg" alt="ClearBreath Logo" class="h-6 w-6 sm:h-7 sm:w-7 opacity-100 group-hover:scale-105 transition-transform duration-300" />
+      <span class="font-semibold tracking-wide text-base sm:text-lg">ClearBreath</span>
+    </a>
+    
+    <div class="flex items-center gap-4 sm:gap-8">
+      <nav class="hidden md:flex items-center gap-8" aria-label="Primary navigation">
+        {nav.map((item) => (
+          <a
+            href={item.href}
+            class="text-sm font-medium text-white/70 hover:text-white transition-colors"
+          >
+            {item.label}
+          </a>
+        ))}
+      </nav>
+      
+      <a 
+        href="/#download" 
+        class="inline-flex h-9 items-center justify-center rounded-full bg-white px-4 sm:px-5 text-sm font-bold text-black transition-transform hover:scale-105 active:scale-95 shadow-[0_0_15px_rgba(255,255,255,0.15)] whitespace-nowrap"
+      >
+        Get App
+      </a>
+    </div>
   </div>
 </header>
 
+<script>
+  function initHeaderScroll() {
+    const container = document.getElementById('header-container');
+    if (!container) return;
+
+    function handleScroll() {
+      if (window.scrollY > 20) {
+        // Scrolled state: shrink to match content width
+        container.classList.remove('max-w-6xl');
+        container.classList.add('max-w-4xl');
+        container.classList.remove('bg-neutral-950/60');
+        container.classList.add('bg-neutral-900/80');
+      } else {
+        // Top state: wider
+        container.classList.add('max-w-6xl');
+        container.classList.remove('max-w-4xl');
+        container.classList.add('bg-neutral-950/60');
+        container.classList.remove('bg-neutral-900/80');
+      }
+    }
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    handleScroll();
+  }
+
+  initHeaderScroll();
+  document.addEventListener('astro:page-load', initHeaderScroll);
+</script>

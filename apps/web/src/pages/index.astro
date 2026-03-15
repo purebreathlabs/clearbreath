@@ -6,64 +6,238 @@ import { seoPages } from '../lib/seo_pages';
 <Layout
   title="ClearBreath — Breathe with intention"
   description="Guest-first breathing exercises with guided pacing, streaks, and a complete pranayama library."
+  fullWidth={true}
 >
-  <section class="py-8">
-    <h1 class="text-5xl tracking-tight font-light text-white">Breathe with intention.</h1>
-    <p class="mt-4 text-lg text-white/70">
-      ClearBreath is a guest-first pranayama and breathing exercise app with guided pacing,
-      calming cues, and offline-first tracking.
-    </p>
+  <style>
+    .circle-animate {
+      animation: breathe 8s ease-in-out infinite;
+    }
+    .circle-glow {
+      box-shadow: 0 0 120px 40px rgba(255, 255, 255, 0.05);
+    }
+    
+    @keyframes breathe {
+      0%, 100% {
+        transform: scale(0.8);
+        opacity: 0.3;
+      }
+      50% {
+        transform: scale(1.1);
+        opacity: 0.8;
+      }
+    }
 
-    <div class="mt-8 flex flex-wrap gap-3">
-      <a
-        href="#download"
-        class="inline-flex items-center justify-center rounded-xl bg-white text-black px-5 py-3 text-sm font-semibold"
-      >
-        Get the app
-      </a>
-      <a
-        href="/privacy"
-        class="inline-flex items-center justify-center rounded-xl border border-white/15 text-white px-5 py-3 text-sm font-semibold hover:border-white/25"
-      >
-        Privacy
-      </a>
+    .fade-up {
+      animation: fadeUp 1s ease-out forwards;
+      opacity: 0;
+      transform: translateY(20px);
+    }
+
+    .delay-100 { animation-delay: 100ms; }
+    .delay-200 { animation-delay: 200ms; }
+    .delay-300 { animation-delay: 300ms; }
+    .delay-400 { animation-delay: 400ms; }
+    .delay-500 { animation-delay: 500ms; }
+
+    @keyframes fadeUp {
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
+    .noise-bg {
+      position: absolute;
+      inset: 0;
+      z-index: -1;
+      opacity: 0.03;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+      pointer-events: none;
+    }
+  </style>
+
+  {/* HERO SECTION */}
+  <section class="relative min-h-[90dvh] flex flex-col justify-center pt-32 pb-20 overflow-hidden">
+    <div class="noise-bg"></div>
+    
+    {/* Abstract Breathing Visual */}
+    <div class="absolute top-1/2 left-[80%] -translate-x-1/2 -translate-y-1/2 w-[300px] h-[300px] md:w-[600px] md:h-[600px] pointer-events-none opacity-30 z-0">
+      <div class="absolute inset-0 rounded-full border border-white/10 circle-animate" style="animation-delay: 0s;"></div>
+      <div class="absolute inset-8 rounded-full border border-white/20 circle-animate circle-glow" style="animation-delay: 2s;"></div>
+      <div class="absolute inset-16 rounded-full border border-white/30 circle-animate" style="animation-delay: 4s;"></div>
     </div>
-  </section>
 
-  <section class="py-8 border-t border-white/10">
-    <h2 class="text-xl font-semibold text-white">What you get</h2>
-    <ul class="mt-4 grid gap-3 text-white/70">
-      <li>9 techniques with clear, paced guidance (more planned)</li>
-      <li>Streaks and weekly minutes (week starts Monday)</li>
-      <li>Background playback and lock-screen controls</li>
-      <li>Guest mode by default, sign-in optional for leaderboard and cloud backup</li>
-    </ul>
-  </section>
+    <div class="relative z-10 w-full max-w-6xl mx-auto px-6 grid lg:grid-cols-2 gap-12 items-center">
+      <div class="flex flex-col items-start text-left">
+        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-white/10 bg-white/5 backdrop-blur-md mb-8 fade-up text-xs font-medium text-white/80 tracking-wide uppercase">
+          <span class="w-1.5 h-1.5 rounded-full bg-white animate-pulse"></span>
+          Now Available
+        </div>
+        
+        <h1 class="text-6xl md:text-8xl font-semibold tracking-tighter text-white leading-[1.1] fade-up delay-100 mb-6">
+          Breathe with <br />
+          <span class="text-transparent bg-clip-text bg-gradient-to-br from-white via-white to-white/40 italic font-light pr-4">intention.</span>
+        </h1>
+        
+        <p class="mt-2 text-lg md:text-2xl text-white/60 max-w-xl font-light fade-up delay-200 leading-relaxed">
+          A guest-first pranayama experience. Guided pacing, calming cues, and pure focus—no distractions.
+        </p>
 
-  <section class="py-8 border-t border-white/10">
-    <h2 class="text-xl font-semibold text-white">Technique pages</h2>
-    <p class="mt-2 text-white/70">
-      Learn the basics, get safe guidance, and use ClearBreath as your timer.
-    </p>
-    <div class="mt-4 grid gap-3">
-      {seoPages
-        .filter((p) => p.kind === 'technique')
-        .map((page) => (
+        <div class="mt-12 flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto fade-up delay-300">
           <a
-            href={`/${page.slug}`}
-            class="rounded-2xl border border-white/10 px-5 py-4 hover:border-white/20 transition-colors"
+            href="#download"
+            class="group relative inline-flex h-14 items-center justify-center gap-2 rounded-full bg-white px-8 text-base font-semibold text-black transition-all hover:scale-105 active:scale-95 w-full sm:w-auto overflow-hidden"
           >
-            <div class="text-white font-semibold">{page.h1}</div>
-            <div class="mt-1 text-sm text-white/65">{page.description}</div>
+            <span class="relative z-10">Get the App Free</span>
+            <div class="absolute inset-0 bg-neutral-200 opacity-0 group-hover:opacity-100 transition-opacity"></div>
           </a>
-        ))}
+          <a
+            href="#features"
+            class="inline-flex h-14 items-center justify-center rounded-full border border-white/15 px-8 text-base font-medium text-white transition-all hover:bg-white/5 hover:border-white/30 w-full sm:w-auto"
+          >
+            Explore Features
+          </a>
+        </div>
+      </div>
+      
+      <div class="relative fade-up delay-400 flex justify-center lg:justify-end">
+        <div class="absolute inset-0 bg-gradient-to-tr from-white/10 to-transparent rounded-[3rem] blur-3xl transform scale-90 -z-10"></div>
+        <img 
+          src="/images/addition.png" 
+          alt="ClearBreath App Preview" 
+          class="w-full max-w-[450px] object-contain drop-shadow-[0_0_40px_rgba(255,255,255,0.15)] transform hover:scale-[1.02] transition-transform duration-700 ease-out"
+        />
+      </div>
     </div>
   </section>
 
-  <section id="download" class="py-8 border-t border-white/10">
-    <h2 class="text-xl font-semibold text-white">Download</h2>
-    <p class="mt-2 text-white/70">
-      iOS and Android download links will be posted here once store listings are live.
-    </p>
+  {/* FEATURES OVERVIEW */}
+  <section id="features" class="py-24 md:py-32 relative border-t border-white/5">
+    <div class="max-w-6xl mx-auto px-6">
+      <div class="mb-16 md:mb-24">
+        <h2 class="text-3xl md:text-5xl font-semibold tracking-tight">Pure practice. <br/><span class="text-white/40">Zero friction.</span></h2>
+      </div>
+      
+      <div class="grid md:grid-cols-2 gap-6 md:gap-8">
+        <div class="group rounded-3xl border border-white/10 bg-neutral-900/50 p-8 md:p-12 hover:border-white/20 transition-colors">
+          <div class="w-12 h-12 rounded-2xl bg-white/10 flex items-center justify-center mb-8 group-hover:scale-110 transition-transform">
+            <svg class="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+          </div>
+          <h3 class="text-2xl font-semibold mb-3">Instant Sessions</h3>
+          <p class="text-white/60 leading-relaxed font-light">
+            Start a breathing session in under 10 seconds. No account required. The app gets out of your way so you can focus on your breath.
+          </p>
+        </div>
+
+        <div class="group rounded-3xl border border-white/10 bg-neutral-900/50 p-8 md:p-12 hover:border-white/20 transition-colors">
+          <div class="w-12 h-12 rounded-2xl bg-white/10 flex items-center justify-center mb-8 group-hover:scale-110 transition-transform">
+            <svg class="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M13 10V3L4 14h7v7l9-11h-7z" />
+            </svg>
+          </div>
+          <h3 class="text-2xl font-semibold mb-3">Streak & Motivation</h3>
+          <p class="text-white/60 leading-relaxed font-light">
+            Build a consistent habit. Only 2 minutes a day keeps your streak alive. Sync across devices securely when you're ready to create an account.
+          </p>
+        </div>
+
+        <div class="group rounded-3xl border border-white/10 bg-neutral-900/50 p-8 md:p-12 hover:border-white/20 transition-colors">
+          <div class="w-12 h-12 rounded-2xl bg-white/10 flex items-center justify-center mb-8 group-hover:scale-110 transition-transform">
+            <svg class="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3" />
+            </svg>
+          </div>
+          <h3 class="text-2xl font-semibold mb-3">Immersive Audio</h3>
+          <p class="text-white/60 leading-relaxed font-light">
+            Phase-specific soft chimes guide your inhale, hold, and exhale. Background playback ensures your session continues even when the phone is locked.
+          </p>
+        </div>
+
+        <div class="group rounded-3xl border border-white/10 bg-neutral-900/50 p-8 md:p-12 hover:border-white/20 transition-colors">
+          <div class="w-12 h-12 rounded-2xl bg-white/10 flex items-center justify-center mb-8 group-hover:scale-110 transition-transform">
+            <svg class="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+            </svg>
+          </div>
+          <h3 class="text-2xl font-semibold mb-3">Safe & Private</h3>
+          <p class="text-white/60 leading-relaxed font-light">
+            Clear contraindications for advanced techniques. Local-first stats mean your data is yours. Total privacy, no ads, no subscriptions.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  {/* PRANAYAMA LIBRARY (TECHNIQUES) */}
+  <section id="techniques" class="py-24 md:py-32 relative border-t border-white/5">
+    <div class="max-w-6xl mx-auto px-6">
+      <div class="flex flex-col md:flex-row md:items-end justify-between gap-8 mb-16">
+        <div class="max-w-xl">
+          <h2 class="text-3xl md:text-5xl font-semibold tracking-tight mb-4">The Library.</h2>
+          <p class="text-lg text-white/60 font-light">
+            9 carefully curated techniques to calm, energize, and balance your mind. 
+            Learn the basics and use ClearBreath as your guide.
+          </p>
+        </div>
+      </div>
+      
+      <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        {seoPages
+          .filter((p) => p.kind === 'technique')
+          .map((page, i) => (
+            <a
+              href={`/${page.slug}`}
+              class="group block p-6 rounded-2xl border border-white/10 bg-white/[0.02] hover:bg-white/[0.04] hover:border-white/30 transition-all duration-300 relative overflow-hidden"
+            >
+              <div class="flex flex-col h-full justify-between relative z-10">
+                <div>
+                  <h3 class="text-xl font-medium text-white mb-2 group-hover:text-white transition-colors">{page.h1}</h3>
+                  <p class="text-sm text-white/50 font-light line-clamp-3">{page.description}</p>
+                </div>
+                <div class="mt-8 flex items-center text-xs font-semibold text-white/40 group-hover:text-white/80 uppercase tracking-wider transition-colors">
+                  Learn more 
+                  <svg class="w-4 h-4 ml-2 -translate-x-2 opacity-0 group-hover:translate-x-0 group-hover:opacity-100 transition-all" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                  </svg>
+                </div>
+              </div>
+            </a>
+          ))}
+      </div>
+    </div>
+  </section>
+
+  {/* DOWNLOAD CTA SECTION */}
+  <section id="download" class="py-32 md:py-48 relative border-t border-white/5 overflow-hidden flex items-center justify-center">
+    <div class="absolute inset-0 bg-gradient-to-b from-transparent to-white/5 pointer-events-none"></div>
+    
+    <div class="relative z-10 max-w-4xl mx-auto px-6 text-center">
+      <img src="/images/only_logo.svg" alt="ClearBreath Icon" class="w-24 h-24 mx-auto mb-8 opacity-80" />
+      <h2 class="text-4xl md:text-7xl font-semibold tracking-tighter mb-6">Start your journey.</h2>
+      <p class="text-xl text-white/60 mb-12 max-w-xl mx-auto font-light">
+        Available soon on iOS and Android. Guest mode included, completely free of ads.
+      </p>
+      
+      <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
+        <button class="flex items-center justify-center w-full sm:w-[220px] h-16 rounded-2xl bg-white/10 border border-white/20 text-white/50 cursor-not-allowed font-medium text-lg backdrop-blur-sm transition-all relative">
+          <svg class="w-6 h-6 mr-3 opacity-60" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M16.365 21.444c-1.325.964-2.545 1.583-4.28 1.556-1.748.025-3.032-.619-4.35-1.58-1.503-1.07-5.074-5.263-5.074-11.455 0-4.323 2.186-6.615 4.544-6.666 1.621-.035 2.87 1.05 4.148 1.05 1.258 0 2.89-1.257 4.793-1.05 1.488.106 3.125.86 4.095 2.29-3.415 1.944-2.923 6.643.518 8.04-1.127 2.812-2.906 5.568-4.394 7.815zM15.426 4.966c-.734.912-2.146 1.543-3.141 1.442.224-1.37.892-2.704 1.83-3.528 1.051-1.026 2.378-1.553 3.394-1.442-.148 1.508-.854 2.658-2.083 3.528z"/>
+          </svg>
+          App Store
+          <span class="absolute -top-3 -right-3 text-[10px] font-bold bg-white text-black px-2 py-1 rounded-full uppercase tracking-wider">Soon</span>
+        </button>
+        
+        <button class="flex items-center justify-center w-full sm:w-[220px] h-16 rounded-2xl bg-white/10 border border-white/20 text-white/50 cursor-not-allowed font-medium text-lg backdrop-blur-sm transition-all mt-4 sm:mt-0 relative">
+          <svg class="w-6 h-6 mr-3 opacity-60" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M17.523 15.3414L14.7317 12.55L20.8986 6.38318C21.419 6.90357 21.7224 7.56845 21.7224 8.28318V16.6168C21.7224 17.3316 21.419 17.9964 20.8986 18.5168L17.523 15.3414ZM16.4623 14.2807L13.6709 11.4893L10.3709 8.18933L3.10237 15.4579C3.62276 15.9783 4.28764 16.2817 5.00237 16.2817H16.4623C16.4623 15.567 16.1589 14.9021 15.6385 14.3817L16.4623 14.2807ZM14.2807 16.4623L11.4893 13.6709L8.18933 10.3709L15.4579 3.10237C15.9783 3.62276 16.2817 4.28764 16.2817 5.00237V16.4623C15.567 16.4623 14.9021 16.1589 14.3817 15.6385L14.2807 16.4623ZM13.6709 11.4893L16.4623 14.2807C16.9827 13.7603 17.2861 13.0954 17.2861 12.3807V5.00237C17.2861 4.28764 16.9827 3.62276 16.4623 3.10237L13.6709 11.4893Z" fill-rule="evenodd" clip-rule="evenodd" />
+            <path d="M3.56711 5.37255L10.5186 12.324L12.324 10.5186L5.37255 3.56711C4.16104 4.02047 3.25055 5.08331 2.97341 6.38604L3.56711 5.37255ZM4.94528 17.9626L11.8967 11.0111L13.7021 12.8165L6.75069 19.7679C5.53918 19.3146 4.62869 18.2517 4.35155 16.949L4.94528 17.9626ZM20.4329 18.6275L13.4814 11.676L11.676 13.4814L18.6275 20.4329C19.839 19.9795 20.7495 18.9167 21.0266 17.614L20.4329 18.6275ZM19.0547 6.03744L12.1033 12.9889L10.2979 11.1835L17.2493 4.23208C18.4608 4.68545 19.3713 5.74829 19.6485 7.05102L19.0547 6.03744Z" />
+          </svg>
+          Google Play
+          <span class="absolute -top-3 -right-3 text-[10px] font-bold bg-white text-black px-2 py-1 rounded-full uppercase tracking-wider">Soon</span>
+        </button>
+      </div>
+    </div>
   </section>
 </Layout>

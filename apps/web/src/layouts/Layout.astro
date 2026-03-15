@@ -6,9 +6,10 @@ import SiteFooter from '../components/SiteFooter.astro';
 interface Props {
   title: string;
   description?: string;
+  fullWidth?: boolean;
 }
 
-const { title, description } = Astro.props;
+const { title, description, fullWidth = false } = Astro.props;
 const pageDescription =
   description ?? 'Breathe with intention. Pranayama and breathing exercises.';
 const canonical = new URL(Astro.url.pathname, Astro.site);
@@ -34,11 +35,11 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
     />
     <title>{title}</title>
   </head>
-  <body class="min-h-dvh bg-black text-white">
-    <div class="min-h-dvh flex flex-col">
+  <body class="min-h-dvh bg-black text-white antialiased selection:bg-white selection:text-black">
+    <div class="min-h-dvh flex flex-col relative">
       <SiteHeader />
-      <main class="flex-1">
-        <div class="mx-auto w-full max-w-3xl px-6 py-12">
+      <main class="flex-1 w-full">
+        <div class={fullWidth ? "w-full overflow-hidden" : "mx-auto w-full max-w-4xl px-6 pt-32 pb-24 overflow-hidden"}>
           <slot />
         </div>
       </main>
