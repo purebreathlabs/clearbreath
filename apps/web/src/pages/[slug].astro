@@ -1,6 +1,6 @@
 ---
 import { readFile } from 'node:fs/promises';
-import { fileURLToPath } from 'node:url';
+import { resolve } from 'node:path';
 
 import Layout from '../layouts/Layout.astro';
 import { seoPages, type SeoPage } from '../lib/seo_pages';
@@ -23,8 +23,9 @@ type MobileTechnique = {
   };
 };
 
-const techniquesPath = fileURLToPath(
-  new URL('../../../mobile/assets/techniques/techniques_v1.json', import.meta.url),
+const techniquesPath = resolve(
+  process.cwd(),
+  '../mobile/assets/techniques/techniques_v1.json',
 );
 const techniques = JSON.parse(
   await readFile(techniquesPath, 'utf8'),
