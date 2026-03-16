@@ -251,8 +251,8 @@ class SettingsScreen extends ConsumerWidget {
                     subtitle: packageInfo.when(
                       data: (info) =>
                           Text('${info.version}+${info.buildNumber}'),
-                      loading: () => const Text('—'),
-                      error: (error, stackTrace) => const Text('—'),
+                      loading: () => const Text('-'),
+                      error: (error, stackTrace) => const Text('-'),
                     ),
                   ),
                   divider(),

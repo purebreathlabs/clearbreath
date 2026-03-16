@@ -195,7 +195,7 @@ class _LeaderboardSignedInScreen extends ConsumerWidget {
 
 String _updatedLabel(DateTime? fetchedAtUtc) {
   if (fetchedAtUtc == null) {
-    return '—';
+    return '-';
   }
   final diff = DateTime.now().toUtc().difference(fetchedAtUtc.toUtc());
   if (diff.inMinutes < 1) {

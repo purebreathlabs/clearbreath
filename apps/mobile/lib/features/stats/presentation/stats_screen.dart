@@ -25,7 +25,7 @@ class StatsScreen extends ConsumerWidget {
       data: (snapshot) {
         final id = snapshot.favoriteTechniqueId;
         if (id == null) {
-          return '—';
+          return '-';
         }
         final list = techniques.asData?.value;
         if (list == null) {
@@ -33,8 +33,8 @@ class StatsScreen extends ConsumerWidget {
         }
         return _findTechniqueName(list, id) ?? _titleCaseId(id);
       },
-      loading: () => '—',
-      error: (error, stackTrace) => '—',
+      loading: () => '-',
+      error: (error, stackTrace) => '-',
     );
 
     return Scaffold(

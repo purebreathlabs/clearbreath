@@ -83,13 +83,13 @@ class _BreathingCircleState extends State<BreathingCircle>
     }
 
     if (phaseChanged) {
-      // Phase changed — snap to new start, then animate to 1.0
+      // Phase changed - snap to new start, then animate to 1.0
       _arc.value = widget.progress;
       _animateToEnd();
       return;
     }
 
-    // Same phase — check for drift
+    // Same phase - check for drift
     if (!_arc.isAnimating) {
       // Controller stopped (e.g. after resume), restart
       _arc.value = widget.progress;

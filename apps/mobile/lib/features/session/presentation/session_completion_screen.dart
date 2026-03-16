@@ -129,8 +129,8 @@ class _SessionCompletionScreenState
         : max(0, (current.durationSecondsActual / 60).round());
     final streakValue = stats.when(
       data: (snapshot) => snapshot.currentStreakDays.toString(),
-      loading: () => '—',
-      error: (error, stackTrace) => '—',
+      loading: () => '-',
+      error: (error, stackTrace) => '-',
     );
     final streakMessage = stats.when(
       data: (snapshot) => _streakMessage(snapshot),
@@ -194,7 +194,7 @@ class _SessionCompletionScreenState
                                 child: _MetricTile(
                                   key: const Key('completion_minutes_tile'),
                                   label: 'Minutes',
-                                  value: minutes == null ? '—' : '$minutes',
+                                  value: minutes == null ? '-' : '$minutes',
                                 ),
                               ),
                               SizedBox(
@@ -203,7 +203,7 @@ class _SessionCompletionScreenState
                                   key: const Key('completion_breaths_tile'),
                                   label: 'Breaths',
                                   value: current == null
-                                      ? '—'
+                                      ? '-'
                                       : '${current.breathsCompletedEstimated}',
                                 ),
                               ),
@@ -323,7 +323,7 @@ class _SessionCompletionScreenState
   }
 
   String _xpEarnedLabel(List<XPAward> awards) {
-    if (awards.isEmpty) return '—';
+    if (awards.isEmpty) return '-';
     var total = 0;
     for (final award in awards) {
       total += award.amount;
@@ -334,7 +334,7 @@ class _SessionCompletionScreenState
   String _streakMessage(StatsSnapshot snapshot) {
     final days = snapshot.currentStreakDays;
     if (days <= 0) {
-      return 'Keep going — 2 min to start today’s streak.';
+      return 'Keep going - 2 min to start today’s streak.';
     }
     if (days == 1) {
       return 'Streak started!';
