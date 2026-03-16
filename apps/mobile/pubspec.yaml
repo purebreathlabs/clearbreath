@@ -18,7 +18,7 @@ dependencies:
   just_audio: ^0.10.5
   path: ^1.9.1
   path_provider: ^2.1.5
-  sqlite3_flutter_libs: ">=0.5.0 <0.6.0"
+  sqlite3_flutter_libs: ^0.6.0+eol
   vibration: ^3.1.7
   wakelock_plus: ^1.4.0
   uuid: ^4.5.3
@@ -32,20 +32,20 @@ dependencies:
   sign_in_with_apple: ^7.0.1
   google_sign_in: ^7.2.0
   device_info_plus: ^12.3.0
-  flutter_local_notifications: ^20.1.0
-  timezone: ^0.10.1
+  flutter_local_notifications: ^21.0.0
+  timezone: ^0.11.0
   flutter_timezone: ^5.0.1
   share_plus: ^12.0.1
   shared_preferences: ^2.5.3
-  firebase_core: ^3.12.1
-  firebase_messaging: ^15.2.4
+  firebase_core: ^4.5.0
+  firebase_messaging: ^16.1.2
   connectivity_plus: ^7.0.0
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^6.0.0
-  flutter_launcher_icons: ^0.13.1
+  flutter_launcher_icons: ^0.14.4
   drift_dev: ^2.31.0
   build_runner: ^2.11.1
   sqlite3: ^2.9.4
