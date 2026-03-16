@@ -61,9 +61,14 @@ jobs:
 
       - name: Generate release notes
         if: startsWith(github.ref, 'refs/tags/v')
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
-          CLIFF_VERSION=$(curl -s https://api.github.com/repos/orhun/git-cliff/releases/latest | grep '"tag_name"' | cut -d'"' -f4)
-          curl -sL "https://github.com/orhun/git-cliff/releases/download/${CLIFF_VERSION}/git-cliff-x86_64-unknown-linux-musl.tar.gz" -o cliff.tar.gz
+          CLIFF_VERSION=$(gh api repos/orhun/git-cliff/releases/latest --jq '.tag_name')
+          gh release download "$CLIFF_VERSION" \
+            --repo orhun/git-cliff \
+            --pattern 'git-cliff-x86_64-unknown-linux-musl.tar.gz' \
+            --output cliff.tar.gz
           tar xzf cliff.tar.gz
           CLIFF_BIN=$(find . -name 'git-cliff' -type f | head -1)
           chmod +x "$CLIFF_BIN"
