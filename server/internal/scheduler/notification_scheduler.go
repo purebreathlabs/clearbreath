@@ -48,8 +48,14 @@ func (s *NotificationScheduler) tick(ctx context.Context) {
 
 	// Redis lock: prevent multiple server instances from double-sending
 	lockKey := "notif:dispatch:" + minuteKey
-	acquired, err := s.rdb.SetNX(ctx, lockKey, "1", 2*time.Minute).Result()
-	if err != nil || !acquired {
+	status, err := s.rdb.SetArgs(ctx, lockKey, "1", redis.SetArgs{
+		Mode: "NX",
+		TTL:  2 * time.Minute,
+	}).Result()
+	if err == redis.Nil || status != "OK" {
+		return
+	}
+	if err != nil {
 		return
 	}
 
