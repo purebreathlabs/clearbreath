@@ -67,7 +67,7 @@ jobs:
           CLIFF_VERSION=$(gh api repos/orhun/git-cliff/releases/latest --jq '.tag_name')
           gh release download "$CLIFF_VERSION" \
             --repo orhun/git-cliff \
-            --pattern 'git-cliff-x86_64-unknown-linux-musl.tar.gz' \
+            --pattern 'git-cliff-*-x86_64-unknown-linux-musl.tar.gz' \
             --output cliff.tar.gz
           tar xzf cliff.tar.gz
           CLIFF_BIN=$(find . -name 'git-cliff' -type f | head -1)
