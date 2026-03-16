@@ -61,7 +61,7 @@ jobs:
 
       - name: Generate release notes
         if: startsWith(github.ref, 'refs/tags/v')
-        uses: orhun/git-cliff-action@v3
+        uses: orhun/git-cliff-action@v4
         with:
           config: cliff.toml
           args: --current --strip header
