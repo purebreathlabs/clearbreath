@@ -18,7 +18,7 @@ dependencies:
   just_audio: ^0.10.5
   path: ^1.9.1
   path_provider: ^2.1.5
-  sqlite3_flutter_libs: ">=0.5.0 <0.6.0"
+  sqlite3_flutter_libs: ^0.6.0+eol
   vibration: ^3.1.7
   wakelock_plus: ^1.4.0
   uuid: ^4.5.3
