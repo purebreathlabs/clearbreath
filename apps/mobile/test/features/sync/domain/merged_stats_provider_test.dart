@@ -99,7 +99,13 @@ void main() {
       });
 
       final sessions = container.read(sessionRepositoryProvider);
-      final now = DateTime.now().toUtc();
+      final localNow = DateTime.now();
+      final now = DateTime(
+        localNow.year,
+        localNow.month,
+        localNow.day,
+        12,
+      ).toUtc();
       await sessions.insert(
         LocalSession(
           clientSessionId: 's1',
@@ -107,7 +113,7 @@ void main() {
           presetId: 'beginner',
           startedAtUtc: now.subtract(const Duration(minutes: 10)),
           endedAtUtc: now.subtract(const Duration(minutes: 5)),
-          timezoneOffsetMinutes: DateTime.now().timeZoneOffset.inMinutes,
+          timezoneOffsetMinutes: localNow.timeZoneOffset.inMinutes,
           durationSecondsActual: 300,
           breathsCompletedEstimated: 42,
           endedEarly: false,
