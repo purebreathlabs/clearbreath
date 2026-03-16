@@ -14,6 +14,30 @@
       },
       "oauth_client": [
         {
+          "client_id": "884656805579-6r8ok5ehr1689n8ilrtnm1irmks1f9l5.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "life.clearbreath.clearbreath",
+            "certificate_hash": "26d59958601d7e0baf0fa707d1d911731c6a954d"
+          }
+        },
+        {
+          "client_id": "884656805579-frpshahbr2hf92c187quctgbdadl5bgb.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "life.clearbreath.clearbreath",
+            "certificate_hash": "2b60c89312dbcd60e275d8cbefd872c243769c67"
+          }
+        },
+        {
+          "client_id": "884656805579-d246uemq96mrn466l2uml85cer23vca9.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "life.clearbreath.clearbreath",
+            "certificate_hash": "90da66468674c290ae7dcfc8e367e3c79b9a59d6"
+          }
+        },
+        {
           "client_id": "884656805579-ptcbmv99ha49rcfm7lelagp5e0ooeepm.apps.googleusercontent.com",
           "client_type": 3
         }
