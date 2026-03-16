@@ -22,7 +22,7 @@ class LeaderboardRowWidget extends StatelessWidget {
     final components = Theme.of(context).extension<AppComponentTokens>()!;
 
     final metric = '${entry.totalXp} XP';
-    final rankText = entry.rank?.toString() ?? '—';
+    final rankText = entry.rank?.toString() ?? '-';
 
     return Container(
       padding: EdgeInsets.symmetric(

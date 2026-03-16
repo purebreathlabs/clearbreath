@@ -175,7 +175,7 @@ func TestNotificationInstallationRoundTrip(t *testing.T) {
 		t.Fatal("expected streak_warning_enabled = false after update")
 	}
 
-	// 5. Unbind (sign-out) — keeps record but nulls user_id
+	// 5. Unbind (sign-out) - keeps record but nulls user_id
 	if err := notifSvc.UnbindFromUser(ctx, "test-device-001", userID); err != nil {
 		t.Fatalf("unbind: %v", err)
 	}

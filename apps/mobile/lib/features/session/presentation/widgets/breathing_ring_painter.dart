@@ -22,7 +22,7 @@ class BreathingRingPainter extends CustomPainter {
     final center = Offset(size.width / 2, size.height / 2);
     final radius = (min(size.width, size.height) / 2) - strokeWidth;
 
-    // 1. Inner radial glow — deeper ambient fill
+    // 1. Inner radial glow - deeper ambient fill
     final glowRadius = radius * 0.92;
     final glowOpacity = (0.06 + 0.16 * glowIntensity).clamp(0.0, 1.0);
     final glowPaint = Paint()

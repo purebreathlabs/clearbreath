@@ -2,7 +2,7 @@
   {
     "id": "box",
     "name": "Box",
-    "shortDescription": "Equal inhale, hold, exhale — repeat.",
+    "shortDescription": "Equal inhale, hold, exhale - repeat.",
     "goals": ["focus", "calm"],
     "animationMode": "circle",
     "safety": { "requiresAck": false, "title": "", "body": "" },

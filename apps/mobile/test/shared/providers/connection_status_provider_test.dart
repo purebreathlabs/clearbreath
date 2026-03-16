@@ -120,7 +120,7 @@ void main() {
     connectivityController.add(false);
     await Future<void>.delayed(const Duration(milliseconds: 100));
 
-    // Then go online — should trigger server check
+    // Then go online - should trigger server check
     connectivityController.add(true);
     await gotOnline.future.timeout(const Duration(seconds: 2));
 

@@ -101,7 +101,7 @@ class _MetronomePulseState extends State<MetronomePulse>
                 SizedBox(height: spacing.md),
               ],
 
-              // The ring — pulses during active round
+              // The ring - pulses during active round
               AnimatedBuilder(
                 animation: _controller,
                 builder: (context, child) {

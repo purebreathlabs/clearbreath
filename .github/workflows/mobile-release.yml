@@ -61,13 +61,18 @@ jobs:
 
       - name: Generate release notes
         if: startsWith(github.ref, 'refs/tags/v')
-        uses: orhun/git-cliff-action@v3
-        with:
-          config: cliff.toml
-          args: --current --strip header
         env:
-          OUTPUT: RELEASE_NOTES.md
-          GITHUB_REPO: ${{ github.repository }}
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          CLIFF_VERSION=$(gh api repos/orhun/git-cliff/releases/latest --jq '.tag_name')
+          gh release download "$CLIFF_VERSION" \
+            --repo orhun/git-cliff \
+            --pattern 'git-cliff-*-x86_64-unknown-linux-musl.tar.gz' \
+            --output cliff.tar.gz
+          tar xzf cliff.tar.gz
+          CLIFF_BIN=$(find . -name 'git-cliff' -type f | head -1)
+          chmod +x "$CLIFF_BIN"
+          "$CLIFF_BIN" --config cliff.toml --current --strip header -o RELEASE_NOTES.md
 
       - name: Create GitHub release
         if: startsWith(github.ref, 'refs/tags/v')
