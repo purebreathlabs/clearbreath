@@ -63,9 +63,11 @@ jobs:
         if: startsWith(github.ref, 'refs/tags/v')
         run: |
           CLIFF_VERSION=$(curl -s https://api.github.com/repos/orhun/git-cliff/releases/latest | grep '"tag_name"' | cut -d'"' -f4)
-          curl -sL "https://github.com/orhun/git-cliff/releases/download/${CLIFF_VERSION}/git-cliff-x86_64-unknown-linux-musl.tar.gz" \
-            | tar xz git-cliff
-          ./git-cliff --config cliff.toml --current --strip header -o RELEASE_NOTES.md
+          curl -sL "https://github.com/orhun/git-cliff/releases/download/${CLIFF_VERSION}/git-cliff-x86_64-unknown-linux-musl.tar.gz" -o cliff.tar.gz
+          tar xzf cliff.tar.gz
+          CLIFF_BIN=$(find . -name 'git-cliff' -type f | head -1)
+          chmod +x "$CLIFF_BIN"
+          "$CLIFF_BIN" --config cliff.toml --current --strip header -o RELEASE_NOTES.md
 
       - name: Create GitHub release
         if: startsWith(github.ref, 'refs/tags/v')
